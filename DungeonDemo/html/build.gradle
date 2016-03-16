@@ -7,15 +7,14 @@ gwt {
     minHeapSize="1G"
 
     src = files(file("src/")) // Needs to be in front of "modules" below.
-    modules 'com.squidpony.basic.GdxDefinition'
-    devModules 'com.squidpony.basic.GdxDefinitionSuperdev'
+    modules 'squidpony.demo.dungeon.GdxDefinition'
+    devModules 'squidpony.demo.dungeon.GdxDefinitionSuperdev'
     project.webAppDirName = 'webapp'
-    
+
     compiler {
         strict = true;
         enableClosureCompiler = true;
         disableCastChecking = true;
-        style = 'DETAILED';
     }
 }
 
