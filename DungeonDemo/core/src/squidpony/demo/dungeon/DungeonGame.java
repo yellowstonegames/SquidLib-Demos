@@ -65,7 +65,7 @@ public class DungeonGame extends ApplicationAdapter {
     private int cellWidth;
     /** The pixel height of a cell */
     private int cellHeight;
-    private SquidInput input;
+    private VisualInput input;
     private Color bgColor;
     private Stage stage;
     private DijkstraMap playerToCursor;
@@ -76,7 +76,7 @@ public class DungeonGame extends ApplicationAdapter {
     private float secondsWithoutMoves;
     private String[] lang = new String[12];
     private int langIndex = 0;
-    private int INTERNAL_ZOOM = 2;
+    private int INTERNAL_ZOOM = 1;
     private double counter = 0;
     LinkedHashMap<Character, Double> costs;
     @Override
@@ -99,11 +99,11 @@ public class DungeonGame extends ApplicationAdapter {
         //of an individual cell. The font will look more crisp if the cell dimensions match the config multipliers
         //exactly, and the stretchable fonts (technically, distance field fonts) can resize to non-square sizes and
         //still retain most of that crispness.
-        gridWidth = 100;
-        gridHeight = 40;
+        gridWidth = 50;
+        gridHeight = 20;
 
-        cellWidth = 13 * INTERNAL_ZOOM;
-        cellHeight = 20 * INTERNAL_ZOOM;
+        cellWidth = 26 * INTERNAL_ZOOM;
+        cellHeight = 40 * INTERNAL_ZOOM;
         // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
         rng = new RNG("SquidLib!");
 
@@ -179,7 +179,7 @@ public class DungeonGame extends ApplicationAdapter {
         // You can also set up a series of future moves by clicking within FOV range, using mouseMoved to determine the
         // path to the mouse position with a DijkstraMap (called playerToCursor), and using touchUp to actually trigger
         // the event when someone clicks.
-        input = new SquidInput(new SquidInput.KeyHandler() {
+        input = new VisualInput(new SquidInput.KeyHandler() {
             @Override
             public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
                 switch (key)
@@ -280,14 +280,16 @@ public class DungeonGame extends ApplicationAdapter {
                 return false;
             }
         }));
+        input.eightWay = false;
+        input.init("Rebuild", "Quit");
+
         //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, input));
         //You might be able to get by with the next line instead of the above line, but the former is preferred.
         //Gdx.input.setInputProcessor(input);
         // and then add display, our one visual component, to the list of things that act in Stage.
         stage.addActor(display);
-
-
+        input.resizeInnerStage(stage);
     }
 
     private void rebuild()
@@ -483,7 +485,10 @@ public class DungeonGame extends ApplicationAdapter {
             secondsWithoutMoves = 0;
         }
 
+        input.show();
+
         // stage has its own batch and must be explicitly told to draw().
+        stage.getViewport().apply(true);
         stage.draw();
         stage.act();
     }
@@ -492,6 +497,10 @@ public class DungeonGame extends ApplicationAdapter {
 	public void resize(int width, int height) {
 		super.resize(width, height);
         //very important to have the mouse behave correctly if the user fullscreens or resizes the game!
-		input.getMouse().reinitialize((float) width / this.gridWidth, (float)height / (this.gridHeight), this.gridWidth, this.gridHeight, 0, 0);
-	}
+		input.reinitialize((float) width / this.gridWidth, (float)height / (this.gridHeight),
+                this.gridWidth, this.gridHeight, 0, 0, width, height);
+        input.update(width, height, true);
+        stage.getViewport().update(width, height, true);
+
+    }
 }
