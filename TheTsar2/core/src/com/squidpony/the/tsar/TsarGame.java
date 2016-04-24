@@ -131,13 +131,16 @@ public class TsarGame extends ApplicationAdapter {
         width = 120;
         height = 35;
         cellWidth = 8;
-        cellHeight = 18;
+        cellHeight = 17;
         // the font will try to load Inconsolata-LGC as a bitmap font from resources.
         // this font is covered under the SIL Open Font License (fully free), so there's no reason it can't be used.
-        display = new SquidLayers(width, height, cellWidth, cellHeight, DefaultResources.smoothName, bgCenter, fgCenter);
+        display = new SquidLayers(width, height, cellWidth, cellHeight, DefaultResources.getStretchableFont(), bgCenter, fgCenter);
+        display.setTextSize(cellWidth, cellHeight + 1);
         display.setAnimationDuration(0.03f);
-        messages = new SquidMessageBox(width, 5, new TextCellFactory().font(DefaultResources.smoothName)
+        messages = new SquidMessageBox(width, 5, DefaultResources.getStretchableFont()
                 .width(cellWidth).height(cellHeight).initBySize());
+        messages.setTextSize(cellWidth, cellHeight + 1);
+
         stage = new Stage(new ScreenViewport(), batch);
 
         //These need to have their positions set before adding any entities if there is an offset involved.

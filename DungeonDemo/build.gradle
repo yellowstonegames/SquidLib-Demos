@@ -10,10 +10,10 @@ buildscript {
     }
 }
 
-configurations.all {
-    // Check for updates every build
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
+//configurations.all {
+//    // Check for updates every build
+//    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+//}
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
@@ -21,7 +21,8 @@ allprojects {
     version = '1.0'
     ext {
         appName = "DungeonDemo"
-        squidlibVersion = '-SNAPSHOT'
+        //squidlibVersion = '-SNAPSHOT'
+        squidlibVersion = 'a8b2b675ed'
         gdxVersion = '1.9.2'
         roboVMVersion = '1.12.0'
         box2DLightsVersion = '1.4'
@@ -35,10 +36,6 @@ allprojects {
         maven { url "https://jitpack.io" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    }
-    configurations.all {
-        // Check for updates every build
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
     }
 }
 
@@ -79,8 +76,8 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
         //compile "com.squidpony:squidlib:3.0.0-SNAPSHOT:sources"
         //compile "com.squidpony:squidlib-util:3.0.0-SNAPSHOT:sources"
-        compile("com.github.SquidPony.SquidLib:squidlib:-SNAPSHOT:sources"){changing = true}
-        compile("com.github.SquidPony.SquidLib:squidlib-util:-SNAPSHOT:sources"){changing = true}
+        compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion:sources")         //{changing = true}
+        compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion:sources")   //{changing = true}
         compile "com.github.tommyettinger:RegExodus:v0.1.1:sources"
     }
 }
@@ -92,8 +89,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         //compile "com.squidpony:squidlib:3.0.0-SNAPSHOT"
         //compile "com.squidpony:squidlib-util:3.0.0-SNAPSHOT"
-        compile("com.github.SquidPony.SquidLib:squidlib:-SNAPSHOT"){changing = true}
-        compile("com.github.SquidPony.SquidLib:squidlib-util:-SNAPSHOT"){changing = true}
+        compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion")   //{changing = true}
+        compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion")   //{changing = true}
         compile "com.github.tommyettinger:RegExodus:v0.1.1"
 
     }
