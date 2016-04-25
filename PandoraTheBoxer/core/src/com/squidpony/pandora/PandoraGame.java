@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import squidpony.FakeLanguageGen;
 import squidpony.panel.IColoredString;
+import squidpony.panel.ICombinedPanel;
 import squidpony.squidai.DijkstraMap;
 import squidpony.squidgrid.Direction;
 import squidpony.squidgrid.FOV;
@@ -105,7 +106,7 @@ public class PandoraGame extends ApplicationAdapter {
         //These need to have their positions set before adding any entities if there is an offset involved.
         messages.setPosition(0, 0);
         display.setPosition(0, messages.getHeight());
-        messages.appendMessage("Pandora opened The Box of All Evil… so she could beat All Evil up.");
+        messages.appendMessage(        "Pandora opened The Box of All Evil... to beat up All Evil.");
         messages.appendWrappingMessage("Use numpad or vi-keys to move, bump=attack. ? for help, q to quit.");
         counter = 0;
 
@@ -496,7 +497,7 @@ public class PandoraGame extends ApplicationAdapter {
         gcp.setPosition((width - (w / 2)) * cellWidth, (height / 2) * cellHeight);
 
 		/* Fill the background with some grey */
-        gcp.fillBG(new Color(0.3f, 0.3f, 0.3f, 0.9f));
+        gcp.fill(ICombinedPanel.What.BG, new Color(0.3f, 0.3f, 0.3f, 0.9f));
 
 		/* Now, to set the text we have to follow SquidPanel's convention */
 		/* First 0: align left, second 0: first line */
