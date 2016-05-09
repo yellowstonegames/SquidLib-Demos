@@ -122,7 +122,7 @@ public class DungeonGame extends ApplicationAdapter {
         // a TextCellFactory. Either way, it will use what is given to make its TextCellFactory, and that handles the
         // layout of text in a cell, among other things. DefaultResources stores pre-configured BitmapFont objects but
         // also some TextCellFactory objects for distance field fonts; either one can be passed to this constructor.
-        // the font will try to load Inconsolata-LGC-Square as a bitmap font with a distance field effect.
+        // the font will try to load Inconsolata-LGC-Custom as a bitmap font with a distance field effect.
         display = new SquidLayers(gridWidth, gridHeight, cellWidth, cellHeight, tcf);
         // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
