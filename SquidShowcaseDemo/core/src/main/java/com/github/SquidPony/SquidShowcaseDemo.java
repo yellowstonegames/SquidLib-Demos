@@ -96,12 +96,13 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
     public static final int INTERNAL_ZOOM = 1;
     private Viewport viewport;
     private float currentZoomX = INTERNAL_ZOOM, currentZoomY = INTERNAL_ZOOM;
+    TextureAtlas atlas;
+    TextureAtlas.AtlasRegion region;
     @Override
     public void create () {
         // gotta have a random number generator. Here the RNG is unseeded, which means a different dungeon every time,
         // among many other changes.
         rng = new RNG();
-        TextureAtlas atlas = new TextureAtlas("icons.atlas");
 
         // seeds can be given easily to RNG's constructor. If you want to request the current state from a random number
         // generator or change the state in the middle of usage, you need to use a StatefulRNG (or EditRNG) instead of a
@@ -230,6 +231,11 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
         mix.putRoundRoomCarvers(2);
         char[][] mg = mix.generate();
         decoDungeon = dungeonGen.generate(mg);
+        // DefaultResources has not only default fonts but now also default icons.
+        // These need the actual assets to be downloaded as part of the zip or tar.gz
+        // archive of assets, or separately fetched from GitHub in the assets/ folder.
+        atlas = DefaultResources.getIconAtlas();
+        region = atlas.findRegion("haunting");
 
         // change the TilesetType to lots of different choices to see what dungeon works best.
         //bareDungeon = dungeonGen.generate(TilesetType.DEFAULT_DUNGEON);
@@ -240,7 +246,6 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
         Coord pl = dungeonGen.utility.randomCell(placement);
         placement = CoordPacker.removePacked(placement, pl.x, pl.y);
         int numMonsters = 60;
-        TextureAtlas.AtlasRegion region = atlas.findRegion("haunting");
         monsters = new SpatialMap<Integer, Monster>(numMonsters);
         for(int i = 0; i < numMonsters; i++)
         {
@@ -443,6 +448,19 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
         stage.addActor(messages);
         viewport = input.resizeInnerStage(stage);
     }
+
+    @Override
+    public void resume() {
+        super.resume();
+        atlas = DefaultResources.getIconAtlas();
+        region = atlas.findRegion("haunting");
+        for(Monster mon : monsters)
+        {
+            mon.entity = display.animateActor(mon.entity.gridX, mon.entity.gridY,
+                    region, fgCenter.filter(display.getPalette().get(11)), true);
+        }
+    }
+
     /**
      * Move the player or open closed doors, remove any monsters the player bumped, then update the DijkstraMap and
      * have the monsters that can see the player try to approach.
