@@ -669,7 +669,7 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
         boolean overlapping;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                overlapping = (!monsters.isEmpty() && monsters.containsPosition(Coord.get(i,j))) || (!monsters.isEmpty() && player.gridX == i*2 && player.gridY == j);
+                overlapping = (!monsters.isEmpty() && monsters.containsPosition(Coord.get(i,j))) || (!monsters.isEmpty() && player.gridX == i && player.gridY == j);
                 // if we see it now, we remember the cell and show a lit cell based on the fovmap value (between 0.0
                 // and 1.0), with 1.0 being almost pure white at +215 lightness and 0.0 being rather dark at -105.
                 if (fovmap[i][j] > 0.0) {
@@ -802,7 +802,7 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
                 if (fovmap[mon.entity.gridX][mon.entity.gridY] > 0.0) {
                     display.drawActor(batch, 1.0f, mon.entity);
                     if(mon.state > 0)
-                        subCell.put(mon.entity.gridX * 2, mon.entity.gridY, '!', SColor.DARK_RED);
+                        subCell.put(mon.entity.gridX * 2, mon.entity.gridY, '!', SColor.YELLOW);
                 }
             }
             subCell.draw(batch, 1.0F);
