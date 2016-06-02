@@ -21,9 +21,7 @@ import squidpony.squidgrid.FOV;
 import squidpony.squidgrid.Radius;
 import squidpony.squidgrid.SpatialMap;
 import squidpony.squidgrid.gui.gdx.*;
-import squidpony.squidgrid.mapping.DungeonGenerator;
-import squidpony.squidgrid.mapping.DungeonUtility;
-import squidpony.squidgrid.mapping.MixedGenerator;
+import squidpony.squidgrid.mapping.*;
 import squidpony.squidmath.Coord;
 import squidpony.squidmath.CoordPacker;
 import squidpony.squidmath.RNG;
@@ -59,7 +57,7 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
     private SquidMessageBox messages;
     /** Non-{@code null} iff '?' was pressed before */
     private /*Nullable*/ Actor help;
-    private DungeonGenerator dungeonGen;
+    private SectionDungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
     private double[][] res;
     private int[][] lights;
@@ -220,17 +218,21 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
                 " Click the top or bottom border of this box to scroll.");
         counter = 0;
 
-        dungeonGen = new DungeonGenerator(width, height, rng);
-        dungeonGen.addWater(8, 6);
-        dungeonGen.addGrass(5);
-        dungeonGen.addBoulders(10);
+        dungeonGen = new SectionDungeonGenerator(width, height, rng);
+        dungeonGen.addWater(SectionDungeonGenerator.ALL, 8, 6);
+        dungeonGen.addGrass(SectionDungeonGenerator.CAVE, 5);
+        dungeonGen.addBoulders(SectionDungeonGenerator.CAVE, 10);
         dungeonGen.addDoors(18, false);
-        MixedGenerator mix = new MixedGenerator(width, height, rng);
-        mix.putCaveCarvers(1);
-        mix.putBoxRoomCarvers(1);
-        mix.putRoundRoomCarvers(2);
-        char[][] mg = mix.generate();
-        decoDungeon = dungeonGen.generate(mg);
+        dungeonGen.addMaze(8);
+        SerpentMapGenerator serpent = new SerpentMapGenerator(width, height, rng);
+        serpent.putCaveCarvers(2);
+        serpent.putWalledBoxRoomCarvers(2);
+        serpent.putWalledRoundRoomCarvers(1);
+        char[][] mg = serpent.generate();
+        decoDungeon = dungeonGen.generate(mg, serpent.getEnvironment());
+        Coord pl = dungeonGen.stairsUp, tgt = dungeonGen.stairsDown;
+        decoDungeon[pl.x][pl.y] = '<';
+        decoDungeon[tgt.x][tgt.y] = '>';
         // DefaultResources has not only default fonts but now also default icons.
         // These need the actual assets to be downloaded as part of the zip or tar.gz
         // archive of assets, or separately fetched from GitHub in the assets/ folder.
@@ -243,8 +245,8 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
         lineDungeon = DungeonUtility.doubleWidth(DungeonUtility.hashesToLines(decoDungeon, true));
         // it's more efficient to get random floors from a packed set containing only (compressed) floor positions.
         short[] placement = CoordPacker.pack(bareDungeon, '.');
-        Coord pl = dungeonGen.utility.randomCell(placement);
-        placement = CoordPacker.removePacked(placement, pl.x, pl.y);
+        //Coord pl = dungeonGen.utility.randomCell(placement);
+        placement = CoordPacker.removeSeveralPacked(placement, pl, tgt);
         int numMonsters = 60;
         monsters = new SpatialMap<Integer, Monster>(numMonsters);
         for(int i = 0; i < numMonsters; i++)
@@ -490,6 +492,10 @@ public class SquidShowcaseDemo extends ApplicationAdapter {
                 fovmap = fov.calculateFOV(res, newX, newY, 8, Radius.SQUARE);
                 display.slide(player, newX, newY);
                 monsters.remove(Coord.get(newX, newY));
+            }
+            if(newX == dungeonGen.stairsDown.x && newY == dungeonGen.stairsDown.y)
+            {
+                messages.appendMessage("WINNER WINNER CHICKEN DINNER!");
             }
 
             phase = Phase.PLAYER_ANIM;
