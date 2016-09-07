@@ -9,7 +9,7 @@ import com.github.SquidPony.BabelBobble;
 public class GwtLauncher extends GwtApplication {
     @Override
     public GwtApplicationConfiguration getConfig() {
-        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(640, 480);
+        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(1000, 700);
         return configuration;
     }
 
