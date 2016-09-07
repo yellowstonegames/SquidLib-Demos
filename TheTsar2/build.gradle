@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
@@ -7,7 +8,6 @@ buildscript {
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
         classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'org.robovm:robovm-gradle-plugin:1.12.0'
     }
 }
 
@@ -20,8 +20,8 @@ allprojects {
         appName = "TheTsar"
 
         //squidlibVersion = '-SNAPSHOT'
-        squidlibVersion = 'a8b2b675ed'
-        gdxVersion = '1.9.2'
+        squidlibVersion = '7a4197e953'
+        gdxVersion = '1.9.3'
         roboVMVersion = '1.12.0'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -74,8 +74,8 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
         //compile "com.squidpony:squidlib:3.0.0-SNAPSHOT:sources"
         //compile "com.squidpony:squidlib-util:3.0.0-SNAPSHOT:sources"
-        compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion:sources")         //{changing = true}
-        compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion:sources")   //{changing = true}
+        compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion:sources")
+        compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion:sources")
         compile "com.github.tommyettinger:RegExodus:v0.1.1:sources"
     }
 }
@@ -87,8 +87,8 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         //compile "com.squidpony:squidlib:3.0.0-SNAPSHOT"
         //compile "com.squidpony:squidlib-util:3.0.0-SNAPSHOT"
-        compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion")   //{changing = true}
-        compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion")   //{changing = true}
+        compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion")
+        compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion")
         compile "com.github.tommyettinger:RegExodus:v0.1.1"
 
     }
