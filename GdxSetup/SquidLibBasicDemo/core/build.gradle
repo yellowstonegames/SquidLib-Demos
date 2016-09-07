@@ -1,9 +1,0 @@
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-eclipse.project.name = appName + '-core'
-
-dependencies {
-  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-  compile "com.squidpony:squidlib:$squidLibVersion"
-  compile "com.github.tommyettinger:regexodus:$regExodusVersion"
-}
-        
