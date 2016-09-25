@@ -12,3 +12,11 @@
 hs_err_pid*
 *.*~
 *#
+
+**/.idea/**
+**/.gradle/**
+
+**/build/libs/**
+**/build/gwt/**
+**/build/classes/**
+
