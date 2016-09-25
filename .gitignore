@@ -12,3 +12,19 @@
 hs_err_pid*
 *.*~
 *#
+
+**/desktop/build/**
+**/gwt/build/**
+
+# jEdit garbage
+*~
+*#*#
+*#*.*#
+/bin/
+
+target/
+*.iml
+.idea/
+.settings/
+
+
