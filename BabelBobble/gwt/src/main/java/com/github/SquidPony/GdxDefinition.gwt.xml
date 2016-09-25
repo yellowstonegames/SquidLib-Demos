@@ -7,6 +7,8 @@
     <inherits name="com.kotcrab.vis.vis-ui" />
     <inherits name="regexodus" />
     <inherits name="squidlib-util" />
+    <inherits name="blazing.chain"/>
+    <inherits name="squidlib-extra" />
     <entry-point class="com.github.SquidPony.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
 </module>

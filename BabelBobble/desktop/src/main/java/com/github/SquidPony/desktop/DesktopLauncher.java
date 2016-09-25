@@ -12,7 +12,7 @@ public class DesktopLauncher {
     }
 
     private static LwjglApplication createApplication() {
-        return new LwjglApplication(new BabelBobble(), getDefaultConfiguration());
+        return new LwjglApplication(new BabelBobble(null), getDefaultConfiguration());
     }
 
     private static LwjglApplicationConfiguration getDefaultConfiguration() {

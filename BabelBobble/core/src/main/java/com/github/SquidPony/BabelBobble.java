@@ -13,9 +13,12 @@ import com.kotcrab.vis.ui.VisUI.SkinScale;
 import com.kotcrab.vis.ui.widget.*;
 import squidpony.FakeLanguageGen;
 import squidpony.NaturalLanguageCipher;
+import squidpony.SquidStorage;
 import squidpony.StringKit;
 import squidpony.squidmath.CrossHash;
 import squidpony.squidmath.StatefulRNG;
+
+import static squidpony.FakeLanguageGen.*;
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
@@ -26,6 +29,12 @@ public class BabelBobble extends ApplicationAdapter {
     public FakeLanguageGen lang;
     public NaturalLanguageCipher cipher;
     public VisTextArea currentArea, langArea;
+    public SquidStorage storage;
+    public Copier copier;
+    public BabelBobble(Copier cop)
+    {
+        copier = cop;
+    }
     public static final String /*flatland = "I call our world Flatland, not because we call it so, but to make its nature clearer " +
             "to you, my happy readers, who are privileged to live in Space.\n" +
             "Imagine a vast sheet of paper on which straight Lines, Triangles, Squares, Pentagons, Hexagons, and other " +
@@ -49,7 +58,7 @@ public class BabelBobble extends ApplicationAdapter {
                     "and fluttered in the trees and bushes. A little way off was a small brook, rushing and sparkling along " +
                     "between green banks, and murmuring in a voice very grateful to a little girl who had lived so long on " +
                     "the dry, gray prairies.";
-    public String cipheredText, currentText = mars;
+    public String cipheredText, currentText;
     public long currentSeed;
     public VisTextField seedField;
     public VisSlider arabicSlider, englishSlider, fantasySlider, frenchSlider, greekSlider, hindiSlider, japaneseSlider,
@@ -58,7 +67,9 @@ public class BabelBobble extends ApplicationAdapter {
     @Override
     public void create() {
         VisUI.load(SkinScale.X1);
-
+        storage = new SquidStorage("babel");
+        currentText = storage.get("data", "text", String.class);
+        if(currentText == null || currentText.equals("")) currentText = mars;
         stage = new Stage(new ScreenViewport());
 
         VisTable root = new VisTable();
@@ -93,19 +104,24 @@ public class BabelBobble extends ApplicationAdapter {
         somaliSlider.setWidth(200);
         swahiliSlider.setWidth(200);
         randomSlider.setWidth(200);
-
-        arabicSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        englishSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        fantasySlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        frenchSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        greekSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        hindiSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        japaneseSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        lovecraftSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        russianSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        somaliSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        swahiliSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
-        randomSlider.addListener(new ChangeListener() {@Override public void changed(ChangeEvent event, Actor actor) {seedField.setText(toSeed());}});
+        
+        ChangeListener listener = new ChangeListener() {
+            @Override public void changed(ChangeEvent event, Actor actor) {
+                seedField.setText(toSeed());
+            }
+        };
+        arabicSlider.addListener(listener);
+        englishSlider.addListener(listener);
+        fantasySlider.addListener(listener);
+        frenchSlider.addListener(listener);
+        greekSlider.addListener(listener);
+        hindiSlider.addListener(listener);
+        japaneseSlider.addListener(listener);
+        lovecraftSlider.addListener(listener);
+        russianSlider.addListener(listener);
+        somaliSlider.addListener(listener);
+        swahiliSlider.addListener(listener);
+        randomSlider.addListener(listener);
 
         rng = new StatefulRNG(); //CrossHash.Lightning.hash64("Let's get babbling!")
         currentArea = new VisTextArea(currentText);
@@ -120,7 +136,6 @@ public class BabelBobble extends ApplicationAdapter {
         root.add("Random language cipher demo").colspan(2).top().pad(10).row();
         root.add(currentArea).bottom().fillX().expandX().pad(10);
         root.add(langArea).bottom().fillX().expandX().pad(10).row();
-
         VisTable tab2 = new VisTable();
         tab2.setWidth(800);
         tab2.add(new VisLabel("Arabic"), arabicSlider); tab2.add().pad(10);tab2.add(new VisLabel("English"), englishSlider);
@@ -137,8 +152,10 @@ public class BabelBobble extends ApplicationAdapter {
         tab2.row();
         root.add(tab2).colspan(2).fillX().expandX().pad(5).row();
 
-        root.add("Current seed for random factors: ").pad(5);
-        String txt = fixSeed(Long.toString(rng.nextLong(), 36) + Long.toString(rng.nextLong(), 36));
+        root.add("Current seed for generating language: ").pad(5);
+        String txt = storage.get("data", "seed", String.class);
+        if(txt == null || txt.equals(""))
+            txt = fixSeed(Long.toString(rng.nextLong(), 36) + Long.toString(rng.nextLong(), 36));
         setFromSeed(txt);
         seedField.setText(txt);
         lang = mixMany();
@@ -162,9 +179,9 @@ public class BabelBobble extends ApplicationAdapter {
             }
         });
         root.add(textButton).pad(10);
-        final VisTextButton useSeedButton = new VisTextButton("Generate");
-        useSeedButton.setColor(Color.PURPLE);
-        useSeedButton.addListener(new ChangeListener() {
+        final VisTextButton generateButton = new VisTextButton("Generate");
+        generateButton.setColor(Color.PURPLE);
+        generateButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 String txt = seedField.getText();
@@ -174,7 +191,7 @@ public class BabelBobble extends ApplicationAdapter {
                     cipher = new NaturalLanguageCipher(lang);
                     cipheredText = cipher.cipher(currentText = currentArea.getText());
                     langArea.setText(cipheredText);
-                } catch (Exception nfe) {
+                } catch (Exception numberFormatOrArrayOOB) {
                     txt = fixSeed(txt);
                     seedField.setText(txt);
                     setFromSeed(txt);
@@ -183,10 +200,22 @@ public class BabelBobble extends ApplicationAdapter {
                     cipheredText = cipher.cipher(currentText = currentArea.getText());
                     langArea.setText(cipheredText);
                 }
+                storage.put("text", currentArea.getText());
+                storage.put("seed", seedField.getText());
+                storage.store("data");
+                if(copier != null)
+                {
+                    copier.clear();
+                    copier.copy(currentText);
+                    copier.copy("\n\n");
+                    copier.copy(cipheredText);
+                    copier.copy("\n\n");
+                    copier.copy(seedField.getText());
+                }
             }
         });
 
-        root.add(useSeedButton).pad(10);
+        root.add(generateButton).pad(10);
         root.pack();
         Gdx.input.setInputProcessor(stage);
 
@@ -203,7 +232,6 @@ public class BabelBobble extends ApplicationAdapter {
     public String fixSeed(String txt)
     {
         return StringKit.hex(CrossHash.Storm.chi.hash64(txt))
-                + ' '
                 + StringKit.hex(CrossHash.Storm.upsilon.hash(txt))
                 + StringKit.hex((short) (CrossHash.Storm.sigma.hash(txt)));
     }
@@ -211,22 +239,22 @@ public class BabelBobble extends ApplicationAdapter {
     {
         currentSeed = Long.parseLong(txt.substring(1, 16), 16) | ((long)Character.digit(txt.charAt(0), 16) << 60);
         rng.setState(currentSeed);
-        arabicSlider.setValue(Character.digit(txt.charAt(17), 16));
-        englishSlider.setValue(Character.digit(txt.charAt(18), 16));
-        fantasySlider.setValue(Character.digit(txt.charAt(19), 16));
-        frenchSlider.setValue(Character.digit(txt.charAt(20), 16));
-        greekSlider.setValue(Character.digit(txt.charAt(21), 16));
-        hindiSlider.setValue(Character.digit(txt.charAt(22), 16));
-        japaneseSlider.setValue(Character.digit(txt.charAt(23), 16));
-        lovecraftSlider.setValue(Character.digit(txt.charAt(24), 16));
-        russianSlider.setValue(Character.digit(txt.charAt(25), 16));
-        somaliSlider.setValue(Character.digit(txt.charAt(26), 16));
-        swahiliSlider.setValue(Character.digit(txt.charAt(27), 16));
-        randomSlider.setValue(Character.digit(txt.charAt(28), 16));
+        arabicSlider.setValue(Character.digit(txt.charAt(16), 16));
+        englishSlider.setValue(Character.digit(txt.charAt(17), 16));
+        fantasySlider.setValue(Character.digit(txt.charAt(18), 16));
+        frenchSlider.setValue(Character.digit(txt.charAt(19), 16));
+        greekSlider.setValue(Character.digit(txt.charAt(20), 16));
+        hindiSlider.setValue(Character.digit(txt.charAt(21), 16));
+        japaneseSlider.setValue(Character.digit(txt.charAt(22), 16));
+        lovecraftSlider.setValue(Character.digit(txt.charAt(23), 16));
+        russianSlider.setValue(Character.digit(txt.charAt(24), 16));
+        somaliSlider.setValue(Character.digit(txt.charAt(25), 16));
+        swahiliSlider.setValue(Character.digit(txt.charAt(26), 16));
+        randomSlider.setValue(Character.digit(txt.charAt(27), 16));
     }
     public String toSeed()
     {
-        return StringKit.hex(currentSeed) + ' ' +
+        return StringKit.hex(currentSeed) +
                 Character.forDigit((int) arabicSlider.getValue(), 16) +
                 Character.forDigit((int) englishSlider.getValue(), 16) +
                 Character.forDigit((int) fantasySlider.getValue(), 16) +
@@ -243,6 +271,21 @@ public class BabelBobble extends ApplicationAdapter {
 
     public FakeLanguageGen mixMany()
     {
+        return FakeLanguageGen.mixAll(
+                FakeLanguageGen.randomLanguage(rng.nextLong()), randomSlider.getValue(),
+                ARABIC_ROMANIZED, arabicSlider.getValue(),
+                ENGLISH, englishSlider.getValue(),
+                FANTASY_NAME, fantasySlider.getValue(),
+                FRENCH, frenchSlider.getValue(),
+                GREEK_ROMANIZED, greekSlider.getValue(),
+                HINDI_ROMANIZED, hindiSlider.getValue(),
+                JAPANESE_ROMANIZED, japaneseSlider.getValue(),
+                LOVECRAFT, lovecraftSlider.getValue(),
+                RUSSIAN_ROMANIZED, russianSlider.getValue(),
+                SOMALI, somaliSlider.getValue(),
+                SWAHILI, swahiliSlider.getValue()
+                );
+        /*
         FakeLanguageGen mixer = FakeLanguageGen.randomLanguage(rng);
         float arabic = arabicSlider.getValue(),
                 english = englishSlider.getValue(),
@@ -275,6 +318,7 @@ public class BabelBobble extends ApplicationAdapter {
         if(somali    > 0) mixer = mixer.mix(FakeLanguageGen.SOMALI, (somali    / total) / (current += somali    / total));
         if(swahili   > 0) mixer = mixer.mix(FakeLanguageGen.SWAHILI, (swahili   / total) / (current + swahili   / total));
         return mixer.removeAccents();
+        */
     }
 
     @Override
