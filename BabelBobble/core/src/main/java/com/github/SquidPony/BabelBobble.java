@@ -296,7 +296,7 @@ public class BabelBobble extends ApplicationAdapter {
                 RUSSIAN_ROMANIZED, russianSlider.getValue(),
                 SOMALI, somaliSlider.getValue(),
                 SWAHILI, swahiliSlider.getValue()
-                );
+                ).removeAccents();
         /*
         FakeLanguageGen mixer = FakeLanguageGen.randomLanguage(rng);
         float arabic = arabicSlider.getValue(),
