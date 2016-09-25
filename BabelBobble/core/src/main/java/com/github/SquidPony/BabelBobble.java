@@ -176,6 +176,18 @@ public class BabelBobble extends ApplicationAdapter {
                 cipher = new NaturalLanguageCipher(lang);
                 cipheredText = cipher.cipher(currentText = currentArea.getText());
                 langArea.setText(cipheredText);
+                storage.put("text", currentArea.getText());
+                storage.put("seed", seedField.getText());
+                storage.store("data");
+                if(copier != null)
+                {
+                    copier.clear();
+                    copier.copy(currentText);
+                    copier.copy("\n\n");
+                    copier.copy(cipheredText);
+                    copier.copy("\n\n");
+                    copier.copy(seedField.getText());
+                }
             }
         });
         root.add(textButton).pad(10);
