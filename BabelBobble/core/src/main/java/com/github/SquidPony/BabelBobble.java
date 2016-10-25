@@ -35,13 +35,13 @@ public class BabelBobble extends ApplicationAdapter {
     {
         copier = cop;
     }
-    public static final String /*flatland = "I call our world Flatland, not because we call it so, but to make its nature clearer " +
+    public static final String flatland = "I call our world Flatland, not because we call it so, but to make its nature clearer " +
             "to you, my happy readers, who are privileged to live in Space.\n" +
             "Imagine a vast sheet of paper on which straight Lines, Triangles, Squares, Pentagons, Hexagons, and other " +
             "figures, instead of remaining fixed in their places, move freely about, on or in the surface, but without " +
             "the power of rising above or sinking below it, very much like shadows - only hard and with luminous edges - " +
             "and you will then have a pretty correct notion of my country and countrymen. Alas, a few years ago, I should " +
-            "have said \"my universe\": but now my mind has been opened to higher views of things.",*/
+            "have said \"my universe\": but now my mind has been opened to higher views of things.",
             mars =  "I have never told this story, nor shall mortal man see this manuscript until after I have passed " +
                     "over for eternity. I know that the average human mind will not believe what it cannot grasp, and so " +
                     "I do not purpose being pilloried by the public, the pulpit, and the press, and held up as a colossal " +

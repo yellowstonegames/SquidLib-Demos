@@ -30,7 +30,7 @@ dependencies {
   //compile "com.squidpony:squidlib-extra:$squidlibVersion:sources"
   //compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion:sources")
   compile "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
-  compile "com.kotcrab.vis:vis-ui:$visUiVersion:sources"
+  //compile "com.kotcrab.vis:vis-ui:$visUiVersion:sources"
 }
 
 task draftRun(type: JettyRunWar) {
@@ -70,7 +70,8 @@ draftWar {
 }
 
 task addSource << {
-  sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+  //sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+  sourceSets.main.compileClasspath += files(project(':gwt').sourceSets.main.allJava.srcDirs)
 }
 
 tasks.compileGwt.dependsOn(addSource)

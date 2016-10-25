@@ -39,6 +39,7 @@ public class GwtLauncher extends GwtApplication {
         });
         return new BabelBobble(new GwtCopier());
     }
+
     public class GwtCopier implements Copier {
         public GwtCopier() {
         }
