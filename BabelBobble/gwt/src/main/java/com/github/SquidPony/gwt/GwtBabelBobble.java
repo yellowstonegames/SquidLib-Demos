@@ -31,7 +31,8 @@ public class GwtBabelBobble extends GwtBareApp {
     public long currentSeed;
     public TextBox seedField;
     public Slider arabicSlider, englishSlider, fantasySlider, frenchSlider, greek1Slider, greek2Slider, hindiSlider,
-            japaneseSlider, lovecraftSlider, russian1Slider, russian2Slider, somaliSlider, swahiliSlider, randomSlider;
+            japaneseSlider, lovecraftSlider, russian1Slider, russian2Slider, somaliSlider, swahiliSlider, norseSlider,
+            inuktitutSlider, nahuatlSlider, random1Slider, random2Slider;
     public static final String mars =  "I have never told this story, nor shall mortal man see this manuscript until after I have passed " +
                     "over for eternity. I know that the average human mind will not believe what it cannot grasp, and so " +
                     "I do not purpose being pilloried by the public, the pulpit, and the press, and held up as a colossal " +
@@ -84,7 +85,11 @@ public class GwtBabelBobble extends GwtBareApp {
         russian2Slider = new Slider(handler);
         somaliSlider = new Slider(handler);
         swahiliSlider = new Slider(handler);
-        randomSlider = new Slider(handler);
+        norseSlider = new Slider(handler);
+        inuktitutSlider = new Slider(handler);
+        nahuatlSlider = new Slider(handler);
+        random1Slider = new Slider(handler);
+        random2Slider = new Slider(handler);
 
         rng = new StatefulRNG(); //CrossHash.Lightning.hash64("Let's get babbling!")
         currentArea = new TextArea();
@@ -110,7 +115,9 @@ public class GwtBabelBobble extends GwtBareApp {
         sliders.add(row("Hindi", hindiSlider, "Japanese", japaneseSlider));
         sliders.add(row("'Lovecraft'", lovecraftSlider, "Russian (1)", russian1Slider));
         sliders.add(row("Russian (2)", russian2Slider, "Somali", somaliSlider));
-        sliders.add(row("Swahili", swahiliSlider, "RANDOM", randomSlider));
+        sliders.add(row("Swahili", swahiliSlider, "Norse", norseSlider));
+        sliders.add(row("Inuktitut", inuktitutSlider, "Nahuatl", nahuatlSlider));
+        sliders.add(row("Random (1)", random1Slider, "Random (2)", random2Slider));
         sliders.sinkEvents(Event.ONCHANGE);
         root.add(sliders);
         HorizontalPanel seeds = new HorizontalPanel();
@@ -201,7 +208,7 @@ public class GwtBabelBobble extends GwtBareApp {
     {
         return (StringKit.hex(CrossHash.Storm.chi.hash64(txt))
                 + StringKit.hex(CrossHash.Storm.upsilon.hash(txt))
-                + StringKit.hex((short) CrossHash.Storm.sigma.hash(txt)) + "00").toUpperCase();
+                + StringKit.hex(CrossHash.Storm.sigma.hash(txt)) + "00").toUpperCase();
     }
     public void setFromSeed(String txt)
     {
@@ -218,9 +225,13 @@ public class GwtBabelBobble extends GwtBareApp {
         russian1Slider.setCurrent(Character.digit(txt.charAt(24), 16));
         somaliSlider.setCurrent(Character.digit(txt.charAt(25), 16));
         swahiliSlider.setCurrent(Character.digit(txt.charAt(26), 16));
-        randomSlider.setCurrent(Character.digit(txt.charAt(27), 16));
-        greek2Slider.setCurrent(Character.digit(txt.charAt(28), 16));
-        russian2Slider.setCurrent(Character.digit(txt.charAt(29), 16));
+        norseSlider.setCurrent(Character.digit(txt.charAt(27), 16));
+        inuktitutSlider.setCurrent(Character.digit(txt.charAt(28), 16));
+        nahuatlSlider.setCurrent(Character.digit(txt.charAt(29), 16));
+        random1Slider.setCurrent(Character.digit(txt.charAt(30), 16));
+        random2Slider.setCurrent(Character.digit(txt.charAt(31), 16));
+        greek2Slider.setCurrent(Character.digit(txt.charAt(32), 16));
+        russian2Slider.setCurrent(Character.digit(txt.charAt(33), 16));
 
     }
     public String toSeed()
@@ -237,7 +248,11 @@ public class GwtBabelBobble extends GwtBareApp {
                 Character.forDigit(russian1Slider.getCurrent(), 16) +
                 Character.forDigit(somaliSlider.getCurrent(), 16) +
                 Character.forDigit(swahiliSlider.getCurrent(), 16) +
-                Character.forDigit(randomSlider.getCurrent(), 16) +
+                Character.forDigit(norseSlider.getCurrent(), 16) +
+                Character.forDigit(inuktitutSlider.getCurrent(), 16) +
+                Character.forDigit(nahuatlSlider.getCurrent(), 16) +
+                Character.forDigit(random1Slider.getCurrent(), 16) +
+                Character.forDigit(random2Slider.getCurrent(), 16) +
                 Character.forDigit(greek2Slider.getCurrent(), 16) +
                 Character.forDigit(russian2Slider.getCurrent(), 16)).toUpperCase();
     }
@@ -245,7 +260,8 @@ public class GwtBabelBobble extends GwtBareApp {
     public FakeLanguageGen mixMany() {
         long sd = rng.nextLong();
         return FakeLanguageGen.mixAll(
-                FakeLanguageGen.randomLanguage(sd), randomSlider.getCurrent(),
+                FakeLanguageGen.randomLanguage(sd), random1Slider.getCurrent(),
+                FakeLanguageGen.randomLanguage(~sd), random2Slider.getCurrent(),
                 ARABIC_ROMANIZED, arabicSlider.getCurrent(),
                 ENGLISH, englishSlider.getCurrent(),
                 FANCY_FANTASY_NAME, fantasySlider.getCurrent(),
@@ -258,7 +274,10 @@ public class GwtBabelBobble extends GwtBareApp {
                 RUSSIAN_ROMANIZED, russian1Slider.getCurrent(),
                 RUSSIAN_AUTHENTIC, russian2Slider.getCurrent(),
                 SOMALI, somaliSlider.getCurrent(),
-                SWAHILI, swahiliSlider.getCurrent()
+                SWAHILI, swahiliSlider.getCurrent(),
+                NORSE, norseSlider.getCurrent(),
+                INUKTITUT, inuktitutSlider.getCurrent(),
+                NAHUATL, nahuatlSlider.getCurrent()
         );
     }
 
