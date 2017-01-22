@@ -140,14 +140,14 @@ public class TsarGame extends ApplicationAdapter {
         //the current health of the player and an '!' for alerted monsters.
         subCell = new SquidPanel(width, height, textFactory.copy());
 
-        display.setAnimationDuration(0.0f);
+        display.setAnimationDuration(0.02f);
         messages = new SquidMessageBox(width, 4,
                 textFactory.copy());
         // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
         // if you use '#' for walls instead of box drawing chars, you don't need this.
-        messages.setTextSize(cellWidth, cellHeight + INTERNAL_ZOOM * 2);
-        display.setTextSize(cellWidth, cellHeight + INTERNAL_ZOOM * 2);
+        messages.setTextSize(cellWidth + INTERNAL_ZOOM, cellHeight + INTERNAL_ZOOM * 2);
+        display.setTextSize(cellWidth + INTERNAL_ZOOM, cellHeight + INTERNAL_ZOOM * 2);
         //The subCell SquidPanel uses a smaller size here; the numbers 8 and 16 should change if cellWidth or cellHeight
         //change, and the INTERNAL_ZOOM multiplier keeps things sharp, the same as it does all over here.
         subCell.setTextSize(12 * INTERNAL_ZOOM, 20 * INTERNAL_ZOOM);
