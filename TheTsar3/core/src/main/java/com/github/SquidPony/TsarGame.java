@@ -14,18 +14,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import squidpony.FakeLanguageGen;
 import squidpony.panel.IColoredString;
 import squidpony.squidai.DijkstraMap;
-import squidpony.squidgrid.Direction;
 import squidpony.squidgrid.FOV;
 import squidpony.squidgrid.Radius;
-import squidpony.squidgrid.SpatialMap;
 import squidpony.squidgrid.gui.gdx.*;
 import squidpony.squidgrid.mapping.DungeonGenerator;
 import squidpony.squidgrid.mapping.DungeonUtility;
 import squidpony.squidgrid.mapping.MixedGenerator;
-import squidpony.squidmath.Coord;
-import squidpony.squidmath.CoordPacker;
-import squidpony.squidmath.OrderedSet;
-import squidpony.squidmath.StatefulRNG;
+import squidpony.squidmath.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,11 +30,7 @@ public class TsarGame extends ApplicationAdapter {
     private static class Monster {
         public AnimatedEntity entity;
         public int state;
-        public Monster(Actor actor, int x, int y, int state)
-        {
-            entity = new AnimatedEntity(actor, x, y);
-            this.state = state;
-        }
+
         public Monster(AnimatedEntity ae, int state)
         {
             entity = ae;
@@ -50,17 +41,7 @@ public class TsarGame extends ApplicationAdapter {
             this.state = state;
             return this;
         }
-        public Monster change(AnimatedEntity ae)
-        {
-            entity = ae;
-            return this;
-        }
-        public Monster move(int x, int y)
-        {
-            entity.gridX = x;
-            entity.gridY = y;
-            return this;
-        }
+
     }
     SpriteBatch batch;
 
@@ -69,30 +50,40 @@ public class TsarGame extends ApplicationAdapter {
     private SquidLayers display;
     private SquidPanel subCell;
     private SquidMessageBox messages;
-    /** Non-{@code null} iff '?' was pressed before */
+    /**
+     * Non-{@code null} iff '?' was pressed before
+     */
     private /*Nullable*/ Actor help;
     private DungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
     private double[][] res;
     private int[][] lights;
     private Color[][] colors, bgColors;
-    private double[][] fovmap, pathMap;
+    private double[][] fovmap;
     private AnimatedEntity player;
     private FOV fov;
-    /** In number of cells */
+    /**
+     * In number of cells
+     */
     private int width;
-    /** In number of cells */
+    /**
+     * In number of cells
+     */
     private int height;
-    /** The pixel width of a cell */
+    /**
+     * The pixel width of a cell
+     */
     private int cellWidth;
-    /** The pixel height of a cell */
+    /**
+     * The pixel height of a cell
+     */
     private int cellHeight;
     private VisualInput input;
     private double counter;
     private boolean[][] seen;
-    private int health = 9;
+    private int health = 7;
     private Color bgColor;
-    private SpatialMap<Integer, Monster> monsters;
+    private OrderedMap<Coord, Monster> monsters;
     private DijkstraMap getToPlayer, playerToCursor;
     private Stage stage;
     private int framesWithoutAnimation = 0;
@@ -111,25 +102,28 @@ public class TsarGame extends ApplicationAdapter {
         rng = new StatefulRNG(0xBADBEEFB0BBL);
 
         batch = new SpriteBatch();
-        width = 90;
-        height = 26;
+        width = 80;
+        height = 28;
         //NOTE: cellWidth and cellHeight are assigned values that are significantly larger than the corresponding sizes
         //in the EverythingDemoLauncher's main method. Because they are scaled up by an integer here, they can be scaled
         //down when rendered, allowing certain small details to appear sharper. This _only_ works with distance field,
         //a.k.a. stretchable, fonts! INTERNAL_ZOOM is a tradeoff between rendering more pixels to increase quality (when
         // values are high) or rendering fewer pixels for speed (when values are low). Using 2 seems to work well.
-        cellWidth = 18 * INTERNAL_ZOOM;
-        cellHeight = 30 * INTERNAL_ZOOM;
+        cellWidth = 13 * INTERNAL_ZOOM;
+        cellHeight = 26 * INTERNAL_ZOOM;
+
+        // Sets our color center, which can be used to filter colors with various effects, though we don't really use it here.
+        scc = DefaultResources.getSCC();
         // getStretchableFont loads an embedded font, Inconsolata-LGC-Custom, that is a distance field font as mentioned
         // earlier. We set the smoothing multiplier on it only because we are using internal zoom to increase sharpness
         // on small details, but if the smoothing is incorrect some sizes look blurry or over-sharpened. This can be set
         // manually if you use a constant internal zoom; here we use 1f for internal zoom 1, about 2/3f for zoom 2, and
         // about 1/2f for zoom 3. If you have more zooms as options for some reason, this formula should hold for many
         // cases but probably not all.
-        scc = DefaultResources.getSCC();
         textFactory = DefaultResources.getStretchableFont().setSmoothingMultiplier(2f / (INTERNAL_ZOOM + 1f))
                 .width(cellWidth).height(cellHeight).initBySize();
-        // Creates a layered series of text grids in a SquidLayers object, using the previously set-up textFactory.
+        // Creates a layered series of text grids in a SquidLayers object, using the previously set-up textFactory and
+        // SquidColorCenters.
         display = new SquidLayers(width, height, cellWidth, cellHeight,
                 textFactory.copy());
         //subCell is a SquidPanel, the same class that SquidLayers has for each of its layers, but we want to render
@@ -140,17 +134,17 @@ public class TsarGame extends ApplicationAdapter {
         //the current health of the player and an '!' for alerted monsters.
         subCell = new SquidPanel(width, height, textFactory.copy());
 
-        display.setAnimationDuration(0.02f);
+        display.setAnimationDuration(0.1f);
         messages = new SquidMessageBox(width, 4,
                 textFactory.copy());
         // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
         // if you use '#' for walls instead of box drawing chars, you don't need this.
-        messages.setTextSize(cellWidth + INTERNAL_ZOOM, cellHeight + INTERNAL_ZOOM * 2);
-        display.setTextSize(cellWidth + INTERNAL_ZOOM, cellHeight + INTERNAL_ZOOM * 2);
+        messages.setTextSize(cellWidth, cellHeight + INTERNAL_ZOOM * 2);
+        display.setTextSize(cellWidth, cellHeight + INTERNAL_ZOOM * 2);
         //The subCell SquidPanel uses a smaller size here; the numbers 8 and 16 should change if cellWidth or cellHeight
         //change, and the INTERNAL_ZOOM multiplier keeps things sharp, the same as it does all over here.
-        subCell.setTextSize(12 * INTERNAL_ZOOM, 20 * INTERNAL_ZOOM);
+        subCell.setTextSize(8 * INTERNAL_ZOOM, 16 * INTERNAL_ZOOM);
         viewport = new StretchViewport(width * cellWidth, (height + 4) * cellHeight);
         stage = new Stage(viewport, batch);
 
@@ -162,8 +156,9 @@ public class TsarGame extends ApplicationAdapter {
                 " Click the top or bottom border of this box to scroll.");
         counter = 0;
 
+
         dungeonGen = new DungeonGenerator(width, height, rng);
-        dungeonGen.addWater(8, 6);
+        dungeonGen.addWater(30, 6);
         dungeonGen.addGrass(5);
         dungeonGen.addBoulders(10);
         dungeonGen.addDoors(18, false);
@@ -179,17 +174,16 @@ public class TsarGame extends ApplicationAdapter {
         bareDungeon = dungeonGen.getBareDungeon();
         lineDungeon = DungeonUtility.hashesToLines(dungeonGen.getDungeon(), true);
         // it's more efficient to get random floors from a packed set containing only (compressed) floor positions.
-        short[] placement = CoordPacker.pack(bareDungeon, '.');
-        Coord pl = dungeonGen.utility.randomCell(placement);
-        placement = CoordPacker.removePacked(placement, pl.x, pl.y);
+        GreasedRegion placement = new GreasedRegion(bareDungeon, '.');
+        Coord pl = placement.singleRandom(rng);
+        placement.remove(pl);
         int numMonsters = 25;
-        monsters = new SpatialMap<Integer, Monster>(numMonsters);
-        for(int i = 0; i < numMonsters; i++)
-        {
-            Coord monPos = dungeonGen.utility.randomCell(placement);
-            placement = CoordPacker.removePacked(placement, monPos.x, monPos.y);
-            monsters.put(monPos, i, new Monster(display.animateActor(monPos.x, monPos.y, 'Я',
-                    display.getPalette().get(11)), 0));
+        monsters = new OrderedMap<Coord, Monster>(numMonsters);
+        for (int i = 0; i < numMonsters; i++) {
+            Coord monPos = placement.singleRandom(rng);
+            placement.remove(monPos);
+            monsters.put(monPos, new Monster(display.animateActor(monPos.x, monPos.y, 'Я',
+                    SColor.CRIMSON), 0));
         }
         // your choice of FOV matters here.
         fov = new FOV(FOV.RIPPLE_TIGHT);
@@ -197,12 +191,10 @@ public class TsarGame extends ApplicationAdapter {
         fovmap = fov.calculateFOV(res, pl.x, pl.y, 8, Radius.SQUARE);
         getToPlayer = new DijkstraMap(decoDungeon, DijkstraMap.Measurement.CHEBYSHEV);
         getToPlayer.rng = rng;
-        getToPlayer.setGoal(pl);
-        pathMap = getToPlayer.scan(null);
-
+        // just showing off a little here; we can use smoothly changing colors for the special AnimatedEntity values we
+        // use for the player and monsters
         player = display.animateActor(pl.x, pl.y, '@',
-                scc.loopingGradient(SColor.PERSIAN_GREEN, SColor.HAN_PURPLE, 45), 1.5f, false);
-//                fgCenter.filter(display.getPalette().get(30)));
+                scc.loopingGradient(SColor.CAPE_JASMINE, SColor.HAN_PURPLE, 45), 1.5f, false);
         cursor = Coord.get(-1, -1);
         toCursor = new ArrayList<Coord>(10);
         awaitedMoves = new ArrayList<Coord>(10);
@@ -236,15 +228,14 @@ public class TsarGame extends ApplicationAdapter {
         // path to the mouse position with a DijkstraMap (called playerToCursor), and using touchUp to actually trigger
         // the event when someone clicks.
         input = new VisualInput(new SquidInput.KeyHandler() {
+            @Override
             public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
-                switch (key)
-                {
+                switch (key) {
                     case SquidInput.UP_ARROW:
                     case 'k':
                     case 'w':
                     case 'K':
-                    case 'W':
-                    {
+                    case 'W': {
                         move(0, -1);
                         break;
                     }
@@ -252,8 +243,7 @@ public class TsarGame extends ApplicationAdapter {
                     case 'j':
                     case 's':
                     case 'J':
-                    case 'S':
-                    {
+                    case 'S': {
                         move(0, 1);
                         break;
                     }
@@ -261,8 +251,7 @@ public class TsarGame extends ApplicationAdapter {
                     case 'h':
                     case 'a':
                     case 'H':
-                    case 'A':
-                    {
+                    case 'A': {
                         move(-1, 0);
                         break;
                     }
@@ -270,51 +259,43 @@ public class TsarGame extends ApplicationAdapter {
                     case 'l':
                     case 'd':
                     case 'L':
-                    case 'D':
-                    {
+                    case 'D': {
                         move(1, 0);
                         break;
                     }
 
                     case SquidInput.UP_LEFT_ARROW:
                     case 'y':
-                    case 'Y':
-                    {
+                    case 'Y': {
                         move(-1, -1);
                         break;
                     }
                     case SquidInput.UP_RIGHT_ARROW:
                     case 'u':
-                    case 'U':
-                    {
+                    case 'U': {
                         move(1, -1);
                         break;
                     }
                     case SquidInput.DOWN_RIGHT_ARROW:
                     case 'n':
-                    case 'N':
-                    {
+                    case 'N': {
                         move(1, 1);
                         break;
                     }
                     case SquidInput.DOWN_LEFT_ARROW:
                     case 'b':
-                    case 'B':
-                    {
+                    case 'B': {
                         move(-1, 1);
                         break;
                     }
-                    case SquidInput.CENTER_ARROW:
-                        break;
                     case 'Q':
                     case 'q':
-                    case SquidInput.ESCAPE:
-                    {
+                    case SquidInput.ESCAPE: {
                         Gdx.app.exit();
                         break;
                     }
                     case '?':
-                        default: {
+                    default: {
                         toggleHelp();
                         break;
                     }
@@ -384,12 +365,10 @@ public class TsarGame extends ApplicationAdapter {
     private void move(int xmod, int ymod) {
         clearHelp();
 
-        if(health <= 0) return;
-
+        if (health <= 0) return;
         int newX = player.gridX + xmod, newY = player.gridY + ymod;
         if (newX >= 0 && newY >= 0 && newX < width && newY < height
-                && bareDungeon[newX][newY] != '#')
-        {
+                && bareDungeon[newX][newY] != '#') {
             // '+' is a door.
             if (lineDungeon[newX][newY] == '+') {
                 decoDungeon[newX][newY] = '/';
@@ -403,102 +382,77 @@ public class TsarGame extends ApplicationAdapter {
                 // recalculate FOV, store it in fovmap for the render to use.
                 fovmap = fov.calculateFOV(res, newX, newY, 8, Radius.SQUARE);
                 display.slide(player, newX, newY);
-                monsters.remove(Coord.get(newX, newY));
+                // if a monster was at the position we moved into, and so was successfully removed...
+                if(monsters.remove(Coord.get(newX, newY)) != null)
+                {
+                    // ...then we make a little blood burst effect.
+                    display.getForegroundLayer().burst(
+                            // the position
+                            newX, newY,
+                            //what it should look like (eight ' marks)
+                            true, '\'',
+                            // the color starts as "blood-colored" and fades to transparent
+                            SColor.BLOOD,
+                            // you can alter this to change the duration of the effect
+                            1f);
+                }
             }
-
             phase = Phase.PLAYER_ANIM;
         }
     }
 
-    // check if a monster's movement would overlap with another monster.
-    private boolean checkOverlap(Monster mon, int x, int y, ArrayList<Coord> futureOccupied)
-    {
-        if(monsters.containsPosition(Coord.get(x, y)) && !mon.equals(monsters.get(Coord.get(x, y))))
-            return true;
-        for(Coord p : futureOccupied)
-        {
-            if(x == p.x && y == p.y)
-                return true;
-        }
-        return false;
-    }
-
     private void postMove()
     {
-
         phase = Phase.MONSTER_ANIM;
-        // The next two lines are important to avoid monsters treating cells the player WAS in as goals.
-        getToPlayer.clearGoals();
-        getToPlayer.resetMap();
-        // now that goals are cleared, we can mark the current player position as a goal.
-        getToPlayer.setGoal(player.gridX, player.gridY);
-        // this is an important piece of DijkstraMap usage; the argument is a Set of Points for squares that
-        // temporarily cannot be moved through (not walls, which are automatically known because the map char[][]
-        // was passed to the DijkstraMap constructor, but things like moving creatures and objects).
-        OrderedSet<Coord> monplaces = monsters.positions();
-
-        pathMap = getToPlayer.scan(monplaces);
+        Coord[] playerArray = {Coord.get(player.gridX, player.gridY)};
+        // in some cases you can use keySet() to get a Set of keys, but that makes a read-only view, and we want
+        // a copy of the key set that we can edit (so monsters don't move into each others' spaces)
+        OrderedSet<Coord> monplaces = monsters.keysAsOrderedSet();
+        int monCount = monplaces.size();
 
         // recalculate FOV, store it in fovmap for the render to use.
         fovmap = fov.calculateFOV(res, player.gridX, player.gridY, 8, Radius.SQUARE);
         // handle monster turns
-        ArrayList<Coord> nextMovePositions = new ArrayList<Coord>(25);
-        for(Coord pos : monsters.positions())
+        ArrayList<Coord> nextMovePositions;
+        for(int ci = 0; ci < monCount; ci++)
         {
+            Coord pos = monplaces.removeFirst();
             Monster mon = monsters.get(pos);
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
-            if(mon.state > 0 || fovmap[pos.x][pos.y] > 0.1)
-            {
-                if(mon.state == 0)
-                {
+            if (mon.state > 0 || fovmap[pos.x][pos.y] > 0.1) {
+                if (mon.state == 0) {
                     messages.appendMessage("The AЯMED GUAЯD shouts at you, \"" +
                             FakeLanguageGen.RUSSIAN_AUTHENTIC.sentence(rng, 1, 3,
                                     new String[]{",", ",", ",", " -"}, new String[]{"!"}, 0.25) + "\"");
                 }
-                // this block is used to ensure that the monster picks the best path, or a random choice if there
-                // is more than one equally good best option.
-                Direction choice = null;
-                double best = 9999.0;
-                Direction[] ds = new Direction[8];
-                rng.shuffle(Direction.OUTWARDS, ds);
-                for(Direction d : ds)
-                {
-                    Coord tmp = pos.translate(d);
-                    if(pathMap[tmp.x][tmp.y] < best &&
-                            !checkOverlap(mon, tmp.x, tmp.y, nextMovePositions))
-                    {
-                        // pathMap is a 2D array of doubles where 0 is the goal (the player).
-                        // we use best to store which option is closest to the goal.
-                        best = pathMap[tmp.x][tmp.y];
-                        choice = d;
-                    }
-                }
-                if(choice != null) {
-                    Coord tmp = pos.translate(choice);
+                getToPlayer.clearGoals();
+                nextMovePositions = getToPlayer.findPath(1, monplaces, null, pos, playerArray);
+                if (nextMovePositions != null && !nextMovePositions.isEmpty()) {
+                    Coord tmp = nextMovePositions.get(0);
                     // if we would move into the player, instead damage the player and give newMons the current
                     // position of this monster.
                     if (tmp.x == player.gridX && tmp.y == player.gridY) {
-                        display.tint(player.gridX, player.gridY, SColor.PURE_CRIMSON, 0, 0.3f);
+                        display.tint(player.gridX, player.gridY, SColor.PURE_CRIMSON, 0, 0.415f);
                         health--;
-                        //player.setText("" + health);
-                        monsters.positionalModify(pos, mon.change(1));
+                        mon.change(1);
+                        monplaces.add(pos);
                     }
                     // otherwise store the new position in newMons.
                     else {
-                        /*if (fovmap[mon.getKey().x][mon.getKey().y] > 0.0) {
-                            display.put(mon.getKey().x, mon.getKey().y, 'M', 11);
-                        }*/
-                        nextMovePositions.add(tmp);
-                        monsters.positionalModify(pos, mon.change(1));
-                        monsters.move(pos, tmp);
+                        mon.change(1);
+                        // alter is a method on OrderedMap and OrderedSet that changes a key in-place
+                        monsters.alter(pos, tmp);
                         display.slide(mon.entity, tmp.x, tmp.y);
-
+                        monplaces.add(tmp);
                     }
+                } else {
+                    mon.change(1);
+                    monplaces.add(pos);
                 }
-                else
-                {
-                    monsters.positionalModify(pos, mon.change(1));
-                }
+            }
+            else
+            {
+                monplaces.add(pos);
             }
         }
 
@@ -531,6 +485,9 @@ public class TsarGame extends ApplicationAdapter {
         IColoredString<Color> helping1 = new IColoredString.Impl<Color>("Use numpad or vi-keys (hjklyubn) to move.", Color.WHITE);
         IColoredString<Color> helping2 = new IColoredString.Impl<Color>("Use ? for help, f to change colors, q to quit.", Color.WHITE);
         IColoredString<Color> helping3 = new IColoredString.Impl<Color>("Click the top or bottom border of the lower message box to scroll.", Color.WHITE);
+        IColoredString<Color> helping4 = new IColoredString.Impl<Color>("Each Я is an AЯMED GUAЯD; bump into them to kill them.", Color.WHITE);
+        IColoredString<Color> helping5 = new IColoredString.Impl<Color>("If an Я starts its turn next to where you just moved, you take damage.", Color.WHITE);
+
 
         /* Some grey color */
         final Color bgColor = new Color(0.3f, 0.3f, 0.3f, 0.9f);
@@ -549,9 +506,11 @@ public class TsarGame extends ApplicationAdapter {
             text.add(helping1);
             text.add(helping2);
             text.add(helping3);
+            text.add(helping4);
+            text.add(helping5);
 
-            final float w = width * cellWidth, aw = helping3.length() * cellWidth * 0.8f * INTERNAL_ZOOM;
-            final float h = height * cellHeight, ah = cellHeight * 9f * INTERNAL_ZOOM;
+            final float w = width * cellWidth, aw = helping3.length() * cellWidth * 0.85f * INTERNAL_ZOOM;
+            final float h = height * cellHeight, ah = cellHeight * 13 * INTERNAL_ZOOM;
             tp.init(aw, ah, text);
             a = tp.getScrollPane();
             final float x = (w - aw) / 2f;
@@ -578,13 +537,13 @@ public class TsarGame extends ApplicationAdapter {
         boolean overlapping;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                overlapping = monsters.containsPosition(Coord.get(i,j)) || (player.gridX == i && player.gridY == j);
+                overlapping = monsters.containsKey(Coord.get(i,j)) || (player.gridX == i && player.gridY == j);
                 // if we see it now, we remember the cell and show a lit cell based on the fovmap value (between 0.0
-                // and 1.0), with 1.0 being almost pure white at +215 lightness and 0.0 being rather dark at -105.
+                // and 1.0), with 1.0 being brighter at +75 lightness and 0.0 being rather dark at -105.
                 if (fovmap[i][j] > 0.0) {
                     seen[i][j] = true;
                     display.put(i, j, (overlapping) ? ' ' : lineDungeon[i][j], colors[i][j], bgColors[i][j],
-                            lights[i][j] + (int) (-105 + 320 * fovmap[i][j]));
+                            lights[i][j] + (int) (-105 + 180 * fovmap[i][j]));
                     // if we don't see it now, but did earlier, use a very dark background, but lighter than black.
                 } else if (seen[i][j]) {
                     display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], -140);
@@ -697,7 +656,9 @@ public class TsarGame extends ApplicationAdapter {
             display.drawActor(batch, 1.0f, player);
             subCell.put(player.gridX, player.gridY, Character.forDigit(health, 10), SColor.PURE_CRIMSON);
 
-            for (Monster mon : monsters) {
+            Monster mon;
+            for (int i = 0; i < monsters.size(); i++) {
+                mon = monsters.getAt(i);
                 // monsters are only drawn if within FOV.
                 if (fovmap[mon.entity.gridX][mon.entity.gridY] > 0.0) {
                     display.drawActor(batch, 1.0f, mon.entity);

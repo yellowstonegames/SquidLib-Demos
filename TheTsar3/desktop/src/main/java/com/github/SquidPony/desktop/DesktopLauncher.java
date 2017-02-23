@@ -18,8 +18,8 @@ public class DesktopLauncher {
     private static LwjglApplicationConfiguration getDefaultConfiguration() {
         LwjglApplicationConfiguration configuration = new LwjglApplicationConfiguration();
         configuration.title = "TheTsar";
-        configuration.width = 90 * 12;
-        configuration.height = 34 * 20;
+        configuration.width = 80 * 13;
+        configuration.height = 32 * 26;
 
         for (int size : new int[] { 128, 64, 32, 16 }) {
             configuration.addIcon("libgdx" + size + ".png", FileType.Internal);
