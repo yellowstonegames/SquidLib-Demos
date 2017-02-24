@@ -87,7 +87,7 @@ public class TsarGame extends ApplicationAdapter {
     private DijkstraMap getToPlayer, playerToCursor;
     private Stage stage;
     private int framesWithoutAnimation = 0;
-    private Coord cursor;
+    private Coord cursor, playerPos;
     private ArrayList<Coord> toCursor;
     private ArrayList<Coord> awaitedMoves;
     private String lang;
@@ -134,7 +134,7 @@ public class TsarGame extends ApplicationAdapter {
         //the current health of the player and an '!' for alerted monsters.
         subCell = new SquidPanel(width, height, textFactory.copy());
 
-        display.setAnimationDuration(0.1f);
+        display.setAnimationDuration(0.15f);
         messages = new SquidMessageBox(width, 4,
                 textFactory.copy());
         // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
@@ -175,8 +175,8 @@ public class TsarGame extends ApplicationAdapter {
         lineDungeon = DungeonUtility.hashesToLines(dungeonGen.getDungeon(), true);
         // it's more efficient to get random floors from a packed set containing only (compressed) floor positions.
         GreasedRegion placement = new GreasedRegion(bareDungeon, '.');
-        Coord pl = placement.singleRandom(rng);
-        placement.remove(pl);
+        playerPos = placement.singleRandom(rng);
+        placement.remove(playerPos);
         int numMonsters = 25;
         monsters = new OrderedMap<Coord, Monster>(numMonsters);
         for (int i = 0; i < numMonsters; i++) {
@@ -188,17 +188,28 @@ public class TsarGame extends ApplicationAdapter {
         // your choice of FOV matters here.
         fov = new FOV(FOV.RIPPLE_TIGHT);
         res = DungeonUtility.generateResistances(decoDungeon);
-        fovmap = fov.calculateFOV(res, pl.x, pl.y, 8, Radius.SQUARE);
+        fovmap = fov.calculateFOV(res, playerPos.x, playerPos.y, 8, Radius.SQUARE);
         getToPlayer = new DijkstraMap(decoDungeon, DijkstraMap.Measurement.CHEBYSHEV);
         getToPlayer.rng = rng;
         // just showing off a little here; we can use smoothly changing colors for the special AnimatedEntity values we
         // use for the player and monsters
-        player = display.animateActor(pl.x, pl.y, '@',
+        player = display.animateActor(playerPos.x, playerPos.y, '@',
                 scc.loopingGradient(SColor.CAPE_JASMINE, SColor.HAN_PURPLE, 45), 1.5f, false);
         cursor = Coord.get(-1, -1);
         toCursor = new ArrayList<Coord>(10);
         awaitedMoves = new ArrayList<Coord>(10);
         playerToCursor = new DijkstraMap(decoDungeon, DijkstraMap.Measurement.EUCLIDEAN);
+        //DijkstraMap is the pathfinding swiss-army knife we use here to find a path to the latest cursor position.
+        //DijkstraMap.Measurement is an enum that determines the possibility or preference to enter diagonals. Here, the
+        // MANHATTAN value is used, which means 4-way movement only, no diagonals possible. Alternatives are CHEBYSHEV,
+        // which allows 8 directions of movement at the same cost for all directions, and EUCLIDEAN, which allows 8
+        // directions, but will prefer orthogonal moves unless diagonal ones are clearly closer "as the crow flies."
+        playerToCursor = new DijkstraMap(decoDungeon, DijkstraMap.Measurement.EUCLIDEAN);
+        //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
+        // player from all walkable cells in the dungeon.
+        playerToCursor.setGoal(playerPos);
+        playerToCursor.scan(null);
+
         final int[][] initialColors = DungeonUtility.generatePaletteIndices(decoDungeon),
                 initialBGColors = DungeonUtility.generateBGPaletteIndices(decoDungeon);
         colors = new Color[width][height];
@@ -310,8 +321,13 @@ public class TsarGame extends ApplicationAdapter {
                 if(fovmap[screenX][screenY] > 0.0 && awaitedMoves.isEmpty()) {
                     if (toCursor.isEmpty()) {
                         cursor = Coord.get(screenX, screenY);
-                        //Uses DijkstraMap to get a path. from the player's position to the cursor
-                        toCursor = playerToCursor.findPath(30, null, null, Coord.get(player.gridX, player.gridY), cursor);
+                        //This uses DijkstraMap.findPathPreScannned() to get a path as a List of Coord from the current
+                        // player position to the position the user clicked on. The "PreScanned" part is an optimization
+                        // that's special to DijkstraMap; because the whole map has already been fully analyzed by the
+                        // DijkstraMap.scan() method at the start of the program, and re-calculated whenever the player
+                        // moves, we only need to do a fraction of the work to find the best path with that info.
+                        toCursor = playerToCursor.findPathPreScanned(cursor);
+                        if(!toCursor.isEmpty()) toCursor.remove(0);
                     }
                     awaitedMoves.clear();
                     awaitedMoves.addAll(toCursor);
@@ -325,7 +341,7 @@ public class TsarGame extends ApplicationAdapter {
             }
 
             // causes the path to the mouse position to become highlighted (toCursor contains a list of points that
-            // receive highlighting). Uses DijkstraMap.findPath() to find the path, which is surprisingly fast.
+            // receive highlighting). Uses DijkstraMap.findPathPreScanned() to find the path, which is very fast.
             @Override
             public boolean mouseMoved(int screenX, int screenY) {
                 if(!awaitedMoves.isEmpty())
@@ -337,7 +353,8 @@ public class TsarGame extends ApplicationAdapter {
                 if(fovmap[screenX][screenY] > 0.0) {
                     cursor = Coord.get(screenX, screenY);
                     //Uses DijkstraMap to get a path. from the player's position to the cursor
-                    toCursor = playerToCursor.findPath(30, null, null, Coord.get(player.gridX, player.gridY), cursor);
+                    toCursor = playerToCursor.findPathPreScanned(cursor);
+                    if(!toCursor.isEmpty()) toCursor.remove(0);
                 }
                 return false;
             }
@@ -601,14 +618,32 @@ public class TsarGame extends ApplicationAdapter {
                     switch (phase) {
                         case WAIT:
                         case MONSTER_ANIM:
-                            Coord m = awaitedMoves.remove(0);
+                            playerPos = awaitedMoves.remove(0);
                             toCursor.remove(0);
-                            move(m.x - player.gridX, m.y - player.gridY);
+                            move(playerPos.x - player.gridX, playerPos.y - player.gridY);
                             break;
                         case PLAYER_ANIM:
                             postMove();
                             break;
                     }
+                    // this only happens if we just removed the last Coord from awaitedMoves, and it's only then that we need to
+                    // re-calculate the distances from all cells to the player. We don't need to calculate this information on
+                    // each part of a many-cell move (just the end), nor do we need to calculate it whenever the mouse moves.
+                    if(awaitedMoves.isEmpty())
+                    {
+                        // the next two lines remove any lingering data needed for earlier paths
+                        playerToCursor.clearGoals();
+                        playerToCursor.resetMap();
+                        // the next line marks the player as a "goal" cell, which seems counter-intuitive, but it works because all
+                        // cells will try to find the distance between themselves and the nearest goal, and once this is found, the
+                        // distances don't change as long as the goals don't change. Since the mouse will move and new paths will be
+                        // found, but the player doesn't move until a cell is clicked, the "goal" is the non-changing cell, so the
+                        // player's position, and the "target" of a pathfinding method like DijkstraMap.findPathPreScanned() is the
+                        // currently-moused-over cell, which we only need to set where the mouse is being handled.
+                        playerToCursor.setGoal(playerPos);
+                        playerToCursor.scan(null);
+                    }
+
                 }
             }
         }
