@@ -3,9 +3,9 @@
 <module rename-to="html">
 	<source path="" />
 	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
-	<inherits name="com.github.SquidPony.SquidBasicDemo" />
+	<inherits name="com.github.squidpony.SquidBasicDemo" />
 	<inherits name="regexodus" />
 	<inherits name="squidlib" />
-    <entry-point class="com.github.SquidPony.gwt.GwtLauncher" />
+    <entry-point class="com.github.squidpony.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
 </module>

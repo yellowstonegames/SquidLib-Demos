@@ -1,9 +1,9 @@
-package com.github.SquidPony.gwt;
+package com.github.squidpony.gwt;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.github.SquidPony.SquidBasicDemo;
+import com.github.squidpony.SquidBasicDemo;
 
 /** Launches the GWT application. */
 public class GwtLauncher extends GwtApplication {

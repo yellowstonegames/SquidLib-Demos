@@ -1,8 +1,8 @@
-package com.github.SquidPony.desktop;
+package com.github.squidpony.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.github.SquidPony.SquidBasicDemo;
+import com.github.squidpony.SquidBasicDemo;
 
 /** Launches the desktop (LWJGL) application. */
 public class DesktopLauncher {

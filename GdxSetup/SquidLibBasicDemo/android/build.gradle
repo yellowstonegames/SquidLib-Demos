@@ -17,7 +17,7 @@ android {
     instrumentTest.setRoot('tests')
   }
   defaultConfig {
-    applicationId 'com.github.SquidPony'
+    applicationId 'com.github.squidpony'
     minSdkVersion 8
     targetSdkVersion 23
   }
@@ -81,7 +81,7 @@ task run(type: Exec) {
   }
 
   def adb = path + "/platform-tools/adb"
-  commandLine '$adb', 'shell', 'am', 'start', '-n', 'com.github.SquidPony/com.github.SquidPony.android.AndroidLauncher'
+  commandLine '$adb', 'shell', 'am', 'start', '-n', 'com.github.squidpony/com.github.squidpony.android.AndroidLauncher'
 }
 
 // Sets up the Android Eclipse project using the old Ant based build.

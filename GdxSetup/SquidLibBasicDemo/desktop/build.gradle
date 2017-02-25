@@ -1,7 +1,7 @@
 apply plugin: 'application'
 
 sourceSets.main.resources.srcDirs = [ rootProject.file('assets').absolutePath ]
-mainClassName = 'com.github.SquidPony.desktop.DesktopLauncher'
+mainClassName = 'com.github.squidpony.desktop.DesktopLauncher'
 eclipse.project.name = appName + '-desktop'
 
 dependencies {
