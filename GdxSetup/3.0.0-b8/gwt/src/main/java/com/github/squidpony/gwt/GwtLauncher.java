@@ -9,7 +9,7 @@ import com.github.squidpony.SquidBasicDemo;
 public class GwtLauncher extends GwtApplication {
     @Override
     public GwtApplicationConfiguration getConfig() {
-        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(640, 480);
+        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(80 * 11, 30 * 20);
         return configuration;
     }
 
