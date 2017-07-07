@@ -8,7 +8,7 @@ buildscript {
     dependencies {
         classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
         classpath "de.richsource.gradle.plugins:gwt-gradle-plugin:$gwtPluginVersion"
-        classpath "com.android.tools.build:gradle:$androidPluginVersion"
+        classpath 'com.android.tools.build:gradle:2.2.2'
     }
 }
 

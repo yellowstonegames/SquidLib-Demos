@@ -10,4 +10,5 @@ dependencies {
     compile "com.github.tommyettinger:regexodus:$regExodusVersion"
     compile "com.kotcrab.vis:vis-ui:$visUiVersion"
 }
+
         
