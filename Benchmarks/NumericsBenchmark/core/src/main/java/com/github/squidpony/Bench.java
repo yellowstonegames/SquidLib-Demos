@@ -35,50 +35,74 @@ public class Bench extends ApplicationAdapter {
         batch = new SpriteBatch();
         tcf = DefaultResources.getStretchableSlabFont().width(11).height(22).initBySize();
         bmpFont = tcf.font();
-        text = new String[5];
+        text = new String[8];
         long time, time2;
         
         PintRNG pint = new PintRNG(0x1337BEEF);
         BirdRNG bird = new BirdRNG(0x1337BEEF);
+        HerdRNG herd = new HerdRNG(0x1337BEEF);
         FlapRNG flap = new FlapRNG(0x1337BEEF);
         LapRNG lap = new LapRNG(0x1337BEEF);
         LightRNG light = new LightRNG(0x1337BEEF);
+        BardRNG bard = new BardRNG(0x1337BEEF);
+        BeardRNG beard = new BeardRNG(0x1337BEEF);
         int tally;
         tally = 0;
         time = System.currentTimeMillis();
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 25000000; i++) {
             tally += pint.next(2);
         }
         time2 = System.currentTimeMillis();
         text[0] = "PintRNG took " + (time2 - time) + " ms.";
         tally = 0;
         time = System.currentTimeMillis();
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 25000000; i++) {
             tally += bird.next(2);
         }
         time2 = System.currentTimeMillis();
         text[1] = "BirdRNG took " + (time2 - time) + " ms.";
         tally = 0;
         time = System.currentTimeMillis();
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 25000000; i++) {
+            tally += herd.next(2);
+        }
+        time2 = System.currentTimeMillis();
+        text[2] = "HerdRNG took " + (time2 - time) + " ms.";
+        tally = 0;
+        time = System.currentTimeMillis();
+        for (int i = 0; i < 25000000; i++) {
             tally += flap.next(2);
         }
         time2 = System.currentTimeMillis();
-        text[2] = "FlapRNG took " + (time2 - time) + " ms.";
+        text[3] = "FlapRNG took " + (time2 - time) + " ms.";
         tally = 0;
         time = System.currentTimeMillis();
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 25000000; i++) {
             tally += lap.next(2);
         }
         time2 = System.currentTimeMillis();
-        text[3] = "LapRNG took " + (time2 - time) + " ms.";
+        text[4] = "LapRNG took " + (time2 - time) + " ms.";
         tally = 0;
         time = System.currentTimeMillis();
-        for (int i = 0; i < 10000000; i++) {
+        for (int i = 0; i < 25000000; i++) {
             tally += light.next(2);
         }
         time2 = System.currentTimeMillis();
-        text[4] = "LightRNG took " + (time2 - time) + " ms.";
+        text[5] = "LightRNG took " + (time2 - time) + " ms.";
+        tally = 0;
+        time = System.currentTimeMillis();
+        for (int i = 0; i < 25000000; i++) {
+            tally += beard.next(2);
+        }
+        time2 = System.currentTimeMillis();
+        text[6] = "BeardRNG took " + (time2 - time) + " ms.";
+        tally = 0;
+        time = System.currentTimeMillis();
+        for (int i = 0; i < 25000000; i++) {
+            tally += bard.next(2);
+        }
+        time2 = System.currentTimeMillis();
+        text[7] = "BardRNG took " + (time2 - time) + " ms.";
 
 //        final double[] data = new double[16];
 //        final float[] data2 = new float[16];
@@ -132,7 +156,7 @@ public class Bench extends ApplicationAdapter {
 //        time2 = System.currentTimeMillis();
 //        text[0] = "Wisp.hash(double[])=" + tally + " \ntook " + (time2 - time) + " ms.";
 
-        color = SColor.floatGet(0x8ffffffe);
+        color = SColor.floatGet(0x8ff0fffe);
         colorFromFloat(bmpFont.getColor(), color);
     }
 
@@ -148,7 +172,9 @@ public class Bench extends ApplicationAdapter {
         bmpFont.draw(batch, text[2], 20, 300);
         bmpFont.draw(batch, text[3], 20, 250);
         bmpFont.draw(batch, text[4], 20, 200);
+        bmpFont.draw(batch, text[5], 20, 150);
+        bmpFont.draw(batch, text[6], 20, 100);
+        bmpFont.draw(batch, text[7], 20,  50);
         batch.end();
-
     }
 }

@@ -26,8 +26,8 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
     compile "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
-    compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion:sources")
-    compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion:sources")
+    compile("$squidlibUtilVersion:sources")
+    compile("$squidlibVersion:sources")
 }
 
 task draftRun(type: JettyRunWar) {

@@ -78,8 +78,7 @@ public class TsarGame extends ApplicationAdapter {
      * The pixel height of a cell
      */
     private int cellHeight;
-    private VisualInput input;
-    private double counter;
+    private SquidInput input;
     private boolean[][] seen;
     private int health = 7;
     private Color bgColor;
@@ -92,9 +91,8 @@ public class TsarGame extends ApplicationAdapter {
     private ArrayList<Coord> awaitedMoves;
     private String lang;
     private TextCellFactory textFactory;
-    public static final int INTERNAL_ZOOM = 1;
     private Viewport viewport;
-    private float currentZoomX = INTERNAL_ZOOM, currentZoomY = INTERNAL_ZOOM;
+    private float currentZoomX = 1, currentZoomY = 1;
     private SquidColorCenter scc;
     @Override
     public void create () {
@@ -107,10 +105,9 @@ public class TsarGame extends ApplicationAdapter {
         //NOTE: cellWidth and cellHeight are assigned values that are significantly larger than the corresponding sizes
         //in the EverythingDemoLauncher's main method. Because they are scaled up by an integer here, they can be scaled
         //down when rendered, allowing certain small details to appear sharper. This _only_ works with distance field,
-        //a.k.a. stretchable, fonts! INTERNAL_ZOOM is a tradeoff between rendering more pixels to increase quality (when
-        // values are high) or rendering fewer pixels for speed (when values are low). Using 2 seems to work well.
-        cellWidth = 13 * INTERNAL_ZOOM;
-        cellHeight = 26 * INTERNAL_ZOOM;
+        //a.k.a. stretchable, fonts!
+        cellWidth = 13;
+        cellHeight = 26;
 
         // Sets our color center, which can be used to filter colors with various effects, though we don't really use it here.
         scc = DefaultResources.getSCC();
@@ -120,7 +117,7 @@ public class TsarGame extends ApplicationAdapter {
         // manually if you use a constant internal zoom; here we use 1f for internal zoom 1, about 2/3f for zoom 2, and
         // about 1/2f for zoom 3. If you have more zooms as options for some reason, this formula should hold for many
         // cases but probably not all.
-        textFactory = DefaultResources.getStretchableFont().setSmoothingMultiplier(2f / (INTERNAL_ZOOM + 1f))
+        textFactory = DefaultResources.getStretchableFont()
                 .width(cellWidth).height(cellHeight).initBySize();
         // Creates a layered series of text grids in a SquidLayers object, using the previously set-up textFactory and
         // SquidColorCenters.
@@ -134,17 +131,16 @@ public class TsarGame extends ApplicationAdapter {
         //the current health of the player and an '!' for alerted monsters.
         subCell = new SquidPanel(width, height, textFactory.copy());
 
-        display.setAnimationDuration(0.15f);
+        display.setAnimationDuration(0.12f);
         messages = new SquidMessageBox(width, 4,
                 textFactory.copy());
         // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
         // if you use '#' for walls instead of box drawing chars, you don't need this.
-        messages.setTextSize(cellWidth, cellHeight + INTERNAL_ZOOM * 2);
-        display.setTextSize(cellWidth, cellHeight + INTERNAL_ZOOM * 2);
-        //The subCell SquidPanel uses a smaller size here; the numbers 8 and 16 should change if cellWidth or cellHeight
-        //change, and the INTERNAL_ZOOM multiplier keeps things sharp, the same as it does all over here.
-        subCell.setTextSize(8 * INTERNAL_ZOOM, 16 * INTERNAL_ZOOM);
+        messages.setTextSize(cellWidth, cellHeight + 2);
+        display.setTextSize(cellWidth, cellHeight + 2);
+        //The subCell SquidPanel uses a smaller size here; adjust 8 and 16 if cellWidth or cellHeight change.
+        subCell.setTextSize(8, 16);
         viewport = new StretchViewport(width * cellWidth, (height + 4) * cellHeight);
         stage = new Stage(viewport, batch);
 
@@ -154,8 +150,6 @@ public class TsarGame extends ApplicationAdapter {
         subCell.setPosition(0, messages.getHeight());
         messages.appendWrappingMessage("Use numpad or vi-keys (hjklyubn) to move. Use ? for help, f to change colors, q to quit." +
                 " Click the top or bottom border of this box to scroll.");
-        counter = 0;
-
 
         dungeonGen = new DungeonGenerator(width, height, rng);
         dungeonGen.addWater(30, 6);
@@ -210,19 +204,10 @@ public class TsarGame extends ApplicationAdapter {
         playerToCursor.setGoal(playerPos);
         playerToCursor.scan(null);
 
-        final int[][] initialColors = DungeonUtility.generatePaletteIndices(decoDungeon),
-                initialBGColors = DungeonUtility.generateBGPaletteIndices(decoDungeon);
-        colors = new Color[width][height];
-        bgColors = new Color[width][height];
-        ArrayList<Color> palette = display.getPalette();
         bgColor = SColor.DARK_SLATE_GRAY;
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                colors[i][j] = palette.get(initialColors[i][j]);
-                bgColors[i][j] = palette.get(initialBGColors[i][j]);
-            }
-        }
-        lights = DungeonUtility.generateLightnessModifiers(decoDungeon, counter);
+        colors = MapUtility.generateDefaultColors(decoDungeon);
+        bgColors = MapUtility.generateDefaultBGColors(decoDungeon);
+        lights = MapUtility.generateLightnessModifiers(decoDungeon, System.currentTimeMillis() * 0.08);
         seen = new boolean[width][height];
         lang = FakeLanguageGen.RUSSIAN_AUTHENTIC.sentence(rng, 4, 6, new String[]{",", ",", ",", " -"},
                 new String[]{"..."}, 0.25);
@@ -359,10 +344,6 @@ public class TsarGame extends ApplicationAdapter {
                 return false;
             }
         }));
-        //set this to true to test visual input on desktop
-        input.forceButtons = false;
-        //actions to give names to in the visual input menu
-        input.init("filter", "??? help?", "quit");
         // ABSOLUTELY NEEDED TO HANDLE INPUT
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, input));
         subCell.setOffsetY(messages.getGridHeight() * cellHeight);
@@ -370,7 +351,6 @@ public class TsarGame extends ApplicationAdapter {
         stage.addActor(display);
         // stage.addActor(subCell); // this is not added since it is manually drawn after other steps
         stage.addActor(messages);
-        viewport = input.resizeInnerStage(stage);
     }
     /**
      * Move the player or open closed doors, remove any monsters the player bumped, then update the DijkstraMap and
@@ -526,8 +506,8 @@ public class TsarGame extends ApplicationAdapter {
             text.add(helping4);
             text.add(helping5);
 
-            final float w = width * cellWidth, aw = helping3.length() * cellWidth * 0.85f * INTERNAL_ZOOM;
-            final float h = height * cellHeight, ah = cellHeight * 13 * INTERNAL_ZOOM;
+            final float w = width * cellWidth, aw = helping3.length() * cellWidth * 0.85f;
+            final float h = height * cellHeight, ah = cellHeight * 13;
             tp.init(aw, ah, text);
             a = tp.getScrollPane();
             final float x = (w - aw) / 2f;
@@ -581,10 +561,8 @@ public class TsarGame extends ApplicationAdapter {
         // not sure if this is always needed...
         //Gdx.gl.glEnable(GL20.GL_BLEND);
 
-        // used as the z-axis when generating Simplex noise to make water seem to "move"
-        counter += Gdx.graphics.getDeltaTime() * 15;
-        // this does the standard lighting for walls, floors, etc. but also uses counter to do the Simplex noise thing.
-        lights = DungeonUtility.generateLightnessModifiers(decoDungeon, counter);
+        // this does the standard lighting for walls, floors, etc. but also uses the time to do the Simplex noise thing.
+        lights = MapUtility.generateLightnessModifiers(decoDungeon, System.currentTimeMillis() * 0.08);
         //textFactory.configureShader(batch);
 
         // you done bad. you done real bad.
@@ -603,7 +581,7 @@ public class TsarGame extends ApplicationAdapter {
                 input.next();
             return;
         }
-        // need to display the map every frame, since we clear the screen to avoid artifacts.
+        // need to display the map every frame, since the animations for water change often.
         putMap();
         // if the user clicked, we have a list of moves to perform.
         if(!awaitedMoves.isEmpty())
@@ -655,7 +633,7 @@ public class TsarGame extends ApplicationAdapter {
         // (because with no animations running the last phase must have ended), or start a new animation soon.
         else if(!display.hasActiveAnimations()) {
             ++framesWithoutAnimation;
-            if (framesWithoutAnimation >= 3) {
+            if (framesWithoutAnimation >= 2) {
                 framesWithoutAnimation = 0;
                 switch (phase) {
                     case WAIT:
@@ -676,17 +654,16 @@ public class TsarGame extends ApplicationAdapter {
         {
             framesWithoutAnimation = 0;
         }
-
-        input.show();
-        // stage has its own batch and must be explicitly told to draw(). this also causes it to act().
-        stage.getViewport().apply(true);
-        stage.draw();
         stage.act();
+        // stage has its own batch and must be explicitly told to draw().
+        stage.getViewport().apply(false);
+        batch.setProjectionMatrix(viewport.getCamera().combined);
+        batch.begin();
+        stage.getRoot().draw(batch, 1.0f);
 
         subCell.erase();
         if(help == null) {
             // display does not draw all AnimatedEntities by default, since FOV often changes how they need to be drawn.
-            batch.begin();
             // the player needs to get drawn every frame, of course.
             display.drawActor(batch, 1.0f, player);
             subCell.put(player.gridX, player.gridY, Character.forDigit(health, 10), SColor.PURE_CRIMSON);
@@ -703,8 +680,8 @@ public class TsarGame extends ApplicationAdapter {
             }
             subCell.draw(batch, 1.0F);
             // batch must end if it began.
-            batch.end();
         }
+        batch.end();
     }
 
     @Override
@@ -718,10 +695,8 @@ public class TsarGame extends ApplicationAdapter {
         // message box should be given updated bounds since I don't think it will do this automatically
         messages.setBounds(0, 0, width, currentZoomY * messages.getGridHeight());
         // SquidMouse turns screen positions to cell positions, and needs to be told that cell sizes have changed
-        input.reinitialize(currentZoomX, currentZoomY, this.width, this.height, 0, 0, width, height);
+        input.getMouse().reinitialize(currentZoomX, currentZoomY, this.width, this.height, 0, 0);
         currentZoomX = cellWidth / currentZoomX;
         currentZoomY = cellHeight / currentZoomY;
-        input.update(width, height, true);
-        stage.getViewport().update(width, height, true);
     }
 }
