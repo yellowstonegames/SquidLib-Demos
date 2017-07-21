@@ -1,0 +1,26 @@
+apply plugin: 'scala'
+apply plugin: 'application'
+
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').absolutePath ]
+mainClassName = 'com.squidpony.basic.scala.demo.desktop.DesktopLauncher'
+eclipse.project.name = appName + '-desktop'
+sourceCompatibility = 1.7
+
+dependencies {
+  compile project(':core')
+  compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+  compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  compile "org.scala-lang:scala-library:2.12.2"
+}
+
+jar {
+  archiveName "${appName}-${version}.jar"
+  from { configurations.compile.collect { zipTree(it) } }
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+}
+
+run {
+  ignoreExitValue = true
+}

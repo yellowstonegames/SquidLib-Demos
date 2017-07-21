@@ -1,0 +1,9 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+apply plugin: "scala"
+eclipse.project.name = appName + '-core'
+
+dependencies {
+  compile "org.scala-lang:scala-library:2.12.2"
+  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+  compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
+}
