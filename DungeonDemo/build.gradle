@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'de.richsource.gradle.plugins:gwt-gradle-plugin:0.6'
-        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.android.tools.build:gradle:2.3.0'
     }
 }
 
@@ -22,8 +22,8 @@ allprojects {
     ext {
         appName = "DungeonDemo"
         //squidlibVersion = '-SNAPSHOT'
-        squidlibVersion = 'a8b2b675ed'
-        gdxVersion = '1.9.2'
+        squidlibVersion = 'c4f1ce68f5'
+        gdxVersion = '1.9.6'
         roboVMVersion = '1.12.0'
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
@@ -78,7 +78,7 @@ project(":html") {
         //compile "com.squidpony:squidlib-util:3.0.0-SNAPSHOT:sources"
         compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion:sources")         //{changing = true}
         compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion:sources")   //{changing = true}
-        compile "com.github.tommyettinger:RegExodus:v0.1.1:sources"
+        compile "com.github.tommyettinger:RegExodus:v0.1.9:sources"
     }
 }
 
@@ -90,8 +90,6 @@ project(":core") {
         //compile "com.squidpony:squidlib:3.0.0-SNAPSHOT"
         //compile "com.squidpony:squidlib-util:3.0.0-SNAPSHOT"
         compile("com.github.SquidPony.SquidLib:squidlib:$squidlibVersion")   //{changing = true}
-        compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion")   //{changing = true}
-        compile "com.github.tommyettinger:RegExodus:v0.1.1"
 
     }
 }

@@ -146,11 +146,12 @@ public class MainApplication extends ApplicationAdapter {
         player = placement.singleRandom(rng);
         // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
         FOV.reuseFOV(resistance, visible, player.x, player.y, 7.0, Radius.CIRCLE);
-        // 0.1 is the upper bound (inclusive), so any Coord in visible that is more well-lit than 0.1 will _not_ be in
-        // the blockage Collection, but anything 0.1 or less will be in it. This lets us use blockage to prevent access
+        // 0.0 is the upper bound (inclusive), so any Coord in visible that is more well-lit than 0.0 will _not_ be in
+        // the blockage Collection, but anything 0.0 or less will be in it. This lets us use blockage to prevent access
         // to cells we can't see from the start of the move.
-        blockage = new GreasedRegion(visible, 0.1);
+        blockage = new GreasedRegion(visible, 0.0);
         seen = blockage.copy().not();
+        blockage.surface8way();
         //This is used to allow clicks or taps to take the player to the desired area.
         toCursor = new ArrayList<>(200);
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
@@ -402,9 +403,9 @@ public class MainApplication extends ApplicationAdapter {
             FOV.reuseFOV(resistance, visible, player.x, player.y, 7.0, Radius.CIRCLE);
             // This is just like the constructor used earlier, but affects an existing GreasedRegion without making
             // a new one just for this movement.
-            blockage.refill(visible, 0.1);
+            blockage.refill(visible, 0.0);
             seen.or(blockage.not());
-            blockage.not();
+            blockage.fringe8way();
 
         }
         // changes the top displayed sentence to a new one with the same language. the top will be cycled off next.
@@ -421,10 +422,10 @@ public class MainApplication extends ApplicationAdapter {
 
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
-                if(visible[i][j] > 0.1) {
-                    int bright = baseLightness[i][j] + (int) (-105 +
-                            180 * (visible[i][j] * (1.0 + 0.2 * SeededNoise.noise(i * 0.2, j * 0.2, (int) (System.currentTimeMillis() & 0xffffff) * 0.001, 10000))));
-                    display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], bright);
+                if(visible[i][j] > 0.0) {
+                    display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j],
+                            baseLightness[i][j] + (int) (-105 + 180 * (visible[i][j] * (1.0 +
+                                    0.2 * SeededNoise.noise(i * 0.2, j * 0.2, (int) (System.currentTimeMillis() & 0xffffff) * 0.001, 10000)))));
                 }else if(seen.contains(i, j))
                     display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], -80);
                 else

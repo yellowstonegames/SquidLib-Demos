@@ -3,7 +3,7 @@ package com.squidpony.basic.scala.demo
 import com.badlogic.gdx._
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.g2d.{BitmapFont, SpriteBatch}
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.StretchViewport
 import squidpony.ArrayTools
@@ -17,7 +17,7 @@ import squidpony.squidgrid.mapping.DungeonUtility
 import squidpony.squidmath._
 import java.util
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/** ApplicationListener implementation shared by all platforms. */
 object MainApplication {
   /** In number of cells */
   val gridWidth = 60
@@ -26,16 +26,16 @@ object MainApplication {
   /** In number of cells */
   val bonusHeight = 6
   /** The pixel width of a cell */
-  val cellWidth = 25
+  val cellWidth = 16
   /** The pixel height of a cell */
-  val cellHeight = 25
+  val cellHeight = 16
 }
 
 class MainApplication extends ApplicationAdapter {
   private var batch : SpriteBatch = _
   private var rng = new RNG("SquidLib!")
   private var display : SquidLayers = _
-  private var font : BitmapFont = _
+  private var font : TextCellFactory = _
   private var dungeonGen : DungeonGenerator = _
   private var decoDungeon : Array[Array[Char]] = _
   private var bareDungeon : Array[Array[Char]] = _
@@ -70,12 +70,12 @@ class MainApplication extends ApplicationAdapter {
     // the font will try to load Iosevka Slab as an embedded bitmap font with a distance field effect.
     // the distance field effect allows the font to be stretched without getting blurry or grainy too easily.
     // this font is covered under the SIL Open Font License (fully free), so there's no reason it can't be used.
-    font = DefaultResources.getSquareSmoothFont
+    font = DefaultResources.getStretchableSlabFont.setSmoothingMultiplier(1.8f)
     display = new SquidLayers(MainApplication.gridWidth, MainApplication.gridHeight + MainApplication.bonusHeight, MainApplication.cellWidth, MainApplication.cellHeight, font)
     // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
     // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
     // if you use '#' for walls instead of box drawing chars, you don't need this.
-    //display.setTextSize(MainApplication.cellWidth * 1.05f, MainApplication.cellHeight * 1.1f)
+    display.setTextSize(MainApplication.cellWidth * 1.05f, MainApplication.cellHeight * 1.15f)
     // this makes animations very fast, which is good for multi-cell movement but bad for attack animations.
     display.setAnimationDuration(0.03f)
     //These need to have their positions set before adding any entities if there is an offset involved.
@@ -277,8 +277,8 @@ class MainApplication extends ApplicationAdapter {
     * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
     * In a fully-fledged game, this would not be organized like this, but this is a one-file demo.
     *
-    * @param xmod
-    * @param ymod
+    * @param xmod change of x
+    * @param ymod change of y
     */
   private def move(xmod: Int, ymod: Int) = {
     val newX = player.x + xmod
@@ -317,7 +317,7 @@ class MainApplication extends ApplicationAdapter {
       }
       i += 1
     }
-    var pt : Coord = Coord.get(-1, -1);
+    var pt : Coord = Coord.get(-1, -1)
     var h = 0
     while (h < toCursor.size) {
       pt = toCursor.get(h)
