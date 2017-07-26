@@ -33,6 +33,7 @@ object MainApplication {
 
 class MainApplication extends ApplicationAdapter {
   private var batch : SpriteBatch = _
+  // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
   private var rng = new RNG("SquidLib!")
   private var display : SquidLayers = _
   private var font : TextCellFactory = _
@@ -61,7 +62,7 @@ class MainApplication extends ApplicationAdapter {
   private var blockage : GreasedRegion = _
   private var seen : GreasedRegion = _
 
-  override def create(): Unit = { // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
+  override def create(): Unit = {
 
     //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
     batch = new SpriteBatch
@@ -70,12 +71,12 @@ class MainApplication extends ApplicationAdapter {
     // the font will try to load Iosevka Slab as an embedded bitmap font with a distance field effect.
     // the distance field effect allows the font to be stretched without getting blurry or grainy too easily.
     // this font is covered under the SIL Open Font License (fully free), so there's no reason it can't be used.
-    font = DefaultResources.getStretchableSlabFont.setSmoothingMultiplier(1.8f)
+    font = DefaultResources.getStretchableSlabFont
     display = new SquidLayers(MainApplication.gridWidth, MainApplication.gridHeight + MainApplication.bonusHeight, MainApplication.cellWidth, MainApplication.cellHeight, font)
     // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
     // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
     // if you use '#' for walls instead of box drawing chars, you don't need this.
-    display.setTextSize(MainApplication.cellWidth * 1.05f, MainApplication.cellHeight * 1.15f)
+    display.setTextSize(MainApplication.cellWidth * 1.05f, MainApplication.cellHeight * 1.1f)
     // this makes animations very fast, which is good for multi-cell movement but bad for attack animations.
     display.setAnimationDuration(0.03f)
     //These need to have their positions set before adding any entities if there is an offset involved.

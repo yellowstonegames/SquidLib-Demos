@@ -19,7 +19,7 @@ import squidpony.squidgrid.Radius;
 import squidpony.squidgrid.gui.gdx.*;
 import squidpony.squidgrid.mapping.DungeonGenerator;
 import squidpony.squidgrid.mapping.DungeonUtility;
-import squidpony.squidgrid.mapping.MixedGenerator;
+import squidpony.squidgrid.mapping.SerpentMapGenerator;
 import squidpony.squidmath.*;
 
 import java.util.ArrayList;
@@ -156,7 +156,7 @@ public class TsarGame extends ApplicationAdapter {
         dungeonGen.addGrass(5);
         dungeonGen.addBoulders(10);
         dungeonGen.addDoors(18, false);
-        MixedGenerator mix = new MixedGenerator(width, height, rng);
+        SerpentMapGenerator mix = new SerpentMapGenerator(width, height, rng, 0.1);
         mix.putCaveCarvers(1);
         mix.putBoxRoomCarvers(1);
         mix.putRoundRoomCarvers(2);

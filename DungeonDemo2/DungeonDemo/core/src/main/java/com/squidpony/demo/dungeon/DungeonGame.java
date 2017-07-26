@@ -24,9 +24,6 @@ import squidpony.squidmath.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static squidpony.squidmath.CoordPacker.retract;
-import static squidpony.squidmath.CoordPacker.singleRandom;
-
 /**
  * The main class of the game, constructed once in each of the platform-specific Launcher classes. Doesn't use any
  * platform-specific code.
@@ -72,8 +69,18 @@ public class DungeonGame extends ApplicationAdapter {
     private AnimatedEntity playerAE;
     private List<Coord> toCursor;
     private List<Coord> awaitedMoves;
-    private float secondsWithoutMoves;
+    private GreasedRegion placement;
     OrderedMap<Character, Double> costs;
+
+    private static int total(String text)
+    {
+        int t = 0;
+        for (int i = 0; i < text.length(); i++) {
+            t += text.codePointAt(i);
+        }
+        return t;
+    }
+
     @Override
     public void create () {
         gridWidth = 75;
@@ -83,7 +90,8 @@ public class DungeonGame extends ApplicationAdapter {
         cellHeight = 27;
         // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
         rng = new RNG("SquidLib!");
-
+        // choice is -499832297 on Desktop
+        // choice is -392612924 on GWT
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
         //Here we make sure our Stage, which holds any text-based grids we make, uses our Batch.
@@ -104,7 +112,7 @@ public class DungeonGame extends ApplicationAdapter {
         // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
         // if you use '#' for walls instead of box drawing chars, you don't need this.
-        display.setTextSize(cellWidth * 1.05f, cellHeight * 1.1f);
+        display.setTextSize(cellWidth * 1.1f, cellHeight * 1.1f);
 
         // this makes animations very fast, which is good for multi-cell movement but bad for attack animations.
         display.setAnimationDuration(0.09f);
@@ -113,13 +121,15 @@ public class DungeonGame extends ApplicationAdapter {
         //There is no offset used here, but it's still a good practice here to set positions early on.
         display.setPosition(0, 0);
 
+        placement = new GreasedRegion(gridWidth, gridHeight);
+
         //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
         //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good "ruined" dungeons.
         dungeonGen = new SectionDungeonGenerator(gridWidth, gridHeight, rng);
 
         fov = new FOV(FOV.SHADOW);
 
-        playerToCursor = new DijkstraMap(DefaultResources.getGuiRandom());
+        playerToCursor = new DijkstraMap(new RNG(CrossHash.Wisp.hash64("Random Path?")));
         costs = Maker.<Character, Double>makeOM('£', DijkstraMap.WALL, '¢', 4.0, '"', 2.0);
         rebuild();
         bgColor = SColor.DARK_SLATE_GRAY;
@@ -272,7 +282,7 @@ public class DungeonGame extends ApplicationAdapter {
 
     private void rebuild()
     {
-        serpent = new SerpentMapGenerator(gridWidth, gridHeight, rng, rng.nextDouble(0.15));
+        serpent = new SerpentMapGenerator(gridWidth, gridHeight, rng, rng.nextInt(150) * 0.01);
 
         serpent.putWalledBoxRoomCarvers(rng.between(5, 10));
         serpent.putWalledRoundRoomCarvers(rng.between(3, 6));
@@ -284,8 +294,8 @@ public class DungeonGame extends ApplicationAdapter {
         dungeonGen.addDoors(rng.between(10, 25), false);
         dungeonGen.addGrass(SectionDungeonGenerator.CAVE, rng.between(5, 25));
         dungeonGen.addGrass(SectionDungeonGenerator.ROOM, rng.between(0, 5));
-        dungeonGen.addBoulders(SectionDungeonGenerator.ALL, rng.between(3, 11));
-        if(rng.nextIntHasty(3) == 0)
+        dungeonGen.addBoulders(SectionDungeonGenerator.ALL, rng.between(2, 9));
+        if(rng.nextInt(3) == 0)
             dungeonGen.addLake(rng.between(5, 30), '£', '¢');
         else if(rng.nextBoolean())
             dungeonGen.addLake(rng.between(8, 35));
@@ -336,13 +346,13 @@ public class DungeonGame extends ApplicationAdapter {
         // it's more efficient to get random floors from a packed set containing only (compressed) floor positions.
         // CoordPacker is a deep and involved class, but when other classes request packed data, you usually just need
         // to give them a short array representing a region, as produced by CoordPacker.pack().
-        short[] placement = CoordPacker.pack(decoDungeon, '.');
+        placement.refill(decoDungeon, '.');
         //Coord is the type we use as a general 2D point, usually in a dungeon.
         //Because we know dungeons won't be huge, Coord is optimized for x and y values between -3 and 255, inclusive.
         cursor = Coord.get(-1, -1);
         //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
         //creatures, and possibly a subclass for the player.
-        player = singleRandom(retract(placement, 1, gridWidth, gridHeight, true), rng);
+        player = placement.retract8way().singleRandom(rng);
         if(!player.isWithin(gridWidth, gridHeight))
             rebuild();
         //display.removeAnimatedEntity(playerAE);
@@ -362,15 +372,17 @@ public class DungeonGame extends ApplicationAdapter {
         playerToCursor.initializeCost(DungeonUtility.generateCostMap(decoDungeon, costs, 1.0));
         //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
         // player from all walkable cells in the dungeon.
+        playerToCursor.clearGoals();
+        playerToCursor.resetMap();
         playerToCursor.setGoal(player);
-        playerToCursor.scan();
+        playerToCursor.scan(null);
 
         // DungeonUtility provides various ways to get default colors or other information from a dungeon char 2D array.
         colors = MapUtility.generateDefaultColors(decoDungeon, '£', SColor.CW_LIGHT_YELLOW, '¢', SColor.CW_BRIGHT_ORANGE);
         bgColors = MapUtility.generateDefaultBGColors(decoDungeon, '£', SColor.CW_ORANGE, '¢',  SColor.CW_DARK_ORANGE);
         // the line after this automatically sets the brightness of backgrounds in display to match their contents, so
         // here we simply fill the contents of display with our dungeon (but we don't set the actual colors yet).
-        ArrayTools.insert(display.getForegroundLayer().contents, decoDungeon, 0, 0);
+        ArrayTools.insert(lineDungeon, display.getForegroundLayer().contents, 0, 0);
         display.autoLight((System.currentTimeMillis() & 0xFFFFFFL) * 0.013, '£', '¢');
     }
     /**
@@ -406,7 +418,6 @@ public class DungeonGame extends ApplicationAdapter {
      */
     public void putMap()
     {
-        double alter = 0;
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
                 display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j],
@@ -464,6 +475,7 @@ public class DungeonGame extends ApplicationAdapter {
         // if we are waiting for the player's input and get input, process it.
         else if(input.hasNext()) {
             input.next();
+            input.flush();
         }
         input.show();
 

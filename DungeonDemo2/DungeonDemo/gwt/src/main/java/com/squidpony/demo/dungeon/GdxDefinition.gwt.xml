@@ -3,6 +3,9 @@
 <module rename-to="html">
     <source path="" />
     <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
+    <inherits name="regexodus" />
+    <inherits name="squidlib-util" />
+    <inherits name="squidlib" />
     <inherits name="com.squidpony.demo.dungeon.DungeonGame" />
     <entry-point class="com.squidpony.demo.dungeon.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
