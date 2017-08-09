@@ -9,7 +9,7 @@ buildscript {
     classpath "org.scala-lang:scala-library:2.12.2"
     classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     classpath "de.richsource.gradle.plugins:gwt-gradle-plugin:$gwtPluginVersion"
-    classpath "com.android.tools.build:gradle:$androidPluginVersion"
+    //classpath "com.android.tools.build:gradle:$androidPluginVersion"
   }
 }
 
@@ -18,7 +18,7 @@ allprojects {
   apply plugin: 'idea'
 }
 
-configure(subprojects - project(':android')) {
+configure(subprojects) { // - project(':android')
   apply plugin: 'scala'
   apply plugin: 'java'
   sourceCompatibility = 1.7
