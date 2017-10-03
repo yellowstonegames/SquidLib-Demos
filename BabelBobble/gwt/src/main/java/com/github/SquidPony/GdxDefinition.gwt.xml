@@ -6,8 +6,8 @@
     <!--<inherits name="com.github.SquidPony.BabelBobble" />-->
     <inherits name="regexodus" />
     <inherits name="squidlib-util" />
-    <inherits name="blazing.chain"/>
     <inherits name="squidlib-extra" />
     <entry-point class="com.github.SquidPony.gwt.GwtBabelBobble" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
+    <set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 </module>

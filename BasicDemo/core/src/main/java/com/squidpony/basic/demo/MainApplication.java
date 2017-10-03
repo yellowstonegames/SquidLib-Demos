@@ -70,15 +70,15 @@ public class MainApplication extends ApplicationAdapter {
     //space on the resized screen, but the same measurements will be used (usually called world coordinates by libGDX).
 
     /** In number of cells */
-    public static final int gridWidth = 90;
+    public static final int gridWidth = 180;
     /** In number of cells */
-    public static final int gridHeight = 30;
+    public static final int gridHeight = 50;
     /** In number of cells */
-    public static final int bonusHeight = 7;
+    public static final int bonusHeight = 5;
     /** The initial pixel width of a cell */
-    public static final int cellWidth = 10;
+    public static final int cellWidth = 6;
     /** The initial pixel height of a cell */
-    public static final int cellHeight = 19;
+    public static final int cellHeight = 12;
 
     private SquidInput input;
     private Color bgColor;
@@ -208,7 +208,10 @@ public class MainApplication extends ApplicationAdapter {
         //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
         // player from all walkable cells in the dungeon.
         playerToCursor.setGoal(playerPosition);
-        playerToCursor.scan(blockage);
+        // DijkstraMap.partialScan only finds the distance to get to a cell if that distance is less than some limit,
+        // which is 12 here. It also won't try to find distances through an impassable cell, which here is the blockage
+        // GreasedRegion that contains the cells just past the edge of the player's FOV area.
+        playerToCursor.partialScan(12, blockage);
 
         //The next three lines set the background color for anything we don't draw on, but also create 2D arrays of the
         //same size as decoDungeon that store simple indexes into a common list of colors, using the colors that looks
@@ -366,18 +369,20 @@ public class MainApplication extends ApplicationAdapter {
                         if (awaitedMoves.isEmpty()) {
                             if (toCursor.isEmpty()) {
                                 cursor = Coord.get(screenX, screenY);
-                                //This uses DijkstraMap.findPathPreScannned() to get a path as a List of Coord from the current
+                                // This uses DijkstraMap.findPathPreScannned() to get a path as a List of Coord from the current
                                 // player position to the position the user clicked on. The "PreScanned" part is an optimization
-                                // that's special to DijkstraMap; because the whole map has already been fully analyzed by the
-                                // DijkstraMap.scan() method at the start of the program, and re-calculated whenever the player
-                                // moves, we only need to do a fraction of the work to find the best path with that info.
+                                // that's special to DijkstraMap; because the part of the map that is viable to move into has
+                                // already been fully analyzed by the DijkstraMap.partialScan() method at the start of the
+                                // program, and re-calculated whenever the player moves, we only need to do a fraction of the
+                                // work to find the best path with that info.
                                 toCursor = playerToCursor.findPathPreScanned(cursor);
-                                //findPathPreScanned includes the current cell (goal) by default, which is helpful when
+                                // findPathPreScanned includes the current cell (goal) by default, which is helpful when
                                 // you're finding a path to a monster or loot, and want to bump into it, but here can be
                                 // confusing because you would "move into yourself" as your first move without this.
                                 // Getting a sublist avoids potential performance issues with removing from the start of an
                                 // ArrayList, since it keeps the original list around and only gets a "view" of it.
                                 if (!toCursor.isEmpty()) {
+                                    // we also set the line that shows what path we will take here.
                                     line = OrthoLine.lineChars(toCursor);
                                     toCursor = toCursor.subList(1, toCursor.size());
                                 }
@@ -402,19 +407,20 @@ public class MainApplication extends ApplicationAdapter {
                             return false;
                         }
                         cursor = Coord.get(screenX, screenY);
-                        //This uses DijkstraMap.findPathPreScannned() to get a path as a List of Coord from the current
+                        // This uses DijkstraMap.findPathPreScannned() to get a path as a List of Coord from the current
                         // player position to the position the user clicked on. The "PreScanned" part is an optimization
-                        // that's special to DijkstraMap; because the whole map has already been fully analyzed by the
-                        // DijkstraMap.scan() method at the start of the program, and re-calculated whenever the player
-                        // moves, we only need to do a fraction of the work to find the best path with that info.
-
+                        // that's special to DijkstraMap; because the part of the map that is viable to move into has
+                        // already been fully analyzed by the DijkstraMap.partialScan() method at the start of the
+                        // program, and re-calculated whenever the player moves, we only need to do a fraction of the
+                        // work to find the best path with that info.
                         toCursor = playerToCursor.findPathPreScanned(cursor);
-                        //findPathPreScanned includes the current cell (goal) by default, which is helpful when
+                        // findPathPreScanned includes the current cell (goal) by default, which is helpful when
                         // you're finding a path to a monster or loot, and want to bump into it, but here can be
                         // confusing because you would "move into yourself" as your first move without this.
                         // Getting a sublist avoids potential performance issues with removing from the start of an
                         // ArrayList, since it keeps the original list around and only gets a "view" of it.
                         if (!toCursor.isEmpty()) {
+                            // we also set the line that shows what path we will take here.
                             line = OrthoLine.lineChars(toCursor);
                             toCursor = toCursor.subList(1, toCursor.size());
                         }
@@ -447,6 +453,7 @@ public class MainApplication extends ApplicationAdapter {
             blockage.refill(visible, 0.0);
             seen.or(blockage.not());
             blockage.fringe8way();
+
         }
         // changes the top displayed sentence to a new one with the same language. the top will be cycled off next.
         lang[langIndex] = forms[langIndex].sentence();
@@ -462,12 +469,12 @@ public class MainApplication extends ApplicationAdapter {
         double tm = (System.currentTimeMillis() & 0xffffffL) * 0.001;
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
-                if (visible[i][j] > 0.1) {
-                    int bright = (int) (-65 +
+                if (visible[i][j] > 0.0) {
+                    int bright = (int) (-60 +
                             180 * (visible[i][j] * (1.0 + 0.2 * SeededNoise.noise(i * 0.2, j * 0.2, tm, 10000))));
                     display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], bright);
                 } else if (seen.contains(i, j))
-                    display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], -80);
+                    display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], -95);
                 else
                     display.put(i, j, ' ', SColor.BLACK);
             }
@@ -522,7 +529,10 @@ public class MainApplication extends ApplicationAdapter {
                     // player's position, and the "target" of a pathfinding method like DijkstraMap.findPathPreScanned() is the
                     // currently-moused-over cell, which we only need to set where the mouse is being handled.
                     playerToCursor.setGoal(playerPosition);
-                    playerToCursor.scan(blockage);
+                    // DijkstraMap.partialScan only finds the distance to get to a cell if that distance is less than some limit,
+                    // which is 12 here. It also won't try to find distances through an impassable cell, which here is the blockage
+                    // GreasedRegion that contains the cells just past the edge of the player's FOV area.
+                    playerToCursor.partialScan(12, blockage);
                 }
             }
         }

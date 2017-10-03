@@ -18,12 +18,14 @@ public abstract class GwtBareApp implements EntryPoint, Application {
     private ObjectMap<String, Preferences> prefs = new ObjectMap<String, Preferences>();
     public GwtApplicationConfiguration config;
     public VerticalPanel root;
+    private ApplicationLogger applicationLogger;
+    private int logLevel = LOG_ERROR;
     public abstract void start();
     public abstract GwtApplicationConfiguration getConfig();
     @Override
     public void onModuleLoad () {
         this.config = getConfig();
-
+        applicationLogger = new GwtApplicationLogger(this.config.log);
         Element element = Document.get().getElementById("embed-html");
         if (element == null) {
             VerticalPanel panel = new VerticalPanel();
@@ -112,92 +114,44 @@ public abstract class GwtBareApp implements EntryPoint, Application {
         return null;
     }
 
-    /**
-     * Logs a message to the console or logcat
-     *
-     * @param tag
-     * @param message
-     */
     @Override
-    public void log(String tag, String message) {
-
+    public void log (String tag, String message) {
+        if (logLevel >= LOG_INFO) getApplicationLogger().log(tag, message);
     }
 
-    /**
-     * Logs a message to the console or logcat
-     *
-     * @param tag
-     * @param message
-     * @param exception
-     */
     @Override
-    public void log(String tag, String message, Throwable exception) {
-
+    public void log (String tag, String message, Throwable exception) {
+        if (logLevel >= LOG_INFO) getApplicationLogger().log(tag, message, exception);
     }
 
-    /**
-     * Logs an error message to the console or logcat
-     *
-     * @param tag
-     * @param message
-     */
     @Override
-    public void error(String tag, String message) {
-
+    public void error (String tag, String message) {
+        if (logLevel >= LOG_ERROR) getApplicationLogger().error(tag, message);
     }
 
-    /**
-     * Logs an error message to the console or logcat
-     *
-     * @param tag
-     * @param message
-     * @param exception
-     */
     @Override
-    public void error(String tag, String message, Throwable exception) {
-
+    public void error (String tag, String message, Throwable exception) {
+        if (logLevel >= LOG_ERROR) getApplicationLogger().error(tag, message, exception);
     }
 
-    /**
-     * Logs a debug message to the console or logcat
-     *
-     * @param tag
-     * @param message
-     */
     @Override
-    public void debug(String tag, String message) {
-
+    public void debug (String tag, String message) {
+        if (logLevel >= LOG_DEBUG) getApplicationLogger().debug(tag, message);
     }
 
-    /**
-     * Logs a debug message to the console or logcat
-     *
-     * @param tag
-     * @param message
-     * @param exception
-     */
     @Override
-    public void debug(String tag, String message, Throwable exception) {
-
+    public void debug (String tag, String message, Throwable exception) {
+        if (logLevel >= LOG_DEBUG) getApplicationLogger().debug(tag, message, exception);
     }
 
-    /**
-     * Sets the log level. {@link #LOG_NONE} will mute all log output. {@link #LOG_ERROR} will only let error messages through.
-     * {@link #LOG_INFO} will let all non-debug messages through, and {@link #LOG_DEBUG} will let all messages through.
-     *
-     * @param logLevel {@link #LOG_NONE}, {@link #LOG_ERROR}, {@link #LOG_INFO}, {@link #LOG_DEBUG}.
-     */
     @Override
-    public void setLogLevel(int logLevel) {
-
+    public void setLogLevel (int logLevel) {
+        this.logLevel = logLevel;
     }
 
-    /**
-     * Gets the log level.
-     */
     @Override
     public int getLogLevel() {
-        return 0;
+        return logLevel;
     }
 
     /**
@@ -268,5 +222,15 @@ public abstract class GwtBareApp implements EntryPoint, Application {
     @Override
     public void removeLifecycleListener(LifecycleListener listener) {
 
+    }
+
+    @Override
+    public void setApplicationLogger(ApplicationLogger applicationLogger) {
+        this.applicationLogger = applicationLogger;
+    }
+
+    @Override
+    public ApplicationLogger getApplicationLogger() {
+        return applicationLogger;
     }
 }

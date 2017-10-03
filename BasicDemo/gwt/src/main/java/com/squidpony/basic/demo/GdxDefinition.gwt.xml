@@ -6,7 +6,6 @@
     <inherits name="com.squidpony.basic.demo.MainApplication" />
     <inherits name="regexodus" />
     <inherits name="squidlib-util" />
-    <inherits name="squidlib-extra" />
     <entry-point class="com.squidpony.basic.demo.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
     <set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>
