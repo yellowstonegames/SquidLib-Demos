@@ -3,7 +3,7 @@ apply plugin: 'war'
 apply plugin: 'jetty'
 
 gwt {
-  gwtVersion = gwtFrameworkVersion // Should match the version used for building the GWT backend. See gradle.properties.
+  gwtVersion= '2.8.0' // Should match the gwt version used for building the gwt backend
   maxHeapSize = '1G' // Default 256m is not enough for the GWT compiler. GWT is HUNGRY.
   minHeapSize = '1G'
 
@@ -12,10 +12,8 @@ gwt {
   devModules 'com.github.SquidPony.GdxDefinitionSuperdev'
   project.webAppDirName = 'webapp'
 
-  compiler {
-    strict = true
-    disableCastChecking = true
-  }
+  compiler.strict = true
+  compiler.disableCastChecking = true
 }
 
 dependencies {

@@ -62,6 +62,7 @@ public class TsarGame extends ApplicationAdapter {
     private double[][] fovmap;
     private AnimatedEntity player;
     private FOV fov;
+    private final int fovRange = 8;
     /**
      * In number of cells
      */
@@ -182,7 +183,7 @@ public class TsarGame extends ApplicationAdapter {
         // your choice of FOV matters here.
         fov = new FOV(FOV.RIPPLE_TIGHT);
         res = DungeonUtility.generateResistances(decoDungeon);
-        fovmap = fov.calculateFOV(res, playerPos.x, playerPos.y, 8, Radius.SQUARE);
+        fovmap = fov.calculateFOV(res, playerPos.x, playerPos.y, fovRange, Radius.SQUARE);
         getToPlayer = new DijkstraMap(decoDungeon, DijkstraMap.Measurement.CHEBYSHEV);
         getToPlayer.rng = rng;
         // just showing off a little here; we can use smoothly changing colors for the special AnimatedEntity values we
@@ -346,7 +347,7 @@ public class TsarGame extends ApplicationAdapter {
         }));
         // ABSOLUTELY NEEDED TO HANDLE INPUT
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, input));
-        subCell.setOffsetY(messages.getGridHeight() * cellHeight);
+        //subCell.setOffsetY(messages.getGridHeight() * cellHeight);
         // and then add display and messages, our two visual components, to the list of things that act in Stage.
         stage.addActor(display);
         // stage.addActor(subCell); // this is not added since it is manually drawn after other steps
@@ -373,11 +374,11 @@ public class TsarGame extends ApplicationAdapter {
                 // changes to the map mean the resistances for FOV need to be regenerated.
                 res = DungeonUtility.generateResistances(decoDungeon);
                 // recalculate FOV, store it in fovmap for the render to use.
-                fovmap = fov.calculateFOV(res, player.gridX, player.gridY, 8, Radius.SQUARE);
+                fovmap = fov.calculateFOV(res, player.gridX, player.gridY, fovRange, Radius.SQUARE);
 
             } else {
                 // recalculate FOV, store it in fovmap for the render to use.
-                fovmap = fov.calculateFOV(res, newX, newY, 8, Radius.SQUARE);
+                fovmap = fov.calculateFOV(res, newX, newY, fovRange, Radius.SQUARE);
                 display.slide(player, newX, newY);
                 // if a monster was at the position we moved into, and so was successfully removed...
                 if(monsters.remove(Coord.get(newX, newY)) != null)
@@ -408,7 +409,7 @@ public class TsarGame extends ApplicationAdapter {
         int monCount = monplaces.size();
 
         // recalculate FOV, store it in fovmap for the render to use.
-        fovmap = fov.calculateFOV(res, player.gridX, player.gridY, 8, Radius.SQUARE);
+        fovmap = fov.calculateFOV(res, player.gridX, player.gridY, fovRange, Radius.SQUARE);
         // handle monster turns
         ArrayList<Coord> nextMovePositions;
         for(int ci = 0; ci < monCount; ci++)
@@ -431,11 +432,13 @@ public class TsarGame extends ApplicationAdapter {
                     if (tmp.x == player.gridX && tmp.y == player.gridY) {
                         display.tint(player.gridX, player.gridY, SColor.PURE_CRIMSON, 0, 0.415f);
                         health--;
+                        // make sure the monster is still actively stalking/chasing the player
                         mon.change(1);
                         monplaces.add(pos);
                     }
                     // otherwise store the new position in newMons.
                     else {
+                        // make the monster actively stalk/chase the player
                         mon.change(1);
                         // alter is a method on OrderedMap and OrderedSet that changes a key in-place
                         monsters.alter(pos, tmp);
@@ -619,7 +622,7 @@ public class TsarGame extends ApplicationAdapter {
                         // player's position, and the "target" of a pathfinding method like DijkstraMap.findPathPreScanned() is the
                         // currently-moused-over cell, which we only need to set where the mouse is being handled.
                         playerToCursor.setGoal(playerPos);
-                        playerToCursor.scan(null);
+                        playerToCursor.partialScan(fovRange + 1);
                     }
 
                 }
@@ -698,5 +701,7 @@ public class TsarGame extends ApplicationAdapter {
         input.getMouse().reinitialize(currentZoomX, currentZoomY, this.width, this.height, 0, 0);
         currentZoomX = cellWidth / currentZoomX;
         currentZoomY = cellHeight / currentZoomY;
+        viewport.update(width, height, false);
+
     }
 }
