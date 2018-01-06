@@ -16,6 +16,7 @@ import squidpony.squidgrid.FOV;
 import squidpony.squidgrid.Radius;
 import squidpony.squidgrid.gui.gdx.*;
 import squidpony.squidgrid.mapping.DungeonUtility;
+import squidpony.squidgrid.mapping.FlowingCaveGenerator;
 import squidpony.squidgrid.mapping.SectionDungeonGenerator;
 import squidpony.squidgrid.mapping.SerpentMapGenerator;
 import squidpony.squidgrid.mapping.styled.TilesetType;
@@ -70,16 +71,7 @@ public class DungeonGame extends ApplicationAdapter {
     private List<Coord> toCursor;
     private List<Coord> awaitedMoves;
     private GreasedRegion placement;
-    OrderedMap<Character, Double> costs;
-
-    private static int total(String text)
-    {
-        int t = 0;
-        for (int i = 0; i < text.length(); i++) {
-            t += text.codePointAt(i);
-        }
-        return t;
-    }
+    private OrderedMap<Character, Double> costs;
 
     @Override
     public void create () {
@@ -289,47 +281,49 @@ public class DungeonGame extends ApplicationAdapter {
         serpent.putBoxRoomCarvers(rng.between(2, 5));
         serpent.putRoundRoomCarvers(rng.between(2, 5));
         serpent.putCaveCarvers(rng.between(3, 9));
+        dungeonGen.clearEffects();
         dungeonGen.addWater(SectionDungeonGenerator.CAVE, rng.between(10, 30));
         dungeonGen.addWater(SectionDungeonGenerator.ROOM, rng.between(3, 11));
         dungeonGen.addDoors(rng.between(10, 25), false);
         dungeonGen.addGrass(SectionDungeonGenerator.CAVE, rng.between(5, 25));
         dungeonGen.addGrass(SectionDungeonGenerator.ROOM, rng.between(0, 5));
-        dungeonGen.addBoulders(SectionDungeonGenerator.ALL, rng.between(2, 9));
+        dungeonGen.addBoulders(SectionDungeonGenerator.ALL, rng.between(0, 9));
         if(rng.nextInt(3) == 0)
             dungeonGen.addLake(rng.between(5, 30), '£', '¢');
         else if(rng.nextBoolean())
             dungeonGen.addLake(rng.between(8, 35));
-        else
-            dungeonGen.addLake(0);
         //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
         //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
 
-        switch (rng.nextInt(12))
+        switch (rng.next(4)) // 4 bits, so 0 to 15 inclusive
         {
             case 0:
             case 1:
             case 2:
-            case 11:
+            case 3:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(serpent.generate(), serpent.getEnvironment()));
                 break;
-            case 3:
             case 4:
             case 5:
+            case 6:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.DEFAULT_DUNGEON));
                 break;
-            case 6:
             case 7:
+            case 8:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS));
                 break;
-            case 8:
+            case 9:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.REFERENCE_CAVES));
                 break;
-            case 9:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROOMS_LIMIT_CONNECTIVITY));
+            case 10:
+                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROOMS_AND_CORRIDORS_A));
+                break;
+            case 11:
+                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.MAZE_A));
                 break;
             default:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.CORNER_CAVES));
-                break;
+                FlowingCaveGenerator flow = new FlowingCaveGenerator(gridWidth, gridHeight);
+                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(flow.generate(), flow.getEnvironment()));
         }
 
         //There are lots of options for dungeon generation in SquidLib; you can pass a TilesetType enum to generate()
