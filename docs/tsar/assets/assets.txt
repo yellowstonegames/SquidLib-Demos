@@ -1,0 +1,17 @@
+d:assets:0:application/unknown
+b:Iosevka-License.md:6529:application/unknown
+t:Iosevka-Slab-distance.fnt:231652:application/unknown
+i:Iosevka-Slab-distance.png:529329:image/png
+i:Tentacle-128.png:6532:image/png
+i:Tentacle-16.png:741:image/png
+i:Tentacle-32.png:1696:image/png
+i:Tentacle-64.png:2972:image/png
+i:Tentacle.png:538:image/png
+t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:859:application/unknown
+t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:2996:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl:5350:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/default.vertex.glsl:9159:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/depth.fragment.glsl:904:application/unknown
+t:com/badlogic/gdx/graphics/g3d/shaders/depth.vertex.glsl:3056:application/unknown
+t:com/badlogic/gdx/utils/arial-15.fnt:21743:application/unknown
+i:com/badlogic/gdx/utils/arial-15.png:21814:image/png
