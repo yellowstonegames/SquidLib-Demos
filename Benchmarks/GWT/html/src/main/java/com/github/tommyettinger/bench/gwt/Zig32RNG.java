@@ -242,5 +242,4 @@ public final class Zig32RNG implements StatefulRandomness, Serializable {
     {
         return ((bound * (((b = ((b = (b ^ b >>> 15) * 0xAD7B5) ^ b >>> 12) * 0xCDD1D + a) ^ b >>> 13) & 0x7FFF)) >> 15);
     }
-
 }
