@@ -67,7 +67,8 @@ public class GwtBabelBobble extends GwtBareApp {
     public GwtApplicationConfiguration getConfig() {
         return new GwtApplicationConfiguration(1000, 700);
     }
-
+    
+    @Override
     public void start()
     {
         storage = new SquidStorage("babel");
