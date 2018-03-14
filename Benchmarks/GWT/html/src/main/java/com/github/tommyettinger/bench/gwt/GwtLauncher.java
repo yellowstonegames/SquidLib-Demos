@@ -37,9 +37,11 @@ public class GwtLauncher extends GwtBareApp {
         vp.setPixelSize(512, 512);
         vp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         addIntTest(vp, new Zig32RNG(123456789, 987654321), "Zig32RNG");
+        addIntTest(vp, new Zag32RNG(123456789, 987654321), "Zag32RNG");
         addIntTest(vp, new LightRNG(123456L), "LightRNG");
         addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addLongTest(vp, new Zig32RNG(123456789, 987654321), "Zig32RNG");
+        addLongTest(vp, new Zag32RNG(123456789, 987654321), "Zag32RNG");
         addLongTest(vp, new LightRNG(123456L), "LightRNG");
         addLongTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
 
@@ -80,6 +82,28 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private void addIntTest(final VerticalPanel vp, final Zig32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(500, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportInt(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+    private void addIntTest(final VerticalPanel vp, final Zag32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -172,6 +196,29 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private void addLongTest(final VerticalPanel vp, final Zig32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(500, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportLong(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+
+    private void addLongTest(final VerticalPanel vp, final Zag32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextLong()");
         final TextBox resultLabel = new TextBox();
@@ -288,6 +335,24 @@ public class GwtLauncher extends GwtBareApp {
     /** Run the benchmark the specified number of milliseconds and return
      *  the mean execution time and SEM in milliseconds.
      */
+    private String runIntBenchmark(Zag32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runInt(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+    /** Run the benchmark the specified number of milliseconds and return
+     *  the mean execution time and SEM in milliseconds.
+     */
     private String runIntBenchmark(Light32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
@@ -344,6 +409,24 @@ public class GwtLauncher extends GwtBareApp {
      *  the mean execution time and SEM in milliseconds.
      */
     private String runLongBenchmark(Zig32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runLong(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+    /** Run the benchmark the specified number of milliseconds and return
+     *  the mean execution time and SEM in milliseconds.
+     */
+    private String runLongBenchmark(Zag32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -441,6 +524,11 @@ public class GwtLauncher extends GwtBareApp {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
+    
+    private String reportInt(Zag32RNG rs) {
+        runIntBenchmark(rs, 100, 2); // warm up
+        return runIntBenchmark(rs,2000, 5);
+    }
 
     private String reportInt(Light32RNG rs) {
         runIntBenchmark(rs, 100, 2); // warm up
@@ -458,6 +546,14 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runInt(Zig32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextInt();
+        }
+        return xor;
+    }
+
+    private int runInt(Zag32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextInt();
@@ -493,6 +589,11 @@ public class GwtLauncher extends GwtBareApp {
         return runLongBenchmark(rs,2000, 5);
     }
 
+    private String reportLong(Zag32RNG rs) {
+        runLongBenchmark(rs, 100, 2); // warm up
+        return runLongBenchmark(rs,2000, 5);
+    }
+
     private String reportLong(Light32RNG rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
@@ -509,6 +610,15 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(Zig32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextLong();
+        }
+        return xor;
+    }
+
+
+    private int runLong(Zag32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
