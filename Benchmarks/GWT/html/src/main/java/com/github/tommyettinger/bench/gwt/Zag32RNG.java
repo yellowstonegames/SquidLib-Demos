@@ -14,9 +14,9 @@ import java.io.Serializable;
  * every other int with equal frequency; it repeats every {@code Math.pow(2, 32) - 1} generated numbers. stateB goes
  * through every int by assigning the XLCG result calculated with stateB to stateB; that is then used as input to a
  * XorShift algorithm (with different constants) and the result added to stateA to get the output of one int. The total
- * period is 0xFFFFFFFF00000000 (18446744069414584320). Quality is probably good here, and this passes PractRand without
- * failures and with no anomalies on 128GB of testing, though more testing will be done soon to make sure this passes
- * some tough spots at 1TB and 8TB.
+ * period is 0xFFFFFFFF00000000 (18446744069414584320). Quality is very good here, and this passes PractRand without
+ * failures and with 3 minor anomalies on 16TB of testing; it may fail or have another anomaly at 32TB, but generally
+ * passing 16TB without serious or repeated anomalies is enough to confirm a generator as high-quality.
  * <br>
  * Although Zag32RNG has a {@link #determine(int, int)} method, calling it is considerably more complex than other
  * RandomnessSources that provide determine() methods. It also doesn't allow skipping through the state, and a moderate
@@ -74,12 +74,12 @@ public final class Zag32RNG implements StatefulRandomness, Serializable {
     }
 
     public final int nextInt() {
-        int z = (b = (b ^ 0xC74EAD55) * 0xD3DB3 | 0);
+        int z = (b = (b ^ 0xC74EAD55) * 0xA5CB3 | 0);
         a ^= a >>> 14;
-        z ^= z >>> 16;
-        a ^= a << 1;
-        z ^= z >>> 11;
-        return  (z ^ z << 7) + (a ^= a >>> 15) | 0;
+        z ^= z >>> 13;
+        a ^= a >>> 15;
+        z = (z ^ z >>> 11) + (a ^= a << 13) | 0;
+        return (z ^ z >>> 7);
     }
 
     /**
@@ -91,12 +91,12 @@ public final class Zag32RNG implements StatefulRandomness, Serializable {
      */
     @Override
     public final int next(int bits) {
-        int z = (b = (b ^ 0xC74EAD55) * 0xD3DB3 | 0);
+        int z = (b = (b ^ 0xC74EAD55) * 0xA5CB3 | 0);
         a ^= a >>> 14;
-        z ^= z >>> 16;
-        a ^= a << 1;
-        z ^= z >>> 11;
-        return ((z ^ z << 7) + (a ^= a >>> 15)) >>> (32 - bits);
+        z ^= z >>> 13;
+        a ^= a >>> 15;
+        z = (z ^ z >>> 11) + (a ^= a << 13) | 0;
+        return (z ^ z >>> 7) >>> (32 - bits);
     }
 
     /**
@@ -109,18 +109,16 @@ public final class Zag32RNG implements StatefulRandomness, Serializable {
      */
     @Override
     public final long nextLong() {
-        int z = (b ^ 0xC74EAD55) * 0xD3DB3 | 0, y = (b = (z ^ 0xC74EAD55) * 0xD3DB3 | 0);
+        int z = (b ^ 0xC74EAD55) * 0xA5CB3 | 0, y = (b = (z ^ 0xC74EAD55) * 0xA5CB3 | 0);
         a ^= a >>> 14;
-        z ^= z >>> 16;
-        a ^= a << 1;
-        z ^= z >>> 11;
-        z = (z ^ z << 7) + (a ^= a >>> 15) | 0;
+        z ^= z >>> 13;
+        a ^= a >>> 15;
+        z = (z ^ z >>> 11) + (a ^= a << 13) | 0;
         a ^= a >>> 14;
-        y ^= y >>> 16;
-        a ^= a << 1;
-        y ^= y >>> 11;
-        y = (y ^ y << 7) + (a ^= a >>> 15) | 0;
-        return (long)y << 32 ^ z;
+        y ^= y >>> 13;
+        a ^= a >>> 15;
+        y = (y ^ y >>> 11) + (a ^= a << 13) | 0;
+        return (long)(y ^ y >>> 7) << 32 ^ (z ^ z >>> 7); 
     }
 
     /**
@@ -209,43 +207,43 @@ public final class Zag32RNG implements StatefulRandomness, Serializable {
 
     /**
      * Gets a pseudo-random int determined wholly by the given state variables a and b, which should change every call.
-     * Call with {@code determine((a = (a = (a ^= a >>> 14) ^ a << 1) ^ a >>> 15), b = (b ^ 0xC74EAD55) * 0xD3DB3 | 0)},
+     * Call with {@code determine((a = (a = (a ^= a >>> 14) ^ a >>> 15) ^ a << 13), b = (b ^ 0xC74EAD55) * 0xA5CB3 | 0)},
      * where a and b are int variables used as state. The complex call to this method allows it to remain static. In the
      * update for b, the bitwise OR with 0 is only needed for GWT in order to force overflow to wrap instead of losing
      * precision (a quirk of the JS numbers GWT uses). If you know you won't target GWT you can use
-     * {@code b = (b ^ 0xC74EAD55) * 0xD3DB3}. This should be fairly fast on GWT because most PRNGs (that can pass any
+     * {@code b = (b ^ 0xC74EAD55) * 0xA5CB3}. This should be fairly fast on GWT because most PRNGs (that can pass any
      * decent statistical quality tests) use either 64-bit long values or many int variables for state, while this can
      * get by with just two int variables. Using long on GWT is usually the only reasonable option if you expect
-     * arithmetic overflow (because long is emulated by GWT to imitate the behavior of a JDK, and is considerably slower
-     * as a result), but by some careful development for generator, it should have identical results on GWT and on
+     * arithmetic overflow (because long is emulated by GWT to imitate the behavior of a JDK, but is considerably slower
+     * as a result), but by some careful development for this generator, it should have identical results on GWT and on
      * desktop/Android JVMs with only int math.
      * <br>
      * You may find it more convenient to just instantiate a Zag32RNG object rather than using the complex state update;
      * using the methods on a Zag32RNG object may also be more efficient because some operations can be performed with
      * bit-parallel optimizations on the same (modern) processor.
-     * @param a must be non-zero and updated with each call, using {@code a = (a = (a ^= a >>> 14) ^ a << 1) ^ a >>> 15}
-     * @param b must be updated with each call, using {@code b = (b ^ 0xC74EAD55) * 0xD3DB3 | 0}, with {@code | 0} needed for GWT
+     * @param a must be non-zero and updated with each call, using {@code a = (a = (a ^= a >>> 14) ^ a >>> 15) ^ a << 13}
+     * @param b must be updated with each call, using {@code b = (b ^ 0xC74EAD55) * 0xA5CB3 | 0}, with {@code | 0} needed for GWT
      * @return a pseudo-random int, equidistributed over a period of 0xFFFFFFFF00000000; can be any int
      */
     public static int determine(int a, int b) {
-        return ((b = (b ^= b >>> 16) ^ b >>> 11) ^ b << 7) + a | 0;
+        return ((b = ((b ^= b >>> 13) ^ b >>> 11) + a | 0) ^ b >>> 7);
     }
     /**
      * Gets a pseudo-random int between 0 and the given bound, using the given ints a and b as the state; these state
      * variables a and b should change with each call. The exclusive bound can be negative or positive, and can be
      * between -32768 and 32767 (both inclusive); the small limits allow using just 32-bit math. Call with
-     * {@code determineBounded((a = (a = (a ^= a >>> 14) ^ a << 1) ^ a >>> 15), b = (b ^ 0xC74EAD55) * 0xD3DB3 | 0)},
-     * where a and b are int variables used as state. The complex call to this method allows it to remain static. In the
-     * update for b, the bitwise OR with 0 is only needed for GWT in order to force overflow to wrap instead of losing
-     * precision (a quirk of the JS numbers GWT uses). If you know you won't target GWT you can use
-     * {@code b = (b ^ 0xC74EAD55) * 0xD3DB3}.
-     * @param a must be non-zero and updated with each call, using {@code a = (a = (a ^= a >>> 14) ^ a << 1) ^ a >>> 15}
-     * @param b must be updated with each call, using {@code b = (b ^ 0xC74EAD55) * 0xD3DB3 | 0}, with {@code | 0} needed for GWT
+     * {@code determineBounded((a = (a = (a ^= a >>> 14) ^ a >>> 15) ^ a << 13), b = (b ^ 0xC74EAD55) * 0xA5CB3 | 0), bound},
+     * where a and b are int variables used as state and bound is the exclusive outer bound. The complex call to this
+     * method allows it to remain static. In the update for b, the bitwise OR with 0 is only needed for GWT in order to
+     * force overflow to wrap instead of losing precision (a quirk of the JS numbers GWT uses). If you know you won't
+     * target GWT you can use {@code b = (b ^ 0xC74EAD55) * 0xA5CB3}.
+     * @param a must be non-zero and updated with each call, using {@code a = (a = (a ^= a >>> 14) ^ a >>> 15) ^ a << 13}
+     * @param b must be updated with each call, using {@code b = (b ^ 0xC74EAD55) * 0xA5CB3 | 0}, with {@code | 0} needed for GWT
      * @param bound the outer exclusive limit on the random number; should be between -32768 and 32767 (both inclusive)
      * @return a pseudo-random int, between 0 (inclusive) and bound (exclusive)
      */
     public static int determineBounded(int a, int b, int bound)
     {
-        return ((bound * ((((b = (b ^= b >>> 16) ^ b >>> 11) ^ b << 7) + a) & 0x7FFF)) >> 15);
+        return ((bound * (((b = ((b ^= b >>> 13) ^ b >>> 11) + a) ^ b >>> 7) & 0x7FFF)) >> 15);
     }
 }
