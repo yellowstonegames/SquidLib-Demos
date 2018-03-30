@@ -34,16 +34,16 @@ public class GwtLauncher extends GwtBareApp {
         VerticalPanel vp = new VerticalPanel();
         vp.setPixelSize(600, 650);
         vp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
-        addIntTest(vp, new ThrustAlt32RNG(123456789), "ThrustAlt32RNG");
+        addIntTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
         addIntTest(vp, new Zag32RNG(123456789, 987654321), "Zag32RNG");
-        addIntTest(vp, new Zug32RNG(123456789, 987654321), "Zug32RNG");
+        addIntTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
         addIntTest(vp, new XoRo32RNG(123456789, 987654321), "XoRo32RNG");
         addIntTest(vp, new LightRNG(123456L), "LightRNG");
         addIntTest(vp, new XoRoRNG(987654321L, 123456789L), "XoRoRNG");
         addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
-        addLongTest(vp, new ThrustAlt32RNG(123456789), "ThrustAlt32RNG");
+        addLongTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
         addLongTest(vp, new Zag32RNG(123456789, 987654321), "Zag32RNG");
-        addLongTest(vp, new Zug32RNG(123456789, 987654321), "Zug32RNG");
+        addLongTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
         addLongTest(vp, new XoRo32RNG(123456789, 987654321), "XoRo32RNG");
         addLongTest(vp, new LightRNG(123456L), "LightRNG");
         addLongTest(vp, new XoRoRNG(987654321L, 123456789L), "XoRoRNG");
@@ -64,32 +64,32 @@ public class GwtLauncher extends GwtBareApp {
      */
     public static void main(String[] args)
     {
-        ThrustAlt32RNG a = new ThrustAlt32RNG(123456789);
+        Oriole32RNG a = new Oriole32RNG(123456789, 987654321);
         Zag32RNG b = new Zag32RNG(123456789, 987654321);
         LightRNG c = new LightRNG(123456L);
         RandomXS128 d = new RandomXS128(123456789L, 987654321L);
-        Zug32RNG e = new Zug32RNG(123456789, 987654321);
+        Zog32RNG e = new Zog32RNG(123456789, 987654321);
         XoRo32RNG f = new XoRo32RNG(123456789, 987654321);
 
-        System.out.println("ThrustAlt32RNG " + a.nextInt());
+        System.out.println("Oriole32RNG  " + a.nextInt());
         System.out.println("Zag32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
-        System.out.println("Zug32RNG " + e.nextInt());
+        System.out.println("Zog32RNG " + e.nextInt());
         System.out.println("XoRo32RNG " + f.nextInt());
 
-        System.out.println("ThrustAlt32RNG " + a.nextInt());
+        System.out.println("Oriole32RNG  " + a.nextInt());
         System.out.println("Zag32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
-        System.out.println("Zug32RNG " + e.nextInt());
+        System.out.println("Zog32RNG " + e.nextInt());
         System.out.println("XoRo32RNG " + f.nextInt());
 
-        System.out.println("ThrustAlt32RNG " + a.nextInt());
+        System.out.println("Oriole32RNG  " + a.nextInt());
         System.out.println("Zag32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
-        System.out.println("Zug32RNG " + e.nextInt());
+        System.out.println("Zog32RNG " + e.nextInt());
         System.out.println("XoRo32RNG " + f.nextInt());
 
         
@@ -655,7 +655,7 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private void addIntTest(final VerticalPanel vp, final Zug32RNG rs, final String name)
+    private void addIntTest(final VerticalPanel vp, final Zog32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -678,7 +678,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
-    private void addLongTest(final VerticalPanel vp, final Zug32RNG rs, final String name)
+    private void addLongTest(final VerticalPanel vp, final Zog32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextLong()");
         final TextBox resultLabel = new TextBox();
@@ -700,7 +700,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(runBenchButton);
         vp.add(resultLabel);
     }
-    private String runIntBenchmark(Zug32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runIntBenchmark(Zog32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -716,7 +716,7 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String runLongBenchmark(Zug32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runLongBenchmark(Zog32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -732,12 +732,12 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String reportInt(Zug32RNG rs) {
+    private String reportInt(Zog32RNG rs) {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
 
-    private int runInt(Zug32RNG rs) {
+    private int runInt(Zog32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextInt();
@@ -745,12 +745,12 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private String reportLong(Zug32RNG rs) {
+    private String reportLong(Zog32RNG rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
     }
 
-    private int runLong(Zug32RNG rs) {
+    private int runLong(Zog32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
@@ -868,5 +868,107 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
+    private void addIntTest(final VerticalPanel vp, final Oriole32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportInt(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+
+    private void addLongTest(final VerticalPanel vp, final Oriole32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportLong(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+    private String runIntBenchmark(Oriole32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runInt(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+
+    private String runLongBenchmark(Oriole32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runLong(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+
+    private String reportInt(Oriole32RNG rs) {
+        runIntBenchmark(rs, 100, 2); // warm up
+        return runIntBenchmark(rs,2000, 5);
+    }
+
+    private int runInt(Oriole32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextInt();
+        }
+        return xor;
+    }
+
+    private String reportLong(Oriole32RNG rs) {
+        runLongBenchmark(rs, 100, 2); // warm up
+        return runLongBenchmark(rs,2000, 5);
+    }
+
+    private int runLong(Oriole32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextLong();
+        }
+        return xor;
+    }
 
 }

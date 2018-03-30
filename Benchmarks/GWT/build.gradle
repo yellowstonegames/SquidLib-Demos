@@ -28,10 +28,9 @@ subprojects {
   version = '0.0.1-SNAPSHOT'
   ext.appName = 'BenchmarksGWT'
   repositories {
-    mavenLocal()
     mavenCentral()
     jcenter()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } 
     maven { url 'https://jitpack.io' }
   }
 }

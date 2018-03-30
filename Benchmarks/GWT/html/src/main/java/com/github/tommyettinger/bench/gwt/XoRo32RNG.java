@@ -125,16 +125,16 @@ public final class XoRo32RNG implements StatefulRandomness, Serializable {
      * @param seed the int to use to assign this generator's state
      */
     public void setSeed(final int seed) {
-
-        int state = seed + 0x9E3779B9,
-                z = state;
-        z = (z ^ (z >>> 16)) * 0x85EBCA6B;
-        z = (z ^ (z >>> 13)) * 0xC2B2AE35;
-        stateA = z ^ (z >>> 16);
-        z = state + 0x9E3779B9;
-        z = (z ^ (z >>> 16)) * 0x85EBCA6B;
-        z = (z ^ (z >>> 13)) * 0xC2B2AE35;
-        stateB = z ^ (z >>> 16);
+        int z = seed + 0xC74EAD55 | 0, a = seed ^ z;
+        a ^= a >>> 14;
+        z = (z ^ z >>> 10) * 0xA5CB3 | 0;
+        a ^= a >>> 15;
+        stateA = (z ^ z >>> 20) + (a ^= a << 13) | 0;
+        z = seed + 0x8E9D5AAA | 0;
+        a ^= a >>> 14;
+        z = (z ^ z >>> 10) * 0xA5CB3 | 0;
+        a ^= a >>> 15;
+        stateB = (z ^ z >>> 20) + (a ^ a << 13) | 0;
     }
 
     public int getStateA()
@@ -182,7 +182,7 @@ public final class XoRo32RNG implements StatefulRandomness, Serializable {
     }
 
     /**
-     * Sets the current internal state of this Zag32RNG with two ints, where stateA can be any int except 0, and stateB
+     * Sets the current internal state of this XoRo32RNG with two ints, where stateA can be any int except 0, and stateB
      * can be any int.
      * @param stateA any int except 0 (0 will be treated as 1 instead)
      * @param stateB any int
