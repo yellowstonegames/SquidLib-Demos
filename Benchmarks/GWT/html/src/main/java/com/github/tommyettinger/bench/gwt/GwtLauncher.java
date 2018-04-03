@@ -35,14 +35,14 @@ public class GwtLauncher extends GwtBareApp {
         vp.setPixelSize(600, 650);
         vp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         addIntTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
-        addIntTest(vp, new Zag32RNG(123456789, 987654321), "Zag32RNG");
+        addIntTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addIntTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
         addIntTest(vp, new XoRo32RNG(123456789, 987654321), "XoRo32RNG");
         addIntTest(vp, new LightRNG(123456L), "LightRNG");
         addIntTest(vp, new XoRoRNG(987654321L, 123456789L), "XoRoRNG");
         addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addLongTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
-        addLongTest(vp, new Zag32RNG(123456789, 987654321), "Zag32RNG");
+        addLongTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addLongTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
         addLongTest(vp, new XoRo32RNG(123456789, 987654321), "XoRo32RNG");
         addLongTest(vp, new LightRNG(123456L), "LightRNG");
@@ -59,34 +59,34 @@ public class GwtLauncher extends GwtBareApp {
     /**
      * Can be used to compare the three ints produced for each generator's nextInt() button with what a desktop JDK will
      * produce given the same seeds. Light32RNG doesn't produce consistent results between GWT and desktop, so it isn't
-     * included in the GWT build (it's slower than Zag32RNG anyway).
+     * included in the GWT build (it's slower than Lathe32RNG anyway).
      * @param args disregarded
      */
     public static void main(String[] args)
     {
         Oriole32RNG a = new Oriole32RNG(123456789, 987654321);
-        Zag32RNG b = new Zag32RNG(123456789, 987654321);
+        Lathe32RNG b = new Lathe32RNG(123456789, 987654321);
         LightRNG c = new LightRNG(123456L);
         RandomXS128 d = new RandomXS128(123456789L, 987654321L);
         Zog32RNG e = new Zog32RNG(123456789, 987654321);
         XoRo32RNG f = new XoRo32RNG(123456789, 987654321);
 
         System.out.println("Oriole32RNG  " + a.nextInt());
-        System.out.println("Zag32RNG " + b.nextInt());
+        System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Zog32RNG " + e.nextInt());
         System.out.println("XoRo32RNG " + f.nextInt());
 
         System.out.println("Oriole32RNG  " + a.nextInt());
-        System.out.println("Zag32RNG " + b.nextInt());
+        System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Zog32RNG " + e.nextInt());
         System.out.println("XoRo32RNG " + f.nextInt());
 
         System.out.println("Oriole32RNG  " + a.nextInt());
-        System.out.println("Zag32RNG " + b.nextInt());
+        System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Zog32RNG " + e.nextInt());
@@ -117,7 +117,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(runBenchButton);
         vp.add(resultLabel);
     }
-    private void addIntTest(final VerticalPanel vp, final Zag32RNG rs, final String name)
+    private void addIntTest(final VerticalPanel vp, final Lathe32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -209,7 +209,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
-    private void addLongTest(final VerticalPanel vp, final Zag32RNG rs, final String name)
+    private void addLongTest(final VerticalPanel vp, final Lathe32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextLong()");
         final TextBox resultLabel = new TextBox();
@@ -303,7 +303,7 @@ public class GwtLauncher extends GwtBareApp {
     /** Run the benchmark the specified number of milliseconds and return
      *  the mean execution time and SEM in milliseconds.
      */
-    private String runIntBenchmark(Zag32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runIntBenchmark(Lathe32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -376,7 +376,7 @@ public class GwtLauncher extends GwtBareApp {
     /** Run the benchmark the specified number of milliseconds and return
      *  the mean execution time and SEM in milliseconds.
      */
-    private String runLongBenchmark(Zag32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runLongBenchmark(Lathe32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -455,7 +455,7 @@ public class GwtLauncher extends GwtBareApp {
         return runIntBenchmark(rs,2000, 5);
     }
     
-    private String reportInt(Zag32RNG rs) {
+    private String reportInt(Lathe32RNG rs) {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
@@ -478,7 +478,7 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private int runInt(Zag32RNG rs) {
+    private int runInt(Lathe32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextInt();
@@ -506,7 +506,7 @@ public class GwtLauncher extends GwtBareApp {
         return runLongBenchmark(rs,2000, 5);
     }
 
-    private String reportLong(Zag32RNG rs) {
+    private String reportLong(Lathe32RNG rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
     }
@@ -530,7 +530,7 @@ public class GwtLauncher extends GwtBareApp {
     }
 
 
-    private int runLong(Zag32RNG rs) {
+    private int runLong(Lathe32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
