@@ -5,7 +5,7 @@ and related and neighboring rights to this software to the public domain
 worldwide. This software is distributed without any warranty.
 
 See <http://creativecommons.org/publicdomain/zero/1.0/>. */
-package com.github.tommyettinger.bench.gwt;
+package com.github.tommyettinger.bench;
 
 import squidpony.StringKit;
 import squidpony.squidmath.StatefulRandomness;
@@ -14,26 +14,36 @@ import java.io.Serializable;
 
 /**
  * A modification of Blackman and Vigna's xoroshiro128+ generator using two 32-bit ints of state instead of two 64-bit
- * longs, as well as modifying the output with two additional operations on the existing state; this is the fastest
- * generator on GWT I have found that also passes the full 32TB battery of PractRand's statistical tests (probably; the
- * test has finished up to 16TB without anything worse than two "unusual" results, and should be done in mere hours).
- * In statistical testing, xoroshiro always fails some binary matrix rank tests, but smaller-state
- * versions fail other tests as well. The changes Lathe makes apply only to the output of xoroshiro, not its
- * well-tested state transition, and these changes eliminate all statistical failures on 32TB of tested data, avoiding
- * the failures the small-state variant of xoroshiro suffers on BinaryRank, BCFN, DC6, and FPF. It avoids
- * multiplication, like xoroshiro and much of the xorshift family of generators, and any arithmetic it performs is safe
- * for GWT. Lathe makes an extremely small set of changes to xoroshiro, running xoroshiro as normal (holding on to the
- * initial stateA and its result) and then bitwise-rotating the result and adding the (now previous) stateA. Although
- * no bits of xoroshiro are truly free of artifacts, some are harder to find issues with
+ * longs, as well as modifying the output with two additional operations on the existing state; this is both the fastest
+ * generator on GWT I have found without statistical failures, and a StatefulRandomness. Lathe32RNG passes the full 32TB
+ * battery of PractRand's statistical tests, and does so with 3 "unusual" anomalies, no more-serious anomalies, and no
+ * failures. It isn't especially likely that this can pass much more than 32TB of testing (judging by related attempts,
+ * 128TB would be a likely failure point), but because multi-threaded code is either impossible or impractical on GWT,
+ * actually using that many numbers would take a very long time (generating them would take about 3 nanoseconds per int,
+ * but it would take more than 2 to the 43 ints to start to approach detectable failures, and detecting the failures in
+ * anything but the worst case would take more than a day). In statistical testing, xoroshiro always fails some binary
+ * matrix rank tests, but smaller-state versions fail other tests as well. The changes Lathe makes apply only to the
+ * output of xoroshiro, not its well-tested state transition, and these changes eliminate all statistical failures on
+ * 32TB of tested data, avoiding the failures the small-state variant of xoroshiro suffers on BinaryRank, BCFN, DC6, and
+ * FPF. It avoids multiplication (except in {@link #setSeed(int)}, which needs to use a different algorithm to spread a
+ * seed out across twice as much state), like xoroshiro and much of the xorshift family of generators, and any
+ * arithmetic it performs is safe for GWT. Lathe makes an extremely small set of changes to xoroshiro, running xoroshiro
+ * as normal (holding on to the result as well as the initial stateA, called s[0] in the original xoroshiro code) and
+ * then bitwise-rotating the result and adding the (now previous) stateA. Although no bits of xoroshiro are truly free
+ * of artifacts, some are harder to find issues with
  * (see <a href="http://www.pcg-random.org/posts/xoroshiro-fails-truncated.html">this article by PCG-Random's author</a>
  * for more detail). It is unclear if the changes made here would improve the larger-state version, but they probably
  * would help to some extent with at least the binary rank failures. The period is identical to xoroshiro with two
- * 32-bit states, at 0xFFFFFFFFFFFFFFFF . This generator is expected to be slightly slower than xoroshiro without the
- * small extra steps applied to the output, but faster than {@link XoRo32RNG} with the suggested changes to its output
- * ({@code int output = random.nextInt(); output = ((output ^ output >>> 17) * 0xE5CB3 | 0)}), depending on how well
- * multiplication can be optimized relative to bitwise operations and addition.
+ * 32-bit states, at 0xFFFFFFFFFFFFFFFF or 2 to the 64 minus 1. This generator is expected to be slightly slower than
+ * xoroshiro without the small extra steps applied to the output, but faster than {@link XoRo32RNG} with the suggested
+ * changes to its output ({@code int output = random.nextInt(); output = ((output ^ output >>> 17) * 0xE5CB3 | 0)}),
+ * depending on how well multiplication can be optimized relative to bitwise operations and addition. Some simple tests
+ * on bytes instead of ints showed that the technique used here produces all possible bytes with equal frequency when
+ * run on bytes as state, with the exception of producing 0 one less time (because both states cannot be 0 at the same 
+ * time). This gives some confidence for the algorithm used here, but doesn't say anything about how equidistributed
+ * this is across more than one dimension (it could be better or worse than xoroshiro128+).
  * <br>
- * The name comes from the tool that rotates very quickly to remove undesirable parts of an object, akin to how this
+ * The name comes from a tool that rotates very quickly to remove undesirable parts of an object, akin to how this
  * generator adds an extra bitwise rotation to xoroshiro's variant with 32-bit states to remove several types of
  * undesirable statistical failures from its test results.
  * <br>
@@ -54,7 +64,7 @@ public final class Lathe32RNG implements StatefulRandomness, Serializable {
     private int stateA, stateB;
 
     /**
-     * Creates a new generator seeded using three calls to Math.random().
+     * Creates a new generator seeded using two calls to Math.random().
      */
     public Lathe32RNG() {
         setState((int)((Math.random() * 2.0 - 1.0) * 0x80000000), (int)((Math.random() * 2.0 - 1.0) * 0x80000000));
@@ -138,9 +148,9 @@ public final class Lathe32RNG implements StatefulRandomness, Serializable {
     }
 
     /**
-     * Sets the state of this generator using one int, running it through Zog32RNG's algorithm three times to get 
-     * three ints.
-     * @param seed the int to use to assign this generator's state
+     * Sets the state of this generator using one int, running it through Zog32RNG's algorithm two times to get 
+     * two ints. If the states would both be 0, state A is assigned 1 instead.
+     * @param seed the int to use to produce this generator's state
      */
     public void setSeed(final int seed) {
         int z = seed + 0xC74EAD55 | 0, a = seed ^ z;
@@ -161,6 +171,14 @@ public final class Lathe32RNG implements StatefulRandomness, Serializable {
     {
         return stateA;
     }
+    /**
+     * Sets the first part of the state to the given int. As a special case, if the parameter is 0 and stateB is
+     * already 0, this will set stateA to 1 instead, since both states cannot be 0 at the same time. Usually, you
+     * should use {@link #setState(int, int)} to set both states at once, but the result will be the same if you call
+     * setStateA() and then setStateB() or if you call setStateB() and then setStateA().
+     * @param stateA any int
+     */
+
     public void setStateA(int stateA)
     {
         this.stateA = (stateA | stateB) == 0 ? 1 : stateA;
@@ -169,6 +187,14 @@ public final class Lathe32RNG implements StatefulRandomness, Serializable {
     {
         return stateB;
     }
+
+    /**
+     * Sets the second part of the state to the given int. As a special case, if the parameter is 0 and stateA is
+     * already 0, this will set stateA to 1 and stateB to 0, since both cannot be 0 at the same time. Usually, you
+     * should use {@link #setState(int, int)} to set both states at once, but the result will be the same if you call
+     * setStateA() and then setStateB() or if you call setStateB() and then setStateA().
+     * @param stateB any int
+     */
     public void setStateB(int stateB)
     {
         this.stateB = stateB;
@@ -177,8 +203,8 @@ public final class Lathe32RNG implements StatefulRandomness, Serializable {
 
     /**
      * Sets the current internal state of this Lathe32RNG with three ints, where stateA and stateB can each be any int
-     * unless they are both 0, and stateC can be any int without restrictions.
-     * @param stateA any int except 0 (0 will be treated as 1 instead)
+     * unless they are both 0 (which will be treated as if stateA is 1 and stateB is 0).
+     * @param stateA any int (if stateA and stateB are both 0, this will be treated as 1)
      * @param stateB any int
      */
     public void setState(int stateA, int stateB)

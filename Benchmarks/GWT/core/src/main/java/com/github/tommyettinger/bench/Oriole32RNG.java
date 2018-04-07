@@ -5,7 +5,7 @@ and related and neighboring rights to this software to the public domain
 worldwide. This software is distributed without any warranty.
 
 See <http://creativecommons.org/publicdomain/zero/1.0/>. */
-package com.github.tommyettinger.bench.gwt;
+package com.github.tommyettinger.bench;
 
 import squidpony.StringKit;
 import squidpony.squidmath.RandomnessSource;
