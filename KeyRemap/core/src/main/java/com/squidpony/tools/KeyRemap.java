@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.squidgrid.gui.gdx.*;
 import squidpony.squidmath.Coord;
+import squidpony.squidmath.OrderedMap;
 
 import static squidpony.squidgrid.gui.gdx.SquidInput.*;
 
@@ -47,9 +48,9 @@ public class KeyRemap extends ApplicationAdapter {
     //one cell; resizing the window can make the units cellWidth and cellHeight use smaller or larger than a pixel.
 
     /** In number of cells */
-    private static final int gridWidth = 90;
+    private static final int gridWidth = 160;
     /** In number of cells */
-    private static final int gridHeight = 25;
+    private static final int gridHeight = 35;
 
     /** In number of cells */
     private static final int bigWidth = gridWidth;
@@ -59,9 +60,9 @@ public class KeyRemap extends ApplicationAdapter {
     /** In number of cells */
     private static final int bonusHeight = 0;
     /** The pixel width of a cell */
-    private static final int cellWidth = 14;
+    private static final int cellWidth = 8;
     /** The pixel height of a cell */
-    private static final int cellHeight = 28;
+    private static final int cellHeight = 17;
     private SquidInput input;
     private Color bgColor;
     private Stage stage;
@@ -70,209 +71,407 @@ public class KeyRemap extends ApplicationAdapter {
 
     @Override
     public void create () {
-        int[] shiftKeys = {
-                HOME,
-                FORWARD_DELETE,
-                ESCAPE,
-                END,
-
-                ')',
-                '!',
-                '@',
-                '#',
-                '$',
-                '%',
-                '^',
-                '&',
-                '*',
-                '(',
-                VERTICAL_ARROW,
-                DOWN_LEFT_ARROW,
-                DOWN_ARROW,
-                DOWN_RIGHT_ARROW,
-                LEFT_ARROW,
-                CENTER_ARROW,
-                RIGHT_ARROW,
-                UP_LEFT_ARROW,
-                UP_ARROW,
-                UP_RIGHT_ARROW,
-                ':',
-                '*',
-                '#',
-                'A',
-                'B',
-                'C',
-                'D',
-                'E',
-                'F',
-                'G',
-                'H',
-                'I',
-                'J',
-                'K',
-                'L',
-                'M',
-                'N',
-                'O',
-                'P',
-                'Q',
-                'R',
-                'S',
-                'T',
-                'U',
-                'V',
-                'W',
-                'X',
-                'Y',
-                'Z',
-                '<',
-                '>',
-                TAB,
-                ' ',
-                ENTER,
-                BACKSPACE,
-                '~',
-                '_',
-                '+',
-                '{',
-                '}',
-                '|',
-                ':',
-                '"',
-                '?',
-                '@',
-                PAGE_UP,
-                PAGE_DOWN,
-                GAMEPAD_A,
-                GAMEPAD_B,
-                GAMEPAD_C,
-                GAMEPAD_X,
-                GAMEPAD_Y,
-                GAMEPAD_Z,
-                GAMEPAD_L1,
-                GAMEPAD_R1,
-                GAMEPAD_L2,
-                GAMEPAD_R2,
-                GAMEPAD_LEFT_THUMB,
-                GAMEPAD_RIGHT_THUMB,
-                GAMEPAD_START,
-                GAMEPAD_SELECT,
-                INSERT,
-
-                F1,
-                F2,
-                F3,
-                F4,
-                F5,
-                F6,
-                F7,
-                F8,
-                F9,
-                F10,
-                F11,
-                F12,
-        }, keys = {
-                HOME,
-                FORWARD_DELETE,
-                ESCAPE,
-                END,
-
-                '0',
-                '1',
-                '2',
-                '3',
-                '4',
-                '5',
-                '6',
-                '7',
-                '8',
-                '9',
-                VERTICAL_ARROW,
-                DOWN_LEFT_ARROW,
-                DOWN_ARROW,
-                DOWN_RIGHT_ARROW,
-                LEFT_ARROW,
-                CENTER_ARROW,
-                RIGHT_ARROW,
-                UP_LEFT_ARROW,
-                UP_ARROW,
-                UP_RIGHT_ARROW,
-                ':',
-                '*',
-                '#',
-                'a',
-                'b',
-                'c',
-                'd',
-                'e',
-                'f',
-                'g',
-                'h',
-                'i',
-                'j',
-                'k',
-                'l',
-                'm',
-                'n',
-                'o',
-                'p',
-                'q',
-                'r',
-                's',
-                't',
-                'u',
-                'v',
-                'w',
-                'x',
-                'y',
-                'z',
-                ',',
-                '.',
-                TAB,
-                ' ',
-                ENTER,
-                BACKSPACE,
-                '`',
-                '-',
-                '=',
-                '[',
-                ']',
-                '\\',
-                ',',
-                '\'',
-                '/',
-                '@',
-                PAGE_UP,
-                PAGE_DOWN,
-                GAMEPAD_A,
-                GAMEPAD_B,
-                GAMEPAD_C,
-                GAMEPAD_X,
-                GAMEPAD_Y,
-                GAMEPAD_Z,
-                GAMEPAD_L1,
-                GAMEPAD_R1,
-                GAMEPAD_L2,
-                GAMEPAD_R2,
-                GAMEPAD_LEFT_THUMB,
-                GAMEPAD_RIGHT_THUMB,
-                GAMEPAD_START,
-                GAMEPAD_SELECT,
-                INSERT,
-
-                F1,
-                F2,
-                F3,
-                F4,
-                F5,
-                F6,
-                F7,
-                F8,
-                F9,
-                F10,
-                F11,
-                F12,
+        String[] shiftKeyNames = {
+                "A",
+                "B",
+                "C",
+                "D",
+                "E",
+                "F",
+                "G",
+                "H",
+                "I",
+                "J",
+                "K",
+                "L",
+                "M",
+                "N",
+                "O",
+                "P",
+                "Q",
+                "R",
+                "S",
+                "T",
+                "U",
+                "V",
+                "W",
+                "X",
+                "Y",
+                "Z",
+                "Space",
+                "<",
+                ">",
+                "~",
+                "_",
+                "+",
+                "{",
+                "}",
+                "|",
+                ":",
+                "\"",
+                "?",
+                ")",
+                "!",
+                "@",
+                "#",
+                "$",
+                "%",
+                "^",
+                "&",
+                "*",
+                "(",
+                "Vertical Arrow",
+                "Down-Left Arrow",
+                "Down Arrow",
+                "Down-Right Arrow",
+                "Left Arrow",
+                "Center Arrow",
+                "Right Arrow",
+                "Up-Left Arrow",
+                "Up Arrow",
+                "Up-Right Arrow",
+                "Enter",
+                "Tab",
+                "Home",
+                "End",
+                "Backspace",
+                "Forward Delete",
+                "Escape",
+                "Page Up",
+                "Page Down",
+                "Dedicated :",
+                "Dedicated *",
+                "Dedicated #",
+                "Dedicated @",
+                "Gamepad A",
+                "Gamepad B",
+                "Gamepad C",
+                "Gamepad X",
+                "Gamepad Y",
+                "Gamepad Z",
+                "Gamepad L1",
+                "Gamepad R1",
+                "Gamepad L2",
+                "Gamepad R2",
+                "Gamepad Left Thumb",
+                "Gamepad Right Thumb",
+                "Gamepad Start",
+                "Gamepad Select",
+                "F1",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "F10",
+                "F11",
+                "F12",
+                "Insert",
+        }, keyNames = {
+                "a",
+                "b",
+                "c",
+                "d",
+                "e",
+                "f",
+                "g",
+                "h",
+                "i",
+                "j",
+                "k",
+                "l",
+                "m",
+                "n",
+                "o",
+                "p",
+                "q",
+                "r",
+                "s",
+                "t",
+                "u",
+                "v",
+                "w",
+                "x",
+                "y",
+                "z",
+                "Space",
+                ",",
+                ".",
+                "`",
+                "-",
+                "=",
+                "[",
+                "]",
+                "'",
+                ";",
+                "\\",
+                "/",
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "Vertical Arrow",
+                "Down-Left Arrow",
+                "Down Arrow",
+                "Down-Right Arrow",
+                "Left Arrow",
+                "Center Arrow",
+                "Right Arrow",
+                "Up-Left Arrow",
+                "Up Arrow",
+                "Up-Right Arrow",
+                "Enter",
+                "Tab",
+                "Home",
+                "End",
+                "Backspace",
+                "Forward Delete",
+                "Escape",
+                "Page Up",
+                "Page Down",
+                "Dedicated :",
+                "Dedicated *",
+                "Dedicated #",
+                "Dedicated @",
+                "Gamepad A",
+                "Gamepad B",
+                "Gamepad C",
+                "Gamepad X",
+                "Gamepad Y",
+                "Gamepad Z",
+                "Gamepad L1",
+                "Gamepad R1",
+                "Gamepad L2",
+                "Gamepad R2",
+                "Gamepad Left Thumb",
+                "Gamepad Right Thumb",
+                "Gamepad Start",
+                "Gamepad Select",
+                "F1",
+                "F2",
+                "F3",
+                "F4",
+                "F5",
+                "F6",
+                "F7",
+                "F8",
+                "F9",
+                "F10",
+                "F11",
+                "F12",
+                "Insert",
         };
+        Integer[] shiftKeys = {
+                0x80000|'A',
+                0x80000|'B',
+                0x80000|'C',
+                0x80000|'D',
+                0x80000|'E',
+                0x80000|'F',
+                0x80000|'G',
+                0x80000|'H',
+                0x80000|'I',
+                0x80000|'J',
+                0x80000|'K',
+                0x80000|'L',
+                0x80000|'M',
+                0x80000|'N',
+                0x80000|'O',
+                0x80000|'P',
+                0x80000|'Q',
+                0x80000|'R',
+                0x80000|'S',
+                0x80000|'T',
+                0x80000|'U',
+                0x80000|'V',
+                0x80000|'W',
+                0x80000|'X',
+                0x80000|'Y',
+                0x80000|'Z',
+                0x80000|' ',
+                0x80000|'<',
+                0x80000|'>',
+                0x80000|'~',
+                0x80000|'_',
+                0x80000|'+',
+                0x80000|'{',
+                0x80000|'}',
+                0x80000|'|',
+                0x80000|':',
+                0x80000|'"',
+                0x80000|'?',
+                0x80000|')',
+                0x80000|'!',
+                0x80000|'@',
+                0x80000|'#',
+                0x80000|'$',
+                0x80000|'%',
+                0x80000|'^',
+                0x80000|'&',
+                0x80000|'*',
+                0x80000|'(',
+                0x80000|VERTICAL_ARROW,
+                0x80000|DOWN_LEFT_ARROW,
+                0x80000|DOWN_ARROW,
+                0x80000|DOWN_RIGHT_ARROW,
+                0x80000|LEFT_ARROW,
+                0x80000|CENTER_ARROW,
+                0x80000|RIGHT_ARROW,
+                0x80000|UP_LEFT_ARROW,
+                0x80000|UP_ARROW,
+                0x80000|UP_RIGHT_ARROW,
+                0x80000|ENTER,
+                0x80000|TAB,
+                0x80000|HOME,
+                0x80000|END,
+                0x80000|BACKSPACE,
+                0x80000|FORWARD_DELETE,
+                0x80000|ESCAPE,
+                0x80000|PAGE_UP,
+                0x80000|PAGE_DOWN,
+                0x80000|':',
+                0x80000|'*',
+                0x80000|'#',
+                0x80000|'@',
+                0x80000|GAMEPAD_A,
+                0x80000|GAMEPAD_B,
+                0x80000|GAMEPAD_C,
+                0x80000|GAMEPAD_X,
+                0x80000|GAMEPAD_Y,
+                0x80000|GAMEPAD_Z,
+                0x80000|GAMEPAD_L1,
+                0x80000|GAMEPAD_R1,
+                0x80000|GAMEPAD_L2,
+                0x80000|GAMEPAD_R2,
+                0x80000|GAMEPAD_LEFT_THUMB,
+                0x80000|GAMEPAD_RIGHT_THUMB,
+                0x80000|GAMEPAD_START,
+                0x80000|GAMEPAD_SELECT,
+                0x80000|F1,
+                0x80000|F2,
+                0x80000|F3,
+                0x80000|F4,
+                0x80000|F5,
+                0x80000|F6,
+                0x80000|F7,
+                0x80000|F8,
+                0x80000|F9,
+                0x80000|F10,
+                0x80000|F11,
+                0x80000|F12,
+                0x80000|INSERT,
+        }, keys = {
+                0|'a',
+                0|'b',
+                0|'c',
+                0|'d',
+                0|'e',
+                0|'f',
+                0|'g',
+                0|'h',
+                0|'i',
+                0|'j',
+                0|'k',
+                0|'l',
+                0|'m',
+                0|'n',
+                0|'o',
+                0|'p',
+                0|'q',
+                0|'r',
+                0|'s',
+                0|'t',
+                0|'u',
+                0|'v',
+                0|'w',
+                0|'x',
+                0|'y',
+                0|'z',
+                0|' ',
+                0|',',
+                0|'.',
+                0|'`',
+                0|'-',
+                0|'=',
+                0|'[',
+                0|']',
+                0|'\\',
+                0|',',
+                0|'\'',
+                0|'/',
+                0|'0',
+                0|'1',
+                0|'2',
+                0|'3',
+                0|'4',
+                0|'5',
+                0|'6',
+                0|'7',
+                0|'8',
+                0|'9',
+                0|VERTICAL_ARROW,
+                0|DOWN_LEFT_ARROW,
+                0|DOWN_ARROW,
+                0|DOWN_RIGHT_ARROW,
+                0|LEFT_ARROW,
+                0|CENTER_ARROW,
+                0|RIGHT_ARROW,
+                0|UP_LEFT_ARROW,
+                0|UP_ARROW,
+                0|UP_RIGHT_ARROW,
+                0|ENTER,
+                0|TAB,
+                0|HOME,
+                0|END,
+                0|BACKSPACE,
+                0|FORWARD_DELETE,
+                0|ESCAPE,
+                0|PAGE_UP,
+                0|PAGE_DOWN,
+                0|':',
+                0|'*',
+                0|'#',
+                0|'@',
+                0|GAMEPAD_A,
+                0|GAMEPAD_B,
+                0|GAMEPAD_C,
+                0|GAMEPAD_X,
+                0|GAMEPAD_Y,
+                0|GAMEPAD_Z,
+                0|GAMEPAD_L1,
+                0|GAMEPAD_R1,
+                0|GAMEPAD_L2,
+                0|GAMEPAD_R2,
+                0|GAMEPAD_LEFT_THUMB,
+                0|GAMEPAD_RIGHT_THUMB,
+                0|GAMEPAD_START,
+                0|GAMEPAD_SELECT,
+                0|F1,
+                0|F2,
+                0|F3,
+                0|F4,
+                0|F5,
+                0|F6,
+                0|F7,
+                0|F8,
+                0|F9,
+                0|F10,
+                0|F11,
+                0|F12,
+                0|INSERT,
+        };
+        
+        OrderedMap<String, Integer> keyNameMap = new OrderedMap<>(keyNames, keys),
+                shiftKeyNameMap = new OrderedMap<>(shiftKeyNames, shiftKeys); 
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
@@ -280,42 +479,61 @@ public class KeyRemap extends ApplicationAdapter {
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         //Here we make sure our Stage, which holds any text-based grids we make, uses our Batch.
         stage = new Stage(mainViewport, batch);
-        // the font will try to load Iosevka Slab as an embedded bitmap font with a distance field effect.
-        // the distance field effect allows the font to be stretched without getting blurry or grainy too easily.
-        // this font is covered under the SIL Open Font License (fully free), so there's no reason it can't be used.
-        // It is included in the assets folder if this project was made with SquidSetup, along with other fonts
-        // Another option to consider is DefaultResources.getSlabFamily(), which uses the same font (Iosevka Slab) but
-        // treats it differently, and can be used to draw bold and/or italic text at the expense of the font being
-        // slightly less detailed visually and some rare glyphs being omitted. Bold and italic text are usually handled
-        // with markup in text that is passed to SquidLib's GDXMarkup class; see GDXMarkup's docs for more info.
-        // There are also several other distance field fonts, including two more font families like
-        // DefaultResources.getSlabFamily() that allow bold/italic text. Although some BitmapFont assets are available
-        // without a distance field effect, they are discouraged for most usage because they can't cleanly resize
-        // without loading a different BitmapFont per size, and there's usually just one size in DefaultResources.
         display = new SparseLayers(bigWidth, bigHeight, cellWidth, cellHeight,
-                DefaultResources.getCrispDejaVuFont());
+                DefaultResources.getCrispSlabFont());
 
         // A bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // This causes a tiny bit of overlap between cells, which gets rid of an annoying gap between solid lines.
         // If you use '#' for walls instead of box drawing chars, you don't need this.
         // If you don't use DefaultResources.getStretchableSlabFont(), you may need to adjust the multipliers here.
-        display.font.tweakWidth(cellWidth * 1.05f).tweakHeight(cellHeight * 1.1f).initBySize();
-        
-        //CharArray ca = new CharArray(256);
+        display.font.tweakWidth(cellWidth * 1.125f).tweakHeight(cellHeight * 1.1f).initBySize();
+
+        //The next line sets the background color for anything we don't draw on.
+        bgColor = SColor.CW_PALE_BROWN;
+
         contents = new char[gridWidth][gridHeight];
         colors = new float[gridWidth][gridHeight];
-        bgColors = new float[gridWidth][gridHeight];         
-        for (int y = 0, idx= 0; y < gridHeight - 4 && idx < keys.length; y+=5) {
-            for (int x = 0; x < gridWidth - 3 && idx < keys.length; x+=4) {
-                for (int j = 0; j < 4; j++) {
-                    for (int i = 0; i < 3; i++) {
-                        contents[x+i][y+j] = ' ';
-                        colors[x+i][y+j] = -0x1.684044p125F;//SColor.DB_INK
-                        bgColors[x+i][y+j] = -0x1.b9ebeap126F;//SColor.BEIGE
-                    }
+        bgColors = new float[gridWidth][gridHeight];
+        String name;
+        System.out.println(keyNames.length);
+        System.out.println(keyNameMap.size());
+        System.out.println();
+        for (int x = 1, idx = 0; x < gridWidth - 50 && idx < keys.length; x+=54) { 
+            for (int y = 0; y < gridHeight - 1 && idx < keys.length; y++) { 
+                name = shifted ? shiftKeyNameMap.keyAt(idx) : keyNameMap.keyAt(idx);
+                for (int i = 5, p = 0; i < 25 && p < name.length(); i++, p++) {
+                    contents[x+i][y] = name.charAt(p);
+                    colors[x+i][y] = -0x1.684044p125F;//SColor.DB_INK
+                    bgColors[x+i][y] = -0x1.b9ebeap126F;//SColor.BEIGE
                 }
-                contents[x+1][y] = (char) (keys[idx] & 0xFFFF);
-                if(shifted)contents[x][y+1] = 's';
+                for (int i = 5 + name.length(); i < 25; i++) {
+                    contents[x+i][y] = ' ';
+                    colors[x+i][y] = 0F;
+                    bgColors[x+i][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+                }
+                bgColors[x][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+
+                bgColors[x+1][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                bgColors[x+2][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                bgColors[x+3][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+
+                bgColors[x+4][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+
+                if(ctrled)
+                {
+                    contents[x+1][y] = 'C';
+                    colors[x+1][y] = -0x1.d9e268p126F;//SColor.CW_BRIGHT_CYAN
+                }
+                if(alted)
+                {
+                    contents[x+2][y] = 'A';
+                    colors[x+2][y] = -0x1.d913b4p126F;//SColor.CW_LIGHT_PURPLE
+                }
+                if(shifted)
+                {
+                    contents[x+3][y] = 'S';
+                    colors[x+3][y] = -0x1.7677e8p125F;//SColor.CW_BRIGHT_RED
+                }
                 idx++;
             }
         }
@@ -324,8 +542,6 @@ public class KeyRemap extends ApplicationAdapter {
         //These need to have their positions set before adding any entities if there is an offset involved.
         //There is no offset used here, but it's still a good practice here to set positions early on.
         display.setPosition(0f, 0f);
-        //The next line sets the background color for anything we don't draw on.
-        bgColor = SColor.CW_PALE_BROWN;
         
         // this is a big one.
         // SquidInput can be constructed with a KeyHandler (which just processes specific keypresses), a SquidMouse

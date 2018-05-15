@@ -17,7 +17,7 @@ public class Lwjgl3Launcher {
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("KeyRemap");
-        configuration.setWindowedMode(90 * 10, (25 + 7) * 20);
+        configuration.setWindowedMode(160 * 8, 35 * 17);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
     }
