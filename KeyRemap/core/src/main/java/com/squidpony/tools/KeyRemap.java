@@ -68,7 +68,7 @@ public class KeyRemap extends ApplicationAdapter {
     private Stage stage;
     private Coord selectedKey;
     private boolean shifted, ctrled, alted;
-
+    private OrderedMap<String, Integer> keyNameMap, shiftKeyNameMap;
     @Override
     public void create () {
         String[] shiftKeyNames = {
@@ -469,9 +469,9 @@ public class KeyRemap extends ApplicationAdapter {
                 0|F12,
                 0|INSERT,
         };
-        
-        OrderedMap<String, Integer> keyNameMap = new OrderedMap<>(keyNames, keys),
-                shiftKeyNameMap = new OrderedMap<>(shiftKeyNames, shiftKeys); 
+
+        keyNameMap = new OrderedMap<>(keyNames, keys);         
+        shiftKeyNameMap = new OrderedMap<>(shiftKeyNames, shiftKeys); 
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
@@ -494,49 +494,7 @@ public class KeyRemap extends ApplicationAdapter {
         contents = new char[gridWidth][gridHeight];
         colors = new float[gridWidth][gridHeight];
         bgColors = new float[gridWidth][gridHeight];
-        String name;
-        System.out.println(keyNames.length);
-        System.out.println(keyNameMap.size());
-        System.out.println();
-        for (int x = 1, idx = 0; x < gridWidth - 50 && idx < keys.length; x+=54) { 
-            for (int y = 0; y < gridHeight - 1 && idx < keys.length; y++) { 
-                name = shifted ? shiftKeyNameMap.keyAt(idx) : keyNameMap.keyAt(idx);
-                for (int i = 5, p = 0; i < 25 && p < name.length(); i++, p++) {
-                    contents[x+i][y] = name.charAt(p);
-                    colors[x+i][y] = -0x1.684044p125F;//SColor.DB_INK
-                    bgColors[x+i][y] = -0x1.b9ebeap126F;//SColor.BEIGE
-                }
-                for (int i = 5 + name.length(); i < 25; i++) {
-                    contents[x+i][y] = ' ';
-                    colors[x+i][y] = 0F;
-                    bgColors[x+i][y] = -0x1.b9ebeap126F;//SColor.BEIGE
-                }
-                bgColors[x][y] = -0x1.b9ebeap126F;//SColor.BEIGE
 
-                bgColors[x+1][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
-                bgColors[x+2][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
-                bgColors[x+3][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
-
-                bgColors[x+4][y] = -0x1.b9ebeap126F;//SColor.BEIGE
-
-                if(ctrled)
-                {
-                    contents[x+1][y] = 'C';
-                    colors[x+1][y] = -0x1.d9e268p126F;//SColor.CW_BRIGHT_CYAN
-                }
-                if(alted)
-                {
-                    contents[x+2][y] = 'A';
-                    colors[x+2][y] = -0x1.d913b4p126F;//SColor.CW_LIGHT_PURPLE
-                }
-                if(shifted)
-                {
-                    contents[x+3][y] = 'S';
-                    colors[x+3][y] = -0x1.7677e8p125F;//SColor.CW_BRIGHT_RED
-                }
-                idx++;
-            }
-        }
         selectedKey = Coord.get(0,0);
 
         //These need to have their positions set before adding any entities if there is an offset involved.
@@ -570,6 +528,15 @@ public class KeyRemap extends ApplicationAdapter {
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 mouseMoved(screenX, screenY);
+                if(screenY == gridHeight - 1)
+                {
+                    if(screenX >= 20 && screenX < 36)
+                        ctrled = !ctrled;
+                    else if(screenX >= 74 && screenX < 90)
+                        alted = !alted;
+                    else if(screenX >= 128 && screenX < 144)
+                        shifted = !shifted;
+                }
                 return true;
             }
 
@@ -584,11 +551,11 @@ public class KeyRemap extends ApplicationAdapter {
             public boolean mouseMoved(int screenX, int screenY) {
                 // we also need to check if screenX or screenY is out of bounds.
                 if(screenX < 0 || screenY < 0 || screenX >= gridWidth || screenY >= gridHeight ||
-                        (selectedKey.x == screenX && selectedKey.y == screenY) || contents[screenX][screenY] == 0)
+                        (selectedKey.x == screenX && selectedKey.y == screenY))
                 {
                     return false;
                 }
-                selectedKey = Coord.get(screenX, screenY);
+                selectedKey = Coord.get(Math.min(108,((screenX - 1)/54)*54), screenY);
                 return false;
             }
         }));
@@ -600,17 +567,151 @@ public class KeyRemap extends ApplicationAdapter {
 
     }
 
-    /**
-     * Draws the map, applies any highlighting for the path to the cursor, and then draws the player.
-     */
-    public void putMap()
+    public void putContents()
     {
-        //In many other situations, you would clear the drawn characters to prevent things that had been drawn in the
-        //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
-        //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
-        //display.clear();
-        
-        display.put(contents, colors, bgColors); 
+        display.clear();
+        String name;
+        for (int x = 1, idx = 0; x < gridWidth - 50 && idx < keyNameMap.size(); x+=54) {
+            for (int y = 0; y < gridHeight - 2 && idx < keyNameMap.size(); y++) {
+                name = shifted ? shiftKeyNameMap.keyAt(idx) : keyNameMap.keyAt(idx);
+                for (int i = 5, p = 0; i < 25 && p < name.length(); i++, p++) {
+                    contents[x+i][y] = name.charAt(p);
+                    colors[x+i][y] = -0x1.684044p125F;//SColor.DB_INK
+                    bgColors[x+i][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+                }
+                for (int i = 5 + name.length(); i < 25; i++) {
+                    contents[x+i][y] = ' ';
+                    colors[x+i][y] = 0F;
+                    bgColors[x+i][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+                }
+                bgColors[x][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+
+                contents[x+1][y] = ctrled ? 'C' : ' ';
+                bgColors[x+1][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                colors[x+1][y] = -0x1.d9e268p126F;//SColor.CW_BRIGHT_CYAN
+                contents[x+2][y] = alted ? 'A' : ' ';
+                bgColors[x+2][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                colors[x+2][y] = -0x1.d913b4p126F;//SColor.CW_LIGHT_PURPLE
+                contents[x+3][y] = shifted ? 'S' : ' ';
+                bgColors[x+3][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                colors[x+3][y] = -0x1.7677e8p125F;//SColor.CW_BRIGHT_RED
+
+                bgColors[x+4][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+                idx++;
+            }
+        }
+        final int bottom = gridHeight - 1;
+        int start = 26;
+        contents[start  ][bottom] = 'C';
+        contents[start+1][bottom] = 't';
+        contents[start+2][bottom] = 'r';
+        contents[start+3][bottom] = 'l';
+
+        contents[start+5][bottom] = 'O';
+        for (int x = 20; x < 36; x++) {
+            bgColors[x][bottom] = -0x1.3aa22ap126F;//SColor.CW_DARK_BLUE
+        }
+        if(ctrled)
+        {
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            start++;
+            colors[start++][bottom] = -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            colors[start++][bottom] = -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            colors[start][bottom] =   -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            contents[start--][bottom] = ' ';
+            contents[start][bottom] = 'n';
+        }
+        else
+        {
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            start++;
+            colors[start++][bottom] = -0x1.432b0ap126F;//SColor.DB_IRON;
+            colors[start++][bottom] = -0x1.432b0ap126F;//SColor.DB_IRON;
+            colors[start][bottom] =   -0x1.432b0ap126F;//SColor.DB_IRON;
+            contents[start--][bottom] = 'f';
+            contents[start][bottom] = 'f';
+        }
+        start = 80;
+        contents[start  ][bottom] = 'A';
+        contents[start+1][bottom] = 'l';
+        contents[start+2][bottom] = 't';
+
+        contents[start+4][bottom] = 'O';
+        for (int x = 74; x < 90; x++) {
+            bgColors[x][bottom] = -0x1.2a7f0cp126F;//SColor.CW_DRAB_PURPLE
+        }
+
+        if(alted)
+        {
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            start++;
+            colors[start++][bottom] = -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            colors[start++][bottom] = -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            colors[start][bottom] =   -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            contents[start--][bottom] = ' ';
+            contents[start][bottom] = 'n';
+        }
+        else
+        {
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            start++;
+            colors[start++][bottom] = -0x1.432b0ap126F;//SColor.DB_IRON;
+            colors[start++][bottom] = -0x1.432b0ap126F;//SColor.DB_IRON;
+            colors[start][bottom] =   -0x1.432b0ap126F;//SColor.DB_IRON;
+            contents[start--][bottom] = 'f';
+            contents[start][bottom] = 'f';
+        }
+        start = 133;
+        contents[start  ][bottom] = 'S';
+        contents[start+1][bottom] = 'h';
+        contents[start+2][bottom] = 'i';
+        contents[start+3][bottom] = 'f';
+        contents[start+4][bottom] = 't';
+
+        contents[start+6][bottom] = 'O';
+        for (int x = 128; x < 144; x++) {
+            bgColors[x][bottom] = -0x1.2c2d42p125F;//SColor.CW_DARK_RED
+        }
+        if(shifted)
+        {
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            colors[start++][bottom] = SColor.FLOAT_WHITE;
+            start++;
+            colors[start++][bottom] = -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            colors[start++][bottom] = -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            colors[start][bottom] = -0x1.6f5b36p126F;//SColor.DB_STORM_CLOUD;
+            contents[start--][bottom] = ' ';
+            contents[start][bottom] = 'n';
+        }
+        else
+        {
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            colors[start++][bottom] = -0x1.fefefep125F;//SColor.CW_GRAY;
+            start++;
+            colors[start++][bottom] = -0x1.432b0ap126F;//SColor.DB_IRON;
+            colors[start++][bottom] = -0x1.432b0ap126F;//SColor.DB_IRON;
+            colors[start][bottom] =   -0x1.432b0ap126F;//SColor.DB_IRON;
+            contents[start--][bottom] = 'f';
+            contents[start][bottom] = 'f';
+        }
+
+        display.put(contents, colors, bgColors);
         display.putWithLight(selectedKey.x, selectedKey.y, bgColors[selectedKey.x][selectedKey.y], SColor.FLOAT_BLACK, 0.25f);
     }
     @Override
@@ -620,7 +721,7 @@ public class KeyRemap extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // need to display the map every frame, since we clear the screen to avoid artifacts.
-        putMap();
+        putContents();
         // if the user clicked, we have a list of moves to perform.
         // if we are waiting for the player's input and get input, process it.
         if(input.hasNext()) {
@@ -648,7 +749,7 @@ public class KeyRemap extends ApplicationAdapter {
         // in some other cases it has useful traits (x % 2 can be 0, 1, or -1 depending on whether x is negative, while
         // x & 1 will always be 0 or 1).
         input.getMouse().reinitialize(currentZoomX, currentZoomY, gridWidth, gridHeight,
-                (gridWidth & 1) * (int)(currentZoomX * -0.5f), (gridHeight & 1) * (int) (currentZoomY * -0.5f));        // the viewports are updated separately so each doesn't interfere with the other's drawn area.
+                0, 0);
         stage.getViewport().update(width, height, false);
     }
 }
