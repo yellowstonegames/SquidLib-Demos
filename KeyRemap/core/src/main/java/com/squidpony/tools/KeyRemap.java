@@ -8,9 +8,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.squidgrid.gui.gdx.*;
+import squidpony.squidmath.Arrangement;
 import squidpony.squidmath.Coord;
+import squidpony.squidmath.MathExtras;
 import squidpony.squidmath.OrderedMap;
 
 import static squidpony.squidgrid.gui.gdx.SquidInput.*;
@@ -63,12 +66,22 @@ public class KeyRemap extends ApplicationAdapter {
     private static final int cellWidth = 8;
     /** The pixel height of a cell */
     private static final int cellHeight = 17;
-    private SquidInput input;
+    private SquidInput input, mappingStore;
+    private IntIntMap reverseMapping;
+    private Arrangement<Integer> keyToIndex, shiftKeyToIndex;
     private Color bgColor;
     private Stage stage;
-    private Coord selectedKey;
+    private Coord selectionPosition;
+    private int selectedIndex = 0;
     private boolean shifted, ctrled, alted;
     private OrderedMap<String, Integer> keyNameMap, shiftKeyNameMap;
+    
+    private int encodeIndex(final int index, boolean alted, boolean ctrled, boolean shifted)
+    {
+        return (shifted ? shiftKeyNameMap.getAt(index) : keyNameMap.getAt(index))
+            | (alted ? 0x10000 : 0) | (ctrled ? 0x20000 : 0) | (shifted ? 0x40000 : 0);
+    }
+    
     @Override
     public void create () {
         String[] shiftKeyNames = {
@@ -139,10 +152,6 @@ public class KeyRemap extends ApplicationAdapter {
                 "Escape",
                 "Page Up",
                 "Page Down",
-                "Dedicated :",
-                "Dedicated *",
-                "Dedicated #",
-                "Dedicated @",
                 "Gamepad A",
                 "Gamepad B",
                 "Gamepad C",
@@ -238,10 +247,6 @@ public class KeyRemap extends ApplicationAdapter {
                 "Escape",
                 "Page Up",
                 "Page Down",
-                "Dedicated :",
-                "Dedicated *",
-                "Dedicated #",
-                "Dedicated @",
                 "Gamepad A",
                 "Gamepad B",
                 "Gamepad C",
@@ -271,104 +276,100 @@ public class KeyRemap extends ApplicationAdapter {
                 "Insert",
         };
         Integer[] shiftKeys = {
-                0x80000|'A',
-                0x80000|'B',
-                0x80000|'C',
-                0x80000|'D',
-                0x80000|'E',
-                0x80000|'F',
-                0x80000|'G',
-                0x80000|'H',
-                0x80000|'I',
-                0x80000|'J',
-                0x80000|'K',
-                0x80000|'L',
-                0x80000|'M',
-                0x80000|'N',
-                0x80000|'O',
-                0x80000|'P',
-                0x80000|'Q',
-                0x80000|'R',
-                0x80000|'S',
-                0x80000|'T',
-                0x80000|'U',
-                0x80000|'V',
-                0x80000|'W',
-                0x80000|'X',
-                0x80000|'Y',
-                0x80000|'Z',
-                0x80000|' ',
-                0x80000|'<',
-                0x80000|'>',
-                0x80000|'~',
-                0x80000|'_',
-                0x80000|'+',
-                0x80000|'{',
-                0x80000|'}',
-                0x80000|'|',
-                0x80000|':',
-                0x80000|'"',
-                0x80000|'?',
-                0x80000|')',
-                0x80000|'!',
-                0x80000|'@',
-                0x80000|'#',
-                0x80000|'$',
-                0x80000|'%',
-                0x80000|'^',
-                0x80000|'&',
-                0x80000|'*',
-                0x80000|'(',
-                0x80000|VERTICAL_ARROW,
-                0x80000|DOWN_LEFT_ARROW,
-                0x80000|DOWN_ARROW,
-                0x80000|DOWN_RIGHT_ARROW,
-                0x80000|LEFT_ARROW,
-                0x80000|CENTER_ARROW,
-                0x80000|RIGHT_ARROW,
-                0x80000|UP_LEFT_ARROW,
-                0x80000|UP_ARROW,
-                0x80000|UP_RIGHT_ARROW,
-                0x80000|ENTER,
-                0x80000|TAB,
-                0x80000|HOME,
-                0x80000|END,
-                0x80000|BACKSPACE,
-                0x80000|FORWARD_DELETE,
-                0x80000|ESCAPE,
-                0x80000|PAGE_UP,
-                0x80000|PAGE_DOWN,
-                0x80000|':',
-                0x80000|'*',
-                0x80000|'#',
-                0x80000|'@',
-                0x80000|GAMEPAD_A,
-                0x80000|GAMEPAD_B,
-                0x80000|GAMEPAD_C,
-                0x80000|GAMEPAD_X,
-                0x80000|GAMEPAD_Y,
-                0x80000|GAMEPAD_Z,
-                0x80000|GAMEPAD_L1,
-                0x80000|GAMEPAD_R1,
-                0x80000|GAMEPAD_L2,
-                0x80000|GAMEPAD_R2,
-                0x80000|GAMEPAD_LEFT_THUMB,
-                0x80000|GAMEPAD_RIGHT_THUMB,
-                0x80000|GAMEPAD_START,
-                0x80000|GAMEPAD_SELECT,
-                0x80000|F1,
-                0x80000|F2,
-                0x80000|F3,
-                0x80000|F4,
-                0x80000|F5,
-                0x80000|F6,
-                0x80000|F7,
-                0x80000|F8,
-                0x80000|F9,
-                0x80000|F10,
-                0x80000|F11,
-                0x80000|F12,
-                0x80000|INSERT,
+                0x40000|'A',
+                0x40000|'B',
+                0x40000|'C',
+                0x40000|'D',
+                0x40000|'E',
+                0x40000|'F',
+                0x40000|'G',
+                0x40000|'H',
+                0x40000|'I',
+                0x40000|'J',
+                0x40000|'K',
+                0x40000|'L',
+                0x40000|'M',
+                0x40000|'N',
+                0x40000|'O',
+                0x40000|'P',
+                0x40000|'Q',
+                0x40000|'R',
+                0x40000|'S',
+                0x40000|'T',
+                0x40000|'U',
+                0x40000|'V',
+                0x40000|'W',
+                0x40000|'X',
+                0x40000|'Y',
+                0x40000|'Z',
+                0x40000|' ',
+                0x40000|'<',
+                0x40000|'>',
+                0x40000|'~',
+                0x40000|'_',
+                0x40000|'+',
+                0x40000|'{',
+                0x40000|'}',
+                0x40000|'|',
+                0x40000|':',
+                0x40000|'"',
+                0x40000|'?',
+                0x40000|')',
+                0x40000|'!',
+                0x40000|'@',
+                0x40000|'#',
+                0x40000|'$',
+                0x40000|'%',
+                0x40000|'^',
+                0x40000|'&',
+                0x40000|'*',
+                0x40000|'(',
+                0x40000|VERTICAL_ARROW,
+                0x40000|DOWN_LEFT_ARROW,
+                0x40000|DOWN_ARROW,
+                0x40000|DOWN_RIGHT_ARROW,
+                0x40000|LEFT_ARROW,
+                0x40000|CENTER_ARROW,
+                0x40000|RIGHT_ARROW,
+                0x40000|UP_LEFT_ARROW,
+                0x40000|UP_ARROW,
+                0x40000|UP_RIGHT_ARROW,
+                0x40000|ENTER,
+                0x40000|TAB,
+                0x40000|HOME,
+                0x40000|END,
+                0x40000|BACKSPACE,
+                0x40000|FORWARD_DELETE,
+                0x40000|ESCAPE,
+                0x40000|PAGE_UP,
+                0x40000|PAGE_DOWN,
+                0x40000|GAMEPAD_A,
+                0x40000|GAMEPAD_B,
+                0x40000|GAMEPAD_C,
+                0x40000|GAMEPAD_X,
+                0x40000|GAMEPAD_Y,
+                0x40000|GAMEPAD_Z,
+                0x40000|GAMEPAD_L1,
+                0x40000|GAMEPAD_R1,
+                0x40000|GAMEPAD_L2,
+                0x40000|GAMEPAD_R2,
+                0x40000|GAMEPAD_LEFT_THUMB,
+                0x40000|GAMEPAD_RIGHT_THUMB,
+                0x40000|GAMEPAD_START,
+                0x40000|GAMEPAD_SELECT,
+                0x40000|F1,
+                0x40000|F2,
+                0x40000|F3,
+                0x40000|F4,
+                0x40000|F5,
+                0x40000|F6,
+                0x40000|F7,
+                0x40000|F8,
+                0x40000|F9,
+                0x40000|F10,
+                0x40000|F11,
+                0x40000|F12,
+                0x40000|INSERT,
         }, keys = {
                 0|'a',
                 0|'b',
@@ -437,10 +438,6 @@ public class KeyRemap extends ApplicationAdapter {
                 0|ESCAPE,
                 0|PAGE_UP,
                 0|PAGE_DOWN,
-                0|':',
-                0|'*',
-                0|'#',
-                0|'@',
                 0|GAMEPAD_A,
                 0|GAMEPAD_B,
                 0|GAMEPAD_C,
@@ -471,8 +468,9 @@ public class KeyRemap extends ApplicationAdapter {
         };
 
         keyNameMap = new OrderedMap<>(keyNames, keys);         
-        shiftKeyNameMap = new OrderedMap<>(shiftKeyNames, shiftKeys); 
-
+        shiftKeyNameMap = new OrderedMap<>(shiftKeyNames, shiftKeys);
+        keyToIndex = new Arrangement<>(keys);
+        shiftKeyToIndex = new Arrangement<>(shiftKeys);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
         StretchViewport mainViewport = new StretchViewport(gridWidth * cellWidth, gridHeight * cellHeight);
@@ -495,26 +493,33 @@ public class KeyRemap extends ApplicationAdapter {
         colors = new float[gridWidth][gridHeight];
         bgColors = new float[gridWidth][gridHeight];
 
-        selectedKey = Coord.get(0,0);
+        selectionPosition = Coord.get(0,0);
 
         //These need to have their positions set before adding any entities if there is an offset involved.
         //There is no offset used here, but it's still a good practice here to set positions early on.
         display.setPosition(0f, 0f);
+
+        mappingStore = new SquidInput(new KeyHandler() {
+            @Override
+            public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
+            }
+        });
         
-        // this is a big one.
-        // SquidInput can be constructed with a KeyHandler (which just processes specific keypresses), a SquidMouse
-        // (which is given an InputProcessor implementation and can handle multiple kinds of mouse move), or both.
-        // keyHandler is meant to be able to handle complex, modified key input, typically for games that distinguish
-        // between, say, 'q' and 'Q' for 'quaff' and 'Quip' or whatever obtuse combination you choose. The
-        // implementation here handles hjkl keys (also called vi-keys), numpad, arrow keys, and wasd for 4-way movement.
-        // Shifted letter keys produce capitalized chars when passed to KeyHandler.handle(), but we don't care about
-        // that so we just use two case statements with the same body, i.e. one for 'A' and one for 'a'.
-        // You can also set up a series of future moves by clicking within FOV range, using mouseMoved to determine the
-        // path to the mouse position with a DijkstraMap (called playerToCursor), and using touchUp to actually trigger
-        // the event when someone clicks.
+        reverseMapping = new IntIntMap(mappingStore.mapping.size);
+        for(IntIntMap.Entry ent : mappingStore.mapping)
+        {
+            reverseMapping.put(ent.value, ent.key);
+        }
         input = new SquidInput(new SquidInput.KeyHandler() {
             @Override
             public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
+                int combined = combineModifiers(key, alt, ctrl, shift),
+                        code = encodeIndex(selectedIndex, alted, ctrled, shifted);
+                if(reverseMapping.containsKey(code))
+                    mappingStore.mapping.remove(combined, -1);
+                mappingStore.remap(combined, code);
+                reverseMapping.put(code, combined);
+                System.out.println(mappingStore.keyMappingToString());
             }
         },
                 //The second parameter passed to a SquidInput can be a SquidMouse, which takes mouse or touchscreen
@@ -550,12 +555,20 @@ public class KeyRemap extends ApplicationAdapter {
             @Override
             public boolean mouseMoved(int screenX, int screenY) {
                 // we also need to check if screenX or screenY is out of bounds.
-                if(screenX < 0 || screenY < 0 || screenX >= gridWidth || screenY >= gridHeight ||
-                        (selectedKey.x == screenX && selectedKey.y == screenY))
+                if(screenX < 0 || screenY < 0 || screenX >= gridWidth || screenY >= gridHeight - 2 ||
+                        (selectionPosition.x == screenX && selectionPosition.y == screenY))
                 {
                     return false;
                 }
-                selectedKey = Coord.get(Math.min(108,((screenX - 1)/54)*54), screenY);
+                final int col = MathExtras.clamp(((screenX - 1)/54), 0, 2);
+                final int prev = selectedIndex;
+                selectedIndex = col * (gridHeight - 2) + screenY;
+                if(selectedIndex < 0 || selectedIndex >= keyNameMap.size())
+                {
+                    selectedIndex = prev;
+                    return false;
+                }
+                selectionPosition = Coord.get(col * 54, screenY);
                 return false;
             }
         }));
@@ -571,9 +584,11 @@ public class KeyRemap extends ApplicationAdapter {
     {
         display.clear();
         String name;
+        int code;
         for (int x = 1, idx = 0; x < gridWidth - 50 && idx < keyNameMap.size(); x+=54) {
             for (int y = 0; y < gridHeight - 2 && idx < keyNameMap.size(); y++) {
                 name = shifted ? shiftKeyNameMap.keyAt(idx) : keyNameMap.keyAt(idx);
+                code = encodeIndex(idx, alted, ctrled, shifted);
                 for (int i = 5, p = 0; i < 25 && p < name.length(); i++, p++) {
                     contents[x+i][y] = name.charAt(p);
                     colors[x+i][y] = -0x1.684044p125F;//SColor.DB_INK
@@ -597,6 +612,49 @@ public class KeyRemap extends ApplicationAdapter {
                 colors[x+3][y] = -0x1.7677e8p125F;//SColor.CW_BRIGHT_RED
 
                 bgColors[x+4][y] = -0x1.b9ebeap126F;//SColor.BEIGE
+                
+                if((code = reverseMapping.get(code, -1)) >= 0)// && ((code & 0x40000) != 0) == shifted)
+                {
+                    contents[x+25][y] = SquidInput.LEFT_ARROW;
+                    colors[x+25][y] = -0x1.d3c48ap125F;//SColor.CW_JADE
+                    bgColors[x+25][y] = -0x1.48ca68p125F;//SColor.DB_FOREST
+
+                    name = (code & 0x40000) != 0 ? shiftKeyNameMap.keyAt(shiftKeyToIndex.getInt(code & 0x4FFFF))
+                            : keyNameMap.keyAt(keyToIndex.getInt(code & 0xFFFF));
+                    
+                    for (int i = 31, p = 0; i < 50 && p < name.length(); i++, p++) {
+                        contents[x+i][y] = name.charAt(p);
+                        colors[x+i][y] = -0x1.04c06p126F;//SColor.DB_CERULEAN
+                        bgColors[x+i][y] = -0x1.87edb8p126F;//SColor.CW_PALE_HONEYDEW
+                    }
+                    for (int i = 31 + name.length(); i < 50; i++) {
+                        contents[x+i][y] = ' ';
+                        colors[x+i][y] = 0F;
+                        bgColors[x+i][y] = -0x1.87edb8p126F;//SColor.CW_PALE_HONEYDEW
+                    }
+                    bgColors[x+26][y] = -0x1.87edb8p126F;//SColor.CW_PALE_HONEYDEW
+
+                    contents[x+27][y] = (code & 0x20000) != 0 ? 'C' : ' ';
+                    bgColors[x+27][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                    colors[x+27][y] = -0x1.d9e268p126F;//SColor.CW_BRIGHT_CYAN
+                    contents[x+28][y] = (code & 0x10000) != 0 ? 'A' : ' ';
+                    bgColors[x+28][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                    colors[x+28][y] = -0x1.d913b4p126F;//SColor.CW_LIGHT_PURPLE
+                    contents[x+29][y] = (code & 0x40000) != 0 ? 'S' : ' ';
+                    bgColors[x+29][y] = -0x1.a4acb2p125F;//SColor.DB_SOOT
+                    colors[x+29][y] = -0x1.7677e8p125F;//SColor.CW_BRIGHT_RED
+
+                    bgColors[x+30][y] = -0x1.87edb8p126F;//SColor.CW_PALE_HONEYDEW
+                }
+                else
+                {
+                    for (int i = 25; i < 50; i++) {
+                        contents[x+i][y] = ' ';
+                        colors[x+i][y] = 0f;
+                        bgColors[x+i][y] = 0f;
+                    }
+                }
+
                 idx++;
             }
         }
@@ -712,7 +770,7 @@ public class KeyRemap extends ApplicationAdapter {
         }
 
         display.put(contents, colors, bgColors);
-        display.putWithLight(selectedKey.x, selectedKey.y, bgColors[selectedKey.x][selectedKey.y], SColor.FLOAT_BLACK, 0.25f);
+        display.putWithLight(selectionPosition.x, selectionPosition.y, bgColors[selectionPosition.x][selectionPosition.y], SColor.FLOAT_BLACK, 0.25f);
     }
     @Override
     public void render () {
