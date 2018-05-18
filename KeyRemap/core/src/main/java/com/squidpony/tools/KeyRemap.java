@@ -4,13 +4,18 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import squidpony.squidgrid.gui.gdx.*;
+import squidpony.squidgrid.gui.gdx.DefaultResources;
+import squidpony.squidgrid.gui.gdx.SColor;
+import squidpony.squidgrid.gui.gdx.SparseLayers;
+import squidpony.squidgrid.gui.gdx.SquidInput;
+import squidpony.squidgrid.gui.gdx.SquidMouse;
 import squidpony.squidmath.Arrangement;
 import squidpony.squidmath.Coord;
 import squidpony.squidmath.MathExtras;
@@ -75,6 +80,7 @@ public class KeyRemap extends ApplicationAdapter {
     private int selectedIndex = 0;
     private boolean shifted, ctrled, alted;
     private OrderedMap<String, Integer> keyNameMap, shiftKeyNameMap;
+    private FileHandle prefs;
     
     private int encodeIndex(final int index, boolean alted, boolean ctrled, boolean shifted)
     {
@@ -214,9 +220,9 @@ public class KeyRemap extends ApplicationAdapter {
                 "=",
                 "[",
                 "]",
-                "'",
-                ";",
                 "\\",
+                ";",
+                "'",
                 "/",
                 "0",
                 "1",
@@ -406,7 +412,7 @@ public class KeyRemap extends ApplicationAdapter {
                 0|'[',
                 0|']',
                 0|'\\',
-                0|',',
+                0|';',
                 0|'\'',
                 0|'/',
                 0|'0',
@@ -473,13 +479,13 @@ public class KeyRemap extends ApplicationAdapter {
         shiftKeyToIndex = new Arrangement<>(shiftKeys);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
-        StretchViewport mainViewport = new StretchViewport(gridWidth * cellWidth, gridHeight * cellHeight);
+        final StretchViewport mainViewport = new StretchViewport(gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         //Here we make sure our Stage, which holds any text-based grids we make, uses our Batch.
         stage = new Stage(mainViewport, batch);
         display = new SparseLayers(bigWidth, bigHeight, cellWidth, cellHeight,
                 DefaultResources.getCrispSlabFont());
-
+        prefs = Gdx.files.local("keymap.preferences");
         // A bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // This causes a tiny bit of overlap between cells, which gets rid of an annoying gap between solid lines.
         // If you use '#' for walls instead of box drawing chars, you don't need this.
@@ -488,6 +494,7 @@ public class KeyRemap extends ApplicationAdapter {
 
         //The next line sets the background color for anything we don't draw on.
         bgColor = SColor.CW_PALE_BROWN;
+        display.setDefaultBackground(bgColor);
 
         contents = new char[gridWidth][gridHeight];
         colors = new float[gridWidth][gridHeight];
@@ -515,11 +522,12 @@ public class KeyRemap extends ApplicationAdapter {
             public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
                 int combined = combineModifiers(key, alt, ctrl, shift),
                         code = encodeIndex(selectedIndex, alted, ctrled, shifted);
-                if(reverseMapping.containsKey(code))
-                    mappingStore.mapping.remove(combined, -1);
-                mappingStore.remap(combined, code);
-                reverseMapping.put(code, combined);
-                System.out.println(mappingStore.keyMappingToString());
+                mappingStore.mapping.remove(reverseMapping.remove(code, -1), -1);
+                if(combined != code) {
+                    mappingStore.remap(combined, code);
+                    reverseMapping.put(code, combined);
+                }
+                prefs.writeString(mappingStore.keyMappingToString(), false, "UTF-8");
             }
         },
                 //The second parameter passed to a SquidInput can be a SquidMouse, which takes mouse or touchscreen
@@ -550,8 +558,6 @@ public class KeyRemap extends ApplicationAdapter {
                 return mouseMoved(screenX, screenY);
             }
 
-            // causes the path to the mouse position to become highlighted (toCursor contains a list of Coords that
-            // receive highlighting). Uses DijkstraMap.findPathPreScanned() to find the path, which is rather fast.
             @Override
             public boolean mouseMoved(int screenX, int screenY) {
                 // we also need to check if screenX or screenY is out of bounds.
@@ -572,9 +578,9 @@ public class KeyRemap extends ApplicationAdapter {
                 return false;
             }
         }));
-        //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
+        //IMPORTANT so mistakes in previous mappings don't prevent the correct keys from being entered
+        input.clearMapping();
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, input));
-        //we add display, our one visual component that moves, to the list of things that act in the main Stage.
         stage.addActor(display);
 
 
@@ -650,7 +656,7 @@ public class KeyRemap extends ApplicationAdapter {
                 {
                     for (int i = 25; i < 50; i++) {
                         contents[x+i][y] = ' ';
-                        colors[x+i][y] = 0f;
+                        colors[x+i][y] = display.defaultPackedBackground;
                         bgColors[x+i][y] = 0f;
                     }
                 }
