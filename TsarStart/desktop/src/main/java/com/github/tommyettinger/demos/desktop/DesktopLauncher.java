@@ -20,6 +20,8 @@ public class DesktopLauncher {
         configuration.title = "TsarStart";
         configuration.width = 90 * 10;
         configuration.height = (25 + 7) * 20;
+        configuration.vSyncEnabled = false;
+        configuration.foregroundFPS = 0;
         for (int size : new int[] { 128, 64, 32, 16 }) {
             configuration.addIcon("libgdx" + size + ".png", FileType.Internal);
         }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.FakeLanguageGen;
@@ -40,7 +41,7 @@ public class TsarDemo extends ApplicationAdapter {
     SpriteBatch batch;
     private Phase phase = Phase.WAIT;
 
-    private RNG rng;
+    private GWTRNG rng;
     private SparseLayers display;
     private SquidMessageBox messageDisplay;
     private DungeonGenerator dungeonGen;
@@ -79,6 +80,7 @@ public class TsarDemo extends ApplicationAdapter {
     private static final int cellHeight = 20;
     private SquidInput input;
     private Color bgColor;
+    private TextCellFactory font;
     private Stage stage, messageStage;
     private OrderedMap<Coord, TextCellFactory.Glyph> monsters;
     private DijkstraMap getToPlayer, playerToCursor;
@@ -109,7 +111,8 @@ public class TsarDemo extends ApplicationAdapter {
     private double[][] resistance;
     private double[][] visible;
     private int health = 9;
-
+    
+    private Vector2 screenPosition;
     // GreasedRegion is a hard-to-explain class, but it's an incredibly useful one for map generation and many other
     // tasks; it stores a region of "on" cells where everything not in that region is considered "off," and can be used
     // as a Collection of Coord points. However, it's more than that! Because of how it is implemented, it can perform
@@ -145,8 +148,11 @@ public class TsarDemo extends ApplicationAdapter {
 
     @Override
     public void create () {
-        // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
-        rng = new RNG("SquidLib!");
+        // gotta have a random number generator.
+        // We can seed a GWTRNG, which is optimized for the HTML target,
+        // with any int or long we want. You can also hash a String with
+        // CrossHash.hash("Some seed") to get a random-seeming int for a seed.
+        rng = new GWTRNG(123456789);
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
@@ -170,8 +176,8 @@ public class TsarDemo extends ApplicationAdapter {
         // DefaultResources.getSlabFamily() that allow bold/italic text. Although some BitmapFont assets are available
         // without a distance field effect, they are discouraged for most usage because they can't cleanly resize
         // without loading a different BitmapFont per size, and there's usually just one size in DefaultResources.
-        display = new SparseLayers(bigWidth, bigHeight + bonusHeight, cellWidth, cellHeight,
-                DefaultResources.getStretchableSlabFont());
+        font = DefaultResources.getStretchableSlabFont();
+        display = new SparseLayers(bigWidth, bigHeight + bonusHeight, cellWidth, cellHeight, font);
 
         messageDisplay = new SquidMessageBox(gridWidth, bonusHeight - 1, display.font);
 
@@ -406,6 +412,12 @@ public class TsarDemo extends ApplicationAdapter {
                         Gdx.app.exit();
                         break;
                     }
+                    case 'c': // cheat vision
+                    case 'C':
+                    {
+                        seen.fill(true);
+                        break;
+                    }
                 }
             }
         },
@@ -475,16 +487,11 @@ public class TsarDemo extends ApplicationAdapter {
         stage.addActor(display);
         //we add messageDisplay to messageStage, where it will be unchanged by camera moves in the main Stage.
         messageStage.addActor(messageDisplay);
-
+        
+        screenPosition = new Vector2(cellWidth, cellHeight);
 
     }
-
-    private Runnable resetRunnable = new Runnable() {
-        @Override
-        public void run() {
-            player = Coord.get(display.gridX(pg.getX()), display.gridY(pg.getY()));
-        }
-    };
+    
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
      * In a fully-fledged game, this would not be organized like this, but this is a one-file demo.
@@ -737,7 +744,14 @@ public class TsarDemo extends ApplicationAdapter {
         // we have the main stage set itself up after the language stage has already drawn.
         stage.getViewport().apply(false);
         // stage has its own batch and must be explicitly told to draw().
-        stage.draw();
+        batch.setProjectionMatrix(stage.getCamera().combined);
+        screenPosition.set(cellWidth * 5, cellHeight);
+        stage.screenToStageCoordinates(screenPosition);
+        batch.begin();
+        stage.getRoot().draw(batch, 1);
+        font.bmpFont.setColor(Color.WHITE);
+        font.bmpFont.draw(batch, Gdx.graphics.getFramesPerSecond() + " FPS", screenPosition.x, screenPosition.y);
+        batch.end();
     }
 
     @Override

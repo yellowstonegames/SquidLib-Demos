@@ -8,7 +8,7 @@ buildscript {
   dependencies {
     classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     classpath "com.android.tools.build:gradle:$androidPluginVersion"
-    classpath "de.richsource.gradle.plugins:gwt-gradle-plugin:$gwtPluginVersion"
+    classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
   }
 }
 
@@ -20,10 +20,6 @@ allprojects {
 configure(subprojects - project(':android')) {
   apply plugin: 'java'
   sourceCompatibility = 1.7
-  compileJava {
-    options.fork = true
-    options.incremental = true
-  }
 }
 
 subprojects {
