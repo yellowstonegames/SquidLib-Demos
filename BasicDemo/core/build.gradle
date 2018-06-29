@@ -2,7 +2,7 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
-  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-  compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
+  implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+  implementation "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
 }
         

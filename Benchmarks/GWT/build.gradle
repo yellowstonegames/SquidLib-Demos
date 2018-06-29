@@ -7,7 +7,7 @@ buildscript {
   }
   dependencies {
     classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-    classpath "de.richsource.gradle.plugins:gwt-gradle-plugin:$gwtPluginVersion"
+    classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
   }
 }
 
@@ -28,6 +28,7 @@ subprojects {
   version = '0.0.1-SNAPSHOT'
   ext.appName = 'BenchmarksGWT'
   repositories {
+    mavenLocal();
     mavenCentral()
     jcenter()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } 

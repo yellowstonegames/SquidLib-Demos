@@ -164,19 +164,22 @@ public class TsarDemo extends ApplicationAdapter {
         //Here we make sure our Stage, which holds any text-based grids we make, uses our Batch.
         stage = new Stage(mainViewport, batch);
         messageStage = new Stage(messageViewport, batch);
-        // the font will try to load Iosevka Slab as an embedded bitmap font with a distance field effect.
+        // the font will try to load Iosevka Slab as an embedded bitmap font with a (MSDF) distance field effect.
         // the distance field effect allows the font to be stretched without getting blurry or grainy too easily.
         // this font is covered under the SIL Open Font License (fully free), so there's no reason it can't be used.
         // It is included in the assets folder if this project was made with SquidSetup, along with other fonts
-        // Another option to consider is DefaultResources.getSlabFamily(), which uses the same font (Iosevka Slab) but
-        // treats it differently, and can be used to draw bold and/or italic text at the expense of the font being
+        // Another option to consider is DefaultResources.getCrispSlabFamily(), which uses the same font (Iosevka Slab)
+        // but treats it differently, and can be used to draw bold and/or italic text at the expense of the font being
         // slightly less detailed visually and some rare glyphs being omitted. Bold and italic text are usually handled
         // with markup in text that is passed to SquidLib's GDXMarkup class; see GDXMarkup's docs for more info.
-        // There are also several other distance field fonts, including two more font families like
+        // There are also several other distance field fonts, including more font families like
         // DefaultResources.getSlabFamily() that allow bold/italic text. Although some BitmapFont assets are available
         // without a distance field effect, they are discouraged for most usage because they can't cleanly resize
         // without loading a different BitmapFont per size, and there's usually just one size in DefaultResources.
-        font = DefaultResources.getStretchableSlabFont();
+        // the "Crisp" fonts use an MSDF effect, while "Stretchable" ones use an SDF effect. MSDF is a little faster to
+        // render than SDF, but SDF can resize to smaller sizes while remaining closer to legible. MSDF also generally
+        // looks better at large sizes because the corners stay sharp, instead of rounding as SDF does.
+        font = DefaultResources.getCrispSlabFont();
         display = new SparseLayers(bigWidth, bigHeight + bonusHeight, cellWidth, cellHeight, font);
 
         messageDisplay = new SquidMessageBox(gridWidth, bonusHeight - 1, display.font);
@@ -510,13 +513,13 @@ public class TsarDemo extends ApplicationAdapter {
                 // changes to the map mean the resistances for FOV need to be regenerated.
                 resistance = DungeonUtility.generateSimpleResistances(decoDungeon);
                 // recalculate FOV, store it in fovmap for the render to use.
-                visible = FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
+                FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0.0);
                 seen.or(blockage.not());
                 blockage.fringe8way();
             } else {
                 // recalculate FOV, store it in fovmap for the render to use.
-                visible = FOV.reuseFOV(resistance, visible, newX, newY, fovRange, Radius.CIRCLE);
+                FOV.reuseFOV(resistance, visible, newX, newY, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0.0);
                 seen.or(blockage.not());
                 blockage.fringe8way();

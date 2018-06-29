@@ -18,6 +18,8 @@ public class DesktopLauncher {
     private static LwjglApplicationConfiguration getDefaultConfiguration() {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.title = "BasicDemo";
+        config.vSyncEnabled = false;
+        config.foregroundFPS = 0;
         config.width = MainApplication.gridWidth * MainApplication.cellWidth;
         config.height = (MainApplication.gridHeight + MainApplication.bonusHeight) * MainApplication.cellHeight;
         for (int size : new int[] { 128, 64, 32, 16 }) {

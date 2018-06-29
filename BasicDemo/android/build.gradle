@@ -1,8 +1,8 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
-  buildToolsVersion '25.0.2'
-  compileSdkVersion 23
+  buildToolsVersion '27.0.3'
+  compileSdkVersion 27
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
@@ -13,8 +13,6 @@ android {
       assets.srcDirs = ['../assets']
       jniLibs.srcDirs = ['libs']
     }
-
-    instrumentTest.setRoot('tests')
   }
   packagingOptions {
     // Preventing from license violations (more or less):
@@ -34,20 +32,28 @@ android {
   defaultConfig {
     applicationId 'com.squidpony.demo'
     minSdkVersion 8
-    targetSdkVersion 23
+    targetSdkVersion 27
   }
 }
 
 configurations { natives }
-
+repositories {
+  mavenCentral()
+  jcenter()
+  google()
+  maven { url 'https://jitpack.io' }
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
 dependencies {
-  compile project(':core')
-  compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+  implementation project(':core')
+  implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+
 }
 
 // Called every time gradle gets executed, takes the native dependencies of

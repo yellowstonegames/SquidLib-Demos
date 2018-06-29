@@ -7,6 +7,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.*;
+import regexodus.Matcher;
+import regexodus.Pattern;
 import squidpony.squidmath.*;
 
 
@@ -71,6 +73,17 @@ public class GwtLauncher extends GwtBareApp {
         //addIntTest(vp, new Light32RNG(2132132130, 2123456789), "Light32RNG");
         //addLongTest(vp, new Light32RNG(2132132130, 2123456789), "Light32RNG");
 
+        Pattern pat = Pattern.compile("(?:\\p{InBasicLatin}{3})(\\p{Ll})(\\p{Ll})(\\p{Ll}).");
+        Matcher mat = pat.matcher("Random ");
+        mat.find();
+        StringBuilder sb = new StringBuilder(3);
+        mat.getGroup(0,sb);
+        mat.getGroup(3,sb);
+        mat.getGroup(2,sb);
+        mat.getGroup(2,sb);
+        mat.getGroup(1,sb);
+        vp.add(new Label(sb.toString()));
+        
         RootPanel.get().sinkEvents(Event.ONCLICK);
         RootPanel.get("embed-html").add(vp);
     }

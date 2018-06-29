@@ -8,29 +8,20 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.FakeLanguageGen;
+import squidpony.StringKit;
 import squidpony.squidai.DijkstraMap;
 import squidpony.squidgrid.FOV;
 import squidpony.squidgrid.Radius;
-import squidpony.squidgrid.gui.gdx.AnimatedEntity;
-import squidpony.squidgrid.gui.gdx.DefaultResources;
-import squidpony.squidgrid.gui.gdx.MapUtility;
-import squidpony.squidgrid.gui.gdx.SColor;
-import squidpony.squidgrid.gui.gdx.SquidInput;
-import squidpony.squidgrid.gui.gdx.SquidLayers;
-import squidpony.squidgrid.gui.gdx.SquidMouse;
+import squidpony.squidgrid.gui.gdx.*;
 import squidpony.squidgrid.mapping.DungeonGenerator;
 import squidpony.squidgrid.mapping.DungeonUtility;
-import squidpony.squidmath.Coord;
-import squidpony.squidmath.GreasedRegion;
-import squidpony.squidmath.OrthoLine;
-import squidpony.squidmath.RNG;
-import squidpony.squidmath.SeededNoise;
+import squidpony.squidmath.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -52,11 +43,11 @@ import java.util.List;
 public class MainApplication extends ApplicationAdapter {
     private SpriteBatch batch;
 
-    private RNG rng;
-    private SquidLayers display;
+    private GWTRNG rng;
+    private SparseLayers display;
     private DungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
-    private Color[][] colors, bgColors;
+    private float[][] colors, bgColors;
 
     //Here, gridHeight refers to the total number of rows to be displayed on the screen.
     //We're displaying 30 rows of dungeon, then 7 more rows of text generation to show some tricks with language.
@@ -70,22 +61,23 @@ public class MainApplication extends ApplicationAdapter {
     //space on the resized screen, but the same measurements will be used (usually called world coordinates by libGDX).
 
     /** In number of cells */
-    public static final int gridWidth = 180;
+    public static final int gridWidth = 120;
     /** In number of cells */
-    public static final int gridHeight = 50;
+    public static final int gridHeight = 36;
     /** In number of cells */
     public static final int bonusHeight = 5;
     /** The initial pixel width of a cell */
-    public static final int cellWidth = 6;
+    public static final int cellWidth = 9;
     /** The initial pixel height of a cell */
-    public static final int cellHeight = 12;
+    public static final int cellHeight = 18;
 
     private SquidInput input;
     private Color bgColor;
     private Stage stage;
+    private Vector2 screenPosition;
     private DijkstraMap playerToCursor;
     private Coord cursor, playerPosition;
-    private AnimatedEntity playerMobile;
+    private TextCellFactory.Glyph playerMobile;
     private List<Coord> toCursor;
     private List<Coord> awaitedMoves;
     private String[] lang;
@@ -96,10 +88,11 @@ public class MainApplication extends ApplicationAdapter {
     private double[][] visible;
     private GreasedRegion blockage;
     private GreasedRegion seen;
+    private GreasedRegion seenChanging;
     @Override
     public void create () {
         // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
-        rng = new RNG("SquidLib!");
+        rng = new GWTRNG(CrossHash.Falcon.hash("Squid..."), CrossHash.Falcon.hash("Lib!"));
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
@@ -108,15 +101,12 @@ public class MainApplication extends ApplicationAdapter {
         // the font will try to load Iosevka Slab as an embedded bitmap font with a distance field effect.
         // the distance field effect allows the font to be stretched without getting blurry or grainy too easily.
         // this font is covered under the SIL Open Font License (fully free), so there's no reason it can't be used.
-        display = new SquidLayers(gridWidth, gridHeight + bonusHeight, cellWidth, cellHeight,
-                DefaultResources.getStretchableSlabFont());
+        display = new SparseLayers(gridWidth, gridHeight + bonusHeight, cellWidth, cellHeight,
+                DefaultResources.getCrispSlabFont());
         // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
         // if you use '#' for walls instead of box drawing chars, you don't need this.
-        display.setTextSize(cellWidth * 1.1f, cellHeight * 1.1f);
-
-        // this makes animations medium-fast, which makes multi-cell movement slightly slower but nicer-looking.
-        display.setAnimationDuration(0.1f);
+        display.font.tweakHeight(cellHeight * 1.08f).initBySize();
 
         //These need to have their positions set before adding any entities if there is an offset involved.
         //There is no offset used here, but it's still a good practice here to set positions early on.
@@ -171,19 +161,20 @@ public class MainApplication extends ApplicationAdapter {
         // if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
         // don't seed the RNG, any valid cell should be possible.
         playerPosition = placement.singleRandom(rng);
-        playerMobile = display.animateActor(playerPosition.x, playerPosition.y, '@', SColor.CW_FLUSH_BLUE);
+        playerMobile = display.glyph('@', SColor.CW_FLUSH_BLUE, playerPosition.x, playerPosition.y);
         // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
         FOV.reuseFOV(resistance, visible, playerPosition.x, playerPosition.y, 9.0, Radius.CIRCLE);
         // 0.0 is the upper bound (inclusive), so any Coord in visible that is more well-lit than 0.0 will _not_ be in
         // the blockage Collection, but anything 0.0 or less will be in it. This lets us use blockage to prevent access
         // to cells we can't see from the start of the move.
-        blockage = new GreasedRegion(visible, 0.0);
+        blockage = new GreasedRegion(visible, 0.000001, 9999.0);
         // Here we mark the initially seen cells as anything that wasn't included in the unseen "blocked" region.
         // We invert the copy's contents to prepare for a later step, which makes blockage contain only the cells that
         // are above 0.0, then copy it to save this step as the seen cells. We will modify seen later independently of
         // the blocked cells, so a copy is correct here. Most methods on GreasedRegion objects will modify the
         // GreasedRegion they are called on, which can greatly help efficiency on long chains of operations.
-        seen = blockage.not().copy();
+        seen = blockage.copy();
+        seenChanging = new GreasedRegion(gridWidth, gridHeight);
         // Here is one of those methods on a GreasedRegion; fringe8way takes a GreasedRegion (here, the set of cells
         // that are visible to the player), and modifies it to contain only cells that were not in the last step, but
         // were adjacent to a cell that was present in the last step. This can be visualized as taking the area just
@@ -218,8 +209,8 @@ public class MainApplication extends ApplicationAdapter {
         // up as the colors for the cell with the same x and y.
         bgColor = SColor.DARK_SLATE_GRAY;
         SColor.LIMITED_PALETTE[3] = SColor.DB_GRAPHITE;
-        colors = MapUtility.generateDefaultColors(decoDungeon);
-        bgColors = MapUtility.generateDefaultBGColors(decoDungeon);
+        colors = MapUtility.generateDefaultColorsFloat(decoDungeon);
+        bgColors = MapUtility.generateDefaultBGColorsFloat(decoDungeon);
         // this creates an array of sentence builders, where each imitates one or more languages or linguistic styles.
         // this serves to demonstrate the large amount of glyphs SquidLib supports.
         // there's no need to put much effort into understanding this section yet, and many games won't use the language
@@ -227,56 +218,65 @@ public class MainApplication extends ApplicationAdapter {
         // minimum words in a sentence, maximum words in a sentence, "mid" punctuation that can be after a word (like a
         // comma), "end" punctuation that can be at the end of a sentence, frequency of "mid" punctuation (the chance in
         // 1.0 that a word will have something like a comma appended after it), and the limit on how many chars to use.
+        StatefulRNG langRNG = new StatefulRNG(12345679);
         forms = new FakeLanguageGen.SentenceForm[]
                 {
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.ENGLISH, 5, 10, new String[]{",", ",", ",", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.ENGLISH, langRNG, 5, 10, new String[]{",", ",", ",", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.17, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.GREEK_AUTHENTIC, 5, 11, new String[]{",", ",", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.GREEK_AUTHENTIC, langRNG, 5, 11, new String[]{",", ",", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.2, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.GREEK_ROMANIZED, 5, 11, new String[]{",", ",", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.GREEK_ROMANIZED, langRNG, 5, 11, new String[]{",", ",", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.2, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.LOVECRAFT, 3, 9, new String[]{",", ",", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.LOVECRAFT, langRNG, 3, 9, new String[]{",", ",", ";"},
                                 new String[]{".", ".", "!", "!", "?", "...", "..."}, 0.15, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FRENCH, 4, 12, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FRENCH, langRNG, 4, 12, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.17, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.RUSSIAN_AUTHENTIC, 6, 13, new String[]{",", ",", ",", ",", ";", " -"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.RUSSIAN_AUTHENTIC, langRNG, 6, 13, new String[]{",", ",", ",", ",", ";", " -"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.25, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.RUSSIAN_ROMANIZED, 6, 13, new String[]{",", ",", ",", ",", ";", " -"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.RUSSIAN_ROMANIZED, langRNG, 6, 13, new String[]{",", ",", ",", ",", ";", " -"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.25, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.JAPANESE_ROMANIZED, 5, 13, new String[]{",", ",", ",", ",", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.JAPANESE_ROMANIZED, langRNG, 5, 13, new String[]{",", ",", ",", ",", ";"},
                                 new String[]{".", ".", ".", "!", "?", "...", "..."}, 0.12, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.SWAHILI, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.SWAHILI, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?"}, 0.12, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.SOMALI, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.SOMALI, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?"}, 0.12, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.HINDI_ROMANIZED, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.HINDI_ROMANIZED, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?"}, 0.12, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.NORSE, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.NORSE, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?"}, 0.12, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.INUKTITUT, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.INUKTITUT, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?"}, 0.12, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.NAHUATL, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.NAHUATL, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?"}, 0.12, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FANTASY_NAME, 4, 8, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.SPANISH, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                                new String[]{".", ".", ".", "!", "?"}, 0.12, gridWidth - 4),
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FANTASY_NAME, langRNG, 4, 8, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.22, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FANCY_FANTASY_NAME, 4, 8, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FANCY_FANTASY_NAME, langRNG, 4, 8, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.22, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.ELF, 5, 10, new String[]{",", ",", ",", ";", ";", " -"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.ELF, langRNG, 5, 10, new String[]{",", ",", ",", ";", ";", " -"},
                                 new String[]{".", ".", ".", "...", "?"}, 0.22, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.GOBLIN, 4, 9, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.GOBLIN, langRNG, 4, 9, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", ".", "...", "?"}, 0.1, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.DEMONIC, 4, 8, new String[]{",", ",", ",", ";", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.KOBOLD, langRNG, 4, 7, new String[]{",", ",", ",", ";"},
+                                new String[]{".", ".", "!", "!", "?", "..."}, 0.09, gridWidth - 4),
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.DRAGON, langRNG, 5, 11, new String[]{",", ",", ",", ";", ";", " -"},
+                                new String[]{".", ".", ".", "...", "...", "?", "!"}, 0.22, gridWidth - 4),
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.DEMONIC, langRNG, 4, 8, new String[]{",", ",", ",", ";", ";"},
                                 new String[]{".", ".", "!", "!", "!", "?!"}, 0.07, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.INFERNAL, 6, 13, new String[]{",", ",", ",", ";", ";", " -", "*", " ©"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.INFERNAL, langRNG, 6, 13, new String[]{",", ",", ",", ";", ";", " -", "*", " ©"},
                                 new String[]{".", ".", ".", "...", "?", "...", "?"}, 0.25, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FRENCH.mix(FakeLanguageGen.JAPANESE_ROMANIZED, 0.65), 5, 9, new String[]{",", ",", ",", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.DEEP_SPEECH, langRNG, 4, 7, new String[]{",", ",", ",", ";", ";"},
+                                new String[]{".", ".", "...", "...", "?"}, 0.2, gridWidth - 4),
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.FRENCH.mix(FakeLanguageGen.JAPANESE_ROMANIZED, 0.65), langRNG, 5, 9, new String[]{",", ",", ",", ";"},
                                 new String[]{".", ".", ".", "!", "?", "?", "..."}, 0.14, gridWidth - 4),
-                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.ENGLISH.addAccents(0.5, 0.15), 5, 10, new String[]{",", ",", ",", ";"},
+                        new FakeLanguageGen.SentenceForm(FakeLanguageGen.ENGLISH.addAccents(0.5, 0.15), langRNG, 5, 10, new String[]{",", ",", ",", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.17, gridWidth - 4),
                         new FakeLanguageGen.SentenceForm(FakeLanguageGen.SWAHILI.mix(FakeLanguageGen.JAPANESE_ROMANIZED, 0.5).mix(FakeLanguageGen.FRENCH, 0.35)
                                 .mix(FakeLanguageGen.RUSSIAN_ROMANIZED, 0.25).mix(FakeLanguageGen.GREEK_ROMANIZED, 0.2).mix(FakeLanguageGen.ENGLISH, 0.15)
                                 .mix(FakeLanguageGen.FANCY_FANTASY_NAME, 0.12).mix(FakeLanguageGen.LOVECRAFT, 0.1)
-                                , 5, 10, new String[]{",", ",", ",", ";"},
+                                , langRNG, 5, 10, new String[]{",", ",", ",", ";"},
                                 new String[]{".", ".", ".", "!", "?", "..."}, 0.2, gridWidth - 4),
                 };
         /*
@@ -285,7 +285,7 @@ public class MainApplication extends ApplicationAdapter {
          */
         lang = new String[forms.length];
         for (int i = 0; i < forms.length; i++) {
-            lang[i] = forms[i].sentence();
+            lang[i] = StringKit.padRight(forms[i].sentence(), gridWidth - 4);
         }
 
         // this is a big one.
@@ -349,10 +349,22 @@ public class MainApplication extends ApplicationAdapter {
                     }
                     case '*': {
                         if (ctrl)
-                            display.getForegroundLayer().burst(playerPosition.x, playerPosition.y, true, '@', SColor.CW_LIGHT_YELLOW, 0.75f);
+                            display.burst(playerPosition.x, playerPosition.y, 1, Radius.CIRCLE, '@', SColor.CW_LIGHT_YELLOW.toFloatBits(), SColor.CW_LIGHT_YELLOW.toEditedFloat(0, 0, 0, -1f), 0.75f);
                         break;
                     }
+                    case 'c':
+                    case 'C':
+                    {
+                        seenChanging.refill(visible, 0.0);
+                        for(Coord c : seenChanging)
+                        {
+                            final int i = c.x, j = c.y;
+                            display.put(i, j, lineDungeon[i][j], colors[i][j], SColor.lerpFloatColors(bgColors[i][j], SColor.FLOAT_BLACK, 0.4f));
+                        }
+                        seen.allOn();
 
+                        break;
+                    }
                 }
             }
         },
@@ -433,6 +445,12 @@ public class MainApplication extends ApplicationAdapter {
         //Gdx.input.setInputProcessor(input);
         // and then add display, our one visual component, to the list of things that act in Stage.
         stage.addActor(display);
+        screenPosition = new Vector2(cellWidth, cellHeight);
+        for (int i = gridHeight+1; i < gridHeight + bonusHeight; i++) {
+            for (int j = 0; j < gridWidth; j++) {
+                display.backgrounds[j][i] = SColor.COSMIC_LATTE.toFloatBits();
+            }
+        }
 
     }
     /**
@@ -445,18 +463,24 @@ public class MainApplication extends ApplicationAdapter {
         int newX = playerPosition.x + xmod, newY = playerPosition.y + ymod;
         if (newX >= 0 && newY >= 0 && newX < gridWidth && newY < gridHeight
                 && bareDungeon[newX][newY] != '#') {
-            display.slide(playerMobile, newX, newY);
+            display.slide(playerMobile, playerPosition.x, playerPosition.y, newX, newY, 0.1f, null);
             playerPosition = playerPosition.translate(xmod, ymod);
             FOV.reuseFOV(resistance, visible, playerPosition.x, playerPosition.y, 9.0, Radius.CIRCLE);
             // This is just like the constructor used earlier, but affects an existing GreasedRegion without making
-            // a new one just for this movement.
-            blockage.refill(visible, 0.0);
-            seen.or(blockage.not());
+            // a new one just for this movement. It includes all cells with visibility greater than 0, and none that
+            // can't be seen from the current position.
+            blockage.refill(visible, 0.000001, 9999.0);
+            seenChanging.remake(seen).xor(blockage);
+            for(Coord c : seenChanging)
+            {
+                final int i = c.x, j = c.y;
+                display.put(i, j, lineDungeon[i][j], colors[i][j], SColor.lerpFloatColors(bgColors[i][j], SColor.FLOAT_BLACK, 0.4f));
+            }
+            seen.or(blockage);
             blockage.fringe8way();
-
         }
         // changes the top displayed sentence to a new one with the same language. the top will be cycled off next.
-        lang[langIndex] = forms[langIndex].sentence();
+        lang[langIndex] = StringKit.padRight(forms[langIndex].sentence(), gridWidth - 4);
         // cycles through the text snippets displayed whenever the player moves
         langIndex = (langIndex + 1) % lang.length;
     }
@@ -466,33 +490,24 @@ public class MainApplication extends ApplicationAdapter {
      */
     public void putMap()
     {
-        double tm = (System.currentTimeMillis() & 0xffffffL) * 0.001;
         for (int i = 0; i < gridWidth; i++) {
             for (int j = 0; j < gridHeight; j++) {
                 if (visible[i][j] > 0.0) {
-                    int bright = (int) (-60 +
-                            180 * (visible[i][j] * (1.0 + 0.2 * SeededNoise.noise(i * 0.2, j * 0.2, tm, 10000))));
-                    display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], bright);
-                } else if (seen.contains(i, j))
-                    display.put(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], -95);
-                else
-                    display.put(i, j, ' ', SColor.BLACK);
+                    display.putWithConsistentLight(i, j, lineDungeon[i][j], colors[i][j], bgColors[i][j], SColor.FLOAT_WHITE, visible[i][j]);
+                }
+//                else if (seenChanging.contains(i, j))
+//                    display.put(i, j, lineDungeon[i][j], colors[i][j], SColor.lerpFloatColors(bgColors[i][j], SColor.FLOAT_BLACK, 0.4f));
             }
         }
         Coord pt;
         for (int i = 0; i < toCursor.size(); i++) {
             pt = toCursor.get(i);
             // use a brighter light to trace the path to the cursor, from 170 max lightness to 0 min.
-            display.put(pt.x, pt.y, line[i + 1], SColor.CW_RICH_AZURE, bgColors[pt.x][pt.y], 130);
+            display.put(pt.x, pt.y, line[i + 1], SColor.CW_RICH_AZURE.toFloatBits(), SColor.lerpFloatColors(bgColors[pt.x][pt.y], SColor.FLOAT_WHITE, 0.6f));
         }
-        //this helps compatibility with the HTML target, which doesn't support String.format()
-        char[] spaceArray = new char[gridWidth];
-        Arrays.fill(spaceArray, ' ');
-        String spaces = String.valueOf(spaceArray);
 
         for (int i = 0; i < bonusHeight - 1; i++) {
-            display.putString(0, gridHeight + i + 1, spaces, SColor.BLACK, SColor.COSMIC_LATTE);
-            display.putString(2, gridHeight + i + 1, lang[(langIndex + i) % lang.length], SColor.BLACK, SColor.COSMIC_LATTE);
+            display.put(2, gridHeight + i + 1, lang[(langIndex + i) % lang.length], SColor.BLACK, SColor.COSMIC_LATTE);
         }
     }
     @Override
@@ -551,15 +566,19 @@ public class MainApplication extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         stage.getRoot().draw(batch, 1f);
-        display.drawActor(batch, 1f, playerMobile); // this line is different from Stage.draw()
+//        playerMobile.draw(batch, 1f); // this line is different from Stage.draw()
+        batch.setColor(SColor.FLOAT_WHITE);
+        display.font.draw(batch, Gdx.graphics.getFramesPerSecond() + " FPS", screenPosition.x, screenPosition.y);
         batch.end();
     }
 
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+        stage.getViewport().apply();
+        screenPosition.set(cellWidth * 10, cellHeight);
+        stage.screenToStageCoordinates(screenPosition);
         //very important to have the mouse behave correctly if the user fullscreens or resizes the game!
         input.getMouse().reinitialize((float) width / gridWidth, (float) height / (gridHeight + bonusHeight), gridWidth, gridHeight, 0, 0);
     }
-
 }

@@ -1,7 +1,7 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
-  buildToolsVersion '25.0.2'
+  buildToolsVersion '27.0.3'
   compileSdkVersion 25
   sourceSets {
     main {
@@ -13,8 +13,6 @@ android {
       assets.srcDirs = ['../assets']
       jniLibs.srcDirs = ['libs']
     }
-
-    instrumentTest.setRoot('tests')
   }
   packagingOptions {
     // Preventing from license violations (more or less):
@@ -39,10 +37,16 @@ android {
 }
 
 configurations { natives }
-
+repositories {
+  mavenCentral()
+  jcenter()
+  google()
+  maven { url 'https://jitpack.io' }
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
 dependencies {
-  compile project(':core')
-  compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+  implementation project(':core')
+  implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
