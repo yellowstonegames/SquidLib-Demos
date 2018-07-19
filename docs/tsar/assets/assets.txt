@@ -1,7 +1,7 @@
 d:assets:0:application/unknown
-b:Iosevka-License.md:6529:application/unknown
-t:Iosevka-Slab-distance.fnt:231652:application/unknown
-i:Iosevka-Slab-distance.png:529329:image/png
+b:Iosevka-License.md:7545:application/unknown
+t:Iosevka-Slab-msdf.fnt:228990:application/unknown
+i:Iosevka-Slab-msdf.png:801196:image/png
 i:Tentacle-128.png:6532:image/png
 i:Tentacle-16.png:741:image/png
 i:Tentacle-32.png:1696:image/png

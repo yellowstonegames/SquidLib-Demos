@@ -31,22 +31,16 @@ android {
   }
   defaultConfig {
     applicationId 'com.squidpony.demo'
-    minSdkVersion 8
+    minSdkVersion 14
     targetSdkVersion 27
   }
 }
 
 configurations { natives }
-repositories {
-  mavenCentral()
-  jcenter()
-  google()
-  maven { url 'https://jitpack.io' }
-  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-}
+
 dependencies {
-  implementation project(':core')
-  implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+  compile project(':core')
+  compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
@@ -60,11 +54,11 @@ dependencies {
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
 task copyAndroidNatives() {
-  file("libs/armeabi/").mkdirs();
-  file("libs/armeabi-v7a/").mkdirs();
-  file("libs/arm64-v8a/").mkdirs();
-  file("libs/x86_64/").mkdirs();
-  file("libs/x86/").mkdirs();
+  file("libs/armeabi/").mkdirs()
+  file("libs/armeabi-v7a/").mkdirs()
+  file("libs/arm64-v8a/").mkdirs()
+  file("libs/x86_64/").mkdirs()
+  file("libs/x86/").mkdirs()
 
   configurations.natives.files.each { jar ->
     def outputDir = null
@@ -128,7 +122,7 @@ eclipse {
   project {
     name = appName + "-android"
     natures 'com.android.ide.eclipse.adt.AndroidNature'
-    buildCommands.clear();
+    buildCommands.clear()
     buildCommand "com.android.ide.eclipse.adt.ResourceManagerBuilder"
     buildCommand "com.android.ide.eclipse.adt.PreCompilerBuilder"
     buildCommand "org.eclipse.jdt.core.javabuilder"
@@ -144,8 +138,8 @@ idea {
     iml {
       withXml {
         def node = it.asNode()
-        def builder = NodeBuilder.newInstance();
-        builder.current = node;
+        def builder = NodeBuilder.newInstance()
+        builder.current = node
         builder.component(name: "FacetManager") {
           facet(type: "android", name: "Android") {
             configuration {

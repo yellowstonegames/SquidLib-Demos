@@ -45,8 +45,8 @@ repositories {
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
 dependencies {
-  implementation project(':core')
-  implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+  compile project(':core')
+  compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"

@@ -463,7 +463,7 @@ public class MainApplication extends ApplicationAdapter {
         int newX = playerPosition.x + xmod, newY = playerPosition.y + ymod;
         if (newX >= 0 && newY >= 0 && newX < gridWidth && newY < gridHeight
                 && bareDungeon[newX][newY] != '#') {
-            display.slide(playerMobile, playerPosition.x, playerPosition.y, newX, newY, 0.1f, null);
+            display.slide(playerMobile, playerPosition.x, playerPosition.y, newX, newY, 0.125f, null);
             playerPosition = playerPosition.translate(xmod, ymod);
             FOV.reuseFOV(resistance, visible, playerPosition.x, playerPosition.y, 9.0, Radius.CIRCLE);
             // This is just like the constructor used earlier, but affects an existing GreasedRegion without making

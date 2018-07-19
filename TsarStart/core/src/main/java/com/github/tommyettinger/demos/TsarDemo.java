@@ -152,7 +152,8 @@ public class TsarDemo extends ApplicationAdapter {
         // We can seed a GWTRNG, which is optimized for the HTML target,
         // with any int or long we want. You can also hash a String with
         // CrossHash.hash("Some seed") to get a random-seeming int for a seed.
-        rng = new GWTRNG(123456789);
+        // Here we don't seed the GWTRNG, so its seed will be random.
+        rng = new GWTRNG();
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
@@ -187,8 +188,8 @@ public class TsarDemo extends ApplicationAdapter {
         // A bit of a hack to increase the text height slightly without changing the size of the cells they're in.
         // This causes a tiny bit of overlap between cells, which gets rid of an annoying gap between solid lines.
         // If you use '#' for walls instead of box drawing chars, you don't need this.
-        // If you don't use DefaultResources.getStretchableSlabFont(), you may need to adjust the multipliers here.
-        display.font.tweakWidth(cellWidth * 1.1f).tweakHeight(cellHeight * 1.1f).initBySize();
+        // If you don't use DefaultResources.getCrispSlabFont(), you may need to adjust the multipliers here.
+        display.font.tweakHeight(cellHeight * 1.1f).initBySize();
 
         //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
         //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good winding dungeons
@@ -304,7 +305,7 @@ public class TsarDemo extends ApplicationAdapter {
         // impossible to enter.
         blockage.fringe8way();
         floors.remove(player);
-        int numMonsters = 25;
+        int numMonsters = 50;
         monsters = new OrderedMap<>(numMonsters);
         for (int i = 0; i < numMonsters; i++) {
             Coord monPos = floors.singleRandom(rng);
@@ -523,7 +524,7 @@ public class TsarDemo extends ApplicationAdapter {
                 blockage.refill(visible, 0.0);
                 seen.or(blockage.not());
                 blockage.fringe8way();
-                display.slide(pg, player.x, player.y, newX, newY, 0.1f, null);
+                display.slide(pg, player.x, player.y, newX, newY, 0.125f, null);
                 player = Coord.get(newX, newY);
                 // if a monster was at the position we moved into, and so was successfully removed...
                 if(monsters.containsKey(player))
@@ -591,7 +592,7 @@ public class TsarDemo extends ApplicationAdapter {
                     else {
                         // alter is a method on OrderedMap and OrderedSet that changes a key in-place
                         monsters.alter(pos, tmp);
-                        display.slide(mon, pos.x, pos.y, tmp.x, tmp.y, 0.1f, null);
+                        display.slide(mon, pos.x, pos.y, tmp.x, tmp.y, 0.125f, null);
                         monplaces.add(tmp);
                     }
                 } else {

@@ -1,8 +1,14 @@
+apply plugin: 'java'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
 
-dependencies {
-  implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
-  implementation "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
+sourceSets {
+  main {
+    java.srcDirs = [ 'src/main/java' ]
+  }
 }
-        
+
+dependencies {
+  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+  compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
+}
