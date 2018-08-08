@@ -9,7 +9,13 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.*;
 import regexodus.Matcher;
 import regexodus.Pattern;
-import squidpony.squidmath.*;
+import squidpony.squidmath.GWTRNG;
+import squidpony.squidmath.IntVLA;
+import squidpony.squidmath.Lathe32RNG;
+import squidpony.squidmath.LightRNG;
+import squidpony.squidmath.Oriole32RNG;
+import squidpony.squidmath.RNG;
+import squidpony.squidmath.ThrustAlt32RNG;
 
 
 /**
@@ -45,7 +51,7 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
         addIntTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addIntTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
-        addIntTest(vp, new XoRo32RNG(123456789, 987654321), "XoRo32RNG");
+        addIntTest(vp, new Mover32RNG(123456789, 987654321), "Mover32RNG");
         addIntTest(vp, new LightRNG(123456L), "LightRNG");
         addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addIntTest(vp, new GWTRNG(987654321, 123456789), "GWTRNG");
@@ -54,7 +60,7 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
         addLongTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addLongTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
-        addLongTest(vp, new XoRo32RNG(123456789, 987654321), "XoRo32RNG");
+        addLongTest(vp, new Mover32RNG(123456789, 987654321), "Mover32RNG");
         addLongTest(vp, new LightRNG(123456L), "LightRNG");
         addLongTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addLongTest(vp, new GWTRNG(987654321, 123456789), "GWTRNG");
@@ -101,28 +107,28 @@ public class GwtLauncher extends GwtBareApp {
         LightRNG c = new LightRNG(123456L);
         RandomXS128 d = new RandomXS128(123456789L, 987654321L);
         Zog32RNG e = new Zog32RNG(123456789, 987654321);
-        XoRo32RNG f = new XoRo32RNG(123456789, 987654321);
+        Mover32RNG f = new Mover32RNG(123456789, 987654321);
 
         System.out.println("Oriole32RNG  " + a.nextInt());
         System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Zog32RNG " + e.nextInt());
-        System.out.println("XoRo32RNG " + f.nextInt());
+        System.out.println("Mover32RNG " + f.nextInt());
 
         System.out.println("Oriole32RNG  " + a.nextInt());
         System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Zog32RNG " + e.nextInt());
-        System.out.println("XoRo32RNG " + f.nextInt());
+        System.out.println("Mover32RNG " + f.nextInt());
 
         System.out.println("Oriole32RNG  " + a.nextInt());
         System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Zog32RNG " + e.nextInt());
-        System.out.println("XoRo32RNG " + f.nextInt());
+        System.out.println("Mover32RNG " + f.nextInt());
 
         
     }
@@ -851,7 +857,7 @@ public class GwtLauncher extends GwtBareApp {
 
 
 
-    private void addIntTest(final VerticalPanel vp, final XoRo32RNG rs, final String name)
+    private void addIntTest(final VerticalPanel vp, final Mover32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -874,7 +880,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
-    private void addLongTest(final VerticalPanel vp, final XoRo32RNG rs, final String name)
+    private void addLongTest(final VerticalPanel vp, final Mover32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextLong()");
         final TextBox resultLabel = new TextBox();
@@ -896,7 +902,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(runBenchButton);
         vp.add(resultLabel);
     }
-    private String runIntBenchmark(XoRo32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runIntBenchmark(Mover32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -912,7 +918,7 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String runLongBenchmark(XoRo32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runLongBenchmark(Mover32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -928,12 +934,12 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String reportInt(XoRo32RNG rs) {
+    private String reportInt(Mover32RNG rs) {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
 
-    private int runInt(XoRo32RNG rs) {
+    private int runInt(Mover32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextInt();
@@ -941,12 +947,12 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private String reportLong(XoRo32RNG rs) {
+    private String reportLong(Mover32RNG rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
     }
 
-    private int runLong(XoRo32RNG rs) {
+    private int runLong(Mover32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
