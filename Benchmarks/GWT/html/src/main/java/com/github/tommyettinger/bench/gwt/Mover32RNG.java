@@ -90,31 +90,47 @@ public final class Mover32RNG implements RandomnessSource {
     public final void setState(final int s) {
         stateA = startingA[s >>> 9 & 0x7F];
         for (int i = s & 0x1FF; i > 0; i--) {
-            stateA = Integer.rotateLeft(stateA * 0x9E37, 17);
+            stateA *= 0x9E37;
+            stateA = (stateA << 17 | stateA >>> 15);
         }
         stateB = startingB[s >>> 25];
         for (int i = s >>> 16 & 0x1FF; i > 0; i--) {
-            stateB = Integer.rotateLeft(stateB * 0x4E6D, 14);
+            stateB *= 0x4E6D;
+            stateB = (stateB << 14 | stateB >>> 18);
         }
     }
 
     public final int nextInt()
     {
-        return (stateA = Integer.rotateLeft(stateA * 0x9E37, 17)) ^ (stateB = Integer.rotateLeft(stateB * 0x4E6D, 14));
+        final int a = stateA * 0x9E37 | 0;
+        stateA = (a << 17 | a >>> 15);
+        final int b = stateB * 0x4E6D | 0;
+        stateB = (b << 14 | b >>> 18);
+        return stateA ^ stateB;
     }
     @Override
     public final int next(final int bits)
     {
-        return ((stateA = Integer.rotateLeft(stateA * 0x9E37, 17))
-                ^ (stateB = Integer.rotateLeft(stateB * 0x4E6D, 14))) >>> (32 - bits);
+        final int a = stateA * 0x9E37 | 0;
+        stateA = (a << 17 | a >>> 15);
+        final int b = stateB * 0x4E6D | 0;
+        stateB = (b << 14 | b >>> 18);
+        return (stateA ^ stateB) >>> (32 - bits);
     }
     @Override
     public final long nextLong()
     {
-        final long t = (stateA = Integer.rotateLeft(stateA * 0x9E37, 17))
-                ^ (stateB = Integer.rotateLeft(stateB * 0x4E6D, 14));
-        return t << 32 ^ ((stateA = Integer.rotateLeft(stateA * 0x9E37, 17))
-                ^ (stateB = Integer.rotateLeft(stateB * 0x4E6D, 14)));
+        int a = stateA * 0x9E37 | 0;
+        a = (a << 17 | a >>> 15);
+        int b = stateB * 0x4E6D | 0;
+        b = (b << 14 | b >>> 18);
+        long t = a ^ b;
+        final int aa = a * 0x9E37 | 0;
+        stateA = (aa << 17 | aa >>> 15);
+        final int bb = b * 0x4E6D | 0;
+        stateB = (bb << 14 | bb >>> 18);
+        t = t << 32 ^ (stateA ^ stateB);
+        return t;
     }
 
     /**

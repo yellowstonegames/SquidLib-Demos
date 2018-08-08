@@ -51,7 +51,7 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
         addIntTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addIntTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
-        addIntTest(vp, new Mover32RNG(123456789, 987654321), "Mover32RNG");
+        addIntTest(vp, new Mover32RNG(1), "Mover32RNG");
         addIntTest(vp, new LightRNG(123456L), "LightRNG");
         addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addIntTest(vp, new GWTRNG(987654321, 123456789), "GWTRNG");
@@ -60,7 +60,7 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new Oriole32RNG(123456789, 987654321), "Oriole32RNG");
         addLongTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addLongTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
-        addLongTest(vp, new Mover32RNG(123456789, 987654321), "Mover32RNG");
+        addLongTest(vp, new Mover32RNG(1), "Mover32RNG");
         addLongTest(vp, new LightRNG(123456L), "LightRNG");
         addLongTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addLongTest(vp, new GWTRNG(987654321, 123456789), "GWTRNG");
@@ -107,7 +107,7 @@ public class GwtLauncher extends GwtBareApp {
         LightRNG c = new LightRNG(123456L);
         RandomXS128 d = new RandomXS128(123456789L, 987654321L);
         Zog32RNG e = new Zog32RNG(123456789, 987654321);
-        Mover32RNG f = new Mover32RNG(123456789, 987654321);
+        Mover32RNG f = new Mover32RNG(1);
 
         System.out.println("Oriole32RNG  " + a.nextInt());
         System.out.println("Lathe32RNG " + b.nextInt());
