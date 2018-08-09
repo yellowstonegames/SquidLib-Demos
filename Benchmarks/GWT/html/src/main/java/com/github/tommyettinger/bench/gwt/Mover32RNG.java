@@ -6,22 +6,26 @@ import squidpony.squidmath.RandomnessSource;
 
 /**
  * One of Mark Overton's subcycle generators from <a href="http://www.drdobbs.com/tools/229625477">this article</a>,
- * specifically a cmr^cmr with two 32-bit states; this is the fastest 32-bit generator that still passes statistical
- * tests, plus it's optimized for GWT. It has a period of slightly more than 2 to the 63.86, 0xE89BB7902049CD38, and
- * allows 2 to the 32 initial seeds.
+ * modified to act more like LightRNG and to only use one subcycle generator along with one full-cycle generator;
+ * this is the fastest 32-bit generator on desktop JREs that still passes statistical tests, plus it's optimized for GWT
+ * (it isn't as fast as GWTRNG/Lathe32RNG when used on GWT, about 3/4 the speed in Firefox and Chrome, but in Opera it's
+ * the same speed as Lathe32RNG).
+ * It has a period of more than 2 to the 63.99, 0xFFCC893300000000, and allows 2 to the 32 initial seeds. Even if
+ * improper initialization gets it into a smaller subcycle, the minimum period is greater than 2 to the 32.
  * <br>
- * This seems to do well in PractRand testing, up to at least 16TB with nothing worse than "unusual", and at least some
- * variants on cmr+cmr pass BigCrush according to Overton. "Chaotic" generators like this one tend to score well in
+ * This seems to do well in PractRand testing, up to at least 512GB with nothing worse than "unusual" (still testing).
+ * "Chaotic" generators like this one tend to score well in
  * PractRand, but it isn't clear if they will fail other tests. As for speed, this is faster than {@link Lathe32RNG}
- * (which is also high-quality) and is also faster than {@link XoRo32RNG} (which is very fast but has quality issues). Its period is
- * 0xE89BB7902049CD38 or 16,761,192,267,834,314,040 for the largest cycle, which it always initializes into if
- * {@link #setState(int)} is used. setState() only allows 2 to the 32 starting states, but less than 2 to the 64 states
- * are in the largest cycle, so using a long or two ints to set the state seems ill-advised.
+ * (which is also high-quality) and is also faster than {@link XoRo32RNG} (which is very fast but has quality issues). 
+ * Its period is 0xFFCC893300000000, or 18,432,258,227,056,934,912 for the largest cycle, which it always initializes
+ * into if {@link #setState(int)} is used. setState() only allows 2 to the 32 starting states, but less than 2 to the 64
+ * states are in the largest cycle, so using a long or two ints to set the state seems ill-advised.
  * <br>
  * This is a RandomnessSource but not a StatefulRandomness because it needs to take care and avoid seeds that would put
- * it in a short-period subcycle. It uses two generators with different cycle lengths, and skips at most 65536 times
- * into each generator's cycle independently when seeding. It uses constants to store 128 known midpoints for each
- * generator, which ensures it calculates an advance for each generator at most 511 times. 
+ * it in a short-period subcycle. It uses two generators with different cycle lengths (one has a period of 0xFFCC8933,
+ * and the other a full 0x100000000), and skips at most 65536 times into the shorter-cycle generator when seeding.
+ * It uses constants to store 128 known midpoints for the subcycle generator, which ensures it calculates an advance for
+ * only one generator, and at most 511 times. 
  * <br>
  * The name comes from M. Overton, who discovered this category of subcycle generators, and also how this generator can
  * really move when it comes to speed.
@@ -90,47 +94,58 @@ public final class Mover32RNG implements RandomnessSource {
     public final void setState(final int s) {
         stateA = startingA[s >>> 9 & 0x7F];
         for (int i = s & 0x1FF; i > 0; i--) {
-            stateA *= 0x9E37;
-            stateA = (stateA << 17 | stateA >>> 15);
+            stateA += 0x9E3779B9;
+            stateA = (stateA << 2 | stateA >>> 30);
         }
-        stateB = startingB[s >>> 25];
-        for (int i = s >>> 16 & 0x1FF; i > 0; i--) {
-            stateB *= 0x4E6D;
-            stateB = (stateB << 14 | stateB >>> 18);
-        }
+        stateB = s;
     }
 
     public final int nextInt()
     {
-        final int a = stateA * 0x9E37 | 0;
-        stateA = (a << 17 | a >>> 15);
-        final int b = stateB * 0x4E6D | 0;
-        stateB = (b << 14 | b >>> 18);
-        return stateA ^ stateB;
+        int y = stateA + 0x9E3779B9;
+        y = (stateA = (y << 2 | y >>> 30));
+        int z = (stateB = stateB + 0xC3564E95 | 0);
+        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
+        return z ^ ((z >>> 15) + (y ^ (y >>> 12)));
     }
     @Override
     public final int next(final int bits)
     {
-        final int a = stateA * 0x9E37 | 0;
-        stateA = (a << 17 | a >>> 15);
-        final int b = stateB * 0x4E6D | 0;
-        stateB = (b << 14 | b >>> 18);
-        return (stateA ^ stateB) >>> (32 - bits);
+//        final int a = stateA * 0x9E37 | 0;
+//        stateA = (a << 17 | a >>> 15);
+//        final int b = stateB * 0x4E6D | 0;
+//        stateB = (b << 14 | b >>> 18);
+//        return (stateA ^ stateB) >>> (32 - bits);
+        int y = stateA + 0x9E3779B9;
+        y = (stateA = (y << 2 | y >>> 30));
+        int z = (stateB = stateB + 0xC3564E95 | 0);
+        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
+        return (z ^ ((z >>> 15) + (y ^ (y >>> 12)))) >>> (32 - bits);
     }
     @Override
     public final long nextLong()
     {
-        int a = stateA * 0x9E37 | 0;
-        a = (a << 17 | a >>> 15);
-        int b = stateB * 0x4E6D | 0;
-        b = (b << 14 | b >>> 18);
-        long t = a ^ b;
-        final int aa = a * 0x9E37 | 0;
-        stateA = (aa << 17 | aa >>> 15);
-        final int bb = b * 0x4E6D | 0;
-        stateB = (bb << 14 | bb >>> 18);
-        t = t << 32 ^ (stateA ^ stateB);
-        return t;
+        int y = stateA + 0x9E3779B9;
+        y = (y << 2 | y >>> 30);
+        int z = stateB + 0xC3564E95;
+        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
+        long t = z ^ ((z >>> 15) + (y ^ (y >>> 12)));
+        y = y + 0x9E3779B9;
+        stateA = y = (y << 2 | y >>> 30);
+        z = (stateB = stateB + 0x86AC9D2A | 0);
+        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
+        return t << 32 ^ (z ^ ((z >>> 15) + (y ^ (y >>> 12))));
+//        int a = stateA * 0x9E37 | 0;
+//        a = (a << 17 | a >>> 15);
+//        int b = stateB * 0x4E6D | 0;
+//        b = (b << 14 | b >>> 18);
+//        long t = a ^ b;
+//        final int aa = a * 0x9E37 | 0;
+//        stateA = (aa << 17 | aa >>> 15);
+//        final int bb = b * 0x4E6D | 0;
+//        stateB = (bb << 14 | bb >>> 18);
+//        t = t << 32 ^ (stateA ^ stateB);
+//        return t;
     }
 
     /**
