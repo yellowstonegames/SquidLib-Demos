@@ -54,99 +54,212 @@ public final class Mover32RNG implements RandomnessSource {
         this.stateA = stateA == 0 ? 1 : stateA;
         this.stateB = stateB == 0 ? 1 : stateB;
     }
-
     private static final int[] startingA = {
-            0x00000001, 0x9F11DF0B, 0xA9D75498, 0xF4B421DE, 0xB9A82430, 0xED4250C8, 0x15E93F42, 0xDB18983F,
-            0x4932B222, 0x312D3B0D, 0x06EE5612, 0xA18E8AF5, 0xC35ED6EC, 0x2296C3BB, 0x897A99B6, 0x113314FA,
-            0xE5DC6DF1, 0xA1CB5430, 0x88F7B7A7, 0x26681BF6, 0xA0823E05, 0x37F881AC, 0x6535F6E5, 0x97B3DE1B,
-            0xA7EBDF98, 0x8783572B, 0x2C15E0B3, 0x80B297D7, 0x4C4A107F, 0xB27C96F2, 0x304FF465, 0x5C3FB23E,
-            0xBB935E48, 0x6E618A42, 0x080A85CE, 0x352770AF, 0xB3E8D627, 0x68B3AA7C, 0x1F11C1F2, 0x7A686342,
-            0x517FFE3F, 0x92843302, 0x975D9502, 0xB07AE92C, 0x803D9C7B, 0x60AC7206, 0x1D081127, 0xC143F147,
-            0x6A04EB07, 0x2A943751, 0x92C44902, 0xD445ACAF, 0xB85ED97D, 0x08D9E51D, 0x76AFE840, 0xB616A31B,
-            0x2CC4B653, 0x7D2D0367, 0x894DBD23, 0xB685E564, 0xE79CD06E, 0xA4A39079, 0x9E668C50, 0x7A6FA73F,
-            0x46E9DE96, 0x31603264, 0xFFBEFF3A, 0x2CC114A3, 0xC8595749, 0xA9086FBA, 0x99B297E6, 0xF1A90452,
-            0xC9C0AE15, 0x69CDAED1, 0xAB41467E, 0xD1B6D159, 0xD85FA961, 0xF31455D4, 0x104BD460, 0xF8881A1F,
-            0x51E9EA5D, 0x53EA0817, 0xAAE7751F, 0x62059A86, 0x3CE2F8D4, 0xC786C03D, 0x4987ED94, 0x5A3003F5,
-            0x5B007518, 0x65064757, 0xC235E766, 0x1B9ADC61, 0xAE361B43, 0x6863C452, 0x9503D569, 0x6F465A2C,
-            0x6C9372D0, 0x5AF87B87, 0xAD462E2D, 0x4DA7768E, 0x09427461, 0xC70F40EA, 0xF70E648A, 0x85C95AB2,
-            0xA33D25B0, 0x5463C91D, 0x503A631E, 0x2774EF9A, 0x0C56BD16, 0xF7065D36, 0xD69F74A2, 0x80246F1F,
-            0x4FE448E5, 0x79D2D12C, 0x760B2310, 0x8BB27897, 0x7214F867, 0x3278B28D, 0x3CAAB7AB, 0x20482D22,
-            0x48AA7400, 0x8C7865F4, 0x95504AEE, 0x7121E9BC, 0xAB254563, 0x19F96B6B, 0xA04C2CE3, 0x2B6F9021,
+            0x00000001, 0xB6E16604, 0x84A91149, 0x67AC52C8, 0xBEF3BB8C, 0x23CE3E07, 0x6EDBB8A1, 0x274276DF,
+            0xE66E7F42, 0x782250C3, 0x284F0D35, 0xB3903E44, 0x19A162D2, 0x7DCB5533, 0x31146CDF, 0x3666EE93,
+            0x4CFFC6E9, 0xE9AF02E0, 0xC0D678CA, 0x82B174C0, 0xBF6F25BA, 0x6B37ADAB, 0xA8FE16E5, 0xB7B6C86B,
+            0x3C6C3DC6, 0xA9CB1833, 0xEAA1A2D7, 0x5B12EB3D, 0xFB6229D1, 0x364EA5EF, 0x582F63D5, 0x0CB374F5,
+            0x8B161A5E, 0xE759784A, 0x203788FA, 0xAD6791DB, 0xFE4E70F1, 0xB5E14DA3, 0x849610A5, 0xFFFB00FF,
+            0x7D28539A, 0xD0B18B9E, 0x45F2E945, 0x9346659F, 0x02E0C263, 0xFA53EEFE, 0x366BC4B5, 0xBAA06D47,
+            0x714EAB99, 0xA77278AE, 0xC7536981, 0xD2D5B2EF, 0x28C69EF7, 0x3B6B15DB, 0xAC81216F, 0xC6D50F66,
+            0xBFCE5018, 0x43A36D98, 0x0C111B51, 0x4AE6EAA0, 0x960F00DE, 0x60143353, 0x61FEE9CD, 0x4B0CB168,
+            0x91695609, 0x9C10C765, 0x29A4343B, 0xACABAB21, 0x4374163D, 0xC3BAA736, 0x918E3147, 0xC1DAB2FB,
+            0x20355E4D, 0xA0D531FF, 0x516DF23D, 0x0F41D121, 0xAF38E8F6, 0xAE866375, 0x764AAA2B, 0xA63AE93A,
+            0x35B9C0C5, 0x32DCDB6A, 0xA61561D0, 0x52518525, 0x7115E9B9, 0x27B34AD3, 0x8DBBB84F, 0x0F9AEF15,
+            0x199EDEDD, 0xBA5A4993, 0x3CA7D786, 0xDD2C6E48, 0x90BEA6C9, 0xAA34E309, 0xE02FB459, 0x167FCA38,
+            0xA8653EE4, 0x9FCF090E, 0xCB2B47F9, 0x9A3909E5, 0x75B0F986, 0x557B897B, 0x0873C70D, 0xCAF3824B,
+            0x14F63600, 0xF00EF48B, 0x337CED22, 0xBE2A3E1D, 0x5939AF06, 0x72755544, 0xBEA17CD7, 0x0767E32B,
+            0x05D4FB25, 0x560A74AB, 0x58332A3A, 0x309B106B, 0x0DDF9FEF, 0xBF20AB12, 0x4900C5B9, 0xBBF4A294,
+            0xB9A4B25F, 0x0E0F882B, 0xB9AB5606, 0xE4DE86BC, 0xDD026D62, 0xEBB4B162, 0xE3CA2222, 0xEA5A01C5,
     }, startingB = {
-            0x00000001, 0xAF5FF586, 0xCB5FA621, 0x147FEB79, 0x0D2B4A87, 0xC09CD63C, 0x493DCA72, 0xD388DD6F,
-            0x257C6197, 0xDAFCE14D, 0x2778D97C, 0x9488AF6C, 0xE025E6F9, 0x03F7C4A6, 0x84738348, 0x0F7268E9,
-            0xDCD9215E, 0x3FB0AC46, 0x90C7E3DC, 0x4B347FD0, 0x8FB36FBF, 0x525B05B1, 0x311AD316, 0x12375610,
-            0xB0E92B50, 0x95707ED7, 0x0D02EFC9, 0x00DA55BD, 0x32FECFC2, 0x8FAB5273, 0xAEBEB303, 0x77B03E4C,
-            0x3AA3F9D3, 0x456B44D7, 0x92AFC26E, 0x3E887027, 0x584ED1D3, 0x80DC259B, 0xF3E8D5FA, 0xA7C24C1A,
-            0xC415778E, 0xD7BB449A, 0xFECC2032, 0x962501B8, 0x363117E7, 0xEC5E4BCF, 0xE863B55A, 0x1E9BEBF6,
-            0x430EDA44, 0x0BBCD30F, 0x81AA0B42, 0x48E8D6DB, 0x4E90224B, 0x5C7C2E57, 0x3D755220, 0xF1F529A5,
-            0x64E2BF59, 0x9A80E570, 0xFB851D5E, 0xAAF06CAF, 0xBD18D160, 0x81BAD104, 0xCB7F85A5, 0x05D3FEB2,
-            0x3E7F34B6, 0xE2B69058, 0xACCA0C95, 0xF950057D, 0x8EC11DF4, 0xF2CBDB24, 0x863829BF, 0xAEBCA905,
-            0xD24BDD76, 0xD3D7E317, 0x54829318, 0x52A10C3F, 0xB9B86F0A, 0xFD746569, 0x7DAC4A01, 0x2B9F88E9,
-            0xF3184DB6, 0x50C3A49D, 0x8A22549E, 0x9913C627, 0xEEDCEA6F, 0x9C95D489, 0x7C2A42E7, 0x9E9BD919,
-            0x45ACDC0D, 0xECDEEDD9, 0xA24FCCC9, 0xC195D62D, 0x289864BA, 0x89CBC109, 0x4BC5BD74, 0xB4ED95B4,
-            0x5E3CF4C9, 0x0B3EF952, 0x99828E82, 0xCFDC5F50, 0xD5307F76, 0x6B905E5D, 0x818DB5FD, 0x747C61A8,
-            0x68B48552, 0x32C2352B, 0xC0C1FEAD, 0x63C1C57C, 0x5DE87FA0, 0xA97BE18A, 0x14417618, 0x1C7358F7,
-            0x9A7D8D79, 0xDBD3B474, 0xF0594ACC, 0x9D50AF52, 0x0A618F87, 0x23519C0F, 0xFA9E8AB9, 0xA37FDA83,
-            0x74B0372D, 0x48590DFF, 0xB8430CA4, 0x3B30E4A4, 0xC8946F5C, 0xE5D7681B, 0x4D9590CC, 0x634A5F38,
+            0x00000001, 0xA9767029, 0xC36D2FFF, 0x8BC8A46F, 0x3C586BE9, 0x654028F8, 0x3BC36ED8, 0xBCAD2EE5,
+            0x12DD2D5C, 0x99D4A55B, 0xBA00D3C0, 0x4F85CF46, 0x2EDE74A5, 0xAD771823, 0x8ECC54D8, 0x2EB0955F,
+            0x5C1BBA00, 0x9DB7CE62, 0x2A76D204, 0x6DC1C43E, 0xFF4E0E96, 0xE45728BB, 0x4103F12C, 0xD8E3D609,
+            0x58F2587B, 0x4B169E3D, 0x00DDD04F, 0x3721B154, 0xACF777A2, 0x9715D29E, 0x46E45724, 0x299145D6,
+            0x6FDD75D4, 0x572A304B, 0x17519541, 0xC59D50A6, 0x9BE5938D, 0x4AA90B25, 0x01626ACC, 0xDA9A024D,
+            0x47F60DBD, 0x85BA1183, 0xF553788D, 0x1D642674, 0x50B506A0, 0x9EAC6A04, 0x3F7BFCB9, 0x5C32A24D,
+            0x66B3A7AE, 0x1E0D0B7C, 0x3186148B, 0x0461A847, 0xE193E7FA, 0xB5CBB459, 0xFC7D8604, 0xF9F9C493,
+            0xE038620A, 0xFFEDAC2F, 0x38FC87CD, 0x8A0E062B, 0x0EAA198F, 0xED6CBC65, 0x66A73D25, 0x5C3D77AD,
+            0xCA32D8F4, 0x30D44109, 0x55AC56D7, 0x26784CD2, 0x8E95392F, 0x609DA1AB, 0xC01CBA2D, 0x36A594F5,
+            0x65463BB0, 0xEC147FD9, 0xFCB3D73C, 0x13BC191E, 0x36E408C7, 0x550A1050, 0x118BCBCE, 0xF18CEFF0,
+            0x781F50BC, 0xEB306A3F, 0x522147AC, 0x43EF7770, 0x48C7FD2B, 0x04965BE3, 0x557720E4, 0xBA355404,
+            0x07884E1D, 0x85AB54AA, 0x1197FDFD, 0x635DEDE7, 0xBE49761B, 0xF7FA516C, 0xF1854433, 0x56133FE6,
+            0x9F5F8EEF, 0x40B02A4F, 0x4E8B296F, 0xBC197E3B, 0xE896BA7F, 0x6BC0187A, 0x47FCADD1, 0xA594B585,
+            0xA6517A0D, 0x45C47256, 0x8877ADD5, 0xAC8C32A7, 0x2376C425, 0x5427F940, 0xC3332A3E, 0xB3358CCA,
+            0x8E6B3EDA, 0x33F7BF4F, 0x32A3294C, 0xE18EE95E, 0xAE8908E9, 0x79B012AB, 0xCEDEE0E9, 0xA3EB8638,
+            0xA38C2A1A, 0xB60F4A3A, 0xFF670EC7, 0x8E1019AA, 0x9112227D, 0xDBC81559, 0x34CDFF4E, 0x5D357F7C,
     };
 
     public final void setState(final int s) {
         stateA = startingA[s >>> 9 & 0x7F];
         for (int i = s & 0x1FF; i > 0; i--) {
-            stateA += 0x9E3779B9;
-            stateA = (stateA << 2 | stateA >>> 30);
+            stateA *= 0xACED;
+            stateA = (stateA << 28 | stateA >>> 4);
         }
-        stateB = s;
+        stateB = startingB[s >>> 25];
+        for (int i = s >>> 16 & 0x1FF; i > 0; i--) {
+            stateB *= 0xBA55;
+            stateB = (stateB << 19 | stateB >>> 13);
+        }
     }
 
     public final int nextInt()
     {
-        int y = stateA + 0x9E3779B9;
-        y = (stateA = (y << 2 | y >>> 30));
-        int z = (stateB = stateB + 0xC3564E95 | 0);
-        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
-        return z ^ ((z >>> 15) + (y ^ (y >>> 12)));
+        int y = stateA * 0xACED;
+        y = (stateA = (y << 28 | y >>> 4));
+        final int x = stateB * 0xBA55;
+        return y ^ (stateB = (x << 19 | x >>> 13));
     }
     @Override
     public final int next(final int bits)
     {
-//        final int a = stateA * 0x9E37 | 0;
-//        stateA = (a << 17 | a >>> 15);
-//        final int b = stateB * 0x4E6D | 0;
-//        stateB = (b << 14 | b >>> 18);
-//        return (stateA ^ stateB) >>> (32 - bits);
-        int y = stateA + 0x9E3779B9;
-        y = (stateA = (y << 2 | y >>> 30));
-        int z = (stateB = stateB + 0xC3564E95 | 0);
-        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
-        return (z ^ ((z >>> 15) + (y ^ (y >>> 12)))) >>> (32 - bits);
+        int y = stateA * 0xACED;
+        y = (stateA = (y << 28 | y >>> 4));
+        final int x = stateB * 0xBA55;
+        return (y ^ (stateB = (x << 19 | x >>> 13))) >>> (32 - bits);
     }
     @Override
     public final long nextLong()
     {
-        int y = stateA + 0x9E3779B9;
-        y = (y << 2 | y >>> 30);
-        int z = stateB + 0xC3564E95;
-        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
-        long t = z ^ ((z >>> 15) + (y ^ (y >>> 12)));
-        y = y + 0x9E3779B9;
-        stateA = y = (y << 2 | y >>> 30);
-        z = (stateB = stateB + 0x86AC9D2A | 0);
-        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
-        return t << 32 ^ (z ^ ((z >>> 15) + (y ^ (y >>> 12))));
-//        int a = stateA * 0x9E37 | 0;
-//        a = (a << 17 | a >>> 15);
-//        int b = stateB * 0x4E6D | 0;
-//        b = (b << 14 | b >>> 18);
-//        long t = a ^ b;
-//        final int aa = a * 0x9E37 | 0;
-//        stateA = (aa << 17 | aa >>> 15);
-//        final int bb = b * 0x4E6D | 0;
-//        stateB = (bb << 14 | bb >>> 18);
-//        t = t << 32 ^ (stateA ^ stateB);
-//        return t;
+        int y = stateA * 0xACED;
+        y = (y << 28 | y >>> 4);
+        int x = stateB * 0xBA55;
+        long t = y ^ (x = (x << 19 | x >>> 13));
+        y *= 0xACED;
+        stateA = (y = (y << 28 | y >>> 4));
+        x *= 0xBA55;
+        return t << 32 ^ (y ^ (stateB = (x << 19 | x >>> 13)));
     }
+
+//    private static final int[] startingA = {
+//            0x00000001, 0xE0F813FB, 0x3853A562, 0x416A00FB, 0x969733D0, 0x68FC5927, 0x99A19AAE, 0xC4C790CC,
+//            0x996A09D2, 0x6914B3DE, 0xB1A25EE1, 0xBCF1B09F, 0x442C6EF5, 0x475E34F6, 0xCC900DB2, 0x07E720B0,
+//            0x0058393C, 0xA8D71A86, 0xFFA9E99A, 0x2A123AD8, 0x162BA47D, 0x6993B504, 0xAFB932FD, 0xFAD8E139,
+//            0x77990180, 0x452C71B3, 0xF265CBCD, 0xC0F7B73D, 0x8A7F9F87, 0x845E4932, 0x8B5D1621, 0xBCAFA92A,
+//            0xD6D7A1EC, 0x8E2E18A7, 0x33E41E53, 0xDD326FE3, 0x2F05B4EA, 0xB8F6F3C7, 0x9E3DD946, 0x1F0394CB,
+//            0x7F0F299C, 0x61CB8AA1, 0xA9E05E22, 0xBBCD908F, 0xB070DD10, 0x0A2DDBB2, 0xCD0E44D6, 0x0D07CF67,
+//            0x6318736A, 0x74851D1A, 0x67403862, 0x7EAF0F09, 0xDCDFDA15, 0xAE41DED5, 0x6C2B2FB6, 0x6C2A7DA7,
+//            0x3A469C2E, 0x7B3EA36E, 0x858A16F4, 0x5FE35777, 0x21D4F6AF, 0x8547F196, 0x0D562186, 0x8F88EF25,
+//            0x38B8DB7C, 0x5C15CB9D, 0x75F3C219, 0xD0CC6A7B, 0xBBD4DA22, 0x38174193, 0xDEF01557, 0xF8B890C3,
+//            0x5CAE3E75, 0xE366F7B7, 0x10BB0CAB, 0xF82D9CB8, 0xB7D312CC, 0x69F60C1C, 0x512E23E0, 0xBFA77DBB,
+//            0x8CCC44D0, 0x4A486348, 0x233AC5DD, 0xEFF581CF, 0x51D5EA09, 0x6448830E, 0xFF0B9140, 0xA0F34887,
+//            0x92C0F3B8, 0xBBF60BDF, 0xCBE1A1A9, 0x31BF3301, 0xEC6E09A5, 0x87F67486, 0x272E487B, 0x3CEA124F,
+//            0x55282704, 0x6157B070, 0x6102419F, 0x58651391, 0x1C305E1A, 0xFE77CF87, 0x6C78B78B, 0xFF22C4C9,
+//            0x077E96D6, 0xF37FE662, 0x1B08A31A, 0x9C38F87C, 0x55C56A19, 0xE31AA568, 0x11E35EBE, 0xE7C81D24,
+//            0xE6C3D7E0, 0x87A9B50F, 0xB7D3547D, 0x34F0B5C9, 0xC4F93C05, 0xEAC59BB3, 0xDEA348B6, 0x23C56119,
+//            0xB76AE1A3, 0x0D8DA124, 0x4927CF73, 0x2580B158, 0x1F731C31, 0x9DEDEC30, 0x12BAFE34, 0x0B139973,
+//    }, startingB = {
+//            0x00000001, 0xFDE752F6, 0xC84AF5A3, 0xA87499BC, 0xD90270DE, 0xE90ACB23, 0x9257E51C, 0x9EE34DF2,
+//            0x6B6145AE, 0xEC75C190, 0xBCC18895, 0x32D10686, 0x317F5535, 0x5A97DDE9, 0x6A49F707, 0x4FD63148,
+//            0x31C884C3, 0xEE68C32E, 0xDECE7562, 0x989C6CA0, 0x449BAC70, 0xBFF6415E, 0xEB06F9A5, 0xABB8890F,
+//            0x859213D3, 0x7D9C5EB7, 0xCEFB7D21, 0x1054397A, 0x47133437, 0x39EA89DC, 0x57F3FA9B, 0xB7C9825D,
+//            0xBF5CF78E, 0x67AD1C2D, 0x841B6434, 0x5E82C45F, 0x97948021, 0xBF76909D, 0xF74020C5, 0x52F504F2,
+//            0x6B4466F5, 0x6742D957, 0x9FF19ABC, 0x57104213, 0x39B5F5D1, 0x730E17AB, 0x440F8E1B, 0x3B1D4A42,
+//            0x8ED24EBF, 0x7ECE6545, 0x710D59C2, 0x96E768D8, 0x3A33BFAF, 0x775A6C30, 0x5DE6E29C, 0x27B5C59D,
+//            0x24630AF2, 0x2F174DBC, 0xBF2D6A4C, 0xD6334C3B, 0xBE53EF43, 0xC1ECD43B, 0x6A60478E, 0x108F9B4A,
+//            0xA604530E, 0x4570407F, 0xCC6B423A, 0x47C0C0F9, 0xB09671A7, 0xE9A6BDFD, 0xABBD2751, 0x2524B64F,
+//            0x69B20A61, 0x0E696B30, 0x81633930, 0x0006ED93, 0x5C12F794, 0xE82602E0, 0xB1D5EDC2, 0xD31990D7,
+//            0xA9F6060E, 0x3C6BFA34, 0xD193C00F, 0x82D7DB5E, 0x82C49F3C, 0x7A771155, 0x8F0D9415, 0x8A17684D,
+//            0x2D77E8D6, 0x2913858E, 0xB533A466, 0x8129764F, 0x63162CD2, 0x5F2DD6F6, 0xBF8B497A, 0xB43BE06C,
+//            0x98654103, 0x8C28E2AD, 0xDF898920, 0x5D7AA02D, 0x402A4E1F, 0x31CAE12C, 0xA03FB63D, 0x45F0D48A,
+//            0xEFB636E4, 0x15BA997E, 0x03BE743D, 0x50C3829B, 0x1995789C, 0x9EB14174, 0x7E0FACE3, 0xEACE464A,
+//            0x8FD5E698, 0x921A2C9A, 0xBA254C0A, 0x946AD363, 0x380AAFC3, 0xCEA4C41D, 0x13789C1F, 0xD5F712C3,
+//            0x9599AECF, 0x03777BEA, 0xE27AD2AD, 0x17F9E31B, 0xA3AE7641, 0x4A607868, 0x7747EE23, 0x56EB9F40,
+//    };
+//
+//    public final void setState(final int s) {
+//        stateA = startingA[s >>> 9 & 0x7F];
+//        for (int i = s & 0x1FF; i > 0; i--) {
+//            stateA = stateA - 0x9E3779B9 ^ 0xE541440F;
+//            stateA = (stateA << 22 | stateA >>> 10);
+//        }
+//        stateB = startingB[s >>> 25];
+//        for (int i = s >>> 16 & 0x1FF; i > 0; i--) {
+//            stateB += 0xC0EF50EB;
+//            stateB = (stateB << 7 | stateB >>> 25);
+//        }
+//    }
+//
+//    public final int nextInt()
+//    {
+////        int y = stateA + 0x9E3779B9;
+////        y = (stateA = (y << 2 | y >>> 30));
+////        int z = (stateB = stateB + 0xC3564E95 | 0);
+////        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
+////        return z ^ ((z >>> 15) + (y ^ (y >>> 12)));
+//        int y = stateA - 0x9E3779B9 ^ 0xE541440F;
+//        y = (stateA = (y << 22 | y >>> 10));
+//        final int x = stateB + 0xC0EF50EB;
+//        y ^= (stateB = (x << 7 | x >>> 25));
+//        y ^= y << 9;
+//        return y ^ y >>> 13;
+////        int x = stateB;
+////        x ^= x << 5;
+////        y += (stateB = (x << 15 | x >>> 17));
+////        return ((y - (y << 3)) ^ (y + (y << 16)) ^ y);
+////        int y = stateA + 0x9E3779B9;
+////        y = (stateA = (y << 2 | y >>> 30)) ^ 0x632BE5AD;
+////        int x = stateB + 0x6C8E9CF7;
+////        x = (stateB = (x << 7 | x >>> 25)) ^ 0xC3564E95;
+////        return (y - (y << 5)) - (x << 9 | x >>> 23) ^ (x + y >>> 13);
+//
+//
+//                //(y ^ (y << 5)) + (x ^ (x << 8)) ^ (x + y >>> 12);
+//                //(0x632BE5AD ^ x + (x << 8)) + (y - (0xC3564E95 ^ y << 9));
+//    }
+//    @Override
+//    public final int next(final int bits)
+//    {
+////        final int a = stateA * 0x9E37 | 0;
+////        stateA = (a << 17 | a >>> 15);
+////        final int b = stateB * 0x4E6D | 0;
+////        stateB = (b << 14 | b >>> 18);
+////        return (stateA ^ stateB) >>> (32 - bits);
+//        int y = stateA - 0x9E3779B9 ^ 0xE541440F;
+//        y = (stateA = (y << 22 | y >>> 10));
+//        final int x = stateB + 0xC0EF50EB;
+//        y ^= (stateB = (x << 7 | x >>> 25));
+//        y ^= y << 9;
+//        return (y ^ y >> 13) >>> (32 - bits);
+//    }
+//    @Override
+//    public final long nextLong()
+//    {
+////        int y = stateA + 0x9E3779B9;
+////        y = (y << 2 | y >>> 30);
+////        int z = stateB + 0xC3564E95;
+////        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
+////        long t = z ^ ((z >>> 15) + (y ^ (y >>> 12)));
+////        y = y + 0x9E3779B9;
+////        stateA = y = (y << 2 | y >>> 30);
+////        z = (stateB = stateB + 0x86AC9D2A | 0);
+////        z = (z ^ (z >>> 15) ^ y) * 0x6C8E9;
+////        return t << 32 ^ (z ^ ((z >>> 15) + (y ^ (y >>> 12))));
+//
+//        int y = stateA - 0x9E3779B9 ^ 0xE541440F;
+//        y = (y << 22 | y >>> 10);
+//        int x = stateB + 0xC0EF50EB;
+//        int z = y ^ (x = (x << 7 | x >>> 25));
+//        z ^= z << 9;
+//        long t = z ^ z >>> 13;
+//        y = y - 0x9E3779B9 ^ 0xE541440F;
+//        stateA = (y = (y << 22 | y >>> 10));
+//        x += 0xC0EF50EB;
+//        z = y ^ (stateB = (x << 7 | x >>> 25));
+//        z ^= z << 9;
+//        return t << 32 ^ (z ^ z >>> 13);
+////        int a = stateA * 0x9E37 | 0;
+////        a = (a << 17 | a >>> 15);
+////        int b = stateB * 0x4E6D | 0;
+////        b = (b << 14 | b >>> 18);
+////        long t = a ^ b;
+////        final int aa = a * 0x9E37 | 0;
+////        stateA = (aa << 17 | aa >>> 15);
+////        final int bb = b * 0x4E6D | 0;
+////        stateB = (bb << 14 | bb >>> 18);
+////        t = t << 32 ^ (stateA ^ stateB);
+////        return t;
+//    }
 
     /**
      * Produces a copy of this Mover32RNG that, if next() and/or nextLong() are called on this object and the

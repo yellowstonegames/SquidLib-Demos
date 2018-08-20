@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.FakeLanguageGen;
@@ -63,21 +62,21 @@ public class TsarDemo extends ApplicationAdapter {
     //one cell; resizing the window can make the units cellWidth and cellHeight use smaller or larger than a pixel.
 
     /** In number of cells */
-    private static final int gridWidth = 90;
+    public static final int gridWidth = 90;
     /** In number of cells */
-    private static final int gridHeight = 25;
+    public static final int gridHeight = 25;
 
     /** In number of cells */
-    private static final int bigWidth = gridWidth * 2;
+    public static final int bigWidth = gridWidth * 2;
     /** In number of cells */
-    private static final int bigHeight = gridHeight * 2;
+    public static final int bigHeight = gridHeight * 2;
 
     /** In number of cells */
-    private static final int bonusHeight = 7;
+    public static final int bonusHeight = 7;
     /** The pixel width of a cell */
-    private static final int cellWidth = 10;
+    public static final int cellWidth = 10;
     /** The pixel height of a cell */
-    private static final int cellHeight = 20;
+    public static final int cellHeight = 20;
     private SquidInput input;
     private Color bgColor;
     private TextCellFactory font;
@@ -112,7 +111,6 @@ public class TsarDemo extends ApplicationAdapter {
     private double[][] visible;
     private int health = 9;
     
-    private Vector2 screenPosition;
     // GreasedRegion is a hard-to-explain class, but it's an incredibly useful one for map generation and many other
     // tasks; it stores a region of "on" cells where everything not in that region is considered "off," and can be used
     // as a Collection of Coord points. However, it's more than that! Because of how it is implemented, it can perform
@@ -148,11 +146,13 @@ public class TsarDemo extends ApplicationAdapter {
 
     @Override
     public void create () {
-        // gotta have a random number generator.
-        // We can seed a GWTRNG, which is optimized for the HTML target,
-        // with any int or long we want. You can also hash a String with
-        // CrossHash.hash("Some seed") to get a random-seeming int for a seed.
-        // Here we don't seed the GWTRNG, so its seed will be random.
+        // Gotta have a random number generator.
+        // We can seed a GWTRNG, which is optimized for the HTML target, with any int or long
+        // we want. You can also hash a String with CrossHash.hash64("Some seed") to get a
+        // random-seeming long to use for a seed. CrossHash is preferred over String.hashCode()
+        // because it can produce 64-bit seeds and String.hashCode() will only produce 32-bit
+        // seeds; having more possible seeds means more maps and other procedural content
+        // become possible. Here we don't seed the GWTRNG, so its seed will be random.
         rng = new GWTRNG();
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
@@ -491,9 +491,6 @@ public class TsarDemo extends ApplicationAdapter {
         stage.addActor(display);
         //we add messageDisplay to messageStage, where it will be unchanged by camera moves in the main Stage.
         messageStage.addActor(messageDisplay);
-        
-        screenPosition = new Vector2(cellWidth, cellHeight);
-
     }
     
     /**
@@ -749,12 +746,8 @@ public class TsarDemo extends ApplicationAdapter {
         stage.getViewport().apply(false);
         // stage has its own batch and must be explicitly told to draw().
         batch.setProjectionMatrix(stage.getCamera().combined);
-        screenPosition.set(cellWidth * 5, cellHeight);
-        stage.screenToStageCoordinates(screenPosition);
         batch.begin();
         stage.getRoot().draw(batch, 1);
-        font.bmpFont.setColor(Color.WHITE);
-        font.bmpFont.draw(batch, Gdx.graphics.getFramesPerSecond() + " FPS", screenPosition.x, screenPosition.y);
         batch.end();
     }
 
