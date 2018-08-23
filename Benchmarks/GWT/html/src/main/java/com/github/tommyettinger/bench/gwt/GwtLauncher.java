@@ -52,6 +52,8 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addIntTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
         addIntTest(vp, new Mover32RNG(1), "Mover32RNG");
+        addIntTest(vp, new XoshiroStarStar32RNG(123456789), "XoshiroStarStar32RNG");
+        addIntTest(vp, new XoshiroStarPhi32RNG(123456789), "XoshiroStarPhi32RNG");
         addIntTest(vp, new LightRNG(123456L), "LightRNG");
         addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addIntTest(vp, new GWTRNG(987654321, 123456789), "GWTRNG");
@@ -61,6 +63,8 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addLongTest(vp, new Zog32RNG(123456789, 987654321), "Zog32RNG");
         addLongTest(vp, new Mover32RNG(1), "Mover32RNG");
+        addLongTest(vp, new XoshiroStarStar32RNG(123456789), "XoshiroStarStar32RNG");
+        addLongTest(vp, new XoshiroStarPhi32RNG(123456789), "XoshiroStarPhi32RNG");
         addLongTest(vp, new LightRNG(123456L), "LightRNG");
         addLongTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addLongTest(vp, new GWTRNG(987654321, 123456789), "GWTRNG");
@@ -1062,6 +1066,221 @@ public class GwtLauncher extends GwtBareApp {
         }
         return xor;
     }
+
+
+
+
+
+
+
+
+    private void addIntTest(final VerticalPanel vp, final XoshiroStarStar32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportInt(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+
+    private void addLongTest(final VerticalPanel vp, final XoshiroStarStar32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportLong(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+    private String runIntBenchmark(XoshiroStarStar32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runInt(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+
+    private String runLongBenchmark(XoshiroStarStar32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runLong(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+
+    private String reportInt(XoshiroStarStar32RNG rs) {
+        runIntBenchmark(rs, 100, 2); // warm up
+        return runIntBenchmark(rs,2000, 5);
+    }
+
+    private int runInt(XoshiroStarStar32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextInt();
+        }
+        return xor;
+    }
+
+    private String reportLong(XoshiroStarStar32RNG rs) {
+        runLongBenchmark(rs, 100, 2); // warm up
+        return runLongBenchmark(rs,2000, 5);
+    }
+
+    private int runLong(XoshiroStarStar32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextLong();
+        }
+        return xor;
+    }
+
+
+    private void addIntTest(final VerticalPanel vp, final XoshiroStarPhi32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportInt(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+
+    private void addLongTest(final VerticalPanel vp, final XoshiroStarPhi32RNG rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportLong(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+    private String runIntBenchmark(XoshiroStarPhi32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runInt(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+
+    private String runLongBenchmark(XoshiroStarPhi32RNG rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runLong(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+
+    private String reportInt(XoshiroStarPhi32RNG rs) {
+        runIntBenchmark(rs, 100, 2); // warm up
+        return runIntBenchmark(rs,2000, 5);
+    }
+
+    private int runInt(XoshiroStarPhi32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextInt();
+        }
+        return xor;
+    }
+
+    private String reportLong(XoshiroStarPhi32RNG rs) {
+        runLongBenchmark(rs, 100, 2); // warm up
+        return runLongBenchmark(rs,2000, 5);
+    }
+
+    private int runLong(XoshiroStarPhi32RNG rs) {
+        int xor = 0;
+        for (int i = 0; i < 10000; i++) {
+            xor ^= rs.nextLong();
+        }
+        return xor;
+    }
+
     private void addIntTest(final VerticalPanel vp, final RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
