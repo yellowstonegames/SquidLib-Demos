@@ -133,7 +133,7 @@ eclipse {
 // Sets up the Android Idea project using the old Ant based build.
 idea {
   module {
-    sourceDirs += file("src/main/java");
+    sourceDirs += file("src/main/java")
     scopes = [ COMPILE: [plus:[project.configurations.compile]]]
     iml {
       withXml {
