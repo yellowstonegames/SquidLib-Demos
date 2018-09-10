@@ -83,6 +83,7 @@ tasks.draftCompileGwt.dependsOn(addSource)
 
 sourceCompatibility = 1.7
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
+sourceSets.main.java.exclude("emu")
 
 
 eclipse.project {
