@@ -1,4 +1,4 @@
-/*  Written in 2016 by David Blackman and Sebastiano Vigna (vigna@acm.org)
+/*  Written in 2016 by David Blackman and Sebastiano Vigna (vigna@acm.org), ported in 2018 by Tommy Ettinger
 
 To the extent possible under law, the author has dedicated all copyright
 and related and neighboring rights to this software to the public domain
@@ -13,10 +13,13 @@ import squidpony.squidmath.StatefulRandomness;
 import java.io.Serializable;
 
 /**
- * A work-in-progress modification of Blackman and Vigna's xoroshiro64** generator; very close to {@link Lobster32RNG},
- * but uses a large addition (by 0x41C64E6D, used in PractRand) instead of a multiplication (by 31), and changes some
- * of the hard-to-reverse operation's shift/rotation amounts. It's doing pretty well in testing, but benchmarks in the
- * browser give bafflingly different results -- extremely fast in Firefox, but slower than Lobster in Chrome.
+ * A modification of Blackman and Vigna's xoroshiro64** generator; like {@link Starfish32RNG}, but doesn't use any
+ * multiplication and instead uses a pair of hard-to-reverse operations (arranged so no bits of the state should be
+ * directly accessible from the output without serious effort). It's doing pretty well in statistical testing (512 GB
+ * of PractRand with no anomalies), but benchmarks in the browser give strangely different results -- fast in Firefox,
+ * but a little slower than similar generators that do use multiplication in recent Chrome. In older Chrome/Chromium,
+ * it's totally different, and this generator performs almost twice as quickly as Starfish; if whatever regression in
+ * the V8 JavaScript engine causes this can be addressed, Piranha could be very fast again in the most common browser.
  * <br>
  * The name comes from the sea creature theme I'm using for this family of generators and the fast, somewhat reckless
  * movement of piranha fish.
@@ -71,10 +74,10 @@ public final class Piranha32RNG implements StatefulRandomness, Serializable {
     public final int next(int bits) {
         final int s0 = stateA;
         final int s1 = stateB ^ s0;
-        final int result = s0 + 0x41C64E6D;
+        final int result = (s0 << 5) - (s0 << 3 | s0 >>> 29);
         stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
         stateB = (s1 << 13 | s1 >>> 19);
-        return (result << 6) - (result << 4 | result >>> 28) >>> (32 - bits);
+        return (result << 10) - (result << 7 | result >>> 25) >>> (32 - bits);
     }
 
     /**
@@ -84,24 +87,24 @@ public final class Piranha32RNG implements StatefulRandomness, Serializable {
     public final int nextInt() {
         final int s0 = stateA;
         final int s1 = stateB ^ s0;
-        final int result = s0 + 0x41C64E6D;
+        final int result = (s0 << 5) - (s0 << 3 | s0 >>> 29);
         stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
         stateB = (s1 << 13 | s1 >>> 19);
-        return (result << 6) - (result << 4 | result >>> 28) | 0;
+        return (result << 10) - (result << 7 | result >>> 25) | 0;
     }
 
     @Override
     public final long nextLong() {
         int s0 = stateA;
         int s1 = stateB ^ s0;
-        final int high = s0 + 0x41C64E6D;
+        final int high = (s0 << 5) - (s0 << 3 | s0 >>> 29);
         s0 = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
         s1 = (s1 << 13 | s1 >>> 19) ^ s0;
-        final int low = s0 + 0x41C64E6D;
+        final int low = (s0 << 5) - (s0 << 3 | s0 >>> 29);
         stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
         stateB = (s1 << 13 | s1 >>> 19);
-        final long result = (high << 6) - (high << 4 | high >>> 28);
-        return result << 32 ^ ((low << 6) - (low << 4 | low >>> 28));
+        final long result = (high << 10) - (high << 7 | high >>> 25);
+        return result << 32 ^ ((low << 10) - (low << 7 | low >>> 25));
     }
 
     /**

@@ -1,0 +1,29 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+apply plugin: 'application'
+
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+mainClassName = 'com.squidpony.samples.desktop.DesktopLauncher'
+eclipse.project.name = appName + '-desktop'
+sourceCompatibility = 1.7
+
+dependencies {
+  compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+  compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+  compile "com.kotcrab.vis:vis-ui:$visuiVersion"
+  compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
+  compile "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
+  compile "com.github.tommyettinger:regexodus:$regExodusVersion"
+}
+
+jar {
+  archiveName "${appName}-${version}.jar"
+  from { configurations.compile.collect { zipTree(it) } }
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+}
+
+run {
+  ignoreExitValue = true
+}
