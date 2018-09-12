@@ -57,10 +57,8 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
     private static final int width = 512, height = 512;
     
     private SpriteBatch batch;
-//    private SquidPanel display;//, overlay;
     private static final int cellWidth = 1, cellHeight = 1;
     private SquidInput input;
-//    private Stage stage;
     private Viewport view;
     private StatefulRNG rng;
     private long seed;

@@ -13,6 +13,7 @@ import com.kotcrab.vis.ui.widget.Separator;
 import com.kotcrab.vis.ui.widget.VisSelectBox;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.squidpony.samples.DetailedWorldMapDemo;
+import com.squidpony.samples.LocalMapDemo;
 import com.squidpony.samples.RotatingWorldMapDemo;
 
 /**
@@ -29,7 +30,7 @@ public class Sampler extends ApplicationAdapter {
         VisUI.setSkipGdxVersionCheck(true);
         VisUI.load();
         choices = new VisSelectBox<>();
-        choices.setItems(DetailedWorldMapDemo.config, RotatingWorldMapDemo.config);
+        choices.setItems(DetailedWorldMapDemo.config, RotatingWorldMapDemo.config, LocalMapDemo.config);
         button = new VisTextButton("Launch!", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
