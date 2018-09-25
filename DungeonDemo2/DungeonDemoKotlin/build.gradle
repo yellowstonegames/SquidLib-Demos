@@ -1,0 +1,42 @@
+buildscript {
+  ext.kotlin_version = '1.2.61'
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    google()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'http://dl.bintray.com/kotlin/kotlin-eap' }
+  }
+  dependencies {
+    classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+    classpath "de.richsource.gradle.plugins:gwt-gradle-plugin:$gwtPluginVersion"
+    classpath "com.android.tools.build:gradle:$androidPluginVersion"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+  }
+}
+
+allprojects {
+  apply plugin: 'eclipse'
+  apply plugin: 'idea'
+}
+
+configure(subprojects){// - project(':android')) {
+  apply plugin: 'java'
+  sourceCompatibility = 1.8
+}
+
+subprojects {
+  version = '0.0.1-SNAPSHOT'
+  ext.appName = 'DungeonDemo'
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    google()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'http://dl.bintray.com/kotlin/kotlin-eap' }
+  }
+}
+
