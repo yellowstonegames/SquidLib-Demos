@@ -4,9 +4,9 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -82,17 +82,6 @@ public class GraphicalDemo extends ApplicationAdapter {
     /** The pixel height of a cell */
     public static final int cellHeight = 16;
     
-    public float adjustedWidth = 16f, adjustedHeight = 16f;
-    private int offsetX, offsetY;
-
-    private int translateX(int screenX) {
-        return MathUtils.floor((screenX + offsetX) / adjustedWidth);
-    }
-
-    private int translateY(int screenY) {
-        return MathUtils.floor(gridHeight - (screenY + offsetY) / adjustedHeight);
-    }
-
     private boolean onGrid(int screenX, int screenY)
     {
         return screenX >= 0 && screenX < gridWidth && screenY >= 0 && screenY < gridHeight;
@@ -100,11 +89,11 @@ public class GraphicalDemo extends ApplicationAdapter {
 
 
     private InputProcessor input;
-    private long lastDrawTime = Long.MIN_VALUE;
+    private long lastDrawTime = 0;
     private Color bgColor;
     private BitmapFont font;
     private PixelPerfectViewport mainViewport;
-    private OrthographicCamera camera;
+    private Camera camera;
     
     private OrderedMap<Coord, Sprite> monsters;
     private DijkstraMap getToPlayer, playerToCursor;
@@ -151,7 +140,7 @@ public class GraphicalDemo extends ApplicationAdapter {
             FLOAT_WHITE = Color.WHITE.toFloatBits(), 
             FLOAT_BLACK = Color.BLACK.toFloatBits(),
             FLOAT_BLOOD = -0x1.564f86p125F,  // same result as SColor.PURE_CRIMSON.toFloatBits()
-            FLOAT_LIGHTING = -0x1.cff1fep126F, // same result as SColor.COSMIC_LATTE.toFloatBits()
+            FLOAT_LIGHTING = ColorTools.floatGetHSV(0.17f, 0.12f, 0.8f, 1f),//-0x1.cff1fep126F, // same result as SColor.COSMIC_LATTE.toFloatBits()
             FLOAT_GRAY = -0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
     // the player's color as a float
     private float playerColor;
@@ -170,8 +159,8 @@ public class GraphicalDemo extends ApplicationAdapter {
         batch = new SpriteBatch();
         mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
-        camera = new OrthographicCamera();
-        mainViewport.setCamera(camera);
+        camera = mainViewport.getCamera();
+        camera.update();
         //Here we make sure our Stage, which holds any text-based grids we make, uses our Batch.
         atlas = new TextureAtlas("Scroll.atlas");
         font = new BitmapFont(Gdx.files.internal("NanoOKExtended.fnt"), atlas.findRegion("NanoOKExtended"));
@@ -394,15 +383,11 @@ public class GraphicalDemo extends ApplicationAdapter {
         playerToCursor.partialScan(13, blockage);
 
 
-        //The next three lines set the background color for anything we don't draw on, but also create 2D arrays of the
-        //same size as decoDungeon that store the colors for the foregrounds and backgrounds of each cell as packed
-        //floats (a format SparseLayers can use throughout its API), using the colors for the cell with the same x and
-        //y. By changing an item in SColor.LIMITED_PALETTE, we also change the color assigned by MapUtility to floors.
-        bgColor = Color.DARK_GRAY;
+        bgColor = Color.BLACK;
 
 
-        lang = FakeLanguageGen.RUSSIAN_ROMANIZED.sentence(rng, 4, 8,
-                new String[]{",", ",", ",", " -"}, new String[]{"!"}, 0.2, 34);
+        lang = '"' + FakeLanguageGen.DEMONIC.sentence(rng, 4, 7,
+                new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"",  "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
 
         // this is a big one.
         // SquidInput can be constructed with a KeyHandler (which just processes specific keypresses), a SquidMouse
@@ -423,6 +408,7 @@ public class GraphicalDemo extends ApplicationAdapter {
                     case UP:
                     case 'w':
                     case 'W':
+                    case NUMPAD_8:
                         toCursor.clear();
                         //+1 is up on the screen
                         awaitedMoves.add(player.translate(0, 1));
@@ -430,6 +416,7 @@ public class GraphicalDemo extends ApplicationAdapter {
                     case DOWN:
                     case 's':
                     case 'S':
+                    case NUMPAD_2:
                         toCursor.clear();
                         //-1 is down on the screen
                         awaitedMoves.add(player.translate(0, -1));
@@ -437,14 +424,37 @@ public class GraphicalDemo extends ApplicationAdapter {
                     case LEFT:
                     case 'a':
                     case 'A':
+                    case NUMPAD_4:
                         toCursor.clear();
                         awaitedMoves.add(player.translate(-1, 0));
                         break;
                     case RIGHT:
                     case 'd':
                     case 'D':
+                    case NUMPAD_6:
                         toCursor.clear();
                         awaitedMoves.add(player.translate(1, 0));
+                        break;
+                    case NUMPAD_1:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(-1, -1));
+                        break;
+                    case NUMPAD_3:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(1, -1));
+                        break;
+                    case NUMPAD_7:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(-1, 1));
+                        break;
+                    case NUMPAD_9:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(1, 1));
+                        break;
+                    case '.':
+                    case NUMPAD_5:
+                        toCursor.clear();
+                        awaitedMoves.add(player);
                         break;
                     case ESCAPE:
                         Gdx.app.exit();
@@ -457,7 +467,9 @@ public class GraphicalDemo extends ApplicationAdapter {
             // ourselves and copy toCursor over to awaitedMoves.
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                if (onGrid(translateX(screenX), translateY(screenY))) {
+                pos.set(screenX, screenY, 0f);
+                mainViewport.unproject(pos);
+                if (onGrid(MathUtils.floor(pos.x) >> 4, MathUtils.floor(pos.y) >> 4)) {
                     mouseMoved(screenX, screenY);
                     awaitedMoves.addAll(toCursor);
                     return true;
@@ -476,13 +488,9 @@ public class GraphicalDemo extends ApplicationAdapter {
             public boolean mouseMoved(int screenX, int screenY) {
                 if(!awaitedMoves.isEmpty())
                     return false;
-                if (onGrid(screenX = translateX(screenX), screenY = translateY(screenY))) {
-                    // This is needed because we center the camera on the player as he moves through a dungeon that is
-                    // multiple screens wide and tall, but the mouse still only can receive input on one screen's worth
-                    // of cells. (gridWidth >> 1) halves gridWidth, pretty much, and that we use to get the centered
-                    // position after adding to the player's position (along with the gridHeight).
-//                    screenX += player.x - (gridWidth >> 1);
-//                    screenY += player.y - (gridHeight >> 1);
+                pos.set(screenX, screenY, 0f);
+                mainViewport.unproject(pos);
+                if (onGrid(screenX = MathUtils.floor(pos.x) >> 4, screenY = MathUtils.floor(pos.y) >> 4)) {
                     // we also need to check if screenX or screenY is out of bounds.
                     if (screenX < 0 || screenY < 0 || screenX >= bigWidth || screenY >= bigHeight ||
                             (cursor.x == screenX && cursor.y == screenY)) {
@@ -540,15 +548,15 @@ public class GraphicalDemo extends ApplicationAdapter {
                 seen.or(blockage.not());
                 blockage.fringe8way();
                 playerSprite.setPosition(newX * cellWidth, newY * cellHeight);
-                //display.slide(playerSprite, player.x, player.y, newX, newY, 0.125f, null);
                 player = Coord.get(newX, newY);
                 // if a monster was at the position we moved into, and so was successfully removed...
                 if(monsters.containsKey(player))
                 {
                     monsters.remove(player);
                     for (int x = -1; x <= 1; x++) {
-                        for (int y = -1; y < 1; y++) {
-                            bgColors[newX+x][newY+y] = FLOAT_BLOOD;
+                        for (int y = -1; y <= 1; y++) {
+                            if(rng.nextBoolean()) 
+                                bgColors[newX+x][newY+y] = FLOAT_BLOOD;
                         }
                     }
                 }
@@ -586,8 +594,7 @@ public class GraphicalDemo extends ApplicationAdapter {
                     // if we would move into the player, instead damage the player and give newMons the current
                     // position of this monster.
                     if (tmp.x == player.x && tmp.y == player.y) {
-                        // the complicated number below is SColor.PURE_CRIMSON.toFloatBits()
-                        //display.tint(0f, player.x, player.y, -0x1.564f86p125F, 0.415f, null);
+                        // not sure if this stays red for very long
                         playerSprite.setColor(FLOAT_BLOOD);
                         health--;
                         // make sure the monster is still actively stalking/chasing the player
@@ -628,15 +635,9 @@ public class GraphicalDemo extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
                     pos.set(i * cellWidth, j * cellHeight, 0f);
-                    mainViewport.project(pos);
-                    // SparseLayers.putWithLight() changes the background of a given x,y cell by mixing a
-                    // lighting color with the existing background color, optionally putting a character
-                    // there or using some kind of Noise to flicker the lighting over time.
-                    // Here, we use visible (calculated by FOV) to determine how much the lighting color should
-                    // mix into the background color, and adjust it with the default Noise by passing null last.
                     batch.setColor(toCursor.contains(Coord.get(i, j))
                             ? ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_WHITE, 0.9f)
-                            : ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j]));
+                            : ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
                     batch.draw(solid, pos.x, pos.y);
                     if((monster = monsters.get(Coord.get(i, j))) != null)
                     {
@@ -645,16 +646,20 @@ public class GraphicalDemo extends ApplicationAdapter {
                     }
                     if(monster == null && visible[i][j] < 1.0)
                     {
-                        batch.setColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_LIGHTING, (float)visible[i][j]));
+                        batch.setColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
                         batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y);
                     }
                 } else if(seen.contains(i, j)) {
                     pos.set(i * cellWidth, j * cellHeight, 0f);
-                    mainViewport.project(pos);
-                    batch.setColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.5f));
+                    batch.setColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
                     batch.draw(solid, pos.x, pos.y);
                     if ((monster = monsters.get(Coord.get(i, j))) != null)
                         monster.setAlpha(0f);
+                    if(monster == null && visible[i][j] < 1.0)
+                    {
+                        batch.setColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_GRAY, 0.7f));
+                        batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y);
+                    }
                 }
             }
         }
@@ -663,6 +668,7 @@ public class GraphicalDemo extends ApplicationAdapter {
         }
         playerSprite.draw(batch);
         playerSprite.setColor(playerColor);
+        // we don't currently show health, but we could.
         //messageDisplay.putBordersCaptioned(SColor.CW_GRAY_WHITE, GDXMarkup.instance.colorString("Health: [Red]" + health));
     }
     @Override
@@ -676,20 +682,22 @@ public class GraphicalDemo extends ApplicationAdapter {
         camera.position.y =  playerSprite.getY();
         camera.update();
 
-        mainViewport.apply(true);
-        //batch.setProjectionMatrix(camera.combined);
+        mainViewport.apply(false);
+        batch.setProjectionMatrix(camera.combined);
         batch.begin();
         
         // you done bad. you done real bad.
         if (health <= 0) {
             // still need to display the map, then write over it with a message.
             putMap();
-            int wide = Gdx.graphics.getWidth();
+            float wide = mainViewport.getWorldWidth(),
+                    x = playerSprite.getX() - mainViewport.getWorldWidth() * 0.5f,
+                    y = playerSprite.getY();
             font.setColor(Color.RED);
-            font.draw(batch, "THE TSAR WILL HAVE YOUR HEAD!", 0, 14 * adjustedHeight, wide, Align.center, true);
-            font.draw(batch, "AS THE OLD SAYING GOES,", 0, 12 * adjustedHeight, wide, Align.center, true);
-            font.draw(batch, lang, 0, 10 * adjustedHeight, wide, Align.center, true);
-            font.draw(batch, "q to quit.", 0, 8 * adjustedHeight, wide, Align.center, true);
+            font.draw(batch, "YOUR CRAWL IS OVER!", x, y + 48, wide, Align.center, true);
+            font.draw(batch, "A monster sniffs your corpse and says,", x, y + 16, wide, Align.center, true);
+            font.draw(batch, lang, x, y - 16, wide, Align.center, true);
+            font.draw(batch, "q to quit.", x, y - 80, wide, Align.center, true);
             batch.end();
             if(Gdx.input.isKeyPressed(Q))
                 Gdx.app.exit();
@@ -702,7 +710,8 @@ public class GraphicalDemo extends ApplicationAdapter {
         if(!awaitedMoves.isEmpty())
         {
             // this doesn't check for input, but instead processes and removes Coords from awaitedMoves.
-            if (true) {
+            if (System.currentTimeMillis() - lastDrawTime >= 80) {
+                lastDrawTime = System.currentTimeMillis();
                 switch (phase) {
                     case WAIT:
                     case MONSTER_ANIM:
@@ -736,13 +745,9 @@ public class GraphicalDemo extends ApplicationAdapter {
                 }
             }
         }
-        // if we are waiting for the player's input and get input, process it.
-//        else if(input.hasNext() && !display.hasActiveAnimations() && phase == Phase.WAIT) {
-//            input.next();
-//        }
         // if the previous blocks didn't happen, and there are no active animations, then either change the phase
         // (because with no animations running the last phase must have ended), or start a new animation soon.
-        else if(true) {
+        else {
             switch (phase) {
                 case WAIT:
                     break;
@@ -757,31 +762,10 @@ public class GraphicalDemo extends ApplicationAdapter {
         }
         batch.end();
     }     
-    public void reinitialize(float cellWidth, float cellHeight, int offsetX, int offsetY)
-        {
-            adjustedWidth = cellWidth;
-            adjustedHeight = cellHeight;
-            this.offsetX = offsetX;
-            this.offsetY = offsetY;
-        }
-
     @Override
 	public void resize(int width, int height) {
 		super.resize(width, height);
-
-        // message box won't respond to clicks on the far right if the stage hasn't been updated with a larger size
-        float currentZoomX = (float)width / gridWidth;
-        // total new screen height in pixels divided by total number of rows on the screen
-        float currentZoomY = (float)height / (gridHeight + bonusHeight);
-        // SquidMouse turns screen positions to cell positions, and needs to be told that cell sizes have changed
-        // a quirk of how the camera works requires the mouse to be offset by half a cell if the width or height is odd
-        // (gridWidth & 1) is 1 if gridWidth is odd or 0 if it is even; it's good to know and faster than using % , plus
-        // in some other cases it has useful traits (x % 2 can be 0, 1, or -1 depending on whether x is negative, while
-        // x & 1 will always be 0 or 1).
-        reinitialize(currentZoomX, currentZoomY,
-                (gridWidth & 1) * (int)(currentZoomX * -0.5f), (gridHeight & 1) * (int) (currentZoomY * -0.5f));        // the viewports are updated separately so each doesn't interfere with the other's drawn area.
         mainViewport.update(width, height, false);
-        mainViewport.setScreenBounds(0, 0, width, height);
 	}
 }
 // An explanation of hexadecimal float/double literals was mentioned earlier, so here it is.
