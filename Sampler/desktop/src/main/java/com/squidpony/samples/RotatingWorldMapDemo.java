@@ -19,10 +19,7 @@ import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidgrid.gui.gdx.SquidMouse;
 import squidpony.squidgrid.mapping.FantasyPoliticalMapper;
 import squidpony.squidgrid.mapping.WorldMapGenerator;
-import squidpony.squidmath.ClassicNoise;
-import squidpony.squidmath.LinnormRNG;
-import squidpony.squidmath.NumberTools;
-import squidpony.squidmath.StatefulRNG;
+import squidpony.squidmath.*;
 
 /**
  * Port of Zachary Carter's world generation technique, https://github.com/zacharycarter/mapgen
@@ -316,14 +313,13 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, ClassicNoise.instance, 0.75);
         //world = new WorldMapGenerator.MimicMap(seed, WhirlingNoise.instance, 0.8);
 //        world = new WorldMapGenerator.SpaceViewMap(seed, width, height, ClassicNoise.instance, 0.7);
-        world = new WorldMapGenerator.RotatingSpaceMap(seed, width, height, ClassicNoise.instance, 0.75);
+        world = new WorldMapGenerator.RotatingSpaceMap(seed, width, height, FastNoise.instance, 0.7);
         //world = new WorldMapGenerator.RoundSideMap(seed, width, height, ClassicNoise.instance, 0.8);
         //world = new WorldMapGenerator.HyperellipticalMap(seed, width, height, ClassicNoise.instance, 0.7, 0.1, 3.25);
         //cloudNoise = new Noise.Turbulent4D(WhirlingNoise.instance, new Noise.Ridged4D(SeededNoise.instance, 2, 3.7), 3, 5.9);
         //cloudNoise = new Noise.Layered4D(WhirlingNoise.instance, 2, 3.2);
         //cloudNoise2 = new Noise.Ridged4D(SeededNoise.instance, 3, 6.5);
         //world = new WorldMapGenerator.TilingMap(seed, width, height, WhirlingNoise.instance, 0.9);
-        world.generateRivers = false;
         dbm = new WorldMapGenerator.DetailedBiomeMapper();
         fpm = new FantasyPoliticalMapper();
         input = new SquidInput(new SquidInput.KeyHandler() {
