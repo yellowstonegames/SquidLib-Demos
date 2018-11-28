@@ -1,0 +1,48 @@
+apply plugin: 'java'
+sourceSets.main.java.srcDirs = [ "src/main/java" ]
+sourceSets.main.resources.srcDirs += ["src/main/resources"]
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+project.ext.mainClassName = 'com.squidpony.saveload.demo.desktop.DesktopLauncher'
+project.ext.assetsDir = rootProject.file('assets')
+
+eclipse.project.name = appName + '-desktop'
+sourceCompatibility = 1.7
+
+dependencies {
+  compile project(':core')
+  compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+  compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+}
+
+if (!hasProperty('mainClass')) {
+  ext.mainClass = 'com.squidpony.saveload.demo.desktop.DesktopLauncher'
+}
+
+task run(dependsOn: classes, type: JavaExec) {
+  main = project.mainClassName
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  workingDir = project.assetsDir
+  setIgnoreExitValue(true)
+}
+
+task debug(dependsOn: classes, type: JavaExec) {
+  main = project.mainClassName
+  classpath = sourceSets.main.runtimeClasspath
+  standardInput = System.in
+  workingDir = project.assetsDir
+  debug = true
+  setIgnoreExitValue(true)
+}
+
+task dist(type: Jar) {
+  from files(sourceSets.main.output.classesDir)
+  from files(sourceSets.main.output.resourcesDir)
+  from { configurations.compile.collect { zipTree(it) } }
+  archiveName "${appName}-${version}.jar"
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+}
+
+dist.dependsOn classes
