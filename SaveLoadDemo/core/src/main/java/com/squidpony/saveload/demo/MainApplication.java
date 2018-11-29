@@ -1,9 +1,6 @@
 package com.squidpony.saveload.demo;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
@@ -198,34 +195,35 @@ public class MainApplication extends ApplicationAdapter {
     //    private FloatFilter sepia;
     private Data data;
     
-    public Data load() throws Exception {
+    public Data load() throws IllegalStateException {
         String s = Gdx.app.getPreferences("SaveLoadDemo").getString("SavedState");
-        if (s == null || s.isEmpty()) throw new Exception("Saved state is empty.");
+        if (s == null || s.isEmpty()) throw new IllegalStateException("Saved state is empty.");
+        //Gdx.app.log("JSON", LZSPlus.decompress(s));
         return json.fromJson(Data.class, s);
     }
     public void keep(Data d)
     {
-        Gdx.app.getPreferences("SaveLoadDemo").putString("SavedState", json.toJson(d, Data.class));
+        Gdx.app.getPreferences("SaveLoadDemo").putString("SavedState", json.toJson(d, Data.class)).flush();
     }
     @Override
     public void create () {
+//        Gdx.app.setLogLevel(Application.LOG_INFO);
         Coord.expandPoolTo(bigWidth, bigHeight);
         rng = new GWTRNG();
         SColor.LIMITED_PALETTE[3] = SColor.DB_GRAPHITE;
+        dungeonGen = new DungeonGenerator(bigWidth, bigHeight, rng);
         data = new Data();
         
         try {
             data.set(load());
-            dungeonGen = new DungeonGenerator(bigWidth, bigHeight, rng);
             filter.targetCb = data.cb;
             filter.targetCr = data.cr;
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Starting new data!");
+//            Gdx.app.log("maybe_error", "Debug error check: ", e);
+//            Gdx.app.log("start", "Starting new data!");
             FloatFilters.ColorizeFilter cf = new FloatFilters.ColorizeFilter(SColor.DAWNBRINGER_AURORA[rng.between(1, 256)]);
             filter.targetCb = data.cb = cf.targetCb;
             filter.targetCr = data.cr = cf.targetCr;
-            dungeonGen = new DungeonGenerator(bigWidth, bigHeight, rng);
             //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
             //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
             data.decoDungeon = dungeonGen.generate();
@@ -450,12 +448,23 @@ public class MainApplication extends ApplicationAdapter {
                     case 'l':
                     {
                         try {
-                            data.set(load());
-                            filter.targetCb = data.cb;
-                            filter.targetCr = data.cr;
-                        } catch (Exception ignored) {
-                            ignored.printStackTrace();
+                            Data d = load();
+//                            if(d != null)
+//                            {
+//                                Gdx.app.log("data", d.toString());
+//                                Gdx.app.log("data", Float.toString(d.cb));
+//                                Gdx.app.log("data", Float.toString(d.cr));
+//                            }
+//                            else
+//                            {
+//                                Gdx.app.log("data", "data is null");
+//                            }
+                            data.set(d);
+                        } catch (Exception e) {
+//                            Gdx.app.log("data", "Failure!", e);
                         }
+                        filter.targetCb = data.cb;
+                        filter.targetCr = data.cr;
                         break;
                     }
                     case 'K':
