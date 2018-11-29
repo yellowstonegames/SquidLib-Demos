@@ -43,10 +43,10 @@ import java.util.ArrayList;
 // or something related, like Game. Game adds features that SquidLib doesn't currently use, so ApplicationAdapter is
 // perfectly fine for these uses.
 public class MainApplication extends ApplicationAdapter {
+    public GWTRNG rng;
     
     public static class Data
     {
-        public GWTRNG rng;
         // decoDungeon stores the dungeon map with features like grass and water, if present, as chars like '"' and '~'.
         // bareDungeon stores the dungeon map with just walls as '#' and anything not a wall as '.'.
         // Both of the above maps use '#' for walls, and the next two use box-drawing characters instead.
@@ -76,10 +76,6 @@ public class MainApplication extends ApplicationAdapter {
         }
 
         public void set(Data data) {
-            if(rng == null)
-                rng = new GWTRNG(data.rng.getState());
-            else
-                rng.setState(data.rng.getState());
             if(decoDungeon == null)
             {
                 decoDungeon = data.decoDungeon;
@@ -214,27 +210,22 @@ public class MainApplication extends ApplicationAdapter {
     @Override
     public void create () {
         Coord.expandPoolTo(bigWidth, bigHeight);
+        rng = new GWTRNG();
         SColor.LIMITED_PALETTE[3] = SColor.DB_GRAPHITE;
         data = new Data();
         
-        // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
-        // if the seed is identical between two runs, any random factors will also be identical (until user input may
-        // cause the usage of an RNG to change). You can randomize the dungeon and several other initial settings by
-        // just removing the String seed, making the line "rng = new GWTRNG();" . Keeping the seed as a default allows
-        // changes to be more easily reproducible, and using a fixed seed is strongly recommended for tests. 
         try {
             data.set(load());
-            dungeonGen = new DungeonGenerator(bigWidth, bigHeight, data.rng);
+            dungeonGen = new DungeonGenerator(bigWidth, bigHeight, rng);
             filter.targetCb = data.cb;
             filter.targetCr = data.cr;
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Starting new data!");
-            data.rng = new GWTRNG();
-            FloatFilters.ColorizeFilter cf = new FloatFilters.ColorizeFilter(SColor.DAWNBRINGER_AURORA[data.rng.between(1, 256)]);
+            FloatFilters.ColorizeFilter cf = new FloatFilters.ColorizeFilter(SColor.DAWNBRINGER_AURORA[rng.between(1, 256)]);
             filter.targetCb = data.cb = cf.targetCb;
             filter.targetCr = data.cr = cf.targetCr;
-            dungeonGen = new DungeonGenerator(bigWidth, bigHeight, data.rng);
+            dungeonGen = new DungeonGenerator(bigWidth, bigHeight, rng);
             //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
             //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
             data.decoDungeon = dungeonGen.generate();
@@ -251,7 +242,7 @@ public class MainApplication extends ApplicationAdapter {
             // in that region that is "on," or -1,-1 if there are no such cells. It takes an RNG object as a parameter, and
             // if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
             // don't seed the RNG, any valid cell should be possible.
-            data.player = data.floors.singleRandom(data.rng);
+            data.player = data.floors.singleRandom(rng);
             // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
             FOV.reuseFOV(data.resistance, data.visible, data.player.x, data.player.y, 9.0, Radius.CIRCLE);//, (System.currentTimeMillis() & 0xFFFF) * 0x1p-4, 60.0);
 
@@ -450,7 +441,7 @@ public class MainApplication extends ApplicationAdapter {
                     case 'C':
                     case 'c':
                     {
-                        final float rand = SColor.DAWNBRINGER_AURORA[data.rng.between(1, 256)].toFloatBits();
+                        final float rand = SColor.DAWNBRINGER_AURORA[rng.between(1, 256)].toFloatBits();
                         filter.targetCb = data.cb = SColor.chromaBOfFloat(rand);
                         filter.targetCr = data.cr = SColor.chromaROfFloat(rand);
                         break;

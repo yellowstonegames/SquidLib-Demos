@@ -6,6 +6,7 @@
     <inherits name="com.squidpony.saveload.demo.MainApplication" />
     <inherits name="regexodus" />
     <inherits name="squidlib-util" />
+    <inherits name="squidlib-extra" />
     <extend-configuration-property name="gdx.reflect.include" value="com.squidpony.saveload.demo.MainApplication.Data" />
     <entry-point class="com.squidpony.saveload.demo.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
