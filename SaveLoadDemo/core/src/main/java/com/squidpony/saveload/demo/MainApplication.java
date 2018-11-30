@@ -1,6 +1,9 @@
 package com.squidpony.saveload.demo;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
@@ -19,7 +22,7 @@ import squidpony.squidgrid.mapping.LineKit;
 import squidpony.squidmath.Coord;
 import squidpony.squidmath.GWTRNG;
 import squidpony.squidmath.GreasedRegion;
-import squidpony.store.json.JsonCompressor;
+import squidpony.store.json.JsonConverter;
 
 import java.util.ArrayList;
 
@@ -53,6 +56,7 @@ public class MainApplication extends ApplicationAdapter {
         public char[][] decoDungeon, bareDungeon, lineDungeon, prunedDungeon;
         public float[][] colors, bgColors;
         public Coord player;
+        public Coord[] floors;
         public float cb, cr;
         public double[][] resistance;
         public double[][] visible;
@@ -66,7 +70,7 @@ public class MainApplication extends ApplicationAdapter {
         // Here, we use a GreasedRegion to store all floors that the player can walk on, a small rim of cells just beyond
         // the player's vision that blocks pathfinding to areas we can't see a path to, and we also store all cells that we
         // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
-        public GreasedRegion floors, blockage, seen, currentlySeen;
+        public GreasedRegion blockage, seen, currentlySeen;
         
         public Data()
         {
@@ -105,16 +109,15 @@ public class MainApplication extends ApplicationAdapter {
             {
                 blockage = new GreasedRegion(data.blockage);
                 currentlySeen = new GreasedRegion(data.currentlySeen);
-                floors = new GreasedRegion(data.floors);
                 seen = new GreasedRegion(data.seen);
             }
             else 
             {
                 blockage.remake(data.blockage);
                 currentlySeen.remake(data.currentlySeen);
-                floors.remake(data.floors);
                 seen.remake(data.seen);
             }
+            floors = data.floors;
         }
     }
     
@@ -191,15 +194,27 @@ public class MainApplication extends ApplicationAdapter {
 
 //    private static final DslJson<Object> dslJson = new DslJson<>(Settings.withRuntime().allowArrayFormat(true).includeServiceLoader());
 //    private static final JsonWriter writer = dslJson.newWriter();
-    private static final JsonCompressor json = new JsonCompressor(JsonWriter.OutputType.minimal);
+    private static final JsonConverter json = new JsonConverter(JsonWriter.OutputType.minimal);
     //    private FloatFilter sepia;
     private Data data;
     
-    public Data load() throws IllegalStateException {
+    public void load() throws IllegalStateException {
         String s = Gdx.app.getPreferences("SaveLoadDemo").getString("SavedState");
         if (s == null || s.isEmpty()) throw new IllegalStateException("Saved state is empty.");
         //Gdx.app.log("JSON", LZSPlus.decompress(s));
-        return json.fromJson(Data.class, s);
+        data.set(json.fromJson(Data.class, s));
+        filter.targetCb = data.cb;
+        filter.targetCr = data.cr;
+        display.clear();
+        if (display.glyphs.isEmpty()) {
+            pg = display.glyph('@', SColor.SAFETY_ORANGE, data.player.x, data.player.y); 
+        } 
+        else {
+            pg = display.glyphs.get(0);
+            pg.setPosition(display.worldX(data.player.x), display.worldY(data.player.y));
+        }
+        toCursor.clear();
+        awaitedMoves.clear();
     }
     public void keep(Data d)
     {
@@ -212,67 +227,10 @@ public class MainApplication extends ApplicationAdapter {
         rng = new GWTRNG();
         SColor.LIMITED_PALETTE[3] = SColor.DB_GRAPHITE;
         dungeonGen = new DungeonGenerator(bigWidth, bigHeight, rng);
-        data = new Data();
-        
-        try {
-            data.set(load());
-            filter.targetCb = data.cb;
-            filter.targetCr = data.cr;
-        } catch (Exception e) {
-//            Gdx.app.log("maybe_error", "Debug error check: ", e);
-//            Gdx.app.log("start", "Starting new data!");
-            FloatFilters.ColorizeFilter cf = new FloatFilters.ColorizeFilter(SColor.DAWNBRINGER_AURORA[rng.between(1, 256)]);
-            filter.targetCb = data.cb = cf.targetCb;
-            filter.targetCr = data.cr = cf.targetCr;
-            //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
-            //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
-            data.decoDungeon = dungeonGen.generate();
-            //getBareDungeon provides the simplest representation of the generated dungeon -- '#' for walls, '.' for floors.
-            data.bareDungeon = dungeonGen.getBareDungeon();
-            data.lineDungeon = DungeonUtility.hashesToLines(data.decoDungeon);
-
-            data.resistance = DungeonUtility.generateResistances(data.decoDungeon);
-            data.visible = new double[bigWidth][bigHeight];
-            // Here we fill a GreasedRegion so it stores the cells that contain a floor, the '.' char, as "on."
-            data.floors = new GreasedRegion(data.bareDungeon, '.');
-            //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
-            //creatures, and possibly a subclass for the player. The singleRandom() method on GreasedRegion finds one Coord
-            // in that region that is "on," or -1,-1 if there are no such cells. It takes an RNG object as a parameter, and
-            // if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
-            // don't seed the RNG, any valid cell should be possible.
-            data.player = data.floors.singleRandom(rng);
-            // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
-            FOV.reuseFOV(data.resistance, data.visible, data.player.x, data.player.y, 9.0, Radius.CIRCLE);//, (System.currentTimeMillis() & 0xFFFF) * 0x1p-4, 60.0);
-
-            // 0.01 is the upper bound (inclusive), so any Coord in visible that is more well-lit than 0.01 will _not_ be in
-            // the blockage Collection, but anything 0.01 or less will be in it. This lets us use blockage to prevent access
-            // to cells we can't see from the start of the move.
-            data.blockage = new GreasedRegion(data.visible, 0.0);
-            data.seen = data.blockage.not().copy();
-            data.currentlySeen = data.seen.copy();
-            data.blockage.fringe8way();
-            // prunedDungeon starts with the full lineDungeon, which includes features like water and grass but also stores
-            // all walls as box-drawing characters. The issue with using lineDungeon as-is is that a character like '┬' may
-            // be used because there are walls to the east, west, and south of it, even when the player is to the north of
-            // that cell and so has never seen the southern connecting wall, and would have no reason to know it is there.
-            // By calling LineKit.pruneLines(), we adjust prunedDungeon to hold a variant on lineDungeon that removes any
-            // line segments that haven't ever been visible. This is called again whenever seen changes. 
-            data.prunedDungeon = ArrayTools.copy(data.lineDungeon);
-            // We call pruneLines with an optional parameter here, LineKit.lightAlt, which will allow prunedDungeon to use
-            // the half-line chars "╴╵╶╷". These chars aren't supported by all fonts, but they are by the one we use here.
-            // The default is to use LineKit.light , which will replace '╴' and '╶' with '─' and '╷' and '╵' with '│'.
-            LineKit.pruneLines(data.lineDungeon, data.seen, LineKit.lightAlt, data.prunedDungeon);
-            data.colors = MapUtility.generateDefaultColorsFloat(data.decoDungeon);
-            data.bgColors = MapUtility.generateDefaultBGColorsFloat(data.decoDungeon);
-        }
-        // testing FloatFilter; YCbCrFilter multiplies the brightness (Y) and chroma (Cb, Cr) of a color 
-//        filter = new FloatFilters.YCbCrFilter(0.75f + rng.nextFloat(0.25f), 0.5f + rng.nextFloat(), 0.5f + rng.nextFloat());
-        
-//        sepia = new FloatFilters.ColorizeFilter(SColor.CLOVE_BROWN, 0.6f, 0.0f);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         // FilterBatch is exactly like the normal libGDX SpriteBatch except that it filters all colors used for text or
         // for tinting images.
-        
+
         batch = new FilterBatch(filter);
         StretchViewport mainViewport = new StretchViewport(gridWidth * cellWidth, gridHeight * cellHeight),
                 languageViewport = new StretchViewport(gridWidth * cellWidth, bonusHeight * cellHeight);
@@ -313,36 +271,63 @@ public class MainApplication extends ApplicationAdapter {
         // by default it can also handle some negative x and y values (-3 is the lowest it can efficiently store). You
         // can call Coord.expandPool() or Coord.expandPoolTo() if you need larger maps to be just as fast.
         cursor = Coord.get(-1, -1);
-        // here, we need to get a random floor cell to place the player upon, without the possibility of putting him
-        // inside a wall. There are a few ways to do this in SquidLib. The most straightforward way is to randomly
-        // choose x and y positions until a floor is found, but particularly on dungeons with few floor cells, this can
-        // have serious problems -- if it takes too long to find a floor cell, either it needs to be able to figure out
-        // that random choice isn't working and instead choose the first it finds in simple iteration, or potentially
-        // keep trying forever on an all-wall map. There are better ways! These involve using a kind of specific storage
-        // for points or regions, getting that to store only floors, and finding a random cell from that collection of
-        // floors. The two kinds of such storage used commonly in SquidLib are the "packed data" as short[] produced by
-        // CoordPacker (which use very little memory, but can be slow, and are treated as unchanging by CoordPacker so
-        // any change makes a new array), and GreasedRegion objects (which use slightly more memory, tend to be faster
-        // on almost all operations compared to the same operations with CoordPacker, and default to changing the
-        // GreasedRegion object when you call a method on it instead of making a new one). Even though CoordPacker
-        // sometimes has better documentation, GreasedRegion is generally a better choice; it was added to address
-        // shortcomings in CoordPacker, particularly for speed, and the worst-case scenarios for data in CoordPacker are
-        // no problem whatsoever for GreasedRegion. CoordPacker is called that because it compresses the information
-        // for nearby Coords into a smaller amount of memory. GreasedRegion is called that because it encodes regions,
-        // but is "greasy" both in the fatty-food sense of using more space, and in the "greased lightning" sense of
-        // being especially fast. Both of them can be seen as storing regions of points in 2D space as "on" and "off."
-
-
         //These need to have their positions set before adding any entities if there is an offset involved.
         //There is no offset used here, but it's still a good practice here to set positions early on.
 //        display.setPosition(gridWidth * cellWidth * 0.5f - display.worldX(player.x),
 //                gridHeight * cellHeight * 0.5f - display.worldY(player.y));
         display.setPosition(0f, 0f);
-
         //This is used to allow clicks or taps to take the player to the desired area.
         toCursor = new ArrayList<>(200);
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
         awaitedMoves = new ArrayList<>(200);
+
+        data = new Data();
+        
+        try {
+            load();
+        } catch (Exception e) {
+            e.printStackTrace();
+//            Gdx.app.log("maybe_error", "Debug error check: ", e);
+//            Gdx.app.log("start", "Starting new data!");
+            FloatFilters.ColorizeFilter cf = new FloatFilters.ColorizeFilter(SColor.DAWNBRINGER_AURORA[rng.between(1, 256)]);
+            filter.targetCb = data.cb = cf.targetCb;
+            filter.targetCr = data.cr = cf.targetCr;
+            //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
+            //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
+            data.decoDungeon = dungeonGen.generate();
+            data.bareDungeon = dungeonGen.getBareDungeon();
+            data.lineDungeon = DungeonUtility.hashesToLines(data.decoDungeon);
+            data.resistance = DungeonUtility.generateResistances(data.decoDungeon);
+            data.visible = new double[bigWidth][bigHeight];
+            // Here we fill a GreasedRegion so it stores the cells that contain a floor, the '.' char, as "on."
+            data.floors = new GreasedRegion(data.bareDungeon, '.').asCoords();
+            //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
+            //creatures, and possibly a subclass for the player. The singleRandom() method on GreasedRegion finds one Coord
+            // in that region that is "on," or -1,-1 if there are no such cells. It takes an RNG object as a parameter, and
+            // if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
+            // don't seed the RNG, any valid cell should be possible.
+            data.player = rng.getRandomElement(data.floors);
+            pg = display.glyph('@', SColor.SAFETY_ORANGE, data.player.x, data.player.y);
+            // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
+            FOV.reuseFOV(data.resistance, data.visible, data.player.x, data.player.y, 9.0, Radius.CIRCLE);//, (System.currentTimeMillis() & 0xFFFF) * 0x1p-4, 60.0);
+            data.blockage = new GreasedRegion(data.visible, 0.0);
+            data.seen = data.blockage.not().copy();
+            data.currentlySeen = data.seen.copy();
+            data.blockage.fringe8way();
+            // prunedDungeon starts with the full lineDungeon, which includes features like water and grass but also stores
+            // all walls as box-drawing characters. The issue with using lineDungeon as-is is that a character like '┬' may
+            // be used because there are walls to the east, west, and south of it, even when the player is to the north of
+            // that cell and so has never seen the southern connecting wall, and would have no reason to know it is there.
+            // By calling LineKit.pruneLines(), we adjust prunedDungeon to hold a variant on lineDungeon that removes any
+            // line segments that haven't ever been visible. This is called again whenever seen changes. 
+            data.prunedDungeon = ArrayTools.copy(data.lineDungeon);
+            // We call pruneLines with an optional parameter here, LineKit.lightAlt, which will allow prunedDungeon to use
+            // the half-line chars "╴╵╶╷". These chars aren't supported by all fonts, but they are by the one we use here.
+            // The default is to use LineKit.light , which will replace '╴' and '╶' with '─' and '╷' and '╵' with '│'.
+            LineKit.pruneLines(data.lineDungeon, data.seen, LineKit.lightAlt, data.prunedDungeon);
+            data.colors = MapUtility.generateDefaultColorsFloat(data.decoDungeon);
+            data.bgColors = MapUtility.generateDefaultBGColorsFloat(data.decoDungeon);
+        }
         //DijkstraMap is the pathfinding swiss-army knife we use here to find a path to the latest cursor position.
         //DijkstraMap.Measurement is an enum that determines the possibility or preference to enter diagonals. Here, the
         // MANHATTAN value is used, which means 4-way movement only, no diagonals possible. Alternatives are CHEBYSHEV,
@@ -351,7 +336,6 @@ public class MainApplication extends ApplicationAdapter {
         playerToCursor = new DijkstraMap(data.decoDungeon, DijkstraMap.Measurement.MANHATTAN);
         //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
         // player from all walkable cells in the dungeon.
-        playerToCursor.setGoal(data.player);
         playerToCursor.setGoal(data.player);
         // DijkstraMap.partialScan only finds the distance to get to a cell if that distance is less than some limit,
         // which is 13 here. It also won't try to find distances through an impassable cell, which here is the blockage
@@ -363,8 +347,6 @@ public class MainApplication extends ApplicationAdapter {
         //floats (a format SparseLayers can use throughout its API), using the colors for the cell with the same x and
         //y. By changing an item in SColor.LIMITED_PALETTE, we also change the color assigned by MapUtility to floors.
         bgColor = SColor.DARK_SLATE_GRAY;
-        //places the player as an '@' at his position in orange.
-        pg = display.glyph('@', SColor.SAFETY_ORANGE, data.player.x, data.player.y);
         
         // this is a big one.
         // SquidInput can be constructed with a KeyHandler (which just processes specific keypresses), a SquidMouse
@@ -444,27 +426,43 @@ public class MainApplication extends ApplicationAdapter {
                         filter.targetCr = data.cr = SColor.chromaROfFloat(rand);
                         break;
                     }
+                    case 'R':
+                    case 'r':
+                    {
+                        data.decoDungeon = dungeonGen.generate();
+                        data.bareDungeon = dungeonGen.getBareDungeon();
+                        data.lineDungeon = DungeonUtility.hashesToLines(data.decoDungeon);
+                        data.resistance = DungeonUtility.generateResistances(data.decoDungeon);
+                        data.floors = new GreasedRegion(data.bareDungeon, '.').asCoords();
+                        data.player = rng.getRandomElement(data.floors);
+                        display.clear();
+                        pg.setPosition(display.worldX(data.player.x), display.worldY(data.player.y));
+                        FOV.reuseFOV(data.resistance, data.visible, data.player.x, data.player.y, 9.0, Radius.CIRCLE);
+                        data.blockage.refill(data.visible, 0.0);
+                        data.seen.remake(data.blockage).not();
+                        data.currentlySeen.remake(data.seen);
+                        data.blockage.fringe8way();
+                        data.prunedDungeon = ArrayTools.copy(data.lineDungeon);
+                        LineKit.pruneLines(data.lineDungeon, data.seen, LineKit.lightAlt, data.prunedDungeon);
+                        data.colors = MapUtility.generateDefaultColorsFloat(data.decoDungeon);
+                        data.bgColors = MapUtility.generateDefaultBGColorsFloat(data.decoDungeon);
+                        playerToCursor.initialize(data.decoDungeon);
+                        playerToCursor.reset();
+                        playerToCursor.setGoal(data.player);
+                        playerToCursor.partialScan(null, 13, data.blockage, false);
+                        break;
+                    }
                     case 'L':
                     case 'l':
                     {
                         try {
-                            Data d = load();
-//                            if(d != null)
-//                            {
-//                                Gdx.app.log("data", d.toString());
-//                                Gdx.app.log("data", Float.toString(d.cb));
-//                                Gdx.app.log("data", Float.toString(d.cr));
-//                            }
-//                            else
-//                            {
-//                                Gdx.app.log("data", "data is null");
-//                            }
-                            data.set(d);
-                        } catch (Exception e) {
-//                            Gdx.app.log("data", "Failure!", e);
+                            load();
+                            playerToCursor.initialize(data.decoDungeon);
+                            playerToCursor.reset();
+                            playerToCursor.setGoal(data.player);
+                            playerToCursor.partialScan(null, 13, data.blockage, false);
+                        } catch (Exception ignored) {
                         }
-                        filter.targetCb = data.cb;
-                        filter.targetCr = data.cr;
                         break;
                     }
                     case 'K':
@@ -577,8 +575,10 @@ public class MainApplication extends ApplicationAdapter {
         if (newX >= 0 && newY >= 0 && newX < bigWidth && newY < bigHeight
                 && data.bareDungeon[newX][newY] != '#')
         {
-            display.slide(pg, data.player.x, data.player.y, newX, newY, DURATION, null);
-            data.player = data.player.translate(xmod, ymod);
+            if((xmod | ymod) != 0) {
+                display.slide(pg, data.player.x, data.player.y, newX, newY, DURATION, null);
+                data.player = data.player.translate(xmod, ymod);
+            }
             FOV.reuseFOV(data.resistance, data.visible, data.player.x, data.player.y, 9.0, Radius.CIRCLE);//, (System.currentTimeMillis() & 0xFFFF) * 0x1p-4, 60.0);
             // This is just like the constructor used earlier, but affects an existing GreasedRegion without making
             // a new one just for this movement.
