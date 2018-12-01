@@ -1,9 +1,6 @@
 package com.squidpony.saveload.demo;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
@@ -11,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.ArrayTools;
+import squidpony.StringKit;
 import squidpony.squidai.DijkstraMap;
 import squidpony.squidgrid.Direction;
 import squidpony.squidgrid.FOV;
@@ -56,7 +54,7 @@ public class MainApplication extends ApplicationAdapter {
         public char[][] decoDungeon, bareDungeon, lineDungeon, prunedDungeon;
         public float[][] colors, bgColors;
         public Coord player;
-        public Coord[] floors;
+//        public Coord[] floors;
         public float cb, cr;
         public double[][] resistance;
         public double[][] visible;
@@ -70,13 +68,15 @@ public class MainApplication extends ApplicationAdapter {
         // Here, we use a GreasedRegion to store all floors that the player can walk on, a small rim of cells just beyond
         // the player's vision that blocks pathfinding to areas we can't see a path to, and we also store all cells that we
         // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
-        public GreasedRegion blockage, seen, currentlySeen;
+        public GreasedRegion floors, blockage, seen, currentlySeen;
         
+        public long state;
         public Data()
         {
         }
 
         public void set(Data data) {
+            state = data.state;
             if(decoDungeon == null)
             {
                 decoDungeon = data.decoDungeon;
@@ -203,28 +203,29 @@ public class MainApplication extends ApplicationAdapter {
         if (s == null || s.isEmpty()) throw new IllegalStateException("Saved state is empty.");
         //Gdx.app.log("JSON", LZSPlus.decompress(s));
         data.set(json.fromJson(Data.class, s));
+        rng.setState(data.state);
         filter.targetCb = data.cb;
         filter.targetCr = data.cr;
         display.clear();
-        if (display.glyphs.isEmpty()) {
-            pg = display.glyph('@', SColor.SAFETY_ORANGE, data.player.x, data.player.y); 
-        } 
-        else {
-            pg = display.glyphs.get(0);
-            pg.setPosition(display.worldX(data.player.x), display.worldY(data.player.y));
-        }
+        for (int i = display.glyphs.size() - 1; i >= 0; i--) {
+            display.removeGlyph(display.glyphs.get(i));
+        }         
+        pg = display.glyph('@', SColor.SAFETY_ORANGE, data.player.x, data.player.y);
         toCursor.clear();
         awaitedMoves.clear();
     }
     public void keep(Data d)
     {
+        Gdx.app.log("before", StringKit.hex(d.state));
+        d.state = rng.getState();
+        Gdx.app.log("after", StringKit.hex(d.state));
         Gdx.app.getPreferences("SaveLoadDemo").putString("SavedState", json.toJson(d, Data.class)).flush();
     }
     @Override
     public void create () {
-//        Gdx.app.setLogLevel(Application.LOG_INFO);
+        Gdx.app.setLogLevel(Application.LOG_INFO);
         Coord.expandPoolTo(bigWidth, bigHeight);
-        rng = new GWTRNG();
+        rng = new GWTRNG(12345, 67890);
         SColor.LIMITED_PALETTE[3] = SColor.DB_GRAPHITE;
         dungeonGen = new DungeonGenerator(bigWidth, bigHeight, rng);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
@@ -282,13 +283,19 @@ public class MainApplication extends ApplicationAdapter {
         awaitedMoves = new ArrayList<>(200);
 
         data = new Data();
-        
+        data.state = rng.getState();
         try {
-            load();
-        } catch (Exception e) {
-            e.printStackTrace();
+            //load();
+        } catch (Exception e){
+            Gdx.app.log("Serialization", "load fail", e);
+        }
+        finally {
+//        } catch (Exception e) {
+//            e.printStackTrace();
 //            Gdx.app.log("maybe_error", "Debug error check: ", e);
 //            Gdx.app.log("start", "Starting new data!");
+            rng.setState(12345, 67890);
+            data.state = rng.getState();
             FloatFilters.ColorizeFilter cf = new FloatFilters.ColorizeFilter(SColor.DAWNBRINGER_AURORA[rng.between(1, 256)]);
             filter.targetCb = data.cb = cf.targetCb;
             filter.targetCr = data.cr = cf.targetCr;
@@ -300,13 +307,14 @@ public class MainApplication extends ApplicationAdapter {
             data.resistance = DungeonUtility.generateResistances(data.decoDungeon);
             data.visible = new double[bigWidth][bigHeight];
             // Here we fill a GreasedRegion so it stores the cells that contain a floor, the '.' char, as "on."
-            data.floors = new GreasedRegion(data.bareDungeon, '.').asCoords();
+            data.floors = new GreasedRegion(data.bareDungeon, '.');
             //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
             //creatures, and possibly a subclass for the player. The singleRandom() method on GreasedRegion finds one Coord
             // in that region that is "on," or -1,-1 if there are no such cells. It takes an RNG object as a parameter, and
             // if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
             // don't seed the RNG, any valid cell should be possible.
-            data.player = rng.getRandomElement(data.floors);
+            data.player = data.floors.singleRandom(rng);
+//            data.player = rng.getRandomElement(data.floors);
             pg = display.glyph('@', SColor.SAFETY_ORANGE, data.player.x, data.player.y);
             // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
             FOV.reuseFOV(data.resistance, data.visible, data.player.x, data.player.y, 9.0, Radius.CIRCLE);//, (System.currentTimeMillis() & 0xFFFF) * 0x1p-4, 60.0);
@@ -433,7 +441,9 @@ public class MainApplication extends ApplicationAdapter {
                         data.bareDungeon = dungeonGen.getBareDungeon();
                         data.lineDungeon = DungeonUtility.hashesToLines(data.decoDungeon);
                         data.resistance = DungeonUtility.generateResistances(data.decoDungeon);
-                        data.floors = new GreasedRegion(data.bareDungeon, '.').asCoords();
+//                        data.floors = new GreasedRegion(data.bareDungeon, '.').asCoords();
+//                        data.player = rng.getRandomElement(data.floors);
+                        data.floors = new GreasedRegion(data.bareDungeon, '.');
                         data.player = rng.getRandomElement(data.floors);
                         display.clear();
                         pg.setPosition(display.worldX(data.player.x), display.worldY(data.player.y));

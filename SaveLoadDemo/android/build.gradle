@@ -40,7 +40,6 @@ configurations { natives }
 dependencies {
   compile project(':core')
   compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-  api 'javax.json.bind:javax.json.bind-api:1.0'
 
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
