@@ -70,13 +70,14 @@ public class MainApplication extends ApplicationAdapter {
         // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
         public GreasedRegion floors, blockage, seen, currentlySeen;
         
-        public long state;
+        public int stateA, stateB;
         public Data()
         {
         }
 
         public void set(Data data) {
-            state = data.state;
+            stateA = data.stateA;
+            stateB = data.stateB;
             if(decoDungeon == null)
             {
                 decoDungeon = data.decoDungeon;
@@ -203,7 +204,8 @@ public class MainApplication extends ApplicationAdapter {
         if (s == null || s.isEmpty()) throw new IllegalStateException("Saved state is empty.");
         //Gdx.app.log("JSON", LZSPlus.decompress(s));
         data.set(json.fromJson(Data.class, s));
-        rng.setState(data.state);
+        rng.setStateA(data.stateA);
+        rng.setStateB(data.stateB);
         filter.targetCb = data.cb;
         filter.targetCr = data.cr;
         display.clear();
@@ -216,9 +218,13 @@ public class MainApplication extends ApplicationAdapter {
     }
     public void keep(Data d)
     {
-        Gdx.app.log("before", StringKit.hex(d.state));
-        d.state = rng.getState();
-        Gdx.app.log("after", StringKit.hex(d.state));
+        Gdx.app.log("before", StringKit.hex(d.stateA) + ',' + StringKit.hex(d.stateB));
+        d.stateA = rng.getStateA();
+        d.stateB = rng.getStateB();
+        Gdx.app.log("random result", Integer.toString(rng.nextInt()));
+        rng.setStateA(d.stateA);
+        rng.setStateB(d.stateB);
+        Gdx.app.log("after", StringKit.hex(d.stateA) + ',' + StringKit.hex(d.stateB));
         Gdx.app.getPreferences("SaveLoadDemo").putString("SavedState", json.toJson(d, Data.class)).flush();
     }
     @Override
@@ -283,7 +289,8 @@ public class MainApplication extends ApplicationAdapter {
         awaitedMoves = new ArrayList<>(200);
 
         data = new Data();
-        data.state = rng.getState();
+        rng.setStateA(data.stateA);
+        rng.setStateB(data.stateB);
         try {
             //load();
         } catch (Exception e){
@@ -295,7 +302,8 @@ public class MainApplication extends ApplicationAdapter {
 //            Gdx.app.log("maybe_error", "Debug error check: ", e);
 //            Gdx.app.log("start", "Starting new data!");
             rng.setState(12345, 67890);
-            data.state = rng.getState();
+            rng.setStateA(data.stateA);
+            rng.setStateB(data.stateB);
             FloatFilters.ColorizeFilter cf = new FloatFilters.ColorizeFilter(SColor.DAWNBRINGER_AURORA[rng.between(1, 256)]);
             filter.targetCb = data.cb = cf.targetCb;
             filter.targetCr = data.cr = cf.targetCr;
@@ -444,7 +452,7 @@ public class MainApplication extends ApplicationAdapter {
 //                        data.floors = new GreasedRegion(data.bareDungeon, '.').asCoords();
 //                        data.player = rng.getRandomElement(data.floors);
                         data.floors = new GreasedRegion(data.bareDungeon, '.');
-                        data.player = rng.getRandomElement(data.floors);
+                        data.player = data.floors.singleRandom(rng);
                         display.clear();
                         pg.setPosition(display.worldX(data.player.x), display.worldY(data.player.y));
                         FOV.reuseFOV(data.resistance, data.visible, data.player.x, data.player.y, 9.0, Radius.CIRCLE);
@@ -479,6 +487,12 @@ public class MainApplication extends ApplicationAdapter {
                     case 'k':
                     {
                         keep(data);
+                        break;
+                    }
+                    case 'P': // PURGE
+                    {
+                        Gdx.app.getPreferences("SaveLoadDemo").clear();
+                        Gdx.app.getPreferences("SaveLoadDemo").flush();
                         break;
                     }
                 }
