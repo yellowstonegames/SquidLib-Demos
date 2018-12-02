@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.ArrayTools;
-import squidpony.StringKit;
 import squidpony.squidai.DijkstraMap;
 import squidpony.squidgrid.Direction;
 import squidpony.squidgrid.FOV;
@@ -54,7 +53,6 @@ public class MainApplication extends ApplicationAdapter {
         public char[][] decoDungeon, bareDungeon, lineDungeon, prunedDungeon;
         public float[][] colors, bgColors;
         public Coord player;
-//        public Coord[] floors;
         public float cb, cr;
         public double[][] resistance;
         public double[][] visible;
@@ -194,16 +192,12 @@ public class MainApplication extends ApplicationAdapter {
     // This filters colors in a way we adjust over time, producing a sort of hue shift effect.
     // It can also be used to over- or under-saturate colors, change their brightness, or any combination of these. 
 
-//    private static final DslJson<Object> dslJson = new DslJson<>(Settings.withRuntime().allowArrayFormat(true).includeServiceLoader());
-//    private static final JsonWriter writer = dslJson.newWriter();
     private static final JsonConverter json = new JsonConverter(JsonWriter.OutputType.minimal);
-    //    private FloatFilter sepia;
     private Data data;
     
     public void load() throws IllegalStateException {
         String s = Gdx.app.getPreferences("SaveLoadDemo").getString("SavedState");
         if (s == null || s.isEmpty()) throw new IllegalStateException("Saved state is empty.");
-        //Gdx.app.log("JSON", LZSPlus.decompress(s));
         data.set(json.fromJson(Data.class, s));
         rng.setStateA(data.stateA);
         rng.setStateB(data.stateB);
@@ -219,13 +213,8 @@ public class MainApplication extends ApplicationAdapter {
     }
     public void keep(Data d)
     {
-        Gdx.app.log("before", StringKit.hex(d.stateA) + ',' + StringKit.hex(d.stateB));
         d.stateA = rng.getStateA();
         d.stateB = rng.getStateB();
-        Gdx.app.log("random result", Integer.toString(rng.nextInt()));
-        rng.setStateA(d.stateA);
-        rng.setStateB(d.stateB);
-        Gdx.app.log("after", StringKit.hex(d.stateA) + ',' + StringKit.hex(d.stateB));
         Gdx.app.getPreferences("SaveLoadDemo").putString("SavedState", json.toJson(d, Data.class)).flush();
     }
     @Override
@@ -290,18 +279,9 @@ public class MainApplication extends ApplicationAdapter {
         awaitedMoves = new ArrayList<>(200);
 
         data = new Data();
-        rng.setStateA(data.stateA);
-        rng.setStateB(data.stateB);
         try {
-            //load();
+            load();
         } catch (Exception e){
-            Gdx.app.log("Serialization", "load fail", e);
-        }
-        finally {
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Gdx.app.log("maybe_error", "Debug error check: ", e);
-//            Gdx.app.log("start", "Starting new data!");
             rng.setState(12345, 67890);
             rng.setStateA(data.stateA);
             rng.setStateB(data.stateB);
