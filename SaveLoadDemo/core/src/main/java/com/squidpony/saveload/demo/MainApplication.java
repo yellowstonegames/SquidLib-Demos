@@ -69,7 +69,7 @@ public class MainApplication extends ApplicationAdapter {
         // the player's vision that blocks pathfinding to areas we can't see a path to, and we also store all cells that we
         // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
         public GreasedRegion blockage, seen, currentlySeen;
-        public GreasedRegion2 floors;
+        public GreasedRegion floors;
         public int stateA, stateB;
         public Data()
         {
@@ -111,7 +111,7 @@ public class MainApplication extends ApplicationAdapter {
                 blockage = new GreasedRegion(data.blockage);
                 currentlySeen = new GreasedRegion(data.currentlySeen);
                 seen = new GreasedRegion(data.seen);
-                floors = new GreasedRegion2(data.floors);
+                floors = new GreasedRegion(data.floors);
             }
             else 
             {
@@ -316,7 +316,7 @@ public class MainApplication extends ApplicationAdapter {
             data.resistance = DungeonUtility.generateResistances(data.decoDungeon);
             data.visible = new double[bigWidth][bigHeight];
             // Here we fill a GreasedRegion so it stores the cells that contain a floor, the '.' char, as "on."
-            data.floors = new GreasedRegion2(data.bareDungeon, '.');
+            data.floors = new GreasedRegion(data.bareDungeon, '.');
             //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
             //creatures, and possibly a subclass for the player. The singleRandom() method on GreasedRegion finds one Coord
             // in that region that is "on," or -1,-1 if there are no such cells. It takes an RNG object as a parameter, and
@@ -452,7 +452,7 @@ public class MainApplication extends ApplicationAdapter {
                         data.resistance = DungeonUtility.generateResistances(data.decoDungeon);
 //                        data.floors = new GreasedRegion(data.bareDungeon, '.').asCoords();
 //                        data.player = rng.getRandomElement(data.floors);
-                        data.floors = new GreasedRegion2(data.bareDungeon, '.');
+                        data.floors = new GreasedRegion(data.bareDungeon, '.');
                         data.player = data.floors.singleRandom(rng);
                         display.clear();
                         pg.setPosition(display.worldX(data.player.x), display.worldY(data.player.y));
