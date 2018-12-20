@@ -15,6 +15,7 @@ import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.squidpony.samples.DetailedWorldMapDemo;
 import com.squidpony.samples.LocalMapDemo;
 import com.squidpony.samples.RotatingWorldMapDemo;
+import com.squidpony.samples.TsarDemo;
 
 /**
  * Created by Tommy Ettinger on 9/11/2018.
@@ -30,7 +31,7 @@ public class Sampler extends ApplicationAdapter {
         VisUI.setSkipGdxVersionCheck(true);
         VisUI.load();
         choices = new VisSelectBox<>();
-        choices.setItems(DetailedWorldMapDemo.config, RotatingWorldMapDemo.config, LocalMapDemo.config);
+        choices.setItems(TsarDemo.config, DetailedWorldMapDemo.config, RotatingWorldMapDemo.config, LocalMapDemo.config);
         button = new VisTextButton("Launch!", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
