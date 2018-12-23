@@ -2,8 +2,8 @@ buildscript {
   repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    jcenter()
   }
   dependencies {
     classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
@@ -30,9 +30,9 @@ subprojects {
   repositories {
     mavenLocal();
     mavenCentral()
-    jcenter()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } 
     maven { url 'https://jitpack.io' }
+    jcenter()
   }
 }
 
