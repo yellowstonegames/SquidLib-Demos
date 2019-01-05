@@ -59,8 +59,8 @@ public final class GWTRNG2 extends AbstractRNG implements IStatefulRNG, Serializ
         final int low = s0 * 31;
         stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
         stateB = (s1 << 13 | s1 >>> 19);
-        final long result = ((high << 28 | high >>> 4) + 0x9E3779BD);
-        return result << 32 ^ ((low << 28 | low >>> 4) + 0x9E3779BD);
+        return ((high << 28 | high >>> 4) + 0x9E3779BDL) << 32
+                | ((low << 28 | low >>> 4) + 0x9E3779BD & 0xFFFFFFFFL);
     }
 
     @Override
@@ -74,7 +74,6 @@ public final class GWTRNG2 extends AbstractRNG implements IStatefulRNG, Serializ
 
     @Override
     public final double nextDouble() {
-        Gdx.app.log("in", "a " + stateA + ", b " + stateB);
         int s0 = stateA;
         int s1 = stateB ^ s0;
         final int high = s0 * 31;
@@ -83,11 +82,9 @@ public final class GWTRNG2 extends AbstractRNG implements IStatefulRNG, Serializ
         final int low = s0 * 31;
         stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
         stateB = (s1 << 13 | s1 >>> 19);
-        final long result = ((high << 28 | high >>> 4) + 0x9E3779BD);
-        final double out = ((result << 32 ^ ((low << 28 | low >>> 4) + 0x9E3779BD))
-                & 0x1fffffffffffffL) * 0x1p-53;
-        Gdx.app.log("out", "a " + stateA + ", b " + stateB + ", result " + out);
-        return out;
+        return  ((((high << 28 | high >>> 4) + 0x9E3779BDL) << 32
+                | ((low << 28 | low >>> 4) + 0x9E3779BD & 0xFFFFFFFFL))
+                & 0x1FFFFFFFFFFFFFL) * 0x1p-53;
     }
 
     @Override
@@ -97,7 +94,11 @@ public final class GWTRNG2 extends AbstractRNG implements IStatefulRNG, Serializ
         final int result = s0 * 31;
         stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
         stateB = (s1 << 13 | s1 >>> 19);
-        return ((result << 28 | result >>> 4) + 0x9E3779BD & 0xffffff) * 0x1p-24f;
+        return ((result << 28 | result >>> 4) + 0x9E3779BD & 0xFFFFFF) * 0x1p-24f;
+    }
+    @Override
+    public int nextInt(int bound) {
+        return (int) ((bound * (nextInt() & 0xFFFFFFFFL)) >>> 32) & ~(bound >> 31);
     }
 
     @Override

@@ -6,10 +6,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.*;
 
 /**
  * Created by Tommy Ettinger on 10/24/2016.
@@ -18,6 +15,8 @@ public abstract class GwtBareApp implements EntryPoint, Application {
     private ObjectMap<String, Preferences> prefs = new ObjectMap<String, Preferences>();
     public GwtApplicationConfiguration config;
     public VerticalPanel root;
+    public TextArea log = null;
+
     private ApplicationLogger applicationLogger;
     private int logLevel = LOG_ERROR;
     public abstract void start();
@@ -25,7 +24,7 @@ public abstract class GwtBareApp implements EntryPoint, Application {
     @Override
     public void onModuleLoad () {
         this.config = getConfig();
-        applicationLogger = new GwtApplicationLogger(this.config.log);
+        applicationLogger = new GwtApplicationLogger2(this.config.log);
         Element element = Document.get().getElementById("embed-html");
         if (element == null) {
             VerticalPanel panel = new VerticalPanel();
@@ -232,5 +231,9 @@ public abstract class GwtBareApp implements EntryPoint, Application {
     @Override
     public ApplicationLogger getApplicationLogger() {
         return applicationLogger;
+    }
+
+    public VerticalPanel getRootPanel() {
+        return root;
     }
 }

@@ -1,16 +1,15 @@
 package com.github.tommyettinger.bench.gwt;
-
+import squidpony.annotation.GwtIncompatible;
+import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.badlogic.gdx.backends.gwt.GwtBareApp;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.*;
 import squidpony.FakeLanguageGen;
-import squidpony.annotation.GwtIncompatible;
 import squidpony.squidmath.*;
 
 
@@ -36,7 +35,7 @@ public class GwtLauncher extends GwtBareApp {
      */
     @Override
     public void start() {
-        Gdx.app.setLogLevel(LOG_INFO);
+//        Gdx.app.setLogLevel(LOG_INFO);
         VerticalPanel vp = new VerticalPanel();
         vp.setPixelSize(600, 780);
         vp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
@@ -66,7 +65,7 @@ public class GwtLauncher extends GwtBareApp {
         Gdx.app = new HeadlessApplication(new ApplicationAdapter() {
             @Override
             public void create() {
-                Gdx.app.setLogLevel(LOG_INFO);
+//                Gdx.app.setLogLevel(LOG_INFO);
                 srng.setState(123L);
                 System.out.println(FakeLanguageGen.SIMPLISH.sentence(srng, 3, 6));
                 srng.setState(123L);
