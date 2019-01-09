@@ -2,7 +2,7 @@ package com.squidpony.demo.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.squidpony.demo.NorthernLights;
+import com.squidpony.shader.NorthernLights;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
