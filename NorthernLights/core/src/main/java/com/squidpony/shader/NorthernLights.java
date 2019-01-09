@@ -19,7 +19,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private ShaderProgram shader;
 
 	private long startTime;
-	private int seed;
+	private float seed;
 	private int width, height;
 
 	@Override public void create () {
@@ -42,8 +42,8 @@ public class NorthernLights extends ApplicationAdapter {
 
 		long state = TimeUtils.nanoTime() - startTime;
 		// Sarong's DiverRNG.determine(), may be used in SquidLib later.
-		seed = (int) (((state = ((state << ((state & 31) + 5)) ^ state ^ 0xDB4F0B9175AE2165L) * 0xD1B54A32D192ED03L)
-			^ (state >>> ((state >>> 60) + 16))) * 0x369DEA0F31A53F85L >>> 32);
+		seed = (((state = ((state << ((state & 31) + 5)) ^ state ^ 0xDB4F0B9175AE2165L) * 0xD1B54A32D192ED03L)
+			^ (state >>> ((state >>> 60) + 16))) * 0x369DEA0F31A53F85L >>> 32) * 0x1.5bf0a8p-20f;
 
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
@@ -54,14 +54,32 @@ public class NorthernLights extends ApplicationAdapter {
 		this.height = height;
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
 	}
+	private static float swayRandomized(int seed, float value)
+	{
+		final int floor = value >= 0f ? (int) value : (int) value - 1;
+		final float start = (((seed += floor * 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529)) * 0x4.ffffffp-31f,
+				end = (((seed += 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529)) * 0x4.ffffffp-31f;
+		value -= floor;
+		value *= value * (3f - 2f * value);
+		return (1f - value) * start + value * end;
+	}
 
 	@Override public void render () {
-		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
-
+		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x3p-14f;
 		shader.begin();
-		shader.setUniformi("seed", seed);
-		shader.setUniformi("tm", (int) TimeUtils.timeSinceMillis(startTime));
+		shader.setUniformf("seed", seed);
+		shader.setUniformf("tm", ftm);
+		shader.setUniformf("s",
+				swayRandomized(0x9E3779B9, ftm - 1.11f),
+				swayRandomized(0xD1B54A32, ftm + 1.41f),
+				swayRandomized(0xE19B01AA, ftm + 2.61f));
+		shader.setUniformf("c",
+				swayRandomized(0xC13FA9A9, ftm - 1.11f),
+				swayRandomized(0xDB4F0B91, ftm + 1.41f),
+				swayRandomized(0xE60E2B72, ftm + 2.61f));
 		shader.end();
 
 		batch.begin();

@@ -1,4 +1,4 @@
-#version 140
+#version 120
 #ifdef GL_ES
 #define LOWP lowp
 precision mediump float;
@@ -10,57 +10,39 @@ varying LOWP vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 
-uniform int seed;
-uniform int tm;
-
-float swayRandomized (int seed, float value) {
-  int fl = int(floor(value));
-  const float magic = 4.656612874161595E-10;//1.1920930376163766E-7;//0.00000000046566125955216364 * 2.0;
-  int shift = seed;
-  shift += fl * 0x6C8D;
-  float start = ((shift ^ (shift << 11 | (shift >> 21 & 0x7FF))) * (shift | 0xA529)) * magic;
-  shift += 0x6C8D;
-  float end = ((shift ^ (shift << 11 | (shift >> 21 & 0x7FF))) * (shift | 0xA529)) * magic;
-  value -= fl;
-  value *= value * (3.0 - 2.0 * value);
-  return (1.0 - value) * start + value * end;
+uniform float seed;
+uniform float tm;
+uniform vec3 s;
+uniform vec3 c;
+float swayRandomized(float seed, float value)
+{
+    float f = floor(value);
+    float start = sin((cos(f * seed) + sin(f * 1024.)) * 345. + seed);
+    float end   = sin((cos((f+1.) * seed) + sin((f+1.) * 1024.)) * 345. + seed);
+    return mix(start, end, smoothstep(0., 1., value - f));
 }
 
-float swayTight (float value) {
-  return sin((value + 0.25) * 3.14159265358979323846) * 0.5 + 0.5;
-}
-
-float cosmic (float c0, float c1, float c2) {
-  float sum = swayRandomized(seed, c2 + c0);
-  sum += swayRandomized(seed, sum + c0 + c1);
-  sum += swayRandomized(seed, sum + c1 + c2);
-  return sum * 0.33333333333 + 0.5;
+float cosmic(float seed, vec3 con)
+{
+    float sum = swayRandomized(seed, con.z + con.x);
+    sum = sum + swayRandomized(seed, con.x + con.y + sum);
+    sum = sum + swayRandomized(seed, con.y + con.z + sum);
+    return sum * 0.3333333333 + 0.5;
 }
 
 void main() {
-  float magic = 0.00018310546875;
-  float ftm = tm * magic;
-  float s0 = swayRandomized(0x9E3779B9, ftm - 1.11) * 0.025;
-  float c0 = swayRandomized(0xC13FA9A9, ftm - 1.11) * 0.025;
-  float s1 = swayRandomized(0xD1B54A32, ftm + 1.41) * 0.025;
-  float c1 = swayRandomized(0xDB4F0B91, ftm + 1.41) * 0.025;
-  float s2 = swayRandomized(0xE19B01AA, ftm + 2.61) * 0.025;
-  float c2 = swayRandomized(0xE60E2B72, ftm + 2.61) * 0.025;
-  float conn0, conn1, conn2;
-  
-  float x = gl_FragCoord.x;
-  float y = gl_FragCoord.y;
-  conn0 = tm * (0.0004375) + x * c0 - y * s0;
-  conn1 = tm * (0.0005625) - x * c1 + y * s1;
-  conn2 = tm * (0.0008125) + x * c2 + y * s2;
-
-  conn0 = cosmic(conn0, conn1, conn2);
-  conn1 = cosmic(conn0, conn1, conn2);
-  conn2 = cosmic(conn0, conn1, conn2);
-
-  float r = swayTight(conn0);
-  float g = swayTight(conn1);
-  float b = swayTight(conn2);
-
-  gl_FragColor = vec4(r, g, b, 1.0);
+  //vec3 s = vec3(swayRandomized(-16405.31527, tm - 1.11),
+  //              swayRandomized(-77664.8142, tm + 1.41),
+  //              swayRandomized(-50993.5190, tm + 2.61)) * 5.;
+  //vec3 c = vec3(swayRandomized(-10527.92407, tm - 1.11),
+  //              swayRandomized(-61557.6687, tm + 1.41),
+  //              swayRandomized(-43527.8990, tm + 2.61)) * 5.;
+  vec3 con = vec3(0.0004375, 0.0005625, 0.0008125) * tm
+  + c * v_texCoords.x + s * v_texCoords.y;
+  // + c * gl_FragCoord.x + s * gl_FragCoord.y;
+  con.x = cosmic(seed, con);
+  con.y = cosmic(seed, con);
+  con.z = cosmic(seed, con);
+    
+  gl_FragColor = vec4(sin(con * 3.14159265) * 0.5 + 0.5,1.0);
 }

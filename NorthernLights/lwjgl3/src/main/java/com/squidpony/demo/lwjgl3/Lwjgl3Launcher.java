@@ -18,6 +18,7 @@ public class Lwjgl3Launcher {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("NorthernLights");
         configuration.setWindowedMode(640, 480);
+        configuration.useVsync(false);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
     }
