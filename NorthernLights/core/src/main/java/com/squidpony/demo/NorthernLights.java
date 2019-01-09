@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class NorthernLights extends ApplicationAdapter {
-    private long seed = 42L;
+    private int seed;
     private SpriteBatch batch;
     private Texture tiny;
     private long startTime;
@@ -19,6 +19,10 @@ public class NorthernLights extends ApplicationAdapter {
     public void create() {
         super.create();
         startTime = TimeUtils.millis();
+        long state = TimeUtils.nanoTime() - startTime;
+        // Sarong's DiverRNG.determine(), may be used in SquidLib later.
+        seed = (int) (((state = ((state << ((state & 31) + 5)) ^ state ^ 0xDB4F0B9175AE2165L) * 0xD1B54A32D192ED03L)
+                ^ (state >>> ((state >>> 60) + 16))) * 0x369DEA0F31A53F85L >>> 32);
         Gdx.gl.glDisable(GL20.GL_BLEND);
         batch = new SpriteBatch();
         batch.disableBlending();
@@ -35,11 +39,11 @@ public class NorthernLights extends ApplicationAdapter {
         this.width = width;
         this.height = height;
     }
-    public static float swayRandomized(long seed, float value)
+    public static float swayRandomized(int seed, float value)
     {
-        final long floor = value >= 0f ? (long) value : (long) value - 1L;
-        final float start = (((seed += floor * 0x6C8E9CF570932BD5L) ^ (seed >>> 25)) * (seed | 0xA529L)) * 0x0.ffffffp-63f,
-                end = (((seed += 0x6C8E9CF570932BD5L) ^ (seed >>> 25)) * (seed | 0xA529L)) * 0x0.ffffffp-63f;
+        final int floor = value >= 0f ? (int) value : (int) value - 1;
+        final float start = (((seed += floor * 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529)) * 0x0.ffffffp-31f,
+                end = (((seed += 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529)) * 0x0.ffffffp-31f;
         value -= floor;
         value *= value * (3f - 2f * value);
         return (1f - value) * start + value * end;
@@ -72,21 +76,21 @@ public class NorthernLights extends ApplicationAdapter {
     @Override
     public void render() {
         super.render();
-        final long tm = TimeUtils.timeSinceMillis(startTime);
-        final float ftm = tm * 0x3p-13f;
-        final float s0 = swayRandomized(0x9E3779B97F4A7C15L, ftm - 1.11f) * 0.025f;
-        final float c0 = swayRandomized(0xC13FA9A902A6328FL, ftm - 1.11f) * 0.025f;
-        final float s1 = swayRandomized(0xD1B54A32D192ED03L, ftm + 1.41f) * 0.025f;
-        final float c1 = swayRandomized(0xDB4F0B9175AE2165L, ftm + 1.41f) * 0.025f;
-        final float s2 = swayRandomized(0xE19B01AA9D42C633L, ftm + 2.61f) * 0.025f;
-        final float c2 = swayRandomized(0xE60E2B722B53AEEBL, ftm + 2.61f) * 0.025f;
+        final int tm = (int) TimeUtils.timeSinceMillis(startTime);
+        final float ftm = tm * 0x3p-14f;
+        final float s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0.025f;
+        final float c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0.025f;
+        final float s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0.025f;
+        final float c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0.025f;
+        final float s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0.025f;
+        final float c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0.025f;
         float conn0, conn1, conn2;
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                conn0 = tm * (0x1.cac084p-11f) + x * c0 - y * s0;
-                conn1 = tm * (0x1.26e978p-10f) - x * c1 + y * s1;
-                conn2 = tm * (0x1.a9fbe8p-10f) + x * c2 + y * s2;
+                conn0 = tm * (0x1.cac084p-12f) + x * c0 - y * s0;
+                conn1 = tm * (0x1.26e978p-11f) - x * c1 + y * s1;
+                conn2 = tm * (0x1.a9fbe8p-11f) + x * c2 + y * s2;
 
                 conn0 = cosmic(conn0, conn1, conn2);
                 conn1 = cosmic(conn0, conn1, conn2);
