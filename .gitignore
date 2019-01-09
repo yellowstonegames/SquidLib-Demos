@@ -26,5 +26,5 @@ target/
 .idea/
 .settings/
 
-
+**/.gradle/
 *.so
