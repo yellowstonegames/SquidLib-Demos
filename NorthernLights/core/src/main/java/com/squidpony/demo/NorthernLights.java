@@ -38,6 +38,7 @@ public class NorthernLights extends ApplicationAdapter {
         super.resize(width, height);
         this.width = width;
         this.height = height;
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
     }
     public static float swayRandomized(int seed, float value)
     {
@@ -88,9 +89,9 @@ public class NorthernLights extends ApplicationAdapter {
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                conn0 = tm * (0x1.cac084p-12f) + x * c0 - y * s0;
-                conn1 = tm * (0x1.26e978p-11f) - x * c1 + y * s1;
-                conn2 = tm * (0x1.a9fbe8p-11f) + x * c2 + y * s2;
+                conn0 = tm * (4.375E-4f) + x * c0 - y * s0;
+                conn1 = tm * (5.625E-4f) - x * c1 + y * s1;
+                conn2 = tm * (8.125E-4f) + x * c2 + y * s2;
 
                 conn0 = cosmic(conn0, conn1, conn2);
                 conn1 = cosmic(conn0, conn1, conn2);
