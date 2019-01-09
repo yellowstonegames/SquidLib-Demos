@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.8.0//EN" "https://gwt.googlesource.com/gwt/+/2.8.0/distro-source/core/src/gwt-module.dtd">
+<module rename-to="html">
+    <inherits name="GdxDefinition" />
+    <collapse-all-properties />
+    <set-configuration-property name="user.home" value="" />
+    <set-configuration-property name="gdx.assetpath" value="src/main/assets" />
+</module>
