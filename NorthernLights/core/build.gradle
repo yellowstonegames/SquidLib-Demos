@@ -4,4 +4,3 @@ eclipse.project.name = appName + '-core'
 dependencies {
   compile "com.badlogicgames.gdx:gdx:$gdxVersion"
 }
-        

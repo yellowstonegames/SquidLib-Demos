@@ -1,9 +1,9 @@
 apply plugin: 'application'
 
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.squidpony.demo.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
 sourceCompatibility = 1.7
-sourceSets.main.resources.srcDirs += [ file('../assets').absolutePath ]
 
 dependencies {
   compile project(':core')

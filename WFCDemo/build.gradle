@@ -9,8 +9,6 @@ buildscript {
   dependencies {
     classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
-    classpath "com.android.tools.build:gradle:$androidPluginVersion"
-    classpath "com.mobidevelop.robovm:robovm-gradle-plugin:$robovmVersion"
   }
 }
 
@@ -19,14 +17,18 @@ allprojects {
   apply plugin: 'idea'
 }
 
-configure(subprojects - project(':android')) {
+configure(subprojects) {
   apply plugin: 'java'
   sourceCompatibility = 1.7
+  compileJava {
+    options.fork = true
+    options.incremental = true
+  }
 }
 
 subprojects {
   version = '0.0.1-SNAPSHOT'
-  ext.appName = 'NorthernLights'
+  ext.appName = 'WFCDemo'
   repositories {
     mavenLocal()
     mavenCentral()
