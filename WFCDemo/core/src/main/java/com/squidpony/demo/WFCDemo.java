@@ -10,32 +10,18 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import squidpony.StringKit;
 import squidpony.squidgrid.MimicWFC;
 import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidmath.GWTRNG;
 
-/**
- * This is a small, not-overly-simple demo that presents some important features of SquidLib and shows a faster,
- * cleaner, and more recently-introduced way of displaying the map and other text. Features include dungeon map
- * generation, field of view, pathfinding (to the mouse position), continuous noise (used for a wavering torch effect),
- * language generation/ciphering, a colorful glow effect, and ever-present random number generation (with a seed).
- * You can increase the size of the map on most target platforms (but GWT struggles with large... anything) by
- * changing gridHeight and gridWidth to affect the visible area or bigWidth and bigHeight to adjust the size of the
- * dungeon you can move through, with the camera following your '@' symbol.
- * <br>
- * The assets folder of this project, if it was created with SquidSetup, will contain the necessary font files (just one
- * .fnt file and one .png are needed, but many more are included by default). You should move any font files you don't
- * use out of the assets directory when you produce a release JAR, APK, or GWT build.
- */
 public class WFCDemo extends ApplicationAdapter {
     public SpriteBatch batch;
     
     private GWTRNG rng;
     /** In number of cells */
-    private static final int gridWidth = 45;
+    private static final int gridWidth = 50;
     /** In number of cells */
-    private static final int gridHeight = 31;
+    private static final int gridHeight = 50;
 
     /** The pixel width of a cell */
     private static final int cellWidth = 16;
@@ -51,7 +37,7 @@ public class WFCDemo extends ApplicationAdapter {
     @Override
     public void create () {
         // gotta have a random number generator. We can seed a GWTRNG with any long we want, or even a String.
-        rng = new GWTRNG("Welcome to SquidLib!");
+        rng = new GWTRNG();//"Welcome to SquidLib!");
         System.out.println(rng.getState());
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
@@ -94,16 +80,15 @@ public class WFCDemo extends ApplicationAdapter {
     }
     public void remake()
     {
-        tiledMap = loader.load("buch-reduced.tmx");
+        tiledMap = loader.load("testingterrain.tmx");
         TiledMapTileLayer ground = (TiledMapTileLayer) tiledMap.getLayers().get(0);
-        TiledMapTileLayer fringe = (TiledMapTileLayer) tiledMap.getLayers().get(1);
 
         int[][] grid = new int[ground.getWidth()][ground.getHeight()];
 
         for (int x = 0; x < ground.getWidth(); x++) {
             for (int y = 0; y < ground.getHeight(); y++) {
-                TiledMapTileLayer.Cell g = ground.getCell(x, y), f = fringe.getCell(x, y);
-                grid[x][y] = (g == null ? 0xFFFF : g.getTile().getId()) << 16 | (f == null ? 0xFFFF : f.getTile().getId());
+                TiledMapTileLayer.Cell g = ground.getCell(x, y);
+                grid[x][y] = (g == null ? 0xFFFF : g.getTile().getId());
             }
         }
 
@@ -111,42 +96,84 @@ public class WFCDemo extends ApplicationAdapter {
         int i = 0;
         while (!wfc.run(rng, 1000000)) { System.out.println((i += 1000000) + " attempts failed."); }
         int[][] grid2 = wfc.result();
-        
+
         for (int y = 0; y < grid2[0].length; y++) {
             for (int x = 0; x < grid2.length; x++) {
-                System.out.print(StringKit.hex(grid2[x][y]));
-                System.out.print(" ");
-                if(grid2[x][y] >>> 16 != 0xFFFF) 
+//                System.out.print(StringKit.hex(grid2[x][y]));
+//                System.out.print(" ");
+                if(grid2[x][y] != 0xFFFF)
                 {
                     if(ground.getCell(x, y) == null)
                     {
                         TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
-                        c.setTile(tiledMap.getTileSets().getTile(grid2[x][y] >>> 16));
+                        c.setTile(tiledMap.getTileSets().getTile(grid2[x][y]));
                         ground.setCell(x, y, c);
                     }
                     else
-                        ground.getCell(x, y).setTile(tiledMap.getTileSets().getTile(grid2[x][y] >>> 16));
+                        ground.getCell(x, y).setTile(tiledMap.getTileSets().getTile(grid2[x][y]));
                 }
                 else
                     ground.setCell(x, y, null);
-                if((grid2[x][y] & 0xFFFF) != 0xFFFF)
-                {
-                    if(fringe.getCell(x, y) == null)
-                    {
-                        TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
-                        c.setTile(tiledMap.getTileSets().getTile(grid2[x][y] & 0xFFFF));
-                        fringe.setCell(x, y, c);
-                    }
-                    else 
-                        fringe.getCell(x, y).setTile(tiledMap.getTileSets().getTile(grid2[x][y] & 0xFFFF));
-                }
-                else
-                    fringe.setCell(x, y, null);
             }
-            System.out.println();
+//            System.out.println();
         }
 
     }
+//    public void remakeSwamp()
+//    {
+//        tiledMap = loader.load("buch-reduced.tmx");
+//        TiledMapTileLayer ground = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+//        TiledMapTileLayer fringe = (TiledMapTileLayer) tiledMap.getLayers().get(1);
+//
+//        int[][] grid = new int[ground.getWidth()][ground.getHeight()];
+//
+//        for (int x = 0; x < ground.getWidth(); x++) {
+//            for (int y = 0; y < ground.getHeight(); y++) {
+//                TiledMapTileLayer.Cell g = ground.getCell(x, y), f = fringe.getCell(x, y);
+//                grid[x][y] = (g == null ? 0xFFFF : g.getTile().getId()) << 16 | (f == null ? 0xFFFF : f.getTile().getId());
+//            }
+//        }
+//
+//        MimicWFC wfc = new MimicWFC(grid, 2, ground.getWidth(), ground.getHeight(), false, false, 1, 0);
+//        int i = 0;
+//        while (!wfc.run(rng, 1000000)) { System.out.println((i += 1000000) + " attempts failed."); }
+//        int[][] grid2 = wfc.result();
+//
+//        for (int y = 0; y < grid2[0].length; y++) {
+//            for (int x = 0; x < grid2.length; x++) {
+//                System.out.print(StringKit.hex(grid2[x][y]));
+//                System.out.print(" ");
+//                if(grid2[x][y] >>> 16 != 0xFFFF)
+//                {
+//                    if(ground.getCell(x, y) == null)
+//                    {
+//                        TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
+//                        c.setTile(tiledMap.getTileSets().getTile(grid2[x][y] >>> 16));
+//                        ground.setCell(x, y, c);
+//                    }
+//                    else
+//                        ground.getCell(x, y).setTile(tiledMap.getTileSets().getTile(grid2[x][y] >>> 16));
+//                }
+//                else
+//                    ground.setCell(x, y, null);
+//                if((grid2[x][y] & 0xFFFF) != 0xFFFF)
+//                {
+//                    if(fringe.getCell(x, y) == null)
+//                    {
+//                        TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
+//                        c.setTile(tiledMap.getTileSets().getTile(grid2[x][y] & 0xFFFF));
+//                        fringe.setCell(x, y, c);
+//                    }
+//                    else
+//                        fringe.getCell(x, y).setTile(tiledMap.getTileSets().getTile(grid2[x][y] & 0xFFFF));
+//                }
+//                else
+//                    fringe.setCell(x, y, null);
+//            }
+//            System.out.println();
+//        }
+//
+//    }
     @Override
     public void render () {
         // standard clear the background routine for libGDX
@@ -161,10 +188,10 @@ public class WFCDemo extends ApplicationAdapter {
         super.resize(width, height);
         tiledMap.getLayers().get(0).setOffsetX(width * -0.5f);
         tiledMap.getLayers().get(0).setOffsetY(height * 0.5f);
-        tiledMap.getLayers().get(1).setOffsetX(width * -0.5f);
-        tiledMap.getLayers().get(1).setOffsetY(height * 0.5f);
+//        tiledMap.getLayers().get(1).setOffsetX(width * -0.5f);
+//        tiledMap.getLayers().get(1).setOffsetY(height * 0.5f);
         tiledMap.getLayers().get(0).invalidateRenderOffset();
-        tiledMap.getLayers().get(1).invalidateRenderOffset();
+//        tiledMap.getLayers().get(1).invalidateRenderOffset();
 
     }
 }
