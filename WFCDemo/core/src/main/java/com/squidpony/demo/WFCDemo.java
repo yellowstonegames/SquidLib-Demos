@@ -1,7 +1,6 @@
 package com.squidpony.demo;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import squidpony.squidgrid.MimicWFC;
-import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidmath.GWTRNG;
 
 public class WFCDemo extends ApplicationAdapter {
@@ -27,7 +25,7 @@ public class WFCDemo extends ApplicationAdapter {
     private static final int cellWidth = 16;
     /** The pixel height of a cell */
     private static final int cellHeight = 16;
-    private SquidInput input;
+    private InputProcessor input;
     private OrthographicCamera camera;
     
     private TiledMap tiledMap;
@@ -52,30 +50,22 @@ public class WFCDemo extends ApplicationAdapter {
         //camera.translate(gridWidth * cellWidth * -0.5f, gridHeight * cellHeight * -0.5f);
         renderer.setView(camera);
 
-        input = new SquidInput(new SquidInput.KeyHandler() {
+        input = new InputAdapter(){
             @Override
-            public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
-                switch (key)
-                {
-                    case 'Q':
-                    case 'q':
-                    case SquidInput.ESCAPE:
-                    {
+            public boolean keyUp(int keycode) {
+                switch (keycode) {
+                    case Input.Keys.Q:
+                    case Input.Keys.ESCAPE:
                         Gdx.app.exit();
                         break;
-                    }
-                    default:
-                    {
-                        System.out.println("REMAKING");
+                    default: 
                         remake();
                         renderer.setMap(tiledMap);
                         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-                    }
                 }
+                return true;
             }
-        });
-        input.setRepeatGap(Long.MAX_VALUE);
-        //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
+        };
         Gdx.input.setInputProcessor(input);
     }
     public void remake()
@@ -179,7 +169,6 @@ public class WFCDemo extends ApplicationAdapter {
         // standard clear the background routine for libGDX
         Gdx.gl.glClearColor(0, 0, 0, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        if(input.hasNext()) input.next();
         renderer.render();
     }
 

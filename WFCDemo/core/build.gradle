@@ -3,8 +3,8 @@ eclipse.project.name = appName + '-core'
 
 dependencies {
   compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-  compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
   compile "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
   compile "com.github.tommyettinger:regexodus:$regExodusVersion"
+  compile "com.github.tommyettinger:jagd:0.1-SNAPSHOT"
 }
         
