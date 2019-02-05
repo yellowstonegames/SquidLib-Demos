@@ -9,17 +9,17 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import squidpony.squidgrid.MimicWFC;
-import squidpony.squidmath.GWTRNG;
+import jagd.MimicWFC;
+import jagd.RNG;
 
 public class WFCDemo extends ApplicationAdapter {
     public SpriteBatch batch;
     
-    private GWTRNG rng;
+    private RNG rng;
     /** In number of cells */
-    private static final int gridWidth = 50;
+    private static final int gridWidth = 60;
     /** In number of cells */
-    private static final int gridHeight = 50;
+    private static final int gridHeight = 60;
 
     /** The pixel width of a cell */
     private static final int cellWidth = 16;
@@ -27,16 +27,16 @@ public class WFCDemo extends ApplicationAdapter {
     private static final int cellHeight = 16;
     private InputProcessor input;
     private OrthographicCamera camera;
-    
+    private TiledMap originalMap;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
     private TmxMapLoader loader;
     private ScreenViewport viewport;
     @Override
     public void create () {
-        // gotta have a random number generator. We can seed a GWTRNG with any long we want, or even a String.
-        rng = new GWTRNG();//"Welcome to SquidLib!");
-        System.out.println(rng.getState());
+        // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
+        rng = new RNG();//"Welcome to SquidLib!");
+        System.out.println(rng.state);
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
@@ -45,6 +45,7 @@ public class WFCDemo extends ApplicationAdapter {
         //viewport.setScreenBounds(gridWidth * cellWidth / -4, gridHeight * cellHeight / -4, gridWidth * cellWidth, gridHeight * cellHeight);
         
         loader = new TmxMapLoader();
+        originalMap = loader.load("testingterrain.tmx");
         remake();
         renderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         //camera.translate(gridWidth * cellWidth * -0.5f, gridHeight * cellHeight * -0.5f);
@@ -70,8 +71,7 @@ public class WFCDemo extends ApplicationAdapter {
     }
     public void remake()
     {
-        tiledMap = loader.load("testingterrain.tmx");
-        TiledMapTileLayer ground = (TiledMapTileLayer) tiledMap.getLayers().get(0);
+        TiledMapTileLayer ground = (TiledMapTileLayer) originalMap.getLayers().get(0);
 
         int[][] grid = new int[ground.getWidth()][ground.getHeight()];
 
@@ -82,28 +82,25 @@ public class WFCDemo extends ApplicationAdapter {
             }
         }
 
-        MimicWFC wfc = new MimicWFC(grid, 2, ground.getWidth(), ground.getHeight(), false, false, 1, 0);
+        MimicWFC wfc = new MimicWFC(grid, 2, gridWidth, gridHeight, false, false, 1, 0);
         int i = 0;
         while (!wfc.run(rng, 1000000)) { System.out.println((i += 1000000) + " attempts failed."); }
         int[][] grid2 = wfc.result();
-
+        tiledMap = new TiledMap();
+        tiledMap.getTileSets().addTileSet(originalMap.getTileSets().getTileSet(0));
+        TiledMapTileLayer layer = new TiledMapTileLayer(gridWidth, gridHeight, cellWidth, cellHeight);
+        tiledMap.getLayers().add(layer);
         for (int y = 0; y < grid2[0].length; y++) {
             for (int x = 0; x < grid2.length; x++) {
 //                System.out.print(StringKit.hex(grid2[x][y]));
 //                System.out.print(" ");
-                if(grid2[x][y] != 0xFFFF)
-                {
-                    if(ground.getCell(x, y) == null)
-                    {
-                        TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
-                        c.setTile(tiledMap.getTileSets().getTile(grid2[x][y]));
-                        ground.setCell(x, y, c);
-                    }
-                    else
-                        ground.getCell(x, y).setTile(tiledMap.getTileSets().getTile(grid2[x][y]));
+                if(grid2[x][y] != 0xFFFF) {
+                    TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
+                    c.setTile(tiledMap.getTileSets().getTile(grid2[x][y]));
+                    layer.setCell(x, y, c);
                 }
                 else
-                    ground.setCell(x, y, null);
+                    layer.setCell(x, y, null);
             }
 //            System.out.println();
         }

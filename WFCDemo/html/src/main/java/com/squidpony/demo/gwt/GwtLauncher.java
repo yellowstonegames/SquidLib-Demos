@@ -9,7 +9,7 @@ import com.squidpony.demo.WFCDemo;
 public class GwtLauncher extends GwtApplication {
     @Override
     public GwtApplicationConfiguration getConfig() {
-        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(45 * 16, 31 * 16);
+        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(60 * 16, 60 * 16);
         return configuration;
     }
 
