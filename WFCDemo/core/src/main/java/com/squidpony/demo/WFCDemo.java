@@ -8,50 +8,50 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import jagd.MimicWFC;
 import jagd.RNG;
 
+/**
+ * THE TMX MAP USED HERE HAS SOME SPECIAL QUALITIES!
+ * It is surrounded by water, and when there are duplicate tiles in the tileset, it chooses a tile and only uses
+ * that one (so if there are 5 identical grass tiles, it will only use the first). There is an exception for the
+ * roof of a house; different tiles are used for the roof above the door, to the left of the door, and to the
+ * right of the door, and this seems to help increase the placement likelihood for a house.
+ */
 public class WFCDemo extends ApplicationAdapter {
-    public SpriteBatch batch;
-    
+
     private RNG rng;
     /** In number of cells */
-    private static final int gridWidth = 60;
+    private static final int gridWidth = 64;
     /** In number of cells */
-    private static final int gridHeight = 60;
+    private static final int gridHeight = 50;
 
     /** The pixel width of a cell */
     private static final int cellWidth = 16;
     /** The pixel height of a cell */
     private static final int cellHeight = 16;
-    private InputProcessor input;
-    private OrthographicCamera camera;
     private TiledMap originalMap;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
-    private TmxMapLoader loader;
-    private ScreenViewport viewport;
+
     @Override
     public void create () {
         // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
-        rng = new RNG();//"Welcome to SquidLib!");
+        rng = new RNG("IT'S WFC TIME!");
         System.out.println(rng.state);
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        batch = new SpriteBatch();
-        camera = new OrthographicCamera(gridWidth * cellWidth, gridHeight * cellHeight);
-        viewport = new ScreenViewport(camera);
+        SpriteBatch batch = new SpriteBatch();
+        OrthographicCamera camera = new OrthographicCamera(gridWidth * cellWidth, gridHeight * cellHeight);
         //viewport.setScreenBounds(gridWidth * cellWidth / -4, gridHeight * cellHeight / -4, gridWidth * cellWidth, gridHeight * cellHeight);
-        
-        loader = new TmxMapLoader();
-        originalMap = loader.load("testingterrain.tmx");
+
+        TmxMapLoader loader = new TmxMapLoader();
+        originalMap = loader.load("testingTerrainIsland.tmx");
         remake();
         renderer = new OrthogonalTiledMapRenderer(tiledMap, batch);
         //camera.translate(gridWidth * cellWidth * -0.5f, gridHeight * cellHeight * -0.5f);
         renderer.setView(camera);
 
-        input = new InputAdapter(){
+        InputProcessor input = new InputAdapter() {
             @Override
             public boolean keyUp(int keycode) {
                 switch (keycode) {
@@ -59,7 +59,7 @@ public class WFCDemo extends ApplicationAdapter {
                     case Input.Keys.ESCAPE:
                         Gdx.app.exit();
                         break;
-                    default: 
+                    default:
                         remake();
                         renderer.setMap(tiledMap);
                         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -71,20 +71,20 @@ public class WFCDemo extends ApplicationAdapter {
     }
     public void remake()
     {
-        TiledMapTileLayer ground = (TiledMapTileLayer) originalMap.getLayers().get(0);
+        //TiledMapTileLayer ground = (TiledMapTileLayer) originalMap.getLayers().get(0);
+        TiledMapTileLayer originalLayer = (TiledMapTileLayer) originalMap.getLayers().get(0);
 
-        int[][] grid = new int[ground.getWidth()][ground.getHeight()];
+        int[][] grid = new int[originalLayer.getWidth()][originalLayer.getHeight()];
 
-        for (int x = 0; x < ground.getWidth(); x++) {
-            for (int y = 0; y < ground.getHeight(); y++) {
-                TiledMapTileLayer.Cell g = ground.getCell(x, y);
-                grid[x][y] = (g == null ? 0xFFFF : g.getTile().getId());
+        for (int x = 0; x < originalLayer.getWidth(); x++) {
+            for (int y = 0; y < originalLayer.getHeight(); y++) {
+                grid[x][y] = originalLayer.getCell(x, y).getTile().getId();
             }
         }
 
-        MimicWFC wfc = new MimicWFC(grid, 2, gridWidth, gridHeight, false, false, 1, 0);
+        MimicWFC wfc = new MimicWFC(grid, 2, gridWidth, gridHeight, false, false, 1, true);
         int i = 0;
-        while (!wfc.run(rng, 1000000)) { System.out.println((i += 1000000) + " attempts failed."); }
+        while (!wfc.run(rng, 1000000)) { System.out.println((++i) + " attempts failed."); }
         int[][] grid2 = wfc.result();
         tiledMap = new TiledMap();
         tiledMap.getTileSets().addTileSet(originalMap.getTileSets().getTileSet(0));
@@ -92,19 +92,11 @@ public class WFCDemo extends ApplicationAdapter {
         tiledMap.getLayers().add(layer);
         for (int y = 0; y < grid2[0].length; y++) {
             for (int x = 0; x < grid2.length; x++) {
-//                System.out.print(StringKit.hex(grid2[x][y]));
-//                System.out.print(" ");
-                if(grid2[x][y] != 0xFFFF) {
-                    TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
-                    c.setTile(tiledMap.getTileSets().getTile(grid2[x][y]));
-                    layer.setCell(x, y, c);
-                }
-                else
-                    layer.setCell(x, y, null);
+                TiledMapTileLayer.Cell c = new TiledMapTileLayer.Cell();
+                c.setTile(tiledMap.getTileSets().getTile(grid2[x][y]));
+                layer.setCell(x, y, c);
             }
-//            System.out.println();
         }
-
     }
 //    public void remakeSwamp()
 //    {
