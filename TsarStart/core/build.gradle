@@ -1,6 +1,6 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
-
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 dependencies {
   compile "com.badlogicgames.gdx:gdx:$gdxVersion"
   compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"

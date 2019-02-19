@@ -4,6 +4,6 @@ eclipse.project.name = appName + '-core'
 dependencies {
   compile "com.badlogicgames.gdx:gdx:$gdxVersion"
   compile "com.github.tommyettinger:regexodus:$regExodusVersion"
-  compile "com.github.tommyettinger:jagd:0.1-SNAPSHOT"
+  compile "com.github.tommyettinger:jagd:$jagdVersion"
 }
         

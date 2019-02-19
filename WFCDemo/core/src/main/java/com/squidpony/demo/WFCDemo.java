@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import jagd.MimicWFC;
 import jagd.RNG;
 
 /**
@@ -71,18 +72,17 @@ public class WFCDemo extends ApplicationAdapter {
     }
     public void remake()
     {
-        //TiledMapTileLayer ground = (TiledMapTileLayer) originalMap.getLayers().get(0);
         TiledMapTileLayer originalLayer = (TiledMapTileLayer) originalMap.getLayers().get(0);
 
         int[][] grid = new int[originalLayer.getWidth()][originalLayer.getHeight()];
-
+        
         for (int x = 0; x < originalLayer.getWidth(); x++) {
             for (int y = 0; y < originalLayer.getHeight(); y++) {
                 grid[x][y] = originalLayer.getCell(x, y).getTile().getId();
             }
         }
 
-        MimicWFC wfc = new MimicWFC(grid, 2, gridWidth, gridHeight, false, false, 1, true);
+        MimicWFC wfc = new MimicWFC(grid, 2, gridWidth, gridHeight, false, false, 1, 0); // 0 refers to tile id 0, water
         int i = 0;
         while (!wfc.run(rng, 1000000)) { System.out.println((++i) + " attempts failed."); }
         int[][] grid2 = wfc.result();
