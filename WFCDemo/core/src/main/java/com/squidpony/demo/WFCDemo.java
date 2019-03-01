@@ -37,7 +37,7 @@ public class WFCDemo extends ApplicationAdapter {
     @Override
     public void create () {
         // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
-        rng = new RNG("IT'S WFC TIME!");
+        rng = new RNG(123456789);
         System.out.println(rng.state);
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
@@ -75,9 +75,9 @@ public class WFCDemo extends ApplicationAdapter {
         TiledMapTileLayer originalLayer = (TiledMapTileLayer) originalMap.getLayers().get(0);
 
         int[][] grid = new int[originalLayer.getWidth()][originalLayer.getHeight()];
-        
-        for (int x = 0; x < originalLayer.getWidth(); x++) {
-            for (int y = 0; y < originalLayer.getHeight(); y++) {
+
+        for (int y = 0; y < originalLayer.getHeight(); y++) {
+            for (int x = 0; x < originalLayer.getWidth(); x++) {
                 grid[x][y] = originalLayer.getCell(x, y).getTile().getId();
             }
         }
