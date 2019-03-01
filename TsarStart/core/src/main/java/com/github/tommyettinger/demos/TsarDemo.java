@@ -74,9 +74,9 @@ public class TsarDemo extends ApplicationAdapter {
     /** In number of cells */
     public static final int bonusHeight = 7;
     /** The pixel width of a cell */
-    public static final int cellWidth = 10;
+    public static final int cellWidth = 11;
     /** The pixel height of a cell */
-    public static final int cellHeight = 20;
+    public static final int cellHeight = 22;
     private SquidInput input;
     private Color bgColor;
     private TextCellFactory font;
@@ -184,13 +184,7 @@ public class TsarDemo extends ApplicationAdapter {
         display = new SparseLayers(bigWidth, bigHeight + bonusHeight, cellWidth, cellHeight, font);
 
         messageDisplay = new SquidMessageBox(gridWidth, bonusHeight - 1, display.font);
-
-        // A bit of a hack to increase the text height slightly without changing the size of the cells they're in.
-        // This causes a tiny bit of overlap between cells, which gets rid of an annoying gap between solid lines.
-        // If you use '#' for walls instead of box drawing chars, you don't need this.
-        // If you don't use DefaultResources.getCrispSlabFont(), you may need to adjust the multipliers here.
-        display.font.tweakHeight(cellHeight * 1.1f).initBySize();
-
+        
         //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
         //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good winding dungeons
         //with rooms by default, but in the later call to dungeonGen.generate(), you can use a TilesetType such as
@@ -641,7 +635,7 @@ public class TsarDemo extends ApplicationAdapter {
             // putWithLight() can take mix amounts greater than 1 or less than 0 to mix with extra bias.
             display.putWithLight(pt.x, pt.y, bgColors[pt.x][pt.y], SColor.FLOAT_WHITE, 1.25f);
         }
-        messageDisplay.putBordersCaptioned(SColor.CW_GRAY_WHITE, GDXMarkup.instance.colorString("Health: [Red]" + health));
+        messageDisplay.putBordersCaptioned(SColor.CW_GRAY_WHITE.toFloatBits(), GDXMarkup.instance.colorString("Health: [Red]" + health));
     }
     @Override
     public void render () {
