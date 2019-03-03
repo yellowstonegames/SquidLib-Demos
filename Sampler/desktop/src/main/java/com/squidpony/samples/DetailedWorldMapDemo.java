@@ -47,14 +47,14 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
             Empty                  = 14;
 
     //private static final int width = 314 * 3, height = 300;
-//    private static final int width = 1024, height = 512;
+    private static final int width = 1024, height = 512;
 //    private static final int width = 512, height = 256;
 //    private static final int width = 400, height = 400;
 //    private static final int width = 300, height = 300;
     //private static final int width = 1600, height = 800;
 //    private static final int width = 1024, height = 1024;
 //    private static final int width = 700, height = 700;
-    private static final int width = 512, height = 512;
+//    private static final int width = 512, height = 512;
     
     private SpriteBatch batch;
     private static final int cellWidth = 1, cellHeight = 1;
@@ -71,7 +71,7 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
     //private WorldMapGenerator.RoundSideMap world;
     //private WorldMapGenerator.HyperellipticalMap world;
     //private WorldMapGenerator.SphereMapAlt world;
-    private WorldMapGenerator.TilingMap world;
+    private WorldMapGenerator world;
     //private Noise.Noise4D cloudNoise;
     //private final float[][][] cloudData = new float[128][128][128];
 
@@ -192,103 +192,6 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
         }
     }
 
-//    protected void makeBiomes() {
-//        final WorldMapGenerator world = this.world;
-//        final int[][] heightCodeData = world.heightCodeData;
-//        final double[][] heatData = world.heatData, moistureData = world.moistureData, heightData = world.heightData;
-//        int hc, mc, heightCode;
-//        double hot, moist, high, i_hot = 1.0 / this.world.maxHeat, fresh;
-//        for (int x = 0; x < width; x++) {
-//            for (int y = 0; y < height; y++) {
-//
-//                heightCode = heightCodeData[x][y];
-//                if(heightCode == 1000) {
-//                    biomeUpperCodeData[x][y] = biomeLowerCodeData[x][y] = 54;
-//                    shadingData[x][y] = 0.0;
-//                    continue;
-//                }
-//                hot = heatData[x][y];
-//                moist = moistureData[x][y];
-//                high = heightData[x][y];
-//                fresh = world.freshwaterData[x][y];
-//                boolean isLake = world.generateRivers && heightCode >= 4 && fresh > 0.65 && fresh + moist * 2.35 > 2.75,//world.partialLakeData.contains(x, y) && heightCode >= 4,
-//                        isRiver = world.generateRivers && !isLake && heightCode >= 4 && fresh > 0.55 && fresh + moist * 2.2 > 2.15;//world.partialRiverData.contains(x, y) && heightCode >= 4;
-//                if (moist >= (wettestValueUpper - (wetterValueUpper - wetterValueLower) * 0.2)) {
-//                    mc = 5;
-//                } else if (moist >= (wetterValueUpper - (wetValueUpper - wetValueLower) * 0.2)) {
-//                    mc = 4;
-//                } else if (moist >= (wetValueUpper - (dryValueUpper - dryValueLower) * 0.2)) {
-//                    mc = 3;
-//                } else if (moist >= (dryValueUpper - (drierValueUpper - drierValueLower) * 0.2)) {
-//                    mc = 2;
-//                } else if (moist >= (drierValueUpper - (driestValueUpper) * 0.2)) {
-//                    mc = 1;
-//                } else {
-//                    mc = 0;
-//                }
-//
-//                if (hot >= (warmestValueUpper - (warmerValueUpper - warmerValueLower) * 0.2) * i_hot) {
-//                    hc = 5;
-//                } else if (hot >= (warmerValueUpper - (warmValueUpper - warmValueLower) * 0.2) * i_hot) {
-//                    hc = 4;
-//                } else if (hot >= (warmValueUpper - (coldValueUpper - coldValueLower) * 0.2) * i_hot) {
-//                    hc = 3;
-//                } else if (hot >= (coldValueUpper - (colderValueUpper - colderValueLower) * 0.2) * i_hot) {
-//                    hc = 2;
-//                } else if (hot >= (colderValueUpper - (coldestValueUpper) * 0.2) * i_hot) {
-//                    hc = 1;
-//                } else {
-//                    hc = 0;
-//                }
-//
-//                heatCodeData[x][y] = hc;
-//                moistureCodeData[x][y] = mc;
-//                biomeUpperCodeData[x][y] = isLake ? hc + 48 : (isRiver ? hc + 42 : ((heightCode == 4) ? hc + 36 : hc + mc * 6));
-//
-//                if (moist >= (wetterValueUpper + (wettestValueUpper - wettestValueLower) * 0.2)) {
-//                    mc = 5;
-//                } else if (moist >= (wetValueUpper + (wetterValueUpper - wetterValueLower) * 0.2)) {
-//                    mc = 4;
-//                } else if (moist >= (dryValueUpper + (wetValueUpper - wetValueLower) * 0.2)) {
-//                    mc = 3;
-//                } else if (moist >= (drierValueUpper + (dryValueUpper - dryValueLower) * 0.2)) {
-//                    mc = 2;
-//                } else if (moist >= (driestValueUpper + (drierValueUpper - drierValueLower) * 0.2)) {
-//                    mc = 1;
-//                } else {
-//                    mc = 0;
-//                }
-//
-//                if (hot >= (warmerValueUpper + (warmestValueUpper - warmestValueLower) * 0.2) * i_hot) {
-//                    hc = 5;
-//                } else if (hot >= (warmValueUpper + (warmerValueUpper - warmerValueLower) * 0.2) * i_hot) {
-//                    hc = 4;
-//                } else if (hot >= (coldValueUpper + (warmValueUpper - warmValueLower) * 0.2) * i_hot) {
-//                    hc = 3;
-//                } else if (hot >= (colderValueUpper + (coldValueUpper - coldValueLower) * 0.2) * i_hot) {
-//                    hc = 2;
-//                } else if (hot >= (coldestValueUpper + (colderValueUpper - colderValueLower) * 0.2) * i_hot) {
-//                    hc = 1;
-//                } else {
-//                    hc = 0;
-//                }
-//
-//                biomeLowerCodeData[x][y] = hc + mc * 6;
-//
-//                if (isRiver || isLake)
-//                    shadingData[x][y] = //((moist - minWet) / (maxWet - minWet)) * 0.45 + 0.15 - 0.14 * ((hot - minHeat) / (maxHeat - minHeat))
-//                            (moist * 0.35 + 0.6);
-//                else
-//                    shadingData[x][y] = //(upperProximityH + upperProximityM - lowerProximityH - lowerProximityM) * 0.1 + 0.2
-//                            (heightCode == 4) ? (0.18 - high) / (0.08) :
-//                                    NumberTools.bounce((high + moist) * (4.1 + high - hot)) * 0.5 + 0.5; // * (7.5 + moist * 1.9 - hot * 0.9)
-//            }
-//        }
-//        counter = ThrustAltRNG.determine(seed) >>> 48;
-//        //Noise.seamless3D(cloudData, seedC, 3);
-//    }
-
-
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -303,7 +206,7 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
 //        stage = new Stage(view, batch);
         seed = 0x0c415cf07774ab2eL;//0x9987a26d1e4d187dL;//0xDEBACL;
         rng = new StatefulRNG(seed);
-        world = new WorldMapGenerator.TilingMap(seed, width, height, FastNoise.instance, 1.25);
+//        world = new WorldMapGenerator.TilingMap(seed, width, height, FastNoise.instance, 1.25);
         //world = new WorldMapGenerator.SphereMapAlt(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalMap(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, FastNoise.instance, 0.75);
@@ -311,7 +214,7 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
         //world = new WorldMapGenerator.SpaceViewMap(seed, width, height, FastNoise.instance, 0.7);
         //world = new WorldMapGenerator.RotatingSpaceMap(seed, width, height, FastNoise.instance, 0.75);
         //world = new WorldMapGenerator.RoundSideMap(seed, width, height, FastNoise.instance, 0.8);
-        //world = new WorldMapGenerator.HyperellipticalMap(seed, width, height, FastNoise.instance, 0.8);//, 0.1, 3.25);
+        world = new WorldMapGenerator.HyperellipticalMap(seed, width, height, new FastNoise(1337, 1.25f, FastNoise.SIMPLEX_FRACTAL, 2, 2f, 0.5f), 0.8);//, 0.1, 3.25);
         //cloudNoise = new Noise.Turbulent4D(WhirlingNoise.instance, new Noise.Ridged4D(SeededNoise.instance, 2, 3.7), 3, 5.9);
         //cloudNoise = new Noise.Layered4D(WhirlingNoise.instance, 2, 3.2);
         //cloudNoise2 = new Noise.Ridged4D(SeededNoise.instance, 3, 6.5);

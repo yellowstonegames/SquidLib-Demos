@@ -73,7 +73,7 @@ public class LocalMapDemo extends ApplicationAdapter {
     //private WorldMapGenerator.RoundSideMap world;
     //private WorldMapGenerator.HyperellipticalMap world;
     //private WorldMapGenerator.SphereMapAlt world;
-    private WorldMapGenerator.TilingMap world;
+    private WorldMapGenerator world;
     //private Noise.Noise4D cloudNoise;
     //private final float[][][] cloudData = new float[128][128][128];
 
@@ -204,7 +204,7 @@ public class LocalMapDemo extends ApplicationAdapter {
         pt.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         seed = 0x0c415cf07774ab2eL;//0x9987a26d1e4d187dL;//0xDEBACL;
         rng = new StatefulRNG(seed);
-        world = new WorldMapGenerator.TilingMap(seed, bigWidth, bigHeight, FastNoise.instance, 0.55);
+        world = new WorldMapGenerator.LocalMap(seed, bigWidth, bigHeight, FastNoise.instance, 0.95);
         //world = new WorldMapGenerator.SphereMapAlt(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalMap(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, FastNoise.instance, 0.75);
