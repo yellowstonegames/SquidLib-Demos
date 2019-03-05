@@ -41,9 +41,12 @@ public class NorthernLights extends ApplicationAdapter {
 		startTime = TimeUtils.millis();
 
 		long state = TimeUtils.nanoTime() - startTime;
-		// Sarong's DiverRNG.determine(), may be used in SquidLib later.
-		seed = (((state = ((state << ((state & 31) + 5)) ^ state ^ 0xDB4F0B9175AE2165L) * 0xD1B54A32D192ED03L)
-			^ (state >>> ((state >>> 60) + 16))) * 0x369DEA0F31A53F85L >>> 32) * 0x1.5bf0a8p-20f;
+		// Sarong's DiverRNG.randomize()
+		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 36) * 0x1.5bf0a8p-16f;
+
+//		// Sarong's DiverRNG.determine(), may be used in SquidLib later.
+//		seed = (((state = ((state << ((state & 31) + 5)) ^ state ^ 0xDB4F0B9175AE2165L) * 0xD1B54A32D192ED03L)
+//			^ (state >>> ((state >>> 60) + 16))) * 0x369DEA0F31A53F85L >>> 32) * 0x1.5bf0a8p-20f;
 
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
@@ -57,8 +60,8 @@ public class NorthernLights extends ApplicationAdapter {
 	private static float swayRandomized(int seed, float value)
 	{
 		final int floor = value >= 0f ? (int) value : (int) value - 1;
-		final float start = (((seed += floor * 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529)) * 0x4.ffffffp-31f,
-				end = (((seed += 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529)) * 0x4.ffffffp-31f;
+		final float start = (((seed += floor * 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f,
+				end = (((seed += 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f;
 		value -= floor;
 		value *= value * (3f - 2f * value);
 		return (1f - value) * start + value * end;

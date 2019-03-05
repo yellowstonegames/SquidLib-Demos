@@ -27,7 +27,7 @@ float cosmic(float seed, vec3 con)
     float sum = swayRandomized(seed, con.z + con.x);
     sum = sum + swayRandomized(seed, con.x + con.y + sum);
     sum = sum + swayRandomized(seed, con.y + con.z + sum);
-    return sum * 0.3333333333 + 0.5;
+    return sum * 0.3333333333;
 }
 
 void main() {
@@ -41,8 +41,8 @@ void main() {
   + c * v_texCoords.x + s * v_texCoords.y;
   // + c * gl_FragCoord.x + s * gl_FragCoord.y;
   con.x = cosmic(seed, con);
-  con.y = cosmic(seed, con);
-  con.z = cosmic(seed, con);
+  con.y = cosmic(seed + 12.3456, con);
+  con.z = cosmic(seed - 45.6123, con);
     
   gl_FragColor = vec4(sin(con * 3.14159265) * 0.5 + 0.5,1.0);
 }
