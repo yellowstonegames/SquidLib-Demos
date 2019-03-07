@@ -1,5 +1,6 @@
 package com.squidpony.shader;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -23,8 +24,9 @@ public class NorthernLights extends ApplicationAdapter {
 	private int width, height;
 
 	@Override public void create () {
+		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		batch = new SpriteBatch();
-
+		
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
@@ -32,7 +34,7 @@ public class NorthernLights extends ApplicationAdapter {
 		ShaderProgram.pedantic = false;
 		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
 		if (!shader.isCompiled()) {
-			System.out.printf("error compiling shader:\n%s", shader.getLog());
+			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
 			Gdx.app.exit();
 			return;
 		}
@@ -72,7 +74,7 @@ public class NorthernLights extends ApplicationAdapter {
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x3p-14f;
-		shader.begin();
+		batch.begin();
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
 		shader.setUniformf("s",
@@ -83,9 +85,6 @@ public class NorthernLights extends ApplicationAdapter {
 				swayRandomized(0xC13FA9A9, ftm - 1.11f),
 				swayRandomized(0xDB4F0B91, ftm + 1.41f),
 				swayRandomized(0xE60E2B72, ftm + 2.61f));
-		shader.end();
-
-		batch.begin();
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 	}

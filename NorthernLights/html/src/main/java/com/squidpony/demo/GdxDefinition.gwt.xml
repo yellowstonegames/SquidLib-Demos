@@ -3,9 +3,7 @@
 <module rename-to="html">
     <source path="" />
     <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
-    <inherits name="com.squidpony.demo.NorthernLights" />
-    <inherits name="regexodus" />
-    <inherits name="squidlib-util" />
+    <inherits name="com.squidpony.shader.NorthernLights" />
     <entry-point class="com.squidpony.demo.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
     <set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>
