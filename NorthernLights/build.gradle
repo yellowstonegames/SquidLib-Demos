@@ -19,7 +19,7 @@ allprojects {
   apply plugin: 'idea'
 }
 
-configure(subprojects - project(':android')) {
+configure(subprojects) {
   apply plugin: 'java'
   sourceCompatibility = 1.7
 }

@@ -3,6 +3,7 @@ package com.squidpony.shader;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -22,6 +23,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private long startTime;
 	private float seed;
 	private int width, height;
+	private Texture palette;
 
 	@Override public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -30,6 +32,7 @@ public class NorthernLights extends ApplicationAdapter {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
+		palette = new Texture(Gdx.files.internal("DB_Aurora_GLSL.png"), Pixmap.Format.RGBA8888, false);
 
 		ShaderProgram.pedantic = false;
 		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
@@ -45,11 +48,7 @@ public class NorthernLights extends ApplicationAdapter {
 		long state = TimeUtils.nanoTime() - startTime;
 		// Sarong's DiverRNG.randomize()
 		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 36) * 0x1.5bf0a8p-16f;
-
-//		// Sarong's DiverRNG.determine(), may be used in SquidLib later.
-//		seed = (((state = ((state << ((state & 31) + 5)) ^ state ^ 0xDB4F0B9175AE2165L) * 0xD1B54A32D192ED03L)
-//			^ (state >>> ((state >>> 60) + 16))) * 0x369DEA0F31A53F85L >>> 32) * 0x1.5bf0a8p-20f;
-
+		
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 	}
@@ -74,7 +73,11 @@ public class NorthernLights extends ApplicationAdapter {
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x3p-14f;
+		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
+		palette.bind();
 		batch.begin();
+		shader.setUniformi("u_palette", 1);
+		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
 		shader.setUniformf("s",
