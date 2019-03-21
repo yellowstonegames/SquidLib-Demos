@@ -28,3 +28,5 @@ target/
 
 **/.gradle/
 *.so
+
+**/gifexport/

@@ -3,4 +3,5 @@ eclipse.project.name = appName + '-core'
 
 dependencies {
   compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+  compile "com.github.Anuken:GdxGifRecorder:1.3"
 }
