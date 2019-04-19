@@ -14,8 +14,6 @@ uniform float seed;
 uniform float tm;
 uniform vec3 s;
 uniform vec3 c;
-const float b_adj = 31.0 / 32.0;
-const float rb_adj = 32.0 / 1023.0;
 float swayRandomized(float seed, float value)
 {
     float f = floor(value);
@@ -42,13 +40,7 @@ void main() {
   con.y = cosmic(seed + 12.3456, con);
   con.z = cosmic(seed - 45.6123, con);
     
-  vec3 tgt = sin(con * 3.14159265) * 0.5 + 0.5;
-  vec4 used = texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g));
-  float len = length(tgt) + 1.0;
-  float adj = fract(52.9829189 * fract(0.06711056 * gl_FragCoord.x + 0.00583715 * gl_FragCoord.y)) * len - len * 0.5;
-  //float adj = sin(dot(gl_FragCoord.xy, vec2(4.743036261279236, 3.580412143837574))) * 1.1 + 0.05;
-  tgt = clamp(tgt + (tgt - used.rgb) * adj, 0.0, 1.0);
-  gl_FragColor.rgb = v_color.rgb * texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g)).rgb;
+  gl_FragColor.rgb = sin(con * 3.14159265) * 0.5 + 0.5;
   gl_FragColor.a = v_color.a;
 
 }

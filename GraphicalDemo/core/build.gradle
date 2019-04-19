@@ -6,4 +6,3 @@ dependencies {
   compile "com.github.SquidPony.SquidLib:squidlib-util:$squidLibVersion"
   compile "com.github.tommyettinger:regexodus:$regExodusVersion"
 }
-        

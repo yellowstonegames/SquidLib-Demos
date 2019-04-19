@@ -34,20 +34,45 @@ public class NorthernLights extends ApplicationAdapter {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
-		palette = new Texture(Gdx.files.internal("DB_Aurora_GLSL.png"), Pixmap.Format.RGBA8888, false);
+		startTime = TimeUtils.millis();
+		int choice = (int) (startTime >>> 4 & 3L);
+		switch (choice)
+		{
+			case 0:
+				System.out.println("Using DB Aurora");
+				palette = new Texture(Gdx.files.internal("DB_Aurora_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				break;
+			case 1:
+				System.out.println("Using Quorum256");
+				palette = new Texture(Gdx.files.internal("Quorum256_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				break;
+			case 2:
+				System.out.println("Using 6-value-per-channel uniform RGB");
+				palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				break;
+			default:
+				System.out.println("Using all colors, no dithering");
+				palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				break;
+		}
 
 		ShaderProgram.pedantic = false;
-		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
+		if(choice == 3)
+		{
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
+		}
+		else
+		{
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
+		}
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
 			Gdx.app.exit();
 			return;
 		}
 		batch.setShader(shader);
-
-		startTime = TimeUtils.millis();
-
-		long state = TimeUtils.nanoTime() - startTime;
+		
+		long state = -1234567890L;//TimeUtils.nanoTime() - startTime;
 		// Sarong's DiverRNG.randomize()
 		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 36) * 0x1.5bf0a8p-16f;
 		
