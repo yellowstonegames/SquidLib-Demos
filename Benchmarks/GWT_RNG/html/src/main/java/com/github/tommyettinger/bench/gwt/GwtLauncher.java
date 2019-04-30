@@ -44,7 +44,7 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new Starfish32RNG(123456789, 987654321), "Starfish32RNG");
         addIntTest(vp, new Otter32RNG(123456789, 987654321), "Otter32RNG");
         addIntTest(vp, new Lobster32RNG(123456789, 987654321), "Lobster32RNG");
-        addIntTest(vp, new Piranha32RNG(123456789, 987654321), "Piranha32RNG");
+        addIntTest(vp, new Cake32RNG(123456789, 987654321, 1), "Cake32RNG");
         addIntTest(vp, new Mover32RNG(1), "Mover32RNG");
         addIntTest(vp, new XoshiroStarStar32RNG(123456789), "XoshiroStarStar32RNG");
         addIntTest(vp, new XoshiroStarPhi32RNG(123456789), "XoshiroStarPhi32RNG");
@@ -58,7 +58,7 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new Starfish32RNG(123456789, 987654321), "Starfish32RNG");
         addLongTest(vp, new Otter32RNG(123456789, 987654321), "Otter32RNG");
         addLongTest(vp, new Lobster32RNG(123456789, 987654321), "Lobster32RNG");
-        addLongTest(vp, new Piranha32RNG(123456789, 987654321), "Piranha32RNG");
+        addLongTest(vp, new Cake32RNG(123456789, 987654321, 1), "Cake32RNG");
         addLongTest(vp, new Mover32RNG(1), "Mover32RNG");
         addLongTest(vp, new XoshiroStarStar32RNG(123456789), "XoshiroStarStar32RNG");
         addLongTest(vp, new XoshiroStarPhi32RNG(123456789), "XoshiroStarPhi32RNG");
@@ -93,28 +93,28 @@ public class GwtLauncher extends GwtBareApp {
      */
     public static void main(String[] args)
     {
-        Piranha32RNG a = new Piranha32RNG(123456789, 987654321);
+        Cake32RNG a = new Cake32RNG(123456789, 987654321, 1);
         Lathe32RNG b = new Lathe32RNG(123456789, 987654321);
         LightRNG c = new LightRNG(123456L);
         RandomXS128 d = new RandomXS128(123456789L, 987654321L);
         Lobster32RNG e = new Lobster32RNG(123456789, 987654321);
         Mover32RNG f = new Mover32RNG(1);
 
-        System.out.println("Piranha32RNG  " + a.nextInt());
+        System.out.println("Cake32RNG  " + a.nextInt());
         System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Lobster32RNG " + e.nextInt());
         System.out.println("Mover32RNG " + f.nextInt());
 
-        System.out.println("Piranha32RNG  " + a.nextInt());
+        System.out.println("Cake32RNG  " + a.nextInt());
         System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
         System.out.println("Lobster32RNG " + e.nextInt());
         System.out.println("Mover32RNG " + f.nextInt());
 
-        System.out.println("Piranha32RNG  " + a.nextInt());
+        System.out.println("Cake32RNG  " + a.nextInt());
         System.out.println("Lathe32RNG " + b.nextInt());
         System.out.println("LightRNG " + c.nextInt());
         System.out.println("RandomXS128 " + d.nextInt());
@@ -951,7 +951,7 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private void addIntTest(final VerticalPanel vp, final Piranha32RNG rs, final String name)
+    private void addIntTest(final VerticalPanel vp, final Cake32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -974,7 +974,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
-    private void addLongTest(final VerticalPanel vp, final Piranha32RNG rs, final String name)
+    private void addLongTest(final VerticalPanel vp, final Cake32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextLong()");
         final TextBox resultLabel = new TextBox();
@@ -996,7 +996,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(runBenchButton);
         vp.add(resultLabel);
     }
-    private String runIntBenchmark(Piranha32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runIntBenchmark(Cake32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -1012,7 +1012,7 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String runLongBenchmark(Piranha32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runLongBenchmark(Cake32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -1028,12 +1028,12 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String reportInt(Piranha32RNG rs) {
+    private String reportInt(Cake32RNG rs) {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
 
-    private int runInt(Piranha32RNG rs) {
+    private int runInt(Cake32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextInt();
@@ -1041,12 +1041,12 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private String reportLong(Piranha32RNG rs) {
+    private String reportLong(Cake32RNG rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
     }
 
-    private int runLong(Piranha32RNG rs) {
+    private int runLong(Cake32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
