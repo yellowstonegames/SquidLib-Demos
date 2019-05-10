@@ -53,13 +53,13 @@ public class LocalMapDemo extends ApplicationAdapter {
     //private static final int width = 1600, height = 800;
 //    private static final int width = 1024, height = 1024;
 //    private static final int width = 700, height = 700;
-//    private static final int width = 512, height = 512;
-    private static final int width = 128, height = 128;
+    private static final int width = 512, height = 512;
+//    private static final int width = 128, height = 128;
     
     private static final int bigWidth = width << 3, bigHeight = height << 3;
     
     private SpriteBatch batch;
-    private static final int cellWidth = 4, cellHeight = 4;
+    private static final int cellWidth = 1, cellHeight = 1;
     private SquidInput input;
     private Viewport view;
     private StatefulRNG rng;
@@ -204,7 +204,8 @@ public class LocalMapDemo extends ApplicationAdapter {
         pt.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         seed = 0x0c415cf07774ab2eL;//0x9987a26d1e4d187dL;//0xDEBACL;
         rng = new StatefulRNG(seed);
-        world = new WorldMapGenerator.LocalMap(seed, bigWidth, bigHeight, FastNoise.instance, 0.95);
+//        world = new WorldMapGenerator.LocalMap(seed, bigWidth, bigHeight, FastNoise.instance, 0.8);
+        world = new WorldMapGenerator.LocalMap(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.SphereMapAlt(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalMap(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, FastNoise.instance, 0.75);
@@ -273,24 +274,27 @@ public class LocalMapDemo extends ApplicationAdapter {
     }
     public void zoomIn(int zoomX, int zoomY)
     {
-        if(zoom == 3)
-        {
-            System.out.printf("zoomX == %d, old minX == %d\n", zoomX, minX);
-            System.out.printf("zoomX - (width >> 2) << 4 == %d\n", zoomX - (width >> 2) << 4);
-            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> 3));
-            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom + 1)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> 3));
-            System.out.printf("MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth >> 3) == %d\n",
-                    minX);
-        }
-        else {
-            zoom = MathUtils.clamp(zoom+1, 0, 3);
-            System.out.printf("zoomX == %d, old minX == %d, zoom == %d\n", zoomX, minX, zoom);
-            System.out.printf("zoomX - (width >> 2) << 4 == %d\n", zoomX - (width >> 2) << 4);
-            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom));
-            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> zoom));
-            System.out.printf("MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom)) == %d\n",
-                    minX);
-        }
+        world.zoomIn(1, zoomX, zoomY);
+        dbm.makeBiomes(world);
+        zoom++;
+//        if(zoom == 3)
+//        {
+//            System.out.printf("zoomX == %d, old minX == %d\n", zoomX, minX);
+//            System.out.printf("zoomX - (width >> 2) << 4 == %d\n", zoomX - (width >> 2) << 4);
+//            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> 3));
+//            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom + 1)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> 3));
+//            System.out.printf("MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth >> 3) == %d\n",
+//                    minX);
+//        }
+//        else {
+//            zoom = MathUtils.clamp(zoom+1, 0, 3);
+//            System.out.printf("zoomX == %d, old minX == %d, zoom == %d\n", zoomX, minX, zoom);
+//            System.out.printf("zoomX - (width >> 2) << 4 == %d\n", zoomX - (width >> 2) << 4);
+//            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom));
+//            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> zoom));
+//            System.out.printf("MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom)) == %d\n",
+//                    minX);
+//        }
     }
     public void zoomOut()
     {
@@ -298,16 +302,21 @@ public class LocalMapDemo extends ApplicationAdapter {
     }
     public void zoomOut(int zoomX, int zoomY)
     {
-        zoom = MathUtils.clamp(zoom-1, 0, 3);
-        if(zoom == 0)
-        {
-            minX = minY = 0;
+        if(zoom > 0) {
+            world.zoomOut(1, zoomX, zoomY);
+            dbm.makeBiomes(world);
+            zoom--;
         }
-        else
-        {
-            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom));
-            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom + 1)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> zoom));
-        }
+//        zoom = MathUtils.clamp(zoom-1, 0, 3);
+//        if(zoom == 0)
+//        {
+//            minX = minY = 0;
+//        }
+//        else
+//        {
+//            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom));
+//            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom + 1)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> zoom));
+//        }
     }
     public void generate(final long seed)
     {
@@ -315,7 +324,7 @@ public class LocalMapDemo extends ApplicationAdapter {
         System.out.println("Seed used: 0x" + StringKit.hex(seed) + "L");
         //world.setCenterLongitude((System.currentTimeMillis() & 0xFFFFFFF) * 0.0002);
         world.generate(1.25 + NumberTools.formCurvedDouble((seed ^ 0x123456789ABCDL) * 0x12345689ABL) * 0.3,
-                LinnormRNG.determineDouble(seed * 0x12345L + 0x54321L) * 0.2 + 0.9, seed);
+                DiverRNG.determineDouble(seed * 0x12345L + 0x54321L) * 0.2 + 0.9, seed);
         dbm.makeBiomes(world);
         //randomizeColors(seed);
         //political = fpm.generate(seed + 1000L, world, dbm, null, 50, 1.0);
@@ -332,15 +341,15 @@ public class LocalMapDemo extends ApplicationAdapter {
         int[][] biomeCodeData = dbm.biomeCodeData;
         pm.setColor(quantize(SColor.DB_INK));
         pm.fill();
-        final int inc = 8 >> zoom;
-        for (int y = 0, iy = minY; y < height && iy < (height<<3); y++, iy+=inc) {
+//        final int inc = 8 >> zoom;
+        for (int y = 0; y < height; y++) {
             PER_CELL:
-            for (int x = 0, ix = minX; x < width && ix < (width<<3); x++, ix+=inc) {
-                hc = heightCodeData[ix][iy];
+            for (int x = 0; x < width; x++) {
+                hc = heightCodeData[x][y];
                 if (hc == 1000)
                     continue;
-                tc = heatCodeData[ix][iy];
-                bc = biomeCodeData[ix][iy];
+                tc = heatCodeData[x][y];
+                bc = biomeCodeData[x][y];
                 if (tc == 0) {
                     switch (hc) {
                         case 0:
@@ -348,12 +357,12 @@ public class LocalMapDemo extends ApplicationAdapter {
                         case 2:
                         case 3:
                             Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(shallowColor, ice,
-                                    (float) ((heightData[ix][iy] - -1.0) / (WorldMapGenerator.sandLower - -1.0))));
+                                    (float) ((heightData[x][y] - -1.0) / (WorldMapGenerator.sandLower - -1.0))));
                             pm.drawPixel(x, y, quantize(tempColor));//Color.rgba8888(tempColor));
                             continue PER_CELL;
                         case 4:
                             Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(lightIce, ice,
-                                    (float) ((heightData[ix][iy] - WorldMapGenerator.sandLower) / (WorldMapGenerator.sandUpper - WorldMapGenerator.sandLower))));
+                                    (float) ((heightData[x][y] - WorldMapGenerator.sandLower) / (WorldMapGenerator.sandUpper - WorldMapGenerator.sandLower))));
                             pm.drawPixel(x, y, quantize(tempColor));//Color.rgba8888(tempColor));
                             continue PER_CELL;
                     }
@@ -365,7 +374,7 @@ public class LocalMapDemo extends ApplicationAdapter {
                     case 3:
                         Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(
                                 BIOME_COLOR_TABLE[56], coastalColor,
-                                (MathUtils.clamp((float) (((heightData[ix][iy] + 0.06) * 8.0) / (WorldMapGenerator.sandLower + 1.0)), 0f, 1f))));
+                                (MathUtils.clamp((float) (((heightData[x][y] + 0.06) * 8.0) / (WorldMapGenerator.sandLower + 1.0)), 0f, 1f))));
                         pm.drawPixel(x, y, quantize(tempColor));//Color.rgba8888(tempColor));
                         break;
                     default:
