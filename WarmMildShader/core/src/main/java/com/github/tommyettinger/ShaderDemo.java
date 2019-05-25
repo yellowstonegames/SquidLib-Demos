@@ -1,26 +1,32 @@
 package com.github.tommyettinger;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import static com.badlogic.gdx.Gdx.input;
+
 public class ShaderDemo extends ApplicationAdapter {
 
-    protected SpriteBatch batch;
-    protected Texture screenTexture;
+    private SpriteBatch batch;
+    private Texture screenTexture;
 
-    protected long startTime;
+    private long startTime = 0L, lastProcessedTime = 0L;
     private ShaderProgram shader;
     private Vector3 add, mul;
     
+//    private InputEventQueue inputHandler; 
+    
     public void load() {
-        FileHandle file = Gdx.files.internal("Mona_Lisa_404x600.jpg");
+        FileHandle file = Gdx.files.internal("Mona_Lisa.jpg");
         if(!file.exists())
             return;
         screenTexture = new Texture(file);
@@ -29,14 +35,17 @@ public class ShaderDemo extends ApplicationAdapter {
 
     @Override
     public void create() {
+        lastProcessedTime = 0L;
         startTime = TimeUtils.millis();
-        add = new Vector3(0.1f, 0.95f, swayRandomized(12345, TimeUtils.timeSinceMillis(startTime) * 0x1p-9f) * 0.4f + 0.2f);
+        add = new Vector3(0.1f, 0.95f, 0.2f);
+//        add = new Vector3(0.1f, 0.95f, swayRandomized(12345, TimeUtils.timeSinceMillis(startTime) * 0x1p-9f) * 0.4f + 0.2f);
         mul = new Vector3(1f, 0.8f, 0.85f);
         shader = new ShaderProgram(vertexShader, fragmentShaderOnlyWarmMild);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + shader.getLog());
         batch = new SpriteBatch(1000, shader);
         batch.enableBlending();
-        Gdx.input.setInputProcessor(inputProcessor());
+//        inputHandler = inputProcessor();
+//        Gdx.input.setInputProcessor(inputHandler);
         
         load();
     }
@@ -44,22 +53,21 @@ public class ShaderDemo extends ApplicationAdapter {
 
     @Override
     public void render() {
+        handleInput();
         Gdx.gl.glClearColor(0.4f, 0.4f, 0.4f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         batch.setColor(-0x1.fffffep126f); // white as a float to reset any color
         //you can also use
 //        batch.setColor(1f, 1f, 1f, 1f);
-        Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
         batch.begin();
 //        shader.setUniformf("u_mul", 0.9f, 0.7f, 0.75f);
-//          shader.setUniformf("u_add", 0.05f, 0.14f, 0.16f);
-//          shader.setUniformf("u_mul", 1f, 1f, 1f);
-//          shader.setUniformf("u_add", 0f, 0f, 0f);
-        // this makes the "mild" parameter move the color from red to orange to yellow over time.
-        // it only moves in that range because the warmth has been pushed very high.
-        add.z = swayRandomized(12345, TimeUtils.timeSinceMillis(startTime) * 0x1p-9f) * 0.4f + 0.2f;
+//        shader.setUniformf("u_add", 0.05f, 0.14f, 0.16f);
+//        shader.setUniformf("u_mul", 1f, 1f, 1f);
+//        shader.setUniformf("u_add", 0f, 0f, 0f);
+        //// this makes the "mild" parameter move the color from red to orange to yellow over time.
+        //// it only moves in that range because the warmth has been pushed very high.
+        //add.z = swayRandomized(12345, TimeUtils.timeSinceMillis(startTime) * 0x1p-9f) * 0.4f + 0.2f;
         shader.setUniformf("u_mul", mul);
         shader.setUniformf("u_add", add);
         batch.draw(screenTexture, 0, 0);
@@ -75,8 +83,50 @@ public class ShaderDemo extends ApplicationAdapter {
             @Override
             public boolean keyDown(int keycode) {
                 switch (keycode) {
-                    case Input.Keys.Q:
-                    case Input.Keys.ESCAPE:
+                    case Keys.L:
+                    case Keys.UP:
+                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
+                            mul.x += 0.01f;
+                        else
+                            add.x = MathUtils.clamp(add.x + 0.05f, -1f, 1f);
+                        break;
+                    case Keys.D:
+                    case Keys.DOWN:
+                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
+                            mul.x -= 0.01f;
+                        else
+                            add.x = MathUtils.clamp(add.x - 0.05f, -1f, 1f);
+                        break;
+                    case Keys.W:
+                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
+                            mul.y += 0.01f;
+                        else
+                            add.y = MathUtils.clamp(add.y + 0.05f, -1f, 1f);
+                        break;
+                    case Keys.C:
+                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
+                            mul.y -= 0.01f;
+                        else
+                            add.y = MathUtils.clamp(add.y - 0.05f, -1f, 1f);
+                        break;
+                    case Keys.M:
+                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
+                            mul.z += 0.01f;
+                        else
+                            add.z = MathUtils.clamp(add.z + 0.05f, -1f, 1f);
+                        break;
+                    case Keys.B:
+                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
+                            mul.z -= 0.01f;
+                        else
+                            add.z = MathUtils.clamp(add.z - 0.05f, -1f, 1f);
+                        break;
+                    case Keys.R:
+                        mul.set(1f, 1f, 1f);
+                        add.set(0f, 0f, 0f);
+                        break;
+                    case Keys.Q:
+                    case Keys.ESCAPE:
                         Gdx.app.exit();
                         break;
                 }
@@ -84,7 +134,41 @@ public class ShaderDemo extends ApplicationAdapter {
             }
         };
     }
-
+    public void handleInput()
+    {
+        // only process once every 100 ms, or 10 times a second, at most
+        if(TimeUtils.timeSinceMillis(lastProcessedTime) < 100)
+            return;
+        lastProcessedTime = TimeUtils.millis();
+        Vector3 changing;
+        // holding shift will change multipliers, otherwise it affects addends
+        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
+            changing = mul;
+        else 
+            changing = add;
+        if(input.isKeyPressed(Keys.UP) || input.isKeyPressed(Keys.L)) //light
+            changing.x = MathUtils.clamp(changing.x + 0.02f, -1f, 1f);
+        else if(input.isKeyPressed(Keys.DOWN) || input.isKeyPressed(Keys.D)) //dark
+            changing.x = MathUtils.clamp(changing.x - 0.02f, -1f, 1f);
+        else if(input.isKeyPressed(Keys.W)) //warm
+            changing.y = MathUtils.clamp(changing.y + 0.02f, -2f, 2f);
+        else if(input.isKeyPressed(Keys.C)) //cool
+            changing.y = MathUtils.clamp(changing.y - 0.02f, -2f, 2f);
+        else if(input.isKeyPressed(Keys.M)) //mild
+            changing.z = MathUtils.clamp(changing.z + 0.02f, -2f, 2f);
+        else if(input.isKeyPressed(Keys.B)) // bold
+            changing.z = MathUtils.clamp(changing.z - 0.02f, -2f, 2f);
+        else if(input.isKeyPressed(Keys.R)) // reset
+        {
+            mul.set(1f, 1f, 1f);
+            add.set(0f, 0f, 0f);
+        }
+        else if(input.isKeyPressed(Keys.P)) // print
+            System.out.println("Mul: Y="+mul.x+",Cw="+mul.y+",Cm="+mul.z+
+                    "\nAdd: Y="+add.x+",Cw="+add.y+",Cm="+add.z);
+        else if(input.isKeyPressed(Keys.Q) || input.isKeyPressed(Keys.ESCAPE)) //quit
+            Gdx.app.exit();
+    }
     /**
      * This is the default vertex shader from libGDX.
      */
