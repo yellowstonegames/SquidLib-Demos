@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.TimeUtils;
+import io.anuke.gif.GifRecorder;
 
 /**
  * Credit for the shader adaptation goes to angelickite , a very helpful user on the libGDX Discord.
@@ -24,7 +25,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private float seed;
 	private int width, height;
 	private Texture palette;
-//	private GifRecorder gifRecorder;
+	private GifRecorder gifRecorder;
 
 	@Override public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -79,12 +80,12 @@ public class NorthernLights extends ApplicationAdapter {
 		height = Gdx.graphics.getHeight();
 
 
-//		gifRecorder = new GifRecorder(batch);
-//		gifRecorder.setGUIDisabled(true);
-//		gifRecorder.open();
-//		gifRecorder.setBounds(width * -0.5f, height * -0.5f, width, height);
-//		gifRecorder.setFPS(16);
-//		gifRecorder.startRecording();
+		gifRecorder = new GifRecorder(batch);
+		gifRecorder.setGUIDisabled(true);
+		gifRecorder.open();
+		gifRecorder.setBounds(width * -0.5f, height * -0.5f, width, height);
+		gifRecorder.setFPS(16);
+		gifRecorder.startRecording();
 	}
 
 	@Override public void resize (int width, int height) {
@@ -124,11 +125,11 @@ public class NorthernLights extends ApplicationAdapter {
 				swayRandomized(0xE60E2B72, ftm + 2.61f));
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
-//		gifRecorder.update();
-//		if(gifRecorder.isRecording() && TimeUtils.timeSinceMillis(startTime) > 7500L){
-//			gifRecorder.finishRecording();
-//			gifRecorder.writeGIF();
-//		}
+		gifRecorder.update();
+		if(gifRecorder.isRecording() && TimeUtils.timeSinceMillis(startTime) > 7500L){
+			gifRecorder.finishRecording();
+			gifRecorder.writeGIF();
+		}
 
 	}
 }

@@ -25,8 +25,7 @@ public class ShaderDemo extends ApplicationAdapter {
     
 //    private InputEventQueue inputHandler; 
     
-    public void load() {
-        FileHandle file = Gdx.files.internal("Mona_Lisa.jpg");
+    public void load(FileHandle file) {
         if(!file.exists())
             return;
         screenTexture = new Texture(file);
@@ -37,17 +36,14 @@ public class ShaderDemo extends ApplicationAdapter {
     public void create() {
         lastProcessedTime = 0L;
         startTime = TimeUtils.millis();
-        add = new Vector3(0.1f, 0.95f, 0.2f);
+        add = new Vector3(0f, 0f, 0f);
 //        add = new Vector3(0.1f, 0.95f, swayRandomized(12345, TimeUtils.timeSinceMillis(startTime) * 0x1p-9f) * 0.4f + 0.2f);
-        mul = new Vector3(1f, 0.8f, 0.85f);
+        mul = new Vector3(1f, 1f, 1f);
         shader = new ShaderProgram(vertexShader, fragmentShaderOnlyWarmMild);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + shader.getLog());
         batch = new SpriteBatch(1000, shader);
         batch.enableBlending();
-//        inputHandler = inputProcessor();
-//        Gdx.input.setInputProcessor(inputHandler);
-        
-        load();
+        load(Gdx.files.internal("Mona_Lisa.jpg"));
     }
 
 
@@ -78,62 +74,6 @@ public class ShaderDemo extends ApplicationAdapter {
     public void resize(int width, int height) {
     }
 
-    public InputProcessor inputProcessor() {
-        return new InputAdapter() {
-            @Override
-            public boolean keyDown(int keycode) {
-                switch (keycode) {
-                    case Keys.L:
-                    case Keys.UP:
-                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
-                            mul.x += 0.01f;
-                        else
-                            add.x = MathUtils.clamp(add.x + 0.05f, -1f, 1f);
-                        break;
-                    case Keys.D:
-                    case Keys.DOWN:
-                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
-                            mul.x -= 0.01f;
-                        else
-                            add.x = MathUtils.clamp(add.x - 0.05f, -1f, 1f);
-                        break;
-                    case Keys.W:
-                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
-                            mul.y += 0.01f;
-                        else
-                            add.y = MathUtils.clamp(add.y + 0.05f, -1f, 1f);
-                        break;
-                    case Keys.C:
-                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
-                            mul.y -= 0.01f;
-                        else
-                            add.y = MathUtils.clamp(add.y - 0.05f, -1f, 1f);
-                        break;
-                    case Keys.M:
-                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
-                            mul.z += 0.01f;
-                        else
-                            add.z = MathUtils.clamp(add.z + 0.05f, -1f, 1f);
-                        break;
-                    case Keys.B:
-                        if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
-                            mul.z -= 0.01f;
-                        else
-                            add.z = MathUtils.clamp(add.z - 0.05f, -1f, 1f);
-                        break;
-                    case Keys.R:
-                        mul.set(1f, 1f, 1f);
-                        add.set(0f, 0f, 0f);
-                        break;
-                    case Keys.Q:
-                    case Keys.ESCAPE:
-                        Gdx.app.exit();
-                        break;
-                }
-                return true;
-            }
-        };
-    }
     public void handleInput()
     {
         // only process once every 100 ms, or 10 times a second, at most

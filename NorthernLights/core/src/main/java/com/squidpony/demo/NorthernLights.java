@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class NorthernLights extends ApplicationAdapter {
     private int seed;
     private SpriteBatch batch;
     private Texture tiny;
+    private StretchViewport viewport;
     private long startTime;
     private int width, height;
     @Override
@@ -29,16 +31,16 @@ public class NorthernLights extends ApplicationAdapter {
         Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGB888);
         pm.drawPixel(0, 0, -1);
         tiny = new Texture(pm);
-        width = Gdx.graphics.getWidth();
-        height = Gdx.graphics.getHeight();
+        width = 480;
+        height = 320;
+//        width = Gdx.graphics.getWidth();
+//        height = Gdx.graphics.getHeight();
     }
 
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-        this.width = width;
-        this.height = height;
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+//        batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
     }
     public static float swayRandomized(int seed, float value)
     {
@@ -76,7 +78,7 @@ public class NorthernLights extends ApplicationAdapter {
     
     @Override
     public void render() {
-        super.render();
+        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
         final float ftm = tm * 0x3p-14f;
         final float s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0.008f;
@@ -86,6 +88,7 @@ public class NorthernLights extends ApplicationAdapter {
         final float s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0.008f;
         final float c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0.008f;
         float conn0, conn1, conn2;
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
