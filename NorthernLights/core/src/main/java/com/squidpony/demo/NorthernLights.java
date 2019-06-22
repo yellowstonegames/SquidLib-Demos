@@ -7,14 +7,13 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class NorthernLights extends ApplicationAdapter {
+    private static final float RATE = 0.5f;
     private int seed;
     private SpriteBatch batch;
     private Texture tiny;
-    private StretchViewport viewport;
     private long startTime;
     private int width, height;
     @Override
@@ -71,9 +70,9 @@ public class NorthernLights extends ApplicationAdapter {
     private float cosmic(float c0, float c1, float c2)
     {
         float sum = swayRandomized(seed, c2 + c0);
-        sum += swayRandomized(seed, sum + c0 + c1);
-        sum += swayRandomized(seed, sum + c1 + c2);
-        return sum + 0.5f;
+        sum += swayRandomized(~seed, sum + c0 + c1);
+        sum += swayRandomized(seed ^ 0x9E3779B9, sum + c1 + c2);
+        return sum + 0.5f + 2.5f * swayRandomized(seed ^ seed >>> 16, sum + c0 + c1 + c2);
     }
     
     @Override
@@ -81,25 +80,32 @@ public class NorthernLights extends ApplicationAdapter {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
         final float ftm = tm * 0x3p-14f;
-        final float s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0.008f;
-        final float c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0.008f;
-        final float s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0.008f;
-        final float c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0.008f;
-        final float s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0.008f;
-        final float c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0.008f;
+        final float s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0x1p-7f;//0.008f;
+        final float c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0x1p-7f;//0.008f;
+        final float s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0x1p-7f;//0.008f;
+        final float c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0x1p-7f;//0.008f;
+        final float s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0x1p-7f;//0.008f;
+        final float c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0x1p-7f;//0.008f;
+        final float rt = tm * RATE;
+        final float r0 = rt * 0x3.cac1p-13f;
+        final float r1 = rt * 0x4.e6e9p-13f;
+        final float r2 = rt * 0x5.09fcp-13f;
+
         float conn0, conn1, conn2;
         batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                conn0 = tm * (4.375E-4f) + x * c0 - y * s0;
-                conn1 = tm * (5.625E-4f) - x * c1 + y * s1;
-                conn2 = tm * (8.125E-4f) + x * c2 + y * s2;
+                conn0 = r0 + x * c0 - y * s0;
+                conn1 = r1 - x * c1 + y * s1;
+                conn2 = r2 + x * c2 + y * s2;
 
                 conn0 = cosmic(conn0, conn1, conn2);
                 conn1 = cosmic(conn0, conn1, conn2);
                 conn2 = cosmic(conn0, conn1, conn2);
                 batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
+//                conn0 = swayTight(cosmic(conn0, conn1, conn2));
+//                batch.setColor(conn0, conn0, conn0, 1f);
                 batch.draw(tiny, x, y);
             }
         }
