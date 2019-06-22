@@ -39,7 +39,7 @@ public class NorthernLights extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-//        batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
     }
     public static float swayRandomized(int seed, float value)
     {
@@ -65,14 +65,16 @@ public class NorthernLights extends ApplicationAdapter {
      * @param c0 connection 0
      * @param c1 connection 1
      * @param c2 connection 2
-     * @return a continuous noise-like value between -0.5 and 1.5
+     * @return a continuous noise-like value between -0.25f and 4.25f
      */
     private float cosmic(float c0, float c1, float c2)
     {
-        float sum = swayRandomized(seed, c2 + c0);
-        sum += swayRandomized(~seed, sum + c0 + c1);
-        sum += swayRandomized(seed ^ 0x9E3779B9, sum + c1 + c2);
-        return sum + 0.5f + 2.5f * swayRandomized(seed ^ seed >>> 16, sum + c0 + c1 + c2);
+        final float sum = swayRandomized(seed, c0 + c1) * 0.75f + 2.0f;
+//        float sum = swayRandomized(seed, c2 + c0);
+//        sum += swayRandomized(~seed, sum + c0 + c1);
+//        sum += swayRandomized(seed ^ 0x9E3779B9, sum + c1 + c2);
+//        return sum + 0.5f + 2.5f * swayRandomized(seed ^ seed >>> 16, sum + c0 + c1 + c2);
+        return sum + 1.5f * swayRandomized(~seed, sum * (c0 - c1 - c2));
     }
     
     @Override
@@ -92,7 +94,6 @@ public class NorthernLights extends ApplicationAdapter {
         final float r2 = rt * 0x5.09fcp-13f;
 
         float conn0, conn1, conn2;
-        batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
