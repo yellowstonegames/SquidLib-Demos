@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -104,12 +106,50 @@ public class NorthernLights extends ApplicationAdapter {
                 conn0 = cosmic(conn0, conn1, conn2);
                 conn1 = cosmic(conn0, conn1, conn2);
                 conn2 = cosmic(conn0, conn1, conn2);
-                batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
+//                batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
 //                conn0 = swayTight(cosmic(conn0, conn1, conn2));
+                batch.setColor(floatGetHSV(swayTight(conn2 + conn1), 1f, 1f));
 //                batch.setColor(conn0, conn0, conn0, 1f);
                 batch.draw(tiny, x, y);
             }
         }
         batch.end();
     }
+
+
+    public static float floatGetHSV(float hue, float saturation, float value) {
+        if (saturation <= 0.0039f) {
+            return floatGet(value, value, value);
+        } else if (value <= 0.0039f) {
+            return NumberUtils.intBitsToFloat(0xFE000000);
+        } else {
+            final float h = ((hue + 6f) % 1f) * 6f;
+            final int i = (int) h;
+            value = MathUtils.clamp(value, 0f, 1f);
+            saturation = MathUtils.clamp(saturation, 0f, 1f);
+            final float a = value * (1 - saturation);
+            final float b = value * (1 - saturation * (h - i));
+            final float c = value * (1 - saturation * (1 - (h - i)));
+
+            switch (i) {
+                case 0:
+                    return floatGet(value, c, a);
+                case 1:
+                    return floatGet(b, value, a);
+                case 2:
+                    return floatGet(a, value, c);
+                case 3:
+                    return floatGet(a, b, value);
+                case 4:
+                    return floatGet(c, a, value);
+                default:
+                    return floatGet(value, a, b);
+            }
+        }
+    }
+    public static float floatGet(float r, float g, float b) {
+        return NumberUtils.intBitsToFloat(0xFE000000 | ((int) (b * 255) << 16)
+                | ((int) (g * 255) << 8) | (int) (r * 255));
+    }
+
 }
