@@ -108,7 +108,8 @@ public class NorthernLights extends ApplicationAdapter {
                 conn2 = cosmic(conn0, conn1, conn2);
 //                batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
 //                conn0 = swayTight(cosmic(conn0, conn1, conn2));
-                batch.setColor(floatGetHSV(swayTight(conn2 + conn1), 1f, 1f));
+                batch.setColor(lerpFloatColors(floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2)),
+                        floatGetHSV(swayTight(conn2), 1f, 1f), swayTight(0.5f - conn1)));
 //                batch.setColor(conn0, conn0, conn0, 1f);
                 batch.draw(tiny, x, y);
             }
@@ -150,6 +151,15 @@ public class NorthernLights extends ApplicationAdapter {
     public static float floatGet(float r, float g, float b) {
         return NumberUtils.intBitsToFloat(0xFE000000 | ((int) (b * 255) << 16)
                 | ((int) (g * 255) << 8) | (int) (r * 255));
+    }
+    public static float lerpFloatColors(final float start, final float end, final float change) {
+        final int s = NumberUtils.floatToIntBits(start), e = NumberUtils.floatToIntBits(end),
+                rs = (s & 0xFF), gs = (s >>> 8) & 0xFF, bs = (s >>> 16) & 0xFF,
+                re = (e & 0xFF), ge = (e >>> 8) & 0xFF, be = (e >>> 16) & 0xFF;
+        return NumberUtils.intBitsToFloat(((int) (rs + change * (re - rs)) & 0xFF)
+                | (((int) (gs + change * (ge - gs)) & 0xFF) << 8)
+                | (((int) (bs + change * (be - bs)) & 0xFF) << 16)
+                | 0xFE000000);
     }
 
 }
