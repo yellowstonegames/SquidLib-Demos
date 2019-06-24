@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class NorthernLights extends ApplicationAdapter {
-    private static final float RATE = 0.5f;
+    private static final float RATE = 0.75f;
     private int seed;
     private SpriteBatch batch;
     private Texture tiny;
@@ -76,24 +76,24 @@ public class NorthernLights extends ApplicationAdapter {
 //        sum += swayRandomized(~seed, sum + c0 + c1);
 //        sum += swayRandomized(seed ^ 0x9E3779B9, sum + c1 + c2);
 //        return sum + 0.5f + 2.5f * swayRandomized(seed ^ seed >>> 16, sum + c0 + c1 + c2);
-        return sum + 1.5f * swayRandomized(~seed, sum * (c0 - c1 - c2));
+        return sum + 1.75f * swayRandomized(~seed, sum * 0.5698402909980532f + 0.7548776662466927f * (c0 - c1 - c2));
     }
     
     @Override
     public void render() {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
-        final float ftm = tm * 0x3p-14f;
-        final float s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0x1p-7f;//0.008f;
-        final float c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0x1p-7f;//0.008f;
-        final float s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0x1p-7f;//0.008f;
-        final float c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0x1p-7f;//0.008f;
-        final float s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0x1p-7f;//0.008f;
-        final float c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0x1p-7f;//0.008f;
+        final float ftm = tm * 0x3p-13f,
+                s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0x1p-6f,
+                c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0x1p-6f, 
+                s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0x1p-6f,
+                c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0x1p-6f, 
+                s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0x1p-6f,
+                c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0x1p-6f;
         final float rt = tm * RATE;
-        final float r0 = rt * 0x3.cac1p-13f;
-        final float r1 = rt * 0x4.e6e9p-13f;
-        final float r2 = rt * 0x5.09fcp-13f;
+        final float r0 = swayRandomized(0x12345678, rt * 0x3.cac1p-13f);
+        final float r1 = swayRandomized(0x81234567, rt * 0x4.e6e9p-13f);
+        final float r2 = swayRandomized(0x78123456, rt * 0x5.09fcp-13f);
 
         float conn0, conn1, conn2;
         batch.begin();
@@ -106,10 +106,15 @@ public class NorthernLights extends ApplicationAdapter {
                 conn0 = cosmic(conn0, conn1, conn2);
                 conn1 = cosmic(conn0, conn1, conn2);
                 conn2 = cosmic(conn0, conn1, conn2);
-//                batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
+                batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
+//                batch.setColor(lerpFloatColors(
+//                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
+//                        , floatGetHSV(swayTight(conn2), 1f, 1f), swayTight(0.5f - conn1))
+//            );
+
+//                conn0 = swayTight(conn0 + conn1 + conn2);
 //                conn0 = swayTight(cosmic(conn0, conn1, conn2));
-                batch.setColor(lerpFloatColors(floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2)),
-                        floatGetHSV(swayTight(conn2), 1f, 1f), swayTight(0.5f - conn1)));
+//                conn0 = swayTight(conn2);
 //                batch.setColor(conn0, conn0, conn0, 1f);
                 batch.draw(tiny, x, y);
             }
