@@ -71,7 +71,7 @@ public class NorthernLights extends ApplicationAdapter {
      */
     private float cosmic(float c0, float c1, float c2)
     {
-        final float sum = swayRandomized(seed, c0 + c1) * 0.75f + 2.0f;
+        final float sum = swayRandomized(seed, c0 + c1) + 2.0f;
 //        float sum = swayRandomized(seed, c2 + c0);
 //        sum += swayRandomized(~seed, sum + c0 + c1);
 //        sum += swayRandomized(seed ^ 0x9E3779B9, sum + c1 + c2);
@@ -83,19 +83,19 @@ public class NorthernLights extends ApplicationAdapter {
     public void render() {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
-        final float ftm = tm * 0x3p-13f,
+        final float rt = tm * RATE,
+                ftm = rt * 0x3p-13f,
                 s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0x1p-6f,
                 c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0x1p-6f, 
                 s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0x1p-6f,
                 c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0x1p-6f, 
                 s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0x1p-6f,
                 c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0x1p-6f;
-        final float rt = tm * RATE;
-        final float r0 = swayRandomized(0x12345678, rt * 0x3.cac1p-13f);
-        final float r1 = swayRandomized(0x81234567, rt * 0x4.e6e9p-13f);
-        final float r2 = swayRandomized(0x78123456, rt * 0x5.09fcp-13f);
+        final float r0 = rt * 0x3.cac1p-13f;//swayRandomized(0x12345678, rt * 0x3.cac1p-13f);
+        final float r1 = rt * 0x4.e6e9p-13f;//swayRandomized(0x81234567, rt * 0x4.e6e9p-13f);
+        final float r2 = rt * 0x5.09fcp-13f;//swayRandomized(0x78123456, rt * 0x5.09fcp-13f);
 
-        float conn0, conn1, conn2;
+        float conn0, conn1, conn2, zone;
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -103,9 +103,10 @@ public class NorthernLights extends ApplicationAdapter {
                 conn1 = r1 - x * c1 + y * s1;
                 conn2 = r2 + x * c2 + y * s2;
 
-                conn0 = cosmic(conn0, conn1, conn2);
-                conn1 = cosmic(conn0, conn1, conn2);
-                conn2 = cosmic(conn0, conn1, conn2);
+                zone = cosmic(x * 0x1p-7f, y * 0x1p-7f, ftm);
+                conn0 = cosmic(conn0, conn1, conn2) + zone;
+                conn1 = cosmic(conn0, conn1, conn2) + zone;
+                conn2 = cosmic(conn0, conn1, conn2) + zone;
                 batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
@@ -114,7 +115,7 @@ public class NorthernLights extends ApplicationAdapter {
 
 //                conn0 = swayTight(conn0 + conn1 + conn2);
 //                conn0 = swayTight(cosmic(conn0, conn1, conn2));
-//                conn0 = swayTight(conn2);
+//                conn0 = swayTight(conn2 + zone);
 //                batch.setColor(conn0, conn0, conn0, 1f);
                 batch.draw(tiny, x, y);
             }
