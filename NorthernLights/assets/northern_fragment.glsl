@@ -19,16 +19,17 @@ const float rb_adj = 32.0 / 1023.0;
 float swayRandomized(float seed, float value)
 {
     float f = floor(value);
-    float start = sin((cos(f * seed) + sin(f * 1024.)) * 345. + seed);
-    float end   = sin((cos((f+1.) * seed) + sin((f+1.) * 1024.)) * 345. + seed);
+    float start = sin((cos(f * seed) + sin(f * 1024.)) * (420.413));
+    float end   = sin((cos((f+1.) * seed) + sin((f+1.) * 1024.)) * (420.413));
     return mix(start, end, smoothstep(0., 1., value - f));
 }
 float cosmic(float seed, vec3 con)
 {
-    float sum = swayRandomized(seed, con.z + con.x);
-    sum = sum + swayRandomized(seed, con.x + con.y + sum);
-    sum = sum + swayRandomized(seed, con.y + con.z + sum);
-    return sum * 0.3333333333;
+    float sum = swayRandomized(seed, con.z + con.x) + 2.0;
+    return sum + 1.75f * swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x - con.y - con.z));
+    //sum = sum + swayRandomized(seed, con.x + con.y + sum);
+    //sum = sum + swayRandomized(seed, con.y + con.z + sum);
+    //return sum * 0.3333333333;
 }
 void main() {
   //vec3 s = vec3(swayRandomized(-16405.31527, tm - 1.11),
@@ -37,7 +38,7 @@ void main() {
   //vec3 c = vec3(swayRandomized(-10527.92407, tm - 1.11),
   //              swayRandomized(-61557.6687, tm + 1.41),
   //              swayRandomized(-43527.8990, tm + 2.61)) * 5.;
-  vec3 con = vec3(0.0004375, 0.0005625, 0.0008125) * tm  + c * v_texCoords.x + s * v_texCoords.y;
+  vec3 con = vec3(0.0004375, 0.0005625, 0.0008125) * tm + c * v_texCoords.x + s * v_texCoords.y;
   con.x = cosmic(seed, con);
   con.y = cosmic(seed + 12.3456, con);
   con.z = cosmic(seed - 45.6123, con);

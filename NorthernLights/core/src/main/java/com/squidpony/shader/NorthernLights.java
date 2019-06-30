@@ -21,7 +21,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private Texture pixel;
 	private ShaderProgram shader;
 
-	private long startTime;
+	private long startTime, realStartTime;
 	private float seed;
 	private int width, height;
 	private Texture palette;
@@ -34,8 +34,8 @@ public class NorthernLights extends ApplicationAdapter {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
-		startTime = TimeUtils.millis();
-		int choice = 3;//(int) (startTime >>> 4 & 3L);
+		realStartTime = startTime = TimeUtils.millis();
+		int choice = 0;//(int) (startTime >>> 4 & 3L);
 		switch (choice)
 		{
 			case 0:
@@ -75,7 +75,7 @@ public class NorthernLights extends ApplicationAdapter {
 		long state = TimeUtils.nanoTime() - startTime;//-1234567890L;//
 		// Sarong's DiverRNG.randomize()
 		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 36) * 0x1.5bf0a8p-16f;
-		
+		startTime -= (state ^ state >>> 11) & 0xFFFFL;
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 
@@ -93,11 +93,20 @@ public class NorthernLights extends ApplicationAdapter {
 		this.height = height;
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
 	}
-	private static float swayRandomized(int seed, float value)
-	{
+//	private static float swayRandomized(int seed, float value)
+//	{
+//		final int floor = value >= 0f ? (int) value : (int) value - 1;
+//		final float start = (((seed += floor * 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f,
+//				end = (((seed += 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f;
+//		value -= floor;
+//		value *= value * (3f - 2f * value);
+//		return (1f - value) * start + value * end;
+//	}
+
+	public static float swayRandomized(int seed, float value) {
 		final int floor = value >= 0f ? (int) value : (int) value - 1;
-		final float start = (((seed += floor * 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f,
-				end = (((seed += 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f;
+		final float start = ((((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f,
+				end = (((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f;
 		value -= floor;
 		value *= value * (3f - 2f * value);
 		return (1f - value) * start + value * end;
@@ -107,7 +116,7 @@ public class NorthernLights extends ApplicationAdapter {
 		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x7p-16f;// * 0x3p-14f;
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x3p-14f;// * 0x3p-14f;
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
 		palette.bind();
 		batch.begin();
@@ -126,7 +135,7 @@ public class NorthernLights extends ApplicationAdapter {
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 		gifRecorder.update();
-		if(gifRecorder.isRecording() && TimeUtils.timeSinceMillis(startTime) > 7500L){
+		if(gifRecorder.isRecording() && TimeUtils.timeSinceMillis(realStartTime) > 7500L){
 			gifRecorder.finishRecording();
 			gifRecorder.writeGIF();
 		}

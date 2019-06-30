@@ -26,6 +26,7 @@ public class NorthernLights extends ApplicationAdapter {
         // Sarong's DiverRNG.randomize()
         seed = (int)
                 ((state = ((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) ^ state >>> 28);
+        startTime -= seed >>> 16;
         Gdx.gl.glDisable(GL20.GL_BLEND);
         batch = new SpriteBatch();
         batch.disableBlending();
@@ -43,16 +44,24 @@ public class NorthernLights extends ApplicationAdapter {
         super.resize(width, height);
         batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
     }
-    public static float swayRandomized(int seed, float value)
-    {
+//    public static float swayRandomized(int seed, float value)
+//    {
+//        final int floor = value >= 0f ? (int) value : (int) value - 1;
+//        final float start = (((seed += floor * 0xD6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 10) * 0x4.ffffffp-24f,
+//                end = (((seed += 0xD6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 10) * 0x4.ffffffp-24f;
+//        value -= floor;
+//        value *= value * (3f - 2f * value);
+//        return ((1f - value) * start + value * end);
+//    }
+    public static float swayRandomized(int seed, float value) {
         final int floor = value >= 0f ? (int) value : (int) value - 1;
-        final float start = (((seed += floor * 0xD6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 10) * 0x4.ffffffp-24f,
-                end = (((seed += 0xD6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 10) * 0x4.ffffffp-24f;
+        final float start = (((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-24f,
+                end = ((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-24f;
         value -= floor;
         value *= value * (3f - 2f * value);
-        return ((1f - value) * start + value * end);
+        return (1f - value) * start + value * end;
     }
-    // cubic, not quintic like in SquidLib.
+        // cubic, not quintic like in SquidLib.
     public static float swayTight(float value)
     {
         int floor = (value >= 0f ? (int) value : (int) value - 1);
@@ -91,19 +100,19 @@ public class NorthernLights extends ApplicationAdapter {
                 c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0x1p-6f, 
                 s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0x1p-6f,
                 c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0x1p-6f;
-        final float r0 = rt * 0x3.cac1p-13f;//swayRandomized(0x12345678, rt * 0x3.cac1p-13f);
-        final float r1 = rt * 0x4.e6e9p-13f;//swayRandomized(0x81234567, rt * 0x4.e6e9p-13f);
-        final float r2 = rt * 0x5.09fcp-13f;//swayRandomized(0x78123456, rt * 0x5.09fcp-13f);
+//        final float r0 = rt * 0x3.cac1p-13f;//swayRandomized(0x12345678, rt * 0x3.cac1p-13f);
+//        final float r1 = rt * 0x4.e6e9p-13f;//swayRandomized(0x81234567, rt * 0x4.e6e9p-13f);
+//        final float r2 = rt * 0x5.09fcp-13f;//swayRandomized(0x78123456, rt * 0x5.09fcp-13f);
 
         float conn0, conn1, conn2, zone;
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                conn0 = r0 + x * c0 - y * s0;
-                conn1 = r1 - x * c1 + y * s1;
-                conn2 = r2 + x * c2 + y * s2;
+                conn0 = /*r0*/ + x * c0 - y * s0;
+                conn1 = /*r1*/ - x * c1 + y * s1;
+                conn2 = /*r2*/ + x * c2 + y * s2;
 
-                zone = cosmic(x * 0x1p-7f, y * 0x1p-7f, ftm);
+                zone = 0f;//cosmic(x * 0x1p-7f, y * 0x1p-7f, ftm);
                 conn0 = cosmic(conn0, conn1, conn2) + zone;
                 conn1 = cosmic(conn0, conn1, conn2) + zone;
                 conn2 = cosmic(conn0, conn1, conn2) + zone;
