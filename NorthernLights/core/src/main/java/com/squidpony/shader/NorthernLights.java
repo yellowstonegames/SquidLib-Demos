@@ -124,14 +124,14 @@ public class NorthernLights extends ApplicationAdapter {
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
-		shader.setUniformf("s",
-				swayRandomized(0x9E3779B9, ftm - 1.11f),
-				swayRandomized(0xD1B54A32, ftm + 1.41f),
-				swayRandomized(0xE19B01AA, ftm + 2.61f));
-		shader.setUniformf("c",
-				swayRandomized(0xC13FA9A9, ftm - 1.11f),
-				swayRandomized(0xDB4F0B91, ftm + 1.41f),
-				swayRandomized(0xE60E2B72, ftm + 2.61f));
+//		shader.setUniformf("s",
+//				swayRandomized(0x9E3779B9, ftm - 1.11f),
+//				swayRandomized(0xD1B54A32, ftm + 1.41f),
+//				swayRandomized(0xE19B01AA, ftm + 2.61f));
+//		shader.setUniformf("c",
+//				swayRandomized(0xC13FA9A9, ftm - 1.11f),
+//				swayRandomized(0xDB4F0B91, ftm + 1.41f),
+//				swayRandomized(0xE60E2B72, ftm + 2.61f));
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 		gifRecorder.update();

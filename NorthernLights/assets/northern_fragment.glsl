@@ -12,8 +12,8 @@ uniform sampler2D u_palette;
 
 uniform float seed;
 uniform float tm;
-uniform vec3 s;
-uniform vec3 c;
+//uniform vec3 s;
+//uniform vec3 c;
 const float b_adj = 31.0 / 32.0;
 const float rb_adj = 32.0 / 1023.0;
 float swayRandomized(float seed, float value)
@@ -32,13 +32,18 @@ float cosmic(float seed, vec3 con)
     //return sum * 0.3333333333;
 }
 void main() {
-  //vec3 s = vec3(swayRandomized(-16405.31527, tm - 1.11),
-  //              swayRandomized(-77664.8142, tm + 1.41),
-  //              swayRandomized(-50993.5190, tm + 2.61)) * 5.;
-  //vec3 c = vec3(swayRandomized(-10527.92407, tm - 1.11),
-  //              swayRandomized(-61557.6687, tm + 1.41),
-  //              swayRandomized(-43527.8990, tm + 2.61)) * 5.;
-  vec3 con = vec3(0.0004375, 0.0005625, 0.0008125) * tm + c * v_texCoords.x + s * v_texCoords.y;
+  float yt = gl_FragCoord.y * 0.00375 - tm;
+  float xt = tm + gl_FragCoord.x * 0.00375;
+  float xy = (gl_FragCoord.x - gl_FragCoord.y) * 0.00125;
+  vec3 s = vec3(swayRandomized(-16405.31527, xt - 1.11),
+                swayRandomized(77664.8142, 1.41 - xt),
+                swayRandomized(-50993.5190, xt + 2.61)) * 0.005;
+  vec3 c = vec3(swayRandomized(-10527.92407, yt - 1.11),
+                swayRandomized(-61557.6687, yt + 1.41),
+                swayRandomized(43527.8990, 2.61 - yt)) * 0.005;
+  vec3 con = vec3(swayRandomized(92407.10527, -2.4375 - xy),
+                  swayRandomized(-56687.50993, xy + 1.5625),
+                  swayRandomized(-28142.77664, xy + -3.8125)) * tm + c * gl_FragCoord.x + s * gl_FragCoord.y;
   con.x = cosmic(seed, con);
   con.y = cosmic(seed + 12.3456, con);
   con.z = cosmic(seed - 45.6123, con);
