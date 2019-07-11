@@ -35,7 +35,7 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		realStartTime = startTime = TimeUtils.millis();
-		int choice = 0;//(int) (startTime >>> 4 & 3L);
+		int choice = 3;//(int) (startTime >>> 4 & 3L);
 		switch (choice)
 		{
 			case 0:
