@@ -27,9 +27,9 @@ float cosmic(float seed, vec3 con)
     return sum + swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x - con.y - con.z));
 }
 void main() {
-  float yt = gl_FragCoord.y * 0.0025 - tm;
-  float xt = tm - gl_FragCoord.x * 0.0025;
-  float xy = (gl_FragCoord.x + gl_FragCoord.y) * 0.0025;
+  float yt = gl_FragCoord.y * 0.00125 - tm;
+  float xt = tm - gl_FragCoord.x * 0.00125;
+  float xy = (gl_FragCoord.x + gl_FragCoord.y) * 0.00125;
   vec3 s = vec3(swayRandomized(-16405.31527, xt - 3.11),
                 swayRandomized(77664.8142, 1.41 - xt),
                 swayRandomized(-50993.5190, xt + 2.61)) * 0.00625;

@@ -116,7 +116,7 @@ public class NorthernLights extends ApplicationAdapter {
 		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * (2.0E-4f);// * 0x3p-14f;
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * (1.0E-4f);// * 0x3p-14f;
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
 		palette.bind();
 		batch.begin();
