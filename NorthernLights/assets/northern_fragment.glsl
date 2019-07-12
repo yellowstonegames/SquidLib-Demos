@@ -25,16 +25,13 @@ float swayRandomized(float seed, float value)
 }
 float cosmic(float seed, vec3 con)
 {
-    float sum = swayRandomized(seed, con.z + con.x) + 2.0;
-    return sum + 1.75f * swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x - con.y - con.z));
-    //sum = sum + swayRandomized(seed, con.x + con.y + sum);
-    //sum = sum + swayRandomized(seed, con.y + con.z + sum);
-    //return sum * 0.3333333333;
+    float sum = swayRandomized(seed, con.x + con.y + con.z) * 1.5;
+    return sum + swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x - con.y - con.z));
 }
 void main() {
-  float yt = gl_FragCoord.y * 0.00375 - tm;
-  float xt = gl_FragCoord.x * 0.00375 + tm;
-  float xy = (gl_FragCoord.x - gl_FragCoord.y) * 0.00125;
+  float yt = gl_FragCoord.y * 0.0025 - tm;
+  float xt = tm - gl_FragCoord.x * 0.0025;
+  float xy = (gl_FragCoord.x + gl_FragCoord.y) * 0.0025;
   vec3 s = vec3(swayRandomized(-16405.31527, xt - 1.11),
                 swayRandomized(77664.8142, 1.41 - xt),
                 swayRandomized(-50993.5190, xt + 2.61)) * 0.00625;
@@ -45,10 +42,10 @@ void main() {
                   swayRandomized(-56687.50993, xy + 1.5625),
                   swayRandomized(-28142.77664, xy + -3.8125)) * tm + c * gl_FragCoord.x + s * gl_FragCoord.y;
   con.x = cosmic(seed, con);
-  con.y = cosmic(seed + 12.3456, con);
-  con.z = cosmic(seed - 45.6123, con);
+  con.y = cosmic(seed + 123.456, con);
+  con.z = cosmic(seed - 456.123, con);
     
-  vec3 tgt = sin(con * 3.14159265) * 0.5 + 0.5;
+  vec3 tgt = cos(con * 3.14159265) * 0.5 + 0.5;
   
   vec4 used = texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g));
   float len = length(tgt) + 1.0;
