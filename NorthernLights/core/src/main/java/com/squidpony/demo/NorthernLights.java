@@ -18,6 +18,7 @@ public class NorthernLights extends ApplicationAdapter {
     private Texture tiny;
     private long startTime;
     private int width, height;
+    private float iw, ih;
     @Override
     public void create() {
         super.create();
@@ -35,6 +36,8 @@ public class NorthernLights extends ApplicationAdapter {
         tiny = new Texture(pm);
         width = 480;
         height = 320;
+        iw = 1f / width;
+        ih = 1f / height;
 //        width = Gdx.graphics.getWidth();
 //        height = Gdx.graphics.getHeight();
     }
@@ -43,6 +46,10 @@ public class NorthernLights extends ApplicationAdapter {
     public void resize(int width, int height) {
         super.resize(width, height);
         batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        this.width = width;
+        this.height = height;
+		iw = 1f / width;
+		ih = 1f / height;
     }
 //    public static float swayRandomized(int seed, float value)
 //    {
@@ -55,8 +62,8 @@ public class NorthernLights extends ApplicationAdapter {
 //    }
     public static float swayRandomized(int seed, float value) {
         final int floor = value >= 0f ? (int) value : (int) value - 1;
-        final float start = (((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-24f,
-                end = ((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-24f;
+        final float start = (((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-23f - 1f,
+                end = ((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-23f - 1f;
         value -= floor;
         value *= value * (3f - 2f * value);
         return (1f - value) * start + value * end;
@@ -80,42 +87,55 @@ public class NorthernLights extends ApplicationAdapter {
      */
     private float cosmic(float c0, float c1, float c2)
     {
-        final float sum = swayRandomized(seed, c0 + c1) + 2.0f;
+        final float sum = swayRandomized(seed, c0 + c1 + c2) * 1.5f;
 //        float sum = swayRandomized(seed, c2 + c0);
 //        sum += swayRandomized(~seed, sum + c0 + c1);
 //        sum += swayRandomized(seed ^ 0x9E3779B9, sum + c1 + c2);
 //        return sum + 0.5f + 2.5f * swayRandomized(seed ^ seed >>> 16, sum + c0 + c1 + c2);
-        return sum + 1.75f * swayRandomized(~seed, sum * 0.5698402909980532f + 0.7548776662466927f * (c0 - c1 - c2));
+        return sum + swayRandomized(-seed, sum * 0.5698402909980532f + 0.7548776662466927f * (c0 - c1 - c2));
     }
-    
-    @Override
+
+	@Override
     public void render() {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
         final float rt = tm * RATE,
-                ftm = rt * 0x3p-13f,
-                s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0x1p-6f,
-                c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0x1p-6f, 
-                s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0x1p-6f,
-                c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0x1p-6f, 
-                s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0x1p-6f,
-                c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0x1p-6f;
+                ftm = rt * 0x5p-15f;
+//                s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0x1p-6f,
+//                c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0x1p-6f, 
+//                s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0x1p-6f,
+//                c1 = swayRandomized(0xDB4F0B91, ftm + 1.41f) * 0x1p-6f, 
+//                s2 = swayRandomized(0xE19B01AA, ftm + 2.61f) * 0x1p-6f,
+//                c2 = swayRandomized(0xE60E2B72, ftm + 2.61f) * 0x1p-6f;
+
+        
 //        final float r0 = rt * 0x3.cac1p-13f;//swayRandomized(0x12345678, rt * 0x3.cac1p-13f);
 //        final float r1 = rt * 0x4.e6e9p-13f;//swayRandomized(0x81234567, rt * 0x4.e6e9p-13f);
 //        final float r2 = rt * 0x5.09fcp-13f;//swayRandomized(0x78123456, rt * 0x5.09fcp-13f);
 
-        float conn0, conn1, conn2, zone;
+        float conn0, conn1, conn2;
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                conn0 = /*r0*/ + x * c0 - y * s0;
-                conn1 = /*r1*/ - x * c1 + y * s1;
-                conn2 = /*r2*/ + x * c2 + y * s2;
-
-                zone = 0f;//cosmic(x * 0x1p-7f, y * 0x1p-7f, ftm);
-                conn0 = cosmic(conn0, conn1, conn2) + zone;
-                conn1 = cosmic(conn0, conn1, conn2) + zone;
-                conn2 = cosmic(conn0, conn1, conn2) + zone;
+				float ax = x / 240f, ay = y / 160f;
+				float yt = ay * 0.0025f - ftm;
+				float xt = ftm - ax * 0.0025f;
+				float xy = (ax + ay) * 0.0025f;
+				conn0 = swayRandomized(-1052792407, yt - 1.11f) * ax + swayRandomized(-1640531527, xt - 3.11f) * ay + swayRandomized(924071052, -2.4375f - xy) * ftm;
+				conn1 = swayRandomized(-615576687, yt + 2.41f) * ax + swayRandomized(776648142, 1.41f - xt) * ay + swayRandomized(-566875093, xy + 1.5625f) * ftm;
+				conn2 = swayRandomized(435278990, 3.61f - yt) * ax + swayRandomized(-509935190, xt + 2.61f) * ay + swayRandomized(-284277664, xy + -3.8125f) * ftm;
+                conn0 = cosmic(conn0, conn1, conn2);
+                conn1 = cosmic(conn0, conn1, conn2);
+                conn2 = cosmic(conn0, conn1, conn2);
+//                zone  = cosmic(conn0, conn1, conn2);
+//                conn0 = /*r0*/ + x * c0 - y * s0;
+//                conn1 = /*r1*/ - x * c1 + y * s1;
+//                conn2 = /*r2*/ + x * c2 + y * s2;
+//
+//                zone = 0f;//cosmic(x * 0x1p-7f, y * 0x1p-7f, ftm);
+//                conn0 = cosmic(conn0, conn1, conn2) + zone;
+//                conn1 = cosmic(conn0, conn1, conn2) + zone;
+//                conn2 = cosmic(conn0, conn1, conn2) + zone;
                 batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))

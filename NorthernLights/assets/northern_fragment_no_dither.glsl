@@ -30,12 +30,12 @@ void main() {
   float yt = gl_FragCoord.y * 0.0025 - tm;
   float xt = tm - gl_FragCoord.x * 0.0025;
   float xy = (gl_FragCoord.x + gl_FragCoord.y) * 0.0025;
-  vec3 s = vec3(swayRandomized(-16405.31527, xt - 1.11),
+  vec3 s = vec3(swayRandomized(-16405.31527, xt - 3.11),
                 swayRandomized(77664.8142, 1.41 - xt),
                 swayRandomized(-50993.5190, xt + 2.61)) * 0.00625;
   vec3 c = vec3(swayRandomized(-10527.92407, yt - 1.11),
-                swayRandomized(-61557.6687, yt + 1.41),
-                swayRandomized(43527.8990, 2.61 - yt)) * 0.00625;
+                swayRandomized(-61557.6687, yt + 2.41),
+                swayRandomized(43527.8990, 3.61 - yt)) * 0.00625;
   vec3 con = vec3(swayRandomized(92407.10527, -2.4375 - xy),
                   swayRandomized(-56687.50993, xy + 1.5625),
                   swayRandomized(-28142.77664, xy + -3.8125)) * tm + c * gl_FragCoord.x + s * gl_FragCoord.y;
@@ -45,5 +45,4 @@ void main() {
     
   gl_FragColor.rgb = cos(con * 3.14159265) * 0.5 + 0.5;
   gl_FragColor.a = v_color.a;
-
 }
