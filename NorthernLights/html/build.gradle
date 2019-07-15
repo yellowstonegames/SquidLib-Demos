@@ -1,3 +1,4 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 apply plugin: "gwt"
 apply plugin: "war"
@@ -38,10 +39,10 @@ task startHttpServer () {
 }
 
 dependencies {
-  compile project(':core')
-  compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-  compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-  compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+    compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 }
 
 task superDev(type: GwtSuperDev) {
@@ -69,10 +70,10 @@ task dist(dependsOn: [clean, compileGwt]) {
     }
 }
 task addSource {
-  doLast {
-    sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-
-  }
+//  doLast {
+//    sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+//
+//  }
 }
 
 tasks.compileGwt.dependsOn(addSource)
