@@ -76,6 +76,7 @@ public class NorthernLights extends ApplicationAdapter {
 		// Sarong's DiverRNG.randomize()
 		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 36) * 0x1.5bf0a8p-16f;
 		startTime -= (state ^ state >>> 11) & 0xFFFFL;
+		startTime -= 0x1000000;
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 
@@ -116,7 +117,8 @@ public class NorthernLights extends ApplicationAdapter {
 		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * (1.5E-4f);// * 0x3p-14f;
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * 2E-4f;
+		//swayRandomized(123454321, TimeUtils.timeSinceMillis(startTime) * (1.5E-5f) + 3.141592f + swayRandomized(1234321, TimeUtils.timeSinceMillis(startTime) * (1.5E-4f) - 1.618f + swayRandomized(12321, TimeUtils.timeSinceMillis(startTime) * (1E-4f))));// * 0x3p-14f;
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
 		palette.bind();
 		batch.begin();

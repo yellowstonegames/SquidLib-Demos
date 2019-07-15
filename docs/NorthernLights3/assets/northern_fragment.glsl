@@ -14,6 +14,8 @@ uniform float seed;
 uniform float tm;
 //uniform vec3 s;
 //uniform vec3 c;
+const float b_adj = 31.0 / 32.0;
+const float rb_adj = 32.0 / 1023.0;
 float swayRandomized(float seed, float value)
 {
     float f = floor(value);
@@ -27,9 +29,9 @@ float cosmic(float seed, vec3 con)
     return sum + swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x - con.y - con.z));
 }
 void main() {
-  float yt = gl_FragCoord.y * 0.002 - tm;
-  float xt = tm - gl_FragCoord.x * 0.002;
-  float xy = (gl_FragCoord.x + gl_FragCoord.y) * 0.002;
+  float yt = gl_FragCoord.y * 0.00185 - tm;
+  float xt = tm - gl_FragCoord.x * 0.00185;
+  float xy = (gl_FragCoord.x + gl_FragCoord.y) * 0.00185;
   vec3 s = vec3(swayRandomized(-16405.31527, xt - 3.11),
                 swayRandomized(77664.8142, 1.41 - xt),
                 swayRandomized(-50993.5190, xt + 2.61)) * 0.00625;
@@ -38,11 +40,18 @@ void main() {
                 swayRandomized(43527.8990, 3.61 - yt)) * 0.00625;
   vec3 con = vec3(swayRandomized(92407.10527, -2.4375 - xy),
                   swayRandomized(-56687.50993, xy + 1.5625),
-                  swayRandomized(-28142.77664, xy + -3.8125)) * cosmic(123123.456, c - s) + c * gl_FragCoord.x + s * gl_FragCoord.y;
+                  swayRandomized(-28142.77664, xy + -3.8125)) * tm + c * gl_FragCoord.x + s * gl_FragCoord.y;
   con.x = cosmic(seed, con);
   con.y = cosmic(seed + 123.456, con);
   con.z = cosmic(seed - 456.123, con);
-    
-  gl_FragColor.rgb = cos(con * 3.14159265) * 0.5 + 0.5;
+      
+  vec3 tgt = cos(con * 3.14159265) * 0.5 + 0.5;
+  
+  vec4 used = texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g));
+  float len = length(tgt) + 1.0;
+  float adj = fract(52.9829189 * fract(0.06711056 * gl_FragCoord.x + 0.00583715 * gl_FragCoord.y)) * len - len * 0.5;
+  tgt = clamp(tgt + (tgt - used.rgb) * adj, 0.0, 1.0);
+  gl_FragColor.rgb = v_color.rgb * texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g)).rgb;
   gl_FragColor.a = v_color.a;
+
 }
