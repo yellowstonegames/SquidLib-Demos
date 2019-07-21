@@ -1,8 +1,6 @@
 package com.squidpony.shader;
 
-import com.badlogic.gdx.Application;
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
@@ -34,7 +32,7 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		realStartTime = startTime = TimeUtils.millis();
-		int choice = 2;//(int) (startTime >>> 4 & 3L);
+		int choice = 3;//(int) (startTime >>> 4 & 3L);
 		switch (choice)
 		{
 			case 0:
@@ -51,7 +49,7 @@ public class NorthernLights extends ApplicationAdapter {
 				break;
 			default:
 				System.out.println("Using all colors, no dithering");
-				//palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				palette = new Texture(Gdx.files.internal("Lava256_GLSL.png"), Pixmap.Format.RGBA8888, false);
 				break;
 		}
 
@@ -115,6 +113,15 @@ public class NorthernLights extends ApplicationAdapter {
 	@Override public void render () {
 		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+		if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)))
+		{
+			if(Gdx.graphics.isFullscreen())
+				Gdx.graphics.setWindowedMode(480, 320);
+			else 
+			{
+				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+			}
+		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
 		//swayRandomized(123454321, TimeUtils.timeSinceMillis(startTime) * (1.5E-5f) + 3.141592f + swayRandomized(1234321, TimeUtils.timeSinceMillis(startTime) * (1.5E-4f) - 1.618f + swayRandomized(12321, TimeUtils.timeSinceMillis(startTime) * (1E-4f))));// * 0x3p-14f;
