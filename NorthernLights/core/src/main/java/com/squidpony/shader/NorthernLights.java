@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.TimeUtils;
-import io.anuke.gif.GifRecorder;
 
 /**
  * Credit for the shader adaptation goes to angelickite , a very helpful user on the libGDX Discord.
@@ -25,7 +24,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private float seed;
 	private int width, height;
 	private Texture palette;
-	private GifRecorder gifRecorder;
+//	private GifRecorder gifRecorder;
 
 	@Override public void create () {
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -35,7 +34,7 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		realStartTime = startTime = TimeUtils.millis();
-		int choice = 3;//(int) (startTime >>> 4 & 3L);
+		int choice = 2;//(int) (startTime >>> 4 & 3L);
 		switch (choice)
 		{
 			case 0:
@@ -43,16 +42,16 @@ public class NorthernLights extends ApplicationAdapter {
 				palette = new Texture(Gdx.files.internal("DB_Aurora_GLSL.png"), Pixmap.Format.RGBA8888, false);
 				break;
 			case 1:
-				System.out.println("Using Quorum256");
-				palette = new Texture(Gdx.files.internal("Quorum256_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				System.out.println("Using Aurora256");
+				palette = new Texture(Gdx.files.internal("Aurora256_GLSL.png"), Pixmap.Format.RGBA8888, false);
 				break;
 			case 2:
-				System.out.println("Using 6-value-per-channel uniform RGB");
-				palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				System.out.println("Using Lava256");
+				palette = new Texture(Gdx.files.internal("Lava256_GLSL.png"), Pixmap.Format.RGBA8888, false);
 				break;
 			default:
 				System.out.println("Using all colors, no dithering");
-				palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
+				//palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
 				break;
 		}
 
@@ -72,21 +71,21 @@ public class NorthernLights extends ApplicationAdapter {
 		}
 		batch.setShader(shader);
 		
-		long state = TimeUtils.nanoTime() - startTime;//-1234567890L;//
+		long state = TimeUtils.nanoTime() - startTime;//-1234567890L;//-1234567890L;//
 		// Sarong's DiverRNG.randomize()
 		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 36) * 0x1.5bf0a8p-16f;
 		startTime -= (state ^ state >>> 11) & 0xFFFFL;
-		startTime -= 0x1000000;
+		//startTime -= 0x1000000;
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 
 
-		gifRecorder = new GifRecorder(batch);
-		gifRecorder.setGUIDisabled(true);
-		gifRecorder.open();
-		gifRecorder.setBounds(width * -0.5f, height * -0.5f, width, height);
-		gifRecorder.setFPS(16);
-		gifRecorder.startRecording();
+//		gifRecorder = new GifRecorder(batch);
+//		gifRecorder.setGUIDisabled(true);
+//		gifRecorder.open();
+//		gifRecorder.setBounds(width * -0.5f, height * -0.5f, width, height);
+//		gifRecorder.setFPS(16);
+//		gifRecorder.startRecording();
 	}
 
 	@Override public void resize (int width, int height) {
@@ -117,7 +116,7 @@ public class NorthernLights extends ApplicationAdapter {
 		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * 2E-4f;
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
 		//swayRandomized(123454321, TimeUtils.timeSinceMillis(startTime) * (1.5E-5f) + 3.141592f + swayRandomized(1234321, TimeUtils.timeSinceMillis(startTime) * (1.5E-4f) - 1.618f + swayRandomized(12321, TimeUtils.timeSinceMillis(startTime) * (1E-4f))));// * 0x3p-14f;
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
 		palette.bind();
@@ -136,11 +135,11 @@ public class NorthernLights extends ApplicationAdapter {
 //				swayRandomized(0xE60E2B72, ftm + 2.61f));
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
-		gifRecorder.update();
-		if(gifRecorder.isRecording() && TimeUtils.timeSinceMillis(realStartTime) > 7500L){
-			gifRecorder.finishRecording();
-			gifRecorder.writeGIF();
-		}
+//		gifRecorder.update();
+//		if(gifRecorder.isRecording() && TimeUtils.timeSinceMillis(realStartTime) > 7500L){
+//			gifRecorder.finishRecording();
+//			gifRecorder.writeGIF();
+//		}
 
 	}
 }

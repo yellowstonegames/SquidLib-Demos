@@ -29,18 +29,23 @@ float cosmic(float seed, vec3 con)
     return sum + swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x - con.y - con.z));
 }
 void main() {
-  float yt = gl_FragCoord.y * 0.00185 - tm;
-  float xt = tm - gl_FragCoord.x * 0.00185;
-  float xy = (gl_FragCoord.x + gl_FragCoord.y) * 0.00185;
+  vec3 alt = vec3(gl_FragCoord.xy, tm) * 0.00325;
+  float yt = alt.y + alt.z;
+  float xt = alt.z + alt.x;
+  float xy = alt.x + alt.y;
   vec3 s = vec3(swayRandomized(-16405.31527, xt - 3.11),
                 swayRandomized(77664.8142, 1.41 - xt),
-                swayRandomized(-50993.5190, xt + 2.61)) * 0.00625;
+                swayRandomized(-50993.5190, xt + 2.61));
   vec3 c = vec3(swayRandomized(-10527.92407, yt - 1.11),
                 swayRandomized(-61557.6687, yt + 2.41),
-                swayRandomized(43527.8990, 3.61 - yt)) * 0.00625;
-  vec3 con = vec3(swayRandomized(92407.10527, -2.4375 - xy),
+                swayRandomized(43527.8990, 3.61 - yt));
+  vec3 con = (1.251234567 * (length(s) + length(c))) * (vec3(swayRandomized(92407.10527, -2.4375 - xy),
                   swayRandomized(-56687.50993, xy + 1.5625),
-                  swayRandomized(-28142.77664, xy + -3.8125)) * tm + c * gl_FragCoord.x + s * gl_FragCoord.y;
+                  swayRandomized(-28142.77664, xy + -3.8125))
+                   * swayRandomized(111111.111 + seed, alt.z) + c * swayRandomized(11111.1111 + seed, alt.x) + s * swayRandomized(111.111111 + seed, alt.y));
+                   //* (sin(xt) + cos(yt)) + c * (sin(xy) + cos(xt)) + s * (sin(yt) + cos(xy)));
+                   //* swayRandomized(111111.111 + seed, xt + yt) + c * swayRandomized(11111.1111 + seed, xy + xt) + s * swayRandomized(111.111111 + seed, yt + xy));
+                   //* sin(tm) + c * sin(alt.x) + s * sin(alt.y));
   con.x = cosmic(seed, con);
   con.y = cosmic(seed + 123.456, con);
   con.z = cosmic(seed - 456.123, con);

@@ -8,7 +8,7 @@ precision mediump float;
 varying LOWP vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
-uniform sampler2D u_palette;
+//uniform sampler2D u_palette;
 
 uniform float seed;
 uniform float tm;
@@ -27,7 +27,7 @@ float cosmic(float seed, vec3 con)
     return sum + swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x + con.y + con.z - sum));
 }
 void main() {
-  vec3 alt = vec3(gl_FragCoord.xy, tm * 143.0) * 0.00325;
+  vec3 alt = vec3(gl_FragCoord.xy, tm) * 0.00325;
   float yt = alt.y + alt.z;
   float xt = alt.z + alt.x;
   float xy = alt.x + alt.y;
@@ -37,7 +37,7 @@ void main() {
   vec3 c = vec3(swayRandomized(-10527.92407, yt - 1.11),
                 swayRandomized(-61557.6687, yt + 2.41),
                 swayRandomized(43527.8990, 3.61 - yt));
-  vec3 con = 5.5555 * (vec3(swayRandomized(92407.10527, -2.4375 - xy),
+  vec3 con = (1.251234567 * (length(s) + length(c))) * (vec3(swayRandomized(92407.10527, -2.4375 - xy),
                   swayRandomized(-56687.50993, xy + 1.5625),
                   swayRandomized(-28142.77664, xy + -3.8125))
                    * swayRandomized(111111.111 + seed, alt.z) + c * swayRandomized(11111.1111 + seed, alt.x) + s * swayRandomized(111.111111 + seed, alt.y));
