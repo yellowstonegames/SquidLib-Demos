@@ -56,7 +56,8 @@ public class NorthernLights extends ApplicationAdapter {
 		ShaderProgram.pedantic = false;
 		if(choice == 3)
 		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
+//			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
 		}
 		else
 		{

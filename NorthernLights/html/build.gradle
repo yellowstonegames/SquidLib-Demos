@@ -19,7 +19,7 @@ gwt {
 
 import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
 
-def HttpFileServer server = null
+HttpFileServer server = null
 def httpFilePort = 8080
 task startHttpServer () {
   dependsOn draftCompileGwt
