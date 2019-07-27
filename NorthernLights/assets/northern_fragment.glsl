@@ -12,8 +12,6 @@ uniform sampler2D u_palette;
 
 uniform float seed;
 uniform float tm;
-//uniform vec3 s;
-//uniform vec3 c;
 const float b_adj = 31.0 / 32.0;
 const float rb_adj = 32.0 / 1023.0;
 float swayRandomized(float seed, float value)
@@ -58,5 +56,4 @@ void main() {
   tgt = clamp(tgt + (tgt - used.rgb) * adj, 0.0, 1.0);
   gl_FragColor.rgb = v_color.rgb * texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g)).rgb;
   gl_FragColor.a = v_color.a;
-
 }
