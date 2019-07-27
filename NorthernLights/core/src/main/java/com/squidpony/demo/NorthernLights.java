@@ -19,6 +19,7 @@ public class NorthernLights extends ApplicationAdapter {
     private long startTime;
     private int width, height;
     private float iw, ih;
+    private final float[] con = new float[3];
     @Override
     public void create() {
         super.create();
@@ -95,6 +96,13 @@ public class NorthernLights extends ApplicationAdapter {
         return sum + swayRandomized(-seed, sum * 0.5698402909980532f + 0.7548776662466927f * (c0 - c1 - c2));
     }
 
+    private void cosmic(int seed, float[] con, float x, float y, float z)
+    {
+        con[0] += (x = swayRandomized(seed, x + z)) * 1.2f;
+        con[1] += (y = swayRandomized(~seed, y + x)) * 1.2f;
+        con[2] += (swayRandomized(seed ^ 0x9E3779B9, z + y)) * 1.2f;
+    }
+
 	@Override
     public void render() {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
@@ -113,20 +121,23 @@ public class NorthernLights extends ApplicationAdapter {
 //        final float r1 = rt * 0x4.e6e9p-13f;//swayRandomized(0x81234567, rt * 0x4.e6e9p-13f);
 //        final float r2 = rt * 0x5.09fcp-13f;//swayRandomized(0x78123456, rt * 0x5.09fcp-13f);
 
-        float conn0, conn1, conn2;
         batch.begin();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-				float ax = x / 240f, ay = y / 160f;
-				float yt = ay * 0.0025f - ftm;
-				float xt = ftm - ax * 0.0025f;
-				float xy = (ax + ay) * 0.0025f;
-				conn0 = swayRandomized(-1052792407, yt - 1.11f) * ax + swayRandomized(-1640531527, xt - 3.11f) * ay + swayRandomized(924071052, -2.4375f - xy) * ftm;
-				conn1 = swayRandomized(-615576687, yt + 2.41f) * ax + swayRandomized(776648142, 1.41f - xt) * ay + swayRandomized(-566875093, xy + 1.5625f) * ftm;
-				conn2 = swayRandomized(435278990, 3.61f - yt) * ax + swayRandomized(-509935190, xt + 2.61f) * ay + swayRandomized(-284277664, xy + -3.8125f) * ftm;
-                conn0 = cosmic(conn0, conn1, conn2);
-                conn1 = cosmic(conn0, conn1, conn2);
-                conn2 = cosmic(conn0, conn1, conn2);
+				float ax = x * 0.0075f, ay = y * 0.005f; // adjusted for starting dimensions
+				con[0] = ftm + ay;
+				con[1] = ftm + ax;
+				con[2] = ax + ay;
+				//conn0 = swayRandomized(-1052792407, yt - 1.11f) * ax + swayRandomized(-1640531527, xt - 3.11f) * ay + swayRandomized(924071052, -2.4375f - xy) * ftm;
+				//conn1 = swayRandomized(-615576687, yt + 2.41f) * ax + swayRandomized(776648142, 1.41f - xt) * ay + swayRandomized(-566875093, xy + 1.5625f) * ftm;
+				//conn2 = swayRandomized(435278990, 3.61f - yt) * ax + swayRandomized(-509935190, xt + 2.61f) * ay + swayRandomized(-284277664, xy + -3.8125f) * ftm;
+                //conn0 = cosmic(conn0, conn1, conn2);
+                //conn1 = cosmic(conn0, conn1, conn2);
+                //conn2 = cosmic(conn0, conn1, conn2);
+                cosmic(seed ^ 0xC13FA9A9, con, con[1], con[2], con[0]);
+                cosmic(seed ^ 0xDB4F0B91, con, con[2], con[0], con[1]);
+                cosmic(seed ^ 0x19F1D48E, con, con[0], con[1], con[2]);
+                
 //                zone  = cosmic(conn0, conn1, conn2);
 //                conn0 = /*r0*/ + x * c0 - y * s0;
 //                conn1 = /*r1*/ - x * c1 + y * s1;
@@ -136,7 +147,7 @@ public class NorthernLights extends ApplicationAdapter {
 //                conn0 = cosmic(conn0, conn1, conn2) + zone;
 //                conn1 = cosmic(conn0, conn1, conn2) + zone;
 //                conn2 = cosmic(conn0, conn1, conn2) + zone;
-                batch.setColor(swayTight(conn0), swayTight(conn1), swayTight(conn2), 1f);
+                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]), 1f);
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
 //                        , floatGetHSV(swayTight(conn2), 1f, 1f), swayTight(0.5f - conn1))
