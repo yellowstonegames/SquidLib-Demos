@@ -19,7 +19,7 @@ public class Lwjgl3Launcher {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("NorthernLights");
         configuration.setWindowedMode(480, 320);
-        configuration.useVsync(true);
+        configuration.useVsync(false);
         configuration.setIdleFPS(10);
         ShaderProgram.prependFragmentCode = "#version 120\n";
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
