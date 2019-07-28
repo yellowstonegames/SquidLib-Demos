@@ -13,6 +13,8 @@ gwt {
 
     compiler.strict = true
     compiler.disableCastChecking = true
+    
+    compileGwt.style = "PRETTY"
 }
 
 import org.wisepersist.gradle.plugins.gwt.GwtSuperDev

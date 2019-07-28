@@ -42,7 +42,7 @@ public class GwtLauncher extends GwtBareApp {
 
         addIntTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addIntTest(vp, new Starfish32RNG(123456789, 987654321), "Starfish32RNG");
-        addIntTest(vp, new Otter32RNG(123456789, 987654321), "Otter32RNG");
+        addIntTest(vp, new MoverCounter32RNG(123456789, 987654321), "MoverCounter32RNG");
         addIntTest(vp, new Lobster32RNG(123456789, 987654321), "Lobster32RNG");
         addIntTest(vp, new Cake32RNG(123456789, 987654321, 1), "Cake32RNG");
         addIntTest(vp, new Mover32RNG(1), "Mover32RNG");
@@ -52,11 +52,11 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new LightRNG(123456L), "LightRNG");
         addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addIntTest(vp, new GWTRNG(123456789, 987654321), "GWTRNG");
-        addIntTest(vp, new RNG(new Lathe32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
+        addIntTest(vp, new RNG(new Starfish32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
         addIntTest(vp, new RNG(new LightRNG(123456L)), "LightRNG wrapped in RNG");
         addLongTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
         addLongTest(vp, new Starfish32RNG(123456789, 987654321), "Starfish32RNG");
-        addLongTest(vp, new Otter32RNG(123456789, 987654321), "Otter32RNG");
+        addLongTest(vp, new MoverCounter32RNG(123456789, 987654321), "MoverCounter32RNG");
         addLongTest(vp, new Lobster32RNG(123456789, 987654321), "Lobster32RNG");
         addLongTest(vp, new Cake32RNG(123456789, 987654321, 1), "Cake32RNG");
         addLongTest(vp, new Mover32RNG(1), "Mover32RNG");
@@ -66,10 +66,10 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new LightRNG(123456L), "LightRNG");
         addLongTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
         addLongTest(vp, new GWTRNG(123456789, 987654321), "GWTRNG");
-        addLongTest(vp, new RNG(new Lathe32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
+        addLongTest(vp, new RNG(new Starfish32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
         addLongTest(vp, new RNG(new LightRNG(123456L)), "LightRNG wrapped in RNG");
         addBoundedIntTest(vp, new GWTRNG(123456789, 987654321), "GWTRNG");
-        addBoundedIntTest(vp, new RNG(new Lathe32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
+        addBoundedIntTest(vp, new RNG(new Starfish32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
         addBoundedIntTest(vp, new RNG(new LightRNG(123456L)), "LightRNG wrapped in RNG");
 
         vp.add(new Label("Note: Clicking multiple 'wrapped in RNG' buttons will slow down all such buttons."));
@@ -1268,7 +1268,7 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private void addIntTest(final VerticalPanel vp, final Otter32RNG rs, final String name)
+    private void addIntTest(final VerticalPanel vp, final MoverCounter32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -1291,7 +1291,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
-    private void addLongTest(final VerticalPanel vp, final Otter32RNG rs, final String name)
+    private void addLongTest(final VerticalPanel vp, final MoverCounter32RNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextLong()");
         final TextBox resultLabel = new TextBox();
@@ -1313,7 +1313,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(runBenchButton);
         vp.add(resultLabel);
     }
-    private String runIntBenchmark(Otter32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runIntBenchmark(MoverCounter32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -1329,7 +1329,7 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String runLongBenchmark(Otter32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runLongBenchmark(MoverCounter32RNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -1345,12 +1345,12 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String reportInt(Otter32RNG rs) {
+    private String reportInt(MoverCounter32RNG rs) {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
 
-    private int runInt(Otter32RNG rs) {
+    private int runInt(MoverCounter32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextInt();
@@ -1358,12 +1358,12 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private String reportLong(Otter32RNG rs) {
+    private String reportLong(MoverCounter32RNG rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
     }
 
-    private int runLong(Otter32RNG rs) {
+    private int runLong(MoverCounter32RNG rs) {
         int xor = 0;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
