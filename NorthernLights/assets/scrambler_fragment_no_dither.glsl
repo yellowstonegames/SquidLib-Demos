@@ -31,9 +31,9 @@ void main() {
   vec3 con = alt.yzx + alt.zxy;
   vec3 s = 10101.101 + 2525.25 * fract(vec3(seed * 0.6180339887498949, seed * 0.7548776662466927, seed * 0.5698402909980532));
 
-  con += cosmic(s.yzx, con.xyz) * 1.7;
-  con += cosmic(s.zxy, con.yzx) * 1.7;
-  con += cosmic(s.xyz, con.zxy) * 1.7;
+  con += cosmic(s.yzx, con.xyz) * 1.6;
+  con += cosmic(s.zxy, con.yzx) * 1.6;
+  con += cosmic(s.xyz, con.zxy) * 1.6;
   //con += cosmic(s.yzx, con.xyz) * 1.6;
   //con += cosmic(s.zxy, con.yzx) * 1.6;
   //con += cosmic(s.xyz, con.zxy) * 1.25;

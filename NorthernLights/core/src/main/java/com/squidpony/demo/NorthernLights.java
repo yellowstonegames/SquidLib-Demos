@@ -5,21 +5,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.squidpony.MutantBatch;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class NorthernLights extends ApplicationAdapter {
     private static final float RATE = 0.75f;
     private int seed;
-    private SpriteBatch batch;
+    private MutantBatch batch;
     private Texture tiny;
     private long startTime;
     private int width, height;
     private float iw, ih;
-    private final float[] con = new float[3];
+    private final transient float[] con = new float[3];
     @Override
     public void create() {
         super.create();
@@ -30,10 +30,10 @@ public class NorthernLights extends ApplicationAdapter {
                 ((state = ((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) ^ state >>> 28);
         startTime -= seed >>> 16;
         Gdx.gl.glDisable(GL20.GL_BLEND);
-        batch = new SpriteBatch();
+        batch = new MutantBatch();
         batch.disableBlending();
         Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGB888);
-        pm.drawPixel(0, 0, -1);
+        pm.drawPixel(0, 0, -1); // white pixel
         tiny = new Texture(pm);
         width = 480;
         height = 320;
@@ -61,21 +61,32 @@ public class NorthernLights extends ApplicationAdapter {
 //        value *= value * (3f - 2f * value);
 //        return ((1f - value) * start + value * end);
 //    }
+
+//    public static float swayRandomized(int seed, float value) {
+//        final int floor = value >= 0f ? (int) value : (int) value - 1;
+//        final float start = (((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-23f - 1f,
+//                end = ((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-23f - 1f;
+//        value -= floor;
+//        value *= value * (3f - 2f * value);
+//        return (1f - value) * start + value * end;
+//    }
     public static float swayRandomized(int seed, float value) {
         final int floor = value >= 0f ? (int) value : (int) value - 1;
-        final float start = (((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-23f - 1f,
-                end = ((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) * 0x3.FFFFFp-23f - 1f;
+        final float start = ((((seed += floor) ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f,
+                end = (((seed + 1 ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f;
         value -= floor;
         value *= value * (3f - 2f * value);
         return (1f - value) * start + value * end;
     }
-        // cubic, not quintic like in SquidLib.
-    public static float swayTight(float value)
+
+
+    public static int swayTight(float value)
     {
         int floor = (value >= 0f ? (int) value : (int) value - 1);
         value -= floor;
         floor &= 1;
-        return value * value * (3f - 2f * value) * (-floor | 1) + floor;
+        return (int)(value * value * (765f - 510f * value) * (-floor | 1) + (-floor & 255));
+//        return value * value * (3f - 2f * value) * (-floor | 1) + floor;
 //        return value * value * value * (value * (value * 6f - 15f) + 10f) * (-floor | 1) + floor;
     }
 
@@ -98,9 +109,16 @@ public class NorthernLights extends ApplicationAdapter {
 
     private void cosmic(int seed, float[] con, float x, float y, float z)
     {
-        con[0] += (x = swayRandomized(seed, x + z)) * 1.2f;
-        con[1] += (y = swayRandomized(~seed, y + x)) * 1.2f;
-        con[2] += (swayRandomized(seed ^ 0x9E3779B9, z + y)) * 1.2f;
+        con[0] += (x = swayRandomized(seed, x + z));
+        con[1] += (y = swayRandomized(seed ^ 0x7F4A7C15, y + x));
+        con[2] += (swayRandomized(seed ^ 0x9E3779B9, z + y));
+    }
+    
+    private void cosmic(int seed, float[] con, int x, int y, int z)
+    {
+        con[0] += swayRandomized(seed, con[x] + con[z]);
+        con[1] += swayRandomized(seed ^ 0x7F4A7C15, con[y] + con[x]);
+        con[2] += swayRandomized(seed ^ 0x9E3779B9, con[z] + con[y]);
     }
 
 	@Override
@@ -134,9 +152,12 @@ public class NorthernLights extends ApplicationAdapter {
                 //conn0 = cosmic(conn0, conn1, conn2);
                 //conn1 = cosmic(conn0, conn1, conn2);
                 //conn2 = cosmic(conn0, conn1, conn2);
-                cosmic(seed ^ 0xC13FA9A9, con, con[1], con[2], con[0]);
-                cosmic(seed ^ 0xDB4F0B91, con, con[2], con[0], con[1]);
-                cosmic(seed ^ 0x19F1D48E, con, con[0], con[1], con[2]);
+                cosmic(seed ^ 0xC13FA9A9, con, 1, 2, 0);
+                cosmic(seed ^ 0xDB4F0B91, con, 2, 0, 1);
+                cosmic(seed ^ 0x19F1D48E, con, 0, 1, 2);
+//                cosmic(seed ^ 0xC13FA9A9, con, con[1], con[2], con[0]);
+//                cosmic(seed ^ 0xDB4F0B91, con, con[2], con[0], con[1]);
+//                cosmic(seed ^ 0x19F1D48E, con, con[0], con[1], con[2]);
                 
 //                zone  = cosmic(conn0, conn1, conn2);
 //                conn0 = /*r0*/ + x * c0 - y * s0;
@@ -147,7 +168,7 @@ public class NorthernLights extends ApplicationAdapter {
 //                conn0 = cosmic(conn0, conn1, conn2) + zone;
 //                conn1 = cosmic(conn0, conn1, conn2) + zone;
 //                conn2 = cosmic(conn0, conn1, conn2) + zone;
-                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]), 1f);
+                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]));
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
 //                        , floatGetHSV(swayTight(conn2), 1f, 1f), swayTight(0.5f - conn1))

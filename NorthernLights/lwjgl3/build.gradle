@@ -12,8 +12,8 @@ dependencies {
 }
 
 jar {
-  archiveName "${appName}-${version}.jar"
-  from { configurations.compile.collect { zipTree(it) } }
+  archiveName "${appName}.jar"
+  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
