@@ -1,6 +1,5 @@
 package com.squidpony.shader;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -29,7 +28,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private GifRecorder gifRecorder;
 
 	@Override public void create () {
-		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		//Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		batch = new SpriteBatch();
 		
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);

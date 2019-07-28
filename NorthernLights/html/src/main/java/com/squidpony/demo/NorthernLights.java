@@ -1,6 +1,5 @@
 package com.squidpony.demo;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -26,7 +25,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private Texture palette;
 
 	@Override public void create () {
-		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		//Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		batch = new SpriteBatch();
 		
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -57,11 +56,11 @@ public class NorthernLights extends ApplicationAdapter {
 		ShaderProgram.pedantic = false;
 		if(choice == 3)
 		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 		}
 		else
 		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment.glsl"));
 		}
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
@@ -93,10 +92,20 @@ public class NorthernLights extends ApplicationAdapter {
 //		return (1f - value) * start + value * end;
 //	}
 
+//	public static float swayRandomized(int seed, float value) {
+//		final int floor = value >= 0f ? (int) value : (int) value - 1;
+//		final float start = ((((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f,
+//				end = (((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f;
+//		value -= floor;
+//		value *= value * (3f - 2f * value);
+//		return (1f - value) * start + value * end;
+//	}
+//
+
 	public static float swayRandomized(int seed, float value) {
 		final int floor = value >= 0f ? (int) value : (int) value - 1;
-		final float start = ((((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f,
-				end = (((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f;
+		final float start = ((((seed += floor) ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f,
+				end = (((seed + 1 ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f;
 		value -= floor;
 		value *= value * (3f - 2f * value);
 		return (1f - value) * start + value * end;
@@ -105,8 +114,8 @@ public class NorthernLights extends ApplicationAdapter {
 	@Override public void render () {
 		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
-		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * 2E-4f;
+//		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
 		palette.bind();
 		batch.begin();

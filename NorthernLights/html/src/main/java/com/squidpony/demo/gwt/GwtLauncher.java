@@ -9,7 +9,7 @@ import com.squidpony.demo.NorthernLights;
 public class GwtLauncher extends GwtApplication {
     @Override
     public GwtApplicationConfiguration getConfig() {
-        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(480, 320);
+        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(960, 640);
         return configuration;
     }
 
