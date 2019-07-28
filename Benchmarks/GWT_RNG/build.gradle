@@ -19,18 +19,15 @@ allprojects {
 configure(subprojects) {
   apply plugin: 'java'
   sourceCompatibility = 1.7
-  compileJava {
-    options.incremental = true
-  }
 }
 
 subprojects {
   version = '0.0.1-SNAPSHOT'
   ext.appName = 'BenchmarksGWT'
   repositories {
-    mavenLocal();
     mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' } 
+    mavenLocal()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
     jcenter()
   }

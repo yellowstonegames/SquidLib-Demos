@@ -8,6 +8,7 @@ See <http://creativecommons.org/publicdomain/zero/1.0/>. */
 package com.github.tommyettinger.bench.gwt;
 
 import squidpony.StringKit;
+import squidpony.squidmath.Starfish32RNG;
 import squidpony.squidmath.StatefulRandomness;
 
 import java.io.Serializable;
