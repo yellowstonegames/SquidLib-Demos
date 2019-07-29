@@ -3,6 +3,7 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -30,6 +31,7 @@ public class ShaderDemo extends ApplicationAdapter {
             return;
         screenTexture = new Texture(file);
         screenTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        Gdx.graphics.setWindowedMode(screenTexture.getWidth(), screenTexture.getHeight());
     }
 
     @Override
@@ -52,10 +54,10 @@ public class ShaderDemo extends ApplicationAdapter {
         handleInput();
         Gdx.gl.glClearColor(0.4f, 0.4f, 0.4f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.setColor(-0x1.fffffep126f); // white as a float to reset any color
+        batch.setColor(Color.WHITE);
         //you can also use
 //        batch.setColor(1f, 1f, 1f, 1f);
-
+        batch.getProjectionMatrix().setToOrtho2D(0, 0, screenTexture.getWidth(), screenTexture.getHeight());
         batch.begin();
 //        shader.setUniformf("u_mul", 0.9f, 0.7f, 0.75f);
 //        shader.setUniformf("u_add", 0.05f, 0.14f, 0.16f);
