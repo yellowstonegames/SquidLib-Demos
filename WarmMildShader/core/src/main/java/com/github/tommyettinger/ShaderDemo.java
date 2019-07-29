@@ -21,7 +21,7 @@ public class ShaderDemo extends ApplicationAdapter {
     private Texture screenTexture;
 
     private long startTime = 0L, lastProcessedTime = 0L;
-    private ShaderProgram shader;
+    private ShaderProgram shader, hueShader;
     private Vector3 add, mul;
     
 //    private InputEventQueue inputHandler; 
@@ -43,6 +43,8 @@ public class ShaderDemo extends ApplicationAdapter {
         mul = new Vector3(1f, 1f, 1f);
         shader = new ShaderProgram(vertexShader, fragmentShaderOnlyWarmMild);
         if (!shader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + shader.getLog());
+        hueShader = new ShaderProgram(vertexShader, fragmentShaderHueLights);
+        if (!hueShader.isCompiled()) throw new GdxRuntimeException("Couldn't compile shader: " + hueShader.getLog());
         batch = new SpriteBatch(1000, shader);
         batch.enableBlending();
         load(Gdx.files.internal("Mona_Lisa.jpg"));
@@ -66,8 +68,8 @@ public class ShaderDemo extends ApplicationAdapter {
         //// this makes the "mild" parameter move the color from red to orange to yellow over time.
         //// it only moves in that range because the warmth has been pushed very high.
         //add.z = swayRandomized(12345, TimeUtils.timeSinceMillis(startTime) * 0x1p-9f) * 0.4f + 0.2f;
-        shader.setUniformf("u_mul", mul);
-        shader.setUniformf("u_add", add);
+        batch.getShader().setUniformf("u_mul", mul);
+        batch.getShader().setUniformf("u_add", add);
         batch.draw(screenTexture, 0, 0);
         batch.end();
     }
@@ -78,10 +80,18 @@ public class ShaderDemo extends ApplicationAdapter {
 
     public void handleInput()
     {
-        // only process once every 100 ms, or 10 times a second, at most
-        if(TimeUtils.timeSinceMillis(lastProcessedTime) < 100)
+        // only process once every 200 ms, or 5 times a second, at most
+        if(TimeUtils.timeSinceMillis(lastProcessedTime) < 200)
             return;
         lastProcessedTime = TimeUtils.millis();
+        if(input.isKeyPressed(Keys.SPACE))
+        {
+            if(batch.getShader().equals(shader))
+                batch.setShader(hueShader);
+            else
+                batch.setShader(shader);
+            return;
+        }
         Vector3 changing;
         // holding shift will change multipliers, otherwise it affects addends
         if(input.isKeyPressed(Keys.SHIFT_LEFT) || input.isKeyPressed(Keys.SHIFT_RIGHT))
@@ -154,6 +164,24 @@ public class ShaderDemo extends ApplicationAdapter {
                     "{\n" +
                     "   vec4 tgt = texture2D( u_texture, v_texCoords );\n" +
                     "   tgt.rgb = u_add + u_mul * vec3(dot(tgt.rgb, vec3(0.375, 0.5, 0.125)), tgt.r - tgt.b, tgt.g - tgt.b);\n" +
+                    "   gl_FragColor.rgb = v_color.rgb * clamp(vec3(dot(tgt.rgb, vec3(1.0, 0.625, -0.5)), dot(tgt.rgb, vec3(1.0, -0.375, 0.5)), dot(tgt.rgb, vec3(1.0, -0.375, -0.5))), 0.0, 1.0);\n" +
+                    "   gl_FragColor.a = v_color.a * tgt.a;\n" +
+                    "}";
+    
+    public static final String fragmentShaderHueLights =
+            "varying vec2 v_texCoords;\n" +
+                    "varying vec4 v_color;\n" +
+                    "uniform sampler2D u_texture;\n" +
+                    "uniform vec3 u_add;\n" +
+                    "uniform vec3 u_mul;\n" +
+                    "void main()\n" +
+                    "{\n" +
+                    "   vec4 tgt = texture2D( u_texture, v_texCoords );\n" +
+                    "   float luma = dot(tgt.rgb, vec3(0.375, 0.5, 0.125));\n" +
+                    //"   luma = clamp(exp2(luma) - 0.925, 0.0, 1.0);\n" +
+//                    "   luma = clamp(luma * sqrt(luma) * 1.4, 0.0, 1.0);\n" +
+                    "   float adj = sin((luma + 0.2) * -6.283185307179586);\n" + //clamp(luma * 1.5 - 0.25, 0.0, 1.0) //(luma * luma * (3.0 - 2.0 * luma))
+                    "   tgt.rgb = u_add + u_mul * vec3(luma, adj * 0.12 + tgt.r - tgt.b, adj * 0.12 + tgt.g - tgt.b);\n" +
                     "   gl_FragColor.rgb = v_color.rgb * clamp(vec3(dot(tgt.rgb, vec3(1.0, 0.625, -0.5)), dot(tgt.rgb, vec3(1.0, -0.375, 0.5)), dot(tgt.rgb, vec3(1.0, -0.375, -0.5))), 0.0, 1.0);\n" +
                     "   gl_FragColor.a = v_color.a * tgt.a;\n" +
                     "}";
