@@ -168,20 +168,24 @@ public class ShaderDemo extends ApplicationAdapter {
                     "   gl_FragColor.a = v_color.a * tgt.a;\n" +
                     "}";
     
-    public static final String fragmentShaderHueLights =
-            "varying vec2 v_texCoords;\n" +
+    public static final String fragmentShaderHueLights = 
+            "varying vec2 v_texCoords;\n" + 
                     "varying vec4 v_color;\n" +
                     "uniform sampler2D u_texture;\n" +
-                    "uniform vec3 u_add;\n" +
-                    "uniform vec3 u_mul;\n" +
+                    "uniform vec3 u_add;\n" + // defaults to all 0.0
+                    "uniform vec3 u_mul;\n" + // defaults to all 1.0
                     "void main()\n" +
                     "{\n" +
                     "   vec4 tgt = texture2D( u_texture, v_texCoords );\n" +
                     "   float luma = dot(tgt.rgb, vec3(0.375, 0.5, 0.125));\n" +
-                    //"   luma = clamp(exp2(luma) - 0.925, 0.0, 1.0);\n" +
-//                    "   luma = clamp(luma * sqrt(luma) * 1.4, 0.0, 1.0);\n" +
-                    "   float adj = sin((luma + 0.2) * -6.283185307179586);\n" + //clamp(luma * 1.5 - 0.25, 0.0, 1.0) //(luma * luma * (3.0 - 2.0 * luma))
-                    "   tgt.rgb = u_add + u_mul * vec3(luma, adj * 0.12 + tgt.r - tgt.b, adj * 0.12 + tgt.g - tgt.b);\n" +
+                    //"   luma = exp2(luma) - 1.0;\n" + // deepens all colors except the brightest
+                    //"   luma = clamp(luma * sqrt(luma) * 1.4, 0.0, 1.0);\n" + // not much effect
+                    //  other things tried for luma
+                    //  clamp(luma * 1.5 - 0.25, 0.0, 1.0) // moves a lot of low values to 0 and high to 1
+                    //  (luma * luma * (3.0 - 2.0 * luma)) // cubic interpolation, could use smoothstep.
+                    "   float adj = sin(( (luma * luma * (3.0 - 2.0 * luma))  ) * -6.283185307179586);\n" +
+                    "   adj *= abs(adj) * 0.2;\n" + // I think this sharpens the sine wave above
+                    "   tgt.rgb = u_add + u_mul * vec3(luma, adj + tgt.r - tgt.b, adj + tgt.g - tgt.b);\n" +
                     "   gl_FragColor.rgb = v_color.rgb * clamp(vec3(dot(tgt.rgb, vec3(1.0, 0.625, -0.5)), dot(tgt.rgb, vec3(1.0, -0.375, 0.5)), dot(tgt.rgb, vec3(1.0, -0.375, -0.5))), 0.0, 1.0);\n" +
                     "   gl_FragColor.a = v_color.a * tgt.a;\n" +
                     "}";
