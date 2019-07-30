@@ -9,7 +9,7 @@ t:northern_vertex.glsl:345:application/unknown
 i:Quorum256_GLSL.png:7047:image/png
 i:RoughLAB_Aurora256_GLSL.png:6093:image/png
 t:scrambler_fragment.glsl:2060:application/unknown
-t:scrambler_fragment_no_dither.glsl:1468:application/unknown
+t:scrambler_fragment_no_dither.glsl:1462:application/unknown
 i:Uniform216_GLSL.png:905:image/png
 t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:859:application/unknown
 t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:2996:application/unknown
