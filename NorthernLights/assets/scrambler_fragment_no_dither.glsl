@@ -14,8 +14,8 @@ uniform float tm;
 float swayRandomized(float seed, float value)
 {
     float f = floor(value);
-    float start = sin((cos(f + seed) * 62.97531 + seed) * 100.413);
-    float end   = sin((cos((f+1.0) + seed) * 62.97531 + seed) * 100.413);
+    float start = sin((cos(f + seed) * 62.97531 + seed) * 101.413);
+    float end   = sin((cos((f+1.0) + seed) * 62.97531 + seed) * 101.413);
     return mix(start, end, smoothstep(0.0, 1.0, value - f));
 }
 vec3 cosmic(vec3 seed, vec3 con)
@@ -27,9 +27,9 @@ vec3 cosmic(vec3 seed, vec3 con)
 }
 
 void main() {
-  vec3 alt = vec3(gl_FragCoord.xy, tm) * 0.0075;
+  vec3 alt = vec3(gl_FragCoord.xy, tm) * 0.005;
   vec3 con = alt.yzx + alt.zxy;
-  vec3 s = 12121.555 + 2525.25 * fract(vec3(seed * 0.61803, seed * 0.754877666, seed * 0.56984));
+  vec3 s = 31.555 + 21.225 * fract(vec3(seed * 0.61803, seed * 0.75488, seed * 0.56984));
 
   con += cosmic(s.yzx, con.xyz) * 1.6;
   con += cosmic(s.zxy, con.yzx) * 1.6;
