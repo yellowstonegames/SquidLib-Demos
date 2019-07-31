@@ -1,6 +1,7 @@
 package com.github.tommyettinger;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -189,6 +190,21 @@ public class ShaderDemo extends ApplicationAdapter {
                     "   gl_FragColor.rgb = v_color.rgb * clamp(vec3(dot(tgt.rgb, vec3(1.0, 0.625, -0.5)), dot(tgt.rgb, vec3(1.0, -0.375, 0.5)), dot(tgt.rgb, vec3(1.0, -0.375, -0.5))), 0.0, 1.0);\n" +
                     "   gl_FragColor.a = v_color.a * tgt.a;\n" +
                     "}";
+    
+    public static int hueShift(int rgba)
+    {
+        int a = rgba & 0xFF;
+        final float r = (rgba >>> 24) / 255f, g = (rgba >>> 16 & 0xFF) / 255f, b = (rgba >>> 8 & 0xFF) / 255f,
+                luma = r * 0.375f + g * 0.5f + b * 0.125f;
+        float adj = (float) Math.sin((luma * luma * (3f - 2f * luma)) * 6.283185307179586f);
+        adj *= Math.abs(adj) * -0.2f;
+        final float warm = adj + r - b, mild = adj + g - b;
+        return (MathUtils.clamp((int) ((luma + 0.625f * warm - 0.5f * mild) * 256f), 0, 255)<<24|
+                MathUtils.clamp((int) ((luma - 0.375f * warm + 0.5f * mild) * 256f), 0, 255)<<16|
+                MathUtils.clamp((int) ((luma - 0.375f * warm - 0.5f * mild) * 256f), 0, 255)<<8|
+                a);
+    }
+    
     /**
      * Gets a float between -1.0 and 1.0 that smoothly changes as value goes up or down, with a seed that will determine
      * what the peaks and valleys will be on that smooth change.
