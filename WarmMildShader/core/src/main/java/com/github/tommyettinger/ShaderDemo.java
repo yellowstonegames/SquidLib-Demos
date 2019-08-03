@@ -31,7 +31,8 @@ public class ShaderDemo extends ApplicationAdapter {
     public void load(FileHandle file) {
         if(!file.exists())
             return;
-        screenTexture = new Texture(eq.process(new Pixmap(file)), Pixmap.Format.RGBA8888, false);
+//        screenTexture = new Texture(eq.process(new Pixmap(file)), Pixmap.Format.RGBA8888, false);
+        screenTexture = new Texture(file, Pixmap.Format.RGBA8888, false);
         screenTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         Gdx.graphics.setWindowedMode(screenTexture.getWidth(), screenTexture.getHeight());
     }
@@ -183,16 +184,19 @@ public class ShaderDemo extends ApplicationAdapter {
                     "   float luma = dot(tgt.rgb, vec3(0.375, 0.5, 0.125));\n" +
 //                    "   luma = log2(luma+1.0);\n" +
 //                    "   luma *= sqrt(luma);\n" +
-                    "   luma = pow(luma, 1.25);\n" +
+                    "   luma = pow(luma, 1.1875);\n" +
 //                    "   luma = 2.0 - exp2(1.0 - luma);\n" +
                     //"   luma = exp2(luma) - 1.0;\n" + // deepens all colors except the brightest
                     //"   luma = clamp(luma * sqrt(luma) * 1.4, 0.0, 1.0);\n" + // not much effect
                     //  other things tried for luma
                     //  clamp(luma * 1.5 - 0.25, 0.0, 1.0) // moves a lot of low values to 0 and high to 1
                     //  (luma * luma * (3.0 - 2.0 * luma)) // cubic interpolation, could use smoothstep.
-                    //"   float adj = sin(( (luma * luma * (3.0 - 2.0 * luma))  ) * -6.283185307179586);\n" +
-                    "   float adj = sin(( (luma - 0.5) * abs(luma - 0.5)  ) * 12.566370614359172) * 0.18;\n" +
-                    //"   adj *= abs(adj) * 0.2;\n" + // I think this sharpens the sine wave above
+//                    "   float adj = sin(luma * -6.283185307179586) * 0.15;\n" +
+                    // 4pi: 12.566370614359172
+                    // 3.75pi: 11.780972450961723
+                    "   float adj = sin(( (luma - 0.5) * abs(luma - 0.5)  ) * 13.5) * 0.09;\n" + // does not use an exact multiple of pi
+//                    "   float adj = 0.0;\n" + // testing just light adjustment
+                    //"   adj *= abs(adj) * 0.2;\n" + // makes weird changes to a sine wave's shape
                     "   tgt.rgb = u_add + u_mul * vec3(luma, adj + tgt.r - tgt.b, adj + tgt.g - tgt.b);\n" +
                     "   gl_FragColor.rgb = v_color.rgb * clamp(vec3(dot(tgt.rgb, vec3(1.0, 0.625, -0.5)), dot(tgt.rgb, vec3(1.0, -0.375, 0.5)), dot(tgt.rgb, vec3(1.0, -0.375, -0.5))), 0.0, 1.0);\n" +
                     "   gl_FragColor.a = v_color.a * tgt.a;\n" +
@@ -204,14 +208,14 @@ public class ShaderDemo extends ApplicationAdapter {
 //        luma *= Math.sqrt(luma);
         final int a = rgba & 0xFF;
         final float r = (rgba >>> 24) / 255f, g = (rgba >>> 16 & 0xFF) / 255f, b = (rgba >>> 8 & 0xFF) / 255f;
-        double luma = Math.pow(r * 0.375f + g * 0.5f + b * 0.125f, 1.25);
+        final double luma = Math.pow(r * 0.375f + g * 0.5f + b * 0.125f, 1.1875);
 //        float adj = (float) Math.sin((luma * luma * (3 - 2 * luma)) * 6.283185307179586f);
-        final float adj = (float) Math.sin((luma - 0.5f) * Math.abs(luma - 0.5f) * (2f * 6.283185307179586f)) * 0.18f;
+        final float adj = (float) Math.sin((luma - 0.5f) * Math.abs(luma - 0.5f) * 13.5) * 0.09f;//(1.875f * 6.283185307179586f)
 //        adj *= Math.abs(adj) * -0.2f;
-        final float warm = adj + r - b, mild = adj + g - b;
-        return (MathUtils.clamp((int) ((luma + 0.625f * warm - 0.5f * mild) * 256f), 0, 255)<<24|
-                MathUtils.clamp((int) ((luma - 0.375f * warm + 0.5f * mild) * 256f), 0, 255)<<16|
-                MathUtils.clamp((int) ((luma - 0.375f * warm - 0.5f * mild) * 256f), 0, 255)<<8|
+        final float warm = adj + r - b, mild = 0.5f * (adj + g - b);
+        return (MathUtils.clamp((int) ((luma + 0.625f * warm - mild) * 256f), 0, 255)<<24|
+                MathUtils.clamp((int) ((luma - 0.375f * warm + mild) * 256f), 0, 255)<<16|
+                MathUtils.clamp((int) ((luma - 0.375f * warm - mild) * 256f), 0, 255)<<8|
                 a);
     }
     
