@@ -1,4 +1,5 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+apply plugin: 'java-library'
 apply plugin: 'application'
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
@@ -7,18 +8,19 @@ eclipse.project.name = appName + '-desktop'
 sourceCompatibility = 1.7
 
 dependencies {
-  compile "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-  compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-  compile "com.kotcrab.vis:vis-ui:$visuiVersion"
-  compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
-  compile "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
-  compile "com.github.tommyettinger:regexodus:$regExodusVersion"
+  api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+  api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.kotcrab.vis:vis-ui:$visuiVersion"
+  api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
+  api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
+  api "com.github.tommyettinger:regexodus:$regExodusVersion"
 }
 
 jar {
-  archiveName "${appName}-${version}.jar"
-  from { configurations.compile.collect { zipTree(it) } }
+  archiveFileName = "${appName}.jar"
+  from files(sourceSets.main.output.classesDirs)
+  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
