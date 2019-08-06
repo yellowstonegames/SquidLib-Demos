@@ -31,8 +31,8 @@ public class ShaderDemo extends ApplicationAdapter {
     public void load(FileHandle file) {
         if(!file.exists())
             return;
-//        screenTexture = new Texture(eq.process(new Pixmap(file)), Pixmap.Format.RGBA8888, false);
-        screenTexture = new Texture(file, Pixmap.Format.RGBA8888, false);
+        screenTexture = new Texture(eq.process(new Pixmap(file)), Pixmap.Format.RGBA8888, false);
+//        screenTexture = new Texture(file, Pixmap.Format.RGBA8888, false);
         screenTexture.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         Gdx.graphics.setWindowedMode(screenTexture.getWidth(), screenTexture.getHeight());
     }
