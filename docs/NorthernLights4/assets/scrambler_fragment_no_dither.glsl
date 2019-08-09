@@ -16,7 +16,7 @@ float swayRandomized(float seed, float value)
     float f = floor(value);
     float start = sin((cos(f + seed) * 12.973 + seed) * 31.413);
     float end   = sin((cos(f + 1.0 + seed) * 12.973 + seed) * 31.413);
-    return mix(start, end, smoothstep(0.0, 1.0, value - f)) * 0.75;
+    return mix(start, end, smoothstep(0.0, 1.0, value - f)) * 0.625;
 }
 vec3 cosmic(vec3 seed, vec3 con)
 {

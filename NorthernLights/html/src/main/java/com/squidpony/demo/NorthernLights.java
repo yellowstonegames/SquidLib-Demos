@@ -32,36 +32,8 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		realStartTime = startTime = TimeUtils.millis();
-		int choice = 3;//(int) (startTime >>> 4 & 3L);
-		switch (choice)
-		{
-			case 0:
-				System.out.println("Using DB Aurora");
-				palette = new Texture(Gdx.files.internal("DB_Aurora_GLSL.png"), Pixmap.Format.RGBA8888, false);
-				break;
-			case 1:
-				System.out.println("Using Quorum256");
-				palette = new Texture(Gdx.files.internal("Quorum256_GLSL.png"), Pixmap.Format.RGBA8888, false);
-				break;
-			case 2:
-				System.out.println("Using 6-value-per-channel uniform RGB");
-				palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
-				break;
-			default:
-				System.out.println("Using all colors, no dithering");
-				palette = new Texture(Gdx.files.internal("Uniform216_GLSL.png"), Pixmap.Format.RGBA8888, false);
-				break;
-		}
-
-		ShaderProgram.pedantic = false;
-		if(choice == 3)
-		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
-		}
-		else
-		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment.glsl"));
-		}
+		ShaderProgram.pedantic = false;			
+		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
 			Gdx.app.exit();
@@ -69,7 +41,7 @@ public class NorthernLights extends ApplicationAdapter {
 		}
 		batch.setShader(shader);
 		
-		long state = TimeUtils.nanoTime() - startTime;//-1234567890L;//
+		long state = TimeUtils.nanoTime() + startTime;//-1234567890L;//
 		// Sarong's DiverRNG.randomize()
 		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 36) * 0x1.5bf0a8p-16f;
 		startTime -= (state ^ state >>> 11) & 0xFFFFL;
@@ -116,10 +88,7 @@ public class NorthernLights extends ApplicationAdapter {
 		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 //		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
-		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
-		palette.bind();
 		batch.begin();
-		shader.setUniformi("u_palette", 1);
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
