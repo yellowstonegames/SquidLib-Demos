@@ -16,14 +16,14 @@ float swayRandomized(float seed, float value)
     float f = floor(value);
     float start = sin((cos(f + seed) * 12.973 + seed) * 31.413);
     float end   = sin((cos(f + 1.0 + seed) * 12.973 + seed) * 31.413);
-    return mix(start, end, smoothstep(0.0, 1.0, value - f)) * 0.625;
+    return mix(start, end, smoothstep(0.0, 1.0, value - f)) + 1.1;
 }
 vec3 cosmic(vec3 seed, vec3 con)
 {
     con.x = swayRandomized(seed.x, con.x + con.z);
     con.y = swayRandomized(seed.y, con.y + con.x);
     con.z = swayRandomized(seed.z, con.z + con.y);
-    return con * 1.3 + 1.5;
+    return con;
 }
 
 void main() {

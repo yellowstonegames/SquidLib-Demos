@@ -72,8 +72,10 @@ public class NorthernLights extends ApplicationAdapter {
 //    }
     public static float swayRandomized(int seed, float value) {
         final int floor = value >= 0f ? (int) value : (int) value - 1;
-        final float start = ((((seed += floor) ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f,
-                end = (((seed + 1 ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f;
+        final float start = ((((seed += floor) ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF)) * 0x1p-20f,
+                end = (((seed + 1 ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF)) * 0x1p-20f;
+//        final float start = ((((seed += floor) ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f,
+//                end = (((seed + 1 ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f;
         value -= floor;
         value *= value * (3f - 2f * value);
         return (1f - value) * start + value * end;
@@ -168,7 +170,32 @@ public class NorthernLights extends ApplicationAdapter {
 //                conn0 = cosmic(conn0, conn1, conn2) + zone;
 //                conn1 = cosmic(conn0, conn1, conn2) + zone;
 //                conn2 = cosmic(conn0, conn1, conn2) + zone;
+//                int bright = (int)((swayRandomized(seed ^ 0xDB4F0B91, (con[0]) * 2) * 85.25f
+//                        + swayRandomized(seed ^ 0xBBE05633, (con[1]) * 3) * 85.25f
+//                        + swayRandomized(seed ^ 0xA0F2EC75, (con[2]) * 5) * 85.25f));
+//                batch.setColor(bright, bright, bright);
+                //0xDB4F0B9175AE2165L, 0xBBE0563303A4615FL, 0xA0F2EC75A1FE1575L
+                //batch.setColor(swayTight((((con[0]) * 0.2f)
+                //                + ((con[1]) * 0.3f) 
+                //                + ((con[2]) * 0.5f) )),
+                //        swayTight((((con[1]) * 0.2f)
+                //                + ((con[2]) * 0.3f) 
+                //                + ((con[0]) * 0.5f) )),
+                //        swayTight((((con[2]) * 0.2f)
+                //                + ((con[0]) * 0.3f) 
+                //                + ((con[1]) * 0.5f) )));
+                
+//                batch.setColor((int)((swayRandomized(seed ^ 0xDB4F0B91, (con[0]) * 2) * 85.25f
+//                                + swayRandomized(seed ^ 0xBBE05633, (con[1]) * 3) * 85.25f
+//                                + swayRandomized(seed ^ 0xA0F2EC75, (con[2]) * 5) * 85.25f)),
+//                        (int)((swayRandomized(seed ^ 0x0B9175AE, (con[1]) * 2) * 85.25f
+//                                + swayRandomized(seed ^ 0x563303A4, (con[2]) * 3) * 85.25f
+//                                + swayRandomized(seed ^ 0xEC75A1FE, (con[0]) * 5) * 85.25f)),
+//                        (int)((swayRandomized(seed ^ 0x75AE2165, (con[2]) * 2) * 85.25f
+//                                + swayRandomized(seed ^ 0x03A4615F, (con[0]) * 3) * 85.25f
+//                                + swayRandomized(seed ^ 0xA1FE1575, (con[1]) * 5) * 85.25f)));
                 batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]));
+//                batch.setColor((int)(con[0] * 127.99 + 128), (int)(con[1] * 127.99 + 128), (int)(con[2] * 127.99 + 128));
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
 //                        , floatGetHSV(swayTight(conn2), 1f, 1f), swayTight(0.5f - conn1))
