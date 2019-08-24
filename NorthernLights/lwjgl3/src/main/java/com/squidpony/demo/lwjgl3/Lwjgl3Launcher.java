@@ -3,7 +3,7 @@ package com.squidpony.demo.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.squidpony.demo.NorthernLights;
+import com.squidpony.shader.NorthernLights;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -20,6 +20,7 @@ public class Lwjgl3Launcher {
         configuration.setTitle("NorthernLights");
         configuration.setWindowedMode(960, 640);
         configuration.useVsync(false);
+        configuration.setTransparentFramebuffer(true);
         configuration.setIdleFPS(10);
         ShaderProgram.prependFragmentCode = "#version 120\n";
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");

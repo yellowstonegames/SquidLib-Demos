@@ -19,6 +19,7 @@ public class GwtLauncher extends GwtApplication {
         int w = Window.getClientWidth() - PADDING;
         int h = Window.getClientHeight() - PADDING;
         cfg = new GwtApplicationConfiguration(w, h);
+        cfg.alpha = true;
         Window.enableScrolling(false);
         Window.setMargin("0");
         Window.addResizeHandler(new ResizeListener());
