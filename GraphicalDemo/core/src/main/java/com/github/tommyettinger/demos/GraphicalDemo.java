@@ -8,8 +8,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+//import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -35,7 +34,7 @@ import static com.badlogic.gdx.Input.Keys.*;
  */
 public class GraphicalDemo extends ApplicationAdapter {
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
-    SpriteBatch batch;
+    private MutantBatch batch;
     private Phase phase = Phase.WAIT;
 
     // random number generator, optimized for when you build for the web browser (with GWT)
@@ -157,7 +156,7 @@ public class GraphicalDemo extends ApplicationAdapter {
         rng = new GWTRNG();
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        batch = new SpriteBatch();
+        batch = new MutantBatch();
         mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
@@ -249,7 +248,7 @@ public class GraphicalDemo extends ApplicationAdapter {
         //uncomment this next line to randomly add water to the dungeon in pools.
         dungeonGen.addWater(12);
         dungeonGen.addDoors(10, true);
-        dungeonGen.addGrass(6);
+        dungeonGen.addGrass(10);
         //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
         //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
         decoDungeon = dungeonGen.generate();
@@ -328,7 +327,7 @@ public class GraphicalDemo extends ApplicationAdapter {
         //if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
         //don't seed the RNG, any valid cell should be possible.
         player = floors.singleRandom(rng);
-        playerSprite = atlas.createSprite(rng.getRandomElement(possibleCharacters));
+        playerSprite = new Sprite(atlas.findRegion(rng.getRandomElement(possibleCharacters)));
         playerColor = ColorTools.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
         playerSprite.setPackedColor(playerColor);
         playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);
@@ -358,7 +357,7 @@ public class GraphicalDemo extends ApplicationAdapter {
         for (int i = 0; i < numMonsters; i++) {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
-            Sprite monster = atlas.createSprite(rng.getRandomElement(possibleEnemies));
+            Sprite monster = new Sprite(atlas.findRegion(rng.getRandomElement(possibleEnemies)));
             monster.setPackedColor(ColorTools.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monster.setPosition(monPos.x * cellWidth, monPos.y * cellHeight);
@@ -643,7 +642,8 @@ public class GraphicalDemo extends ApplicationAdapter {
                     if((monster = monsters.get(Coord.get(i, j))) != null)
                     {
                         monster.setAlpha(1f);
-                        batch.setColor(monster.getColor());
+                        batch.setPackedColor(monster.getPackedColor());
+                        monster.draw(batch);
                     }
                     if(monster == null && visible[i][j] < 1.0)
                     {
@@ -654,9 +654,9 @@ public class GraphicalDemo extends ApplicationAdapter {
                     pos.set(i * cellWidth, j * cellHeight, 0f);
                     batch.setPackedColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
                     batch.draw(solid, pos.x, pos.y);
-                    if ((monster = monsters.get(Coord.get(i, j))) != null)
-                        monster.setAlpha(0f);
-                    if(monster == null && visible[i][j] < 1.0)
+//                    if ((monster = monsters.get(Coord.get(i, j))) != null)
+//                        monster.setAlpha(0f);
+                    if(!monsters.containsKey(Coord.get(i, j)) && visible[i][j] < 1.0)
                     {
                         batch.setPackedColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_GRAY, 0.7f));
                         batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y);
@@ -664,11 +664,11 @@ public class GraphicalDemo extends ApplicationAdapter {
                 }
             }
         }
-        for (int i = 0; i < monsters.size(); i++) {
-            monsters.getAt(i).draw(batch);
-        }
-        playerSprite.draw(batch);
+//        for (int i = 0; i < monsters.size(); i++) {
+//            monsters.getAt(i).draw(batch);
+//        }
         playerSprite.setPackedColor(playerColor);
+        playerSprite.draw(batch);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         // we don't currently show health, but we could.
         //messageDisplay.putBordersCaptioned(SColor.CW_GRAY_WHITE, GDXMarkup.instance.colorString("Health: [Red]" + health));

@@ -12,7 +12,7 @@ public class ColorTools {
      * Gets a packed float representation of a color given as 4 RGBA float components. LibGDX expects ABGR format
      * in some places, but not all, and it can be confusing to track when it wants RGBA, ABGR, or ARGB. Generally,
      * packed floats like what this returns are ABGR format, the kind that can be passed directly to
-     * {@link com.badlogic.gdx.graphics.g2d.Batch#setColor(float)} without constructing intermediate objects.
+     * {@link com.badlogic.gdx.graphics.g2d.Batch#setPackedColor(float)} without constructing intermediate objects.
      * SquidPanel also uses floats internally instead of LibGDX Color objects in its internal 2D array that
      * associates colors to cells; this has changed from earlier releases and should be much more efficient.
      *
@@ -31,7 +31,7 @@ public class ColorTools {
      * Gets a packed float representation of a color given an RGBA8888-format long. LibGDX expects ABGR format
      * in some places, but not all, and it can be confusing to track when it wants RGBA, ABGR, or ARGB. Generally,
      * packed floats like what this returns are ABGR format, the kind that can be passed directly to
-     * {@link com.badlogic.gdx.graphics.g2d.Batch#setColor(float)} without constructing intermediate objects.
+     * {@link com.badlogic.gdx.graphics.g2d.Batch#setPackedColor(float)} without constructing intermediate objects.
      * SquidPanel also uses floats internally instead of LibGDX Color objects in its internal 2D array that
      * associates colors to cells; this has changed from earlier releases and should be much more efficient.
      * <br>
@@ -52,7 +52,7 @@ public class ColorTools {
      * Gets a packed float representation of a color given an RGBA8888-format int. LibGDX expects ABGR format
      * in some places, but not all, and it can be confusing to track when it wants RGBA, ABGR, or ARGB. Generally,
      * packed floats like what this returns are ABGR format, the kind that can be passed directly to
-     * {@link com.badlogic.gdx.graphics.g2d.Batch#setColor(float)} without constructing intermediate objects.
+     * {@link com.badlogic.gdx.graphics.g2d.Batch#setPackedColor(float)} without constructing intermediate objects.
      * SquidPanel also uses floats internally instead of LibGDX Color objects in its internal 2D array that
      * associates colors to cells; this has changed from earlier releases and should be much more efficient.
      * <br>
@@ -72,7 +72,7 @@ public class ColorTools {
      * Gets a packed float representation of a color given as 3 RGB int components, setting alpha to opaque. LibGDX
      * expects ABGR format in some places, but not all, and it can be confusing to track when it wants RGBA, ABGR,
      * or ARGB. Generally, packed floats like what this returns are ABGR format, the kind that can be passed
-     * directly to {@link com.badlogic.gdx.graphics.g2d.Batch#setColor(float)} without constructing intermediate
+     * directly to {@link com.badlogic.gdx.graphics.g2d.Batch#setPackedColor(float)} without constructing intermediate
      * objects. SquidPanel also uses floats internally instead of LibGDX Color objects in its internal 2D array that
      * associates colors to cells; this has changed from earlier releases and should be much more efficient.
      *
