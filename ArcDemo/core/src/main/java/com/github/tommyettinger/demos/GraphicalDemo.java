@@ -509,7 +509,7 @@ public class GraphicalDemo extends ApplicationCore {
                     // Getting a sublist avoids potential performance issues with removing from the start of an
                     // ArrayList, since it keeps the original list around and only gets a "view" of it.
                     if (!toCursor.isEmpty()) {
-                        toCursor = toCursor.subList(1, toCursor.size());
+                        toCursor.remove(0);
                     }
                 }
                 return false;
@@ -683,7 +683,7 @@ public class GraphicalDemo extends ApplicationCore {
         camera.position.y =  playerSprite.getY();
         camera.update();
 
-        mainViewport.apply(false);
+        mainViewport.apply(true);
         // begin() was here
         
         if (health <= 0) {
