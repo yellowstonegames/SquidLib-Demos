@@ -20,6 +20,7 @@ import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
 import squidpony.squidgrid.FOV;
+import squidpony.squidgrid.Measurement;
 import squidpony.squidgrid.Radius;
 import squidpony.squidgrid.mapping.DungeonGenerator;
 import squidpony.squidgrid.mapping.DungeonUtility;
@@ -329,7 +330,7 @@ public class GraphicalDemo extends ApplicationAdapter {
         player = floors.singleRandom(rng);
         playerSprite = atlas.createSprite(rng.getRandomElement(possibleCharacters));
         playerColor = ColorTools.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
-        playerSprite.setColor(playerColor);
+        playerSprite.setPackedColor(playerColor);
         playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);
         // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
         FOV.reuseFOV(resistance, visible, player.x, player.y, 9.0, Radius.CIRCLE);
@@ -358,7 +359,7 @@ public class GraphicalDemo extends ApplicationAdapter {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
             Sprite monster = atlas.createSprite(rng.getRandomElement(possibleEnemies));
-            monster.setColor(ColorTools.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
+            monster.setPackedColor(ColorTools.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monster.setPosition(monPos.x * cellWidth, monPos.y * cellHeight);
             monsters.put(monPos, monster);
@@ -372,8 +373,8 @@ public class GraphicalDemo extends ApplicationAdapter {
         //Measurement used is EUCLIDEAN, which allows 8 directions, but will prefer orthogonal moves unless diagonal
         //ones are clearly closer "as the crow flies." Alternatives are MANHATTAN, which means 4-way movement only, no
         //diagonals possible, and CHEBYSHEV, which allows 8 directions of movement at the same cost for all directions.
-        playerToCursor = new DijkstraMap(bareDungeon, DijkstraMap.Measurement.EUCLIDEAN);
-        getToPlayer = new DijkstraMap(decoDungeon, DijkstraMap.Measurement.EUCLIDEAN);
+        playerToCursor = new DijkstraMap(bareDungeon, Measurement.EUCLIDEAN);
+        getToPlayer = new DijkstraMap(decoDungeon, Measurement.EUCLIDEAN);
         //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
         // player from all walkable cells in the dungeon.
         playerToCursor.setGoal(player);
@@ -595,7 +596,7 @@ public class GraphicalDemo extends ApplicationAdapter {
                     // position of this monster.
                     if (tmp.x == player.x && tmp.y == player.y) {
                         // not sure if this stays red for very long
-                        playerSprite.setColor(FLOAT_BLOOD);
+                        playerSprite.setPackedColor(FLOAT_BLOOD);
                         health--;
                         // make sure the monster is still actively stalking/chasing the player
                         monplaces.add(pos);
@@ -635,7 +636,7 @@ public class GraphicalDemo extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
                     pos.set(i * cellWidth, j * cellHeight, 0f);
-                    batch.setColor(toCursor.contains(Coord.get(i, j))
+                    batch.setPackedColor(toCursor.contains(Coord.get(i, j))
                             ? ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_WHITE, 0.9f)
                             : ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
                     batch.draw(solid, pos.x, pos.y);
@@ -646,18 +647,18 @@ public class GraphicalDemo extends ApplicationAdapter {
                     }
                     if(monster == null && visible[i][j] < 1.0)
                     {
-                        batch.setColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
+                        batch.setPackedColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
                         batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y);
                     }
                 } else if(seen.contains(i, j)) {
                     pos.set(i * cellWidth, j * cellHeight, 0f);
-                    batch.setColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
+                    batch.setPackedColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
                     batch.draw(solid, pos.x, pos.y);
                     if ((monster = monsters.get(Coord.get(i, j))) != null)
                         monster.setAlpha(0f);
                     if(monster == null && visible[i][j] < 1.0)
                     {
-                        batch.setColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_GRAY, 0.7f));
+                        batch.setPackedColor(ColorTools.lerpFloatColors(colors[i][j], FLOAT_GRAY, 0.7f));
                         batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y);
                     }
                 }
@@ -667,7 +668,8 @@ public class GraphicalDemo extends ApplicationAdapter {
             monsters.getAt(i).draw(batch);
         }
         playerSprite.draw(batch);
-        playerSprite.setColor(playerColor);
+        playerSprite.setPackedColor(playerColor);
+        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         // we don't currently show health, but we could.
         //messageDisplay.putBordersCaptioned(SColor.CW_GRAY_WHITE, GDXMarkup.instance.colorString("Health: [Red]" + health));
     }
