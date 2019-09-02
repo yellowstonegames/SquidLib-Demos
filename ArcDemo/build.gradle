@@ -1,0 +1,31 @@
+buildscript {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    google()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  }
+  dependencies {
+    classpath "com.android.tools.build:gradle:$androidPluginVersion"
+    classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
+  }
+}
+
+configure(subprojects) {
+//configure(subprojects - project(':android')) {
+  apply plugin: 'java-library'
+  sourceCompatibility = 1.8
+}
+
+subprojects {
+  version = '0.0.1-SNAPSHOT'
+  ext.appName = 'ArcDemo'
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+  }
+}

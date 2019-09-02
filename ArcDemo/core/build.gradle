@@ -1,0 +1,7 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+dependencies {
+  api "com.github.Anuken.Arc:arc-core:$arcVersion"
+  api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibVersion"
+  api "com.github.tommyettinger:regexodus:$regExodusVersion"
+}
