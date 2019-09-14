@@ -74,8 +74,6 @@ public class NorthernLights extends ApplicationAdapter {
         final int floor = value >= 0f ? (int) value : (int) value - 1;
         final float start = ((((seed += floor) ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF)) * 0x1p-20f,
                 end = (((seed + 1 ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF)) * 0x1p-20f;
-//        final float start = ((((seed += floor) ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f,
-//                end = (((seed + 1 ^ 0xD1B54A35) * 0x1D2473 & 0xFFFFF) - 0x80000) * 0x1p-19f;
         value -= floor;
         value *= value * (3f - 2f * value);
         return (1f - value) * start + value * end;
@@ -115,7 +113,7 @@ public class NorthernLights extends ApplicationAdapter {
         con[1] += (y = swayRandomized(seed ^ 0x7F4A7C15, y + x));
         con[2] += (swayRandomized(seed ^ 0x9E3779B9, z + y));
     }
-    
+
     private void cosmic(int seed, float[] con, int x, int y, int z)
     {
         con[0] += swayRandomized(seed, con[x] + con[z]);
@@ -123,12 +121,30 @@ public class NorthernLights extends ApplicationAdapter {
         con[2] += swayRandomized(seed ^ 0x9E3779B9, con[z] + con[y]);
     }
 
+    private void cosmic(int seed, float[] con, int x, int y)
+    {
+        con[0] += swayRandomized(seed, con[x] - con[y]) * MathUtils.sin(con[1]);
+        con[1] += swayRandomized(seed ^ 0x7F4A7C15, con[x] + con[y]) * MathUtils.cos(con[0]);
+        con[0] += swayRandomized(seed ^ 0x9E3779B9, con[y] - con[x]) * MathUtils.cos(con[1]);
+        con[1] += swayRandomized(seed ^ 0xDB4F0B91, con[x] + con[y]) * MathUtils.sin(con[0]);
+    }
+
+    private void cosmic(int seed, float[] con)
+    {
+//        con[0] += swayRandomized(seed, con[0] - con[1]) * MathUtils.sin(con[1]);
+//        con[1] += swayRandomized(seed ^ 0x7F4A7C15, con[0] + con[1]) * MathUtils.cos(con[0]);
+        con[0] += swayRandomized(seed, con[0] - con[1]) + MathUtils.sin(con[1]);
+        con[1] -= swayRandomized(seed ^ 0x7F4A7C15, con[0] + con[1]) + MathUtils.cos(con[0]);
+        con[0] -= swayRandomized(seed ^ 0x9E3779B9, con[1] - con[0]) + MathUtils.cos(con[1]);
+        con[1] += swayRandomized(seed ^ 0xDB4F0B91, con[0] + con[1]) + MathUtils.sin(con[0]);
+    }
+
 	@Override
     public void render() {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
         final float rt = tm * RATE,
-                ftm = rt * 0x5p-15f;
+                ftm = rt * 0x5p-13f;
 //                s0 = swayRandomized(0x9E3779B9, ftm - 1.11f) * 0x1p-6f,
 //                c0 = swayRandomized(0xC13FA9A9, ftm - 1.11f) * 0x1p-6f, 
 //                s1 = swayRandomized(0xD1B54A32, ftm + 1.41f) * 0x1p-6f,
@@ -148,15 +164,26 @@ public class NorthernLights extends ApplicationAdapter {
 				con[0] = ftm + ay;
 				con[1] = ftm + ax;
 				con[2] = ax + ay;
-				//conn0 = swayRandomized(-1052792407, yt - 1.11f) * ax + swayRandomized(-1640531527, xt - 3.11f) * ay + swayRandomized(924071052, -2.4375f - xy) * ftm;
+				
+                //conn0 = swayRandomized(-1052792407, yt - 1.11f) * ax + swayRandomized(-1640531527, xt - 3.11f) * ay + swayRandomized(924071052, -2.4375f - xy) * ftm;
 				//conn1 = swayRandomized(-615576687, yt + 2.41f) * ax + swayRandomized(776648142, 1.41f - xt) * ay + swayRandomized(-566875093, xy + 1.5625f) * ftm;
 				//conn2 = swayRandomized(435278990, 3.61f - yt) * ax + swayRandomized(-509935190, xt + 2.61f) * ay + swayRandomized(-284277664, xy + -3.8125f) * ftm;
                 //conn0 = cosmic(conn0, conn1, conn2);
                 //conn1 = cosmic(conn0, conn1, conn2);
                 //conn2 = cosmic(conn0, conn1, conn2);
+                
+                //2D
+//                cosmic(seed ^ 0xDB4F0B91, con, 0, 1);
+//                cosmic(~seed, con, 1, 0);
+//                cosmic(seed, con);
+                
+                //cosmic(seed ^ 0x19F1D48E, con, 0, 1, 2);
+
+//                //3D
                 cosmic(seed ^ 0xC13FA9A9, con, 1, 2, 0);
                 cosmic(seed ^ 0xDB4F0B91, con, 2, 0, 1);
                 cosmic(seed ^ 0x19F1D48E, con, 0, 1, 2);
+
 //                cosmic(seed ^ 0xC13FA9A9, con, con[1], con[2], con[0]);
 //                cosmic(seed ^ 0xDB4F0B91, con, con[2], con[0], con[1]);
 //                cosmic(seed ^ 0x19F1D48E, con, con[0], con[1], con[2]);
@@ -194,7 +221,9 @@ public class NorthernLights extends ApplicationAdapter {
 //                        (int)((swayRandomized(seed ^ 0x75AE2165, (con[2]) * 2) * 85.25f
 //                                + swayRandomized(seed ^ 0x03A4615F, (con[0]) * 3) * 85.25f
 //                                + swayRandomized(seed ^ 0xA1FE1575, (con[1]) * 5) * 85.25f)));
-                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]));
+                final int bright = swayTight(con[0] + con[1] + con[2]);
+                batch.setColor(bright, bright, bright);
+//                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]));
 //                batch.setColor((int)(con[0] * 127.99 + 128), (int)(con[1] * 127.99 + 128), (int)(con[2] * 127.99 + 128));
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
