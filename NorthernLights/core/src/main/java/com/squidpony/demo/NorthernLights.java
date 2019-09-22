@@ -6,13 +6,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.squidpony.APNG;
 import com.squidpony.MutantBatch;
+
+import java.io.IOException;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class NorthernLights extends ApplicationAdapter {
-    private static final float RATE = 0.75f;
+    private static final float RATE = 1.5f;
     private int seed;
     private MutantBatch batch;
     private Texture tiny;
@@ -20,6 +24,8 @@ public class NorthernLights extends ApplicationAdapter {
     private int width, height;
     private float iw, ih;
     private final transient float[] con = new float[3];
+    private Array<Pixmap> frames;
+    private APNG apng;
     @Override
     public void create() {
         super.create();
@@ -37,10 +43,38 @@ public class NorthernLights extends ApplicationAdapter {
         tiny = new Texture(pm);
         width = 480;
         height = 320;
+        apng = new APNG(width * height * 3 >> 1);
+        frames = new Array<>(true, 120, Pixmap.class);
         iw = 1f / width;
         ih = 1f / height;
 //        width = Gdx.graphics.getWidth();
 //        height = Gdx.graphics.getHeight();
+
+        for (int i = 0; i < 50; i++) {
+            Pixmap frame = new Pixmap(width, height, Pixmap.Format.RGBA8888);
+            final int tm = i << 4;
+            final float rt = tm * RATE,
+                    ftm = rt * 0x5p-13f;
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    float ax = x * 0.0075f, ay = y * 0.005f; // adjusted for starting dimensions
+                    con[0] = ftm + ay;
+                    con[1] = ftm + ax;
+                    con[2] = ax + ay;
+                    cosmic(seed ^ 0xC13FA9A9, con, 1, 2, 0);
+                    cosmic(seed ^ 0xDB4F0B91, con, 2, 0, 1);
+                    cosmic(seed ^ 0x19F1D48E, con, 0, 1, 2);
+                    frame.drawPixel(x, y, swayTight(con[0]) << 24 | swayTight(con[1]) << 16 | swayTight(con[2]) << 8 | 0xFF);
+                }
+            }
+            frames.add(frame);
+        }
+        try {
+            apng.write(Gdx.files.local("animated" + TimeUtils.millis() + ".png"), frames, 20);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -221,9 +255,9 @@ public class NorthernLights extends ApplicationAdapter {
 //                        (int)((swayRandomized(seed ^ 0x75AE2165, (con[2]) * 2) * 85.25f
 //                                + swayRandomized(seed ^ 0x03A4615F, (con[0]) * 3) * 85.25f
 //                                + swayRandomized(seed ^ 0xA1FE1575, (con[1]) * 5) * 85.25f)));
-                final int bright = swayTight(con[0] + con[1] + con[2]);
-                batch.setColor(bright, bright, bright);
-//                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]));
+//                final int bright = swayTight(con[0] + con[1] + con[2]);
+//                batch.setColor(bright, bright, bright);
+                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]));
 //                batch.setColor((int)(con[0] * 127.99 + 128), (int)(con[1] * 127.99 + 128), (int)(con[2] * 127.99 + 128));
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
