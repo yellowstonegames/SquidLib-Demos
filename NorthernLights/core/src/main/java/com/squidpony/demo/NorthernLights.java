@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.squidpony.APNG;
+import com.squidpony.IndexedAPNG;
 import com.squidpony.MutantBatch;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class NorthernLights extends ApplicationAdapter {
     private final transient float[] con = new float[3];
     private Array<Pixmap> frames;
     private APNG apng;
+    private IndexedAPNG iapng;
     @Override
     public void create() {
         super.create();
@@ -44,6 +46,7 @@ public class NorthernLights extends ApplicationAdapter {
         width = 480;
         height = 320;
         apng = new APNG(width * height * 3 >> 1);
+        iapng = new IndexedAPNG(width * height * 3 >> 1);
         frames = new Array<>(true, 120, Pixmap.class);
         iw = 1f / width;
         ih = 1f / height;
@@ -72,6 +75,7 @@ public class NorthernLights extends ApplicationAdapter {
         }
         try {
             apng.write(Gdx.files.local("animated" + TimeUtils.millis() + ".png"), frames, 20);
+            iapng.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".png"), frames, 20);
         } catch (IOException e) {
             e.printStackTrace();
         }
