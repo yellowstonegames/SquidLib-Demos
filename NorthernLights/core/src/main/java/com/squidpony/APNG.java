@@ -18,7 +18,8 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 /**
- * APNG encoder with compression. An instance can be reused to encode multiple APNGs with minimal allocation.
+ * Animated PNG encoder with compression.
+ * An instance can be reused to encode multiple animated PNGs with minimal allocation.
  *
  * <pre>
  * Copyright (c) 2007 Matthias Mann - www.matthiasmann.de
@@ -230,9 +231,11 @@ public class APNG implements Disposable {
     }
 
     /**
-     * Disposal will happen automatically in {@link #finalize()} but can be done explicitly if desired.
+     * Disposal should probably be done explicitly, especially if using JRE versions after 8.
+     * In Java 8 and earlier, you could rely on finalize() doing what this does, but that isn't
+     * a safe assumption in Java 9 and later. Note, don't use the same APNG object after you call
+     * this method; you'll need to make a new one if you need to write again after disposing.
      */
-    @SuppressWarnings("javadoc")
     public void dispose() {
         deflater.end();
     }

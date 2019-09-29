@@ -10,7 +10,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.squidpony.APNG;
-import com.squidpony.IndexedAPNG;
 import com.squidpony.MutantBatch;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class NorthernLights extends ApplicationAdapter {
     private final transient float[] con = new float[3];
     private Array<Pixmap> frames;
     private APNG apng;
-    private IndexedAPNG iapng;
+//    private IndexedAPNG iapng;
     @Override
     public void create() {
         super.create();
@@ -43,10 +42,10 @@ public class NorthernLights extends ApplicationAdapter {
         Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGB888);
         pm.drawPixel(0, 0, -1); // white pixel
         tiny = new Texture(pm);
-        width = 480;
-        height = 320;
+        width = 256;
+        height = 256;
         apng = new APNG(width * height * 3 >> 1);
-        iapng = new IndexedAPNG(width * height * 3 >> 1);
+//        iapng = new IndexedAPNG(width * height * 3 >> 1);
         frames = new Array<>(true, 120, Pixmap.class);
         iw = 1f / width;
         ih = 1f / height;
@@ -68,14 +67,15 @@ public class NorthernLights extends ApplicationAdapter {
                     cosmic(seed ^ 0xC13FA9A9, con, 1, 2, 0);
                     cosmic(seed ^ 0xDB4F0B91, con, 2, 0, 1);
                     cosmic(seed ^ 0x19F1D48E, con, 0, 1, 2);
-                    frame.drawPixel(x, y, swayTight(con[0]) << 24 | swayTight(con[1]) << 16 | swayTight(con[2]) << 8 | 0xFF);
+                    frame.drawPixel(x, y, swayTight(con[0]) << 24 | swayTight(con[1]) << 16 | swayTight(con[2]) << 8 | 
+                            255 - Math.min(255, (int)(260 * Math.sqrt(((x - 128) * (x - 128) + (y - 128) * (y - 128)) * 0x1p-14))));
                 }
             }
             frames.add(frame);
         }
         try {
             apng.write(Gdx.files.local("animated" + TimeUtils.millis() + ".png"), frames, 20);
-            iapng.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".png"), frames, 20);
+//            iapng.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".png"), frames, 20);
         } catch (IOException e) {
             e.printStackTrace();
         }
