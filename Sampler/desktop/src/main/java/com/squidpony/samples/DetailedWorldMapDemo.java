@@ -320,7 +320,7 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
     {
         long startTime = System.currentTimeMillis();
         world.setCenterLongitude((System.currentTimeMillis() & 0xFFFFFFF) * 0.0002);
-        world.generate(world.landModifier, world.coolingModifier, seed);
+        world.generate(world.landModifier, world.heatModifier, seed);
         dbm.makeBiomes(world);
         //political = fpm.generate(seed + 1000L, world, dbm, null, 50, 1.0);
 //        System.out.println(StringKit.hex(CrossHash.hash64(world.heightCodeData)) + " " + StringKit.hex(CrossHash.hash64(dbm.biomeCodeData)));

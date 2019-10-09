@@ -28,7 +28,14 @@ public class Sampler extends ApplicationAdapter {
         VisUI.setSkipGdxVersionCheck(true);
         VisUI.load();
         choices = new VisSelectBox<>();
-        choices.setItems(TsarDemo.config, SparseLightingDemo.config, DetailedWorldMapDemo.config, RotatingWorldMapDemo.config, LocalMapDemo.config);
+        choices.setItems(
+                TsarDemo.config,
+                SparseLightingDemo.config,
+                DetailedWorldMapDemo.config,
+                RotatingWorldMapDemo.config,
+                LocalMapDemo.config,
+                WorldMapViewDemo.config
+        );
         button = new VisTextButton("Launch!", new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
