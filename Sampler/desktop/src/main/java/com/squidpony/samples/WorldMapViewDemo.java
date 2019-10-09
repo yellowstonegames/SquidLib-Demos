@@ -20,10 +20,10 @@ import squidpony.squidmath.StatefulRNG;
 
 public class WorldMapViewDemo extends ApplicationAdapter {
 
-    private static final int width = 200, height = 200;
+//    private static final int width = 64, height = 64;
 //    private static final int width = 1024, height = 512;
 //    private static final int width = 512, height = 256;
-//    private static final int width = 256, height = 256;
+    private static final int width = 256, height = 256;
 //    private static final int width = 400, height = 400;
 //    private static final int width = 300, height = 300;
 //    private static final int width = 1600, height = 800;
@@ -51,12 +51,12 @@ public class WorldMapViewDemo extends ApplicationAdapter {
         TextureAtlas atlas = new TextureAtlas("skin/tinted.atlas");
         dot = atlas.findRegion("t-dot");
         batch = new FilterBatch();
-        view = new StretchViewport(width, height);
+        view = new StretchViewport(width * 4, height * 4);
         seed = 42;
         rng = new StatefulRNG(seed);
         //// NOTE: this FastNoise has a different frequency (1f) than the default (1/32f), and that
         //// makes a huge difference on world map quality. It also uses extra octaves.
-        noise = new FastNoise(1337, 1f, FastNoise.SIMPLEX_FRACTAL, 3);//, 1.25f, 0.8f);
+        noise = new FastNoise(1337, 1f, FastNoise.SIMPLEX_FRACTAL, 2);//, 1.25f, 0.8f);
 //        world = new WorldMapGenerator.TilingMap(seed, width, height, new FastNoise(1337, 1f), 1.25);
 //        world = new WorldMapGenerator.EllipticalMap(seed, width, height, WhirlingNoise.instance, 0.875);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, ClassicNoise.instance, 0.75);
@@ -104,17 +104,17 @@ public class WorldMapViewDemo extends ApplicationAdapter {
                     }
                 }
             }
-        }, new SquidMouse(1, 1, width, height, 0, 0, new InputAdapter()
+        }, new SquidMouse(4, 4, width, height, 0, 0, new InputAdapter()
         {
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 if(button == Input.Buttons.RIGHT)
                 {
-                    zoomOut(screenX, screenY);
+                    zoomOut(screenX, height - 1 - screenY);
                 }
                 else
                 {
-                    zoomIn(screenX, screenY);
+                    zoomIn(screenX, height - 1 - screenY);
                 }
                 return true;
             }
@@ -128,7 +128,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     public void zoomIn() {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomIn();
+        world.zoomIn(8, width / 2, height / 2);
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
@@ -137,7 +137,8 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomIn(1, zoomX<<1, zoomY<<1);
+        world.zoomIn(8, zoomX, zoomY);
+
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
@@ -146,7 +147,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomOut();
+        world.zoomOut(8, width / 2, height / 2);
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
@@ -155,7 +156,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomOut(1, zoomX<<1, zoomY<<1);
+        world.zoomOut(8, zoomX, zoomY);
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
@@ -178,7 +179,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     public void rotate()
     {
         long startTime = System.nanoTime();
-        world.setCenterLongitude((startTime & 0xFFFFFFFFFFFFL) * 0x1p-32);
+        world.setCenterLongitude((startTime & 0xFFFFFFFFFFFFL) * 0x1.0p-32);
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
@@ -196,7 +197,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
                 c = cm[x][y];
                 if(c != WorldMapView.emptyColor) {
                     batch.setColor(c);
-                    batch.draw(dot, x, y);
+                    batch.draw(dot, x * 4, y * 4, 4, 4);
                 }
             }
         }
@@ -223,7 +224,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-        view.update(width * 4, height * 4, true);
+        view.update(width, height, true);
     }
 
     public static CustomConfig config = new CustomConfig(WorldMapViewDemo.class);
