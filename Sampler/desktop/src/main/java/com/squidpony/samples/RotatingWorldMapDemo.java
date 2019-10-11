@@ -8,18 +8,21 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.squidpony.samples.desktop.CustomConfig;
 import squidpony.StringKit;
+import squidpony.squidgrid.gui.gdx.FilterBatch;
 import squidpony.squidgrid.gui.gdx.SColor;
 import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidgrid.gui.gdx.SquidMouse;
 import squidpony.squidgrid.mapping.FantasyPoliticalMapper;
 import squidpony.squidgrid.mapping.WorldMapGenerator;
-import squidpony.squidmath.*;
+import squidpony.squidmath.FastNoise;
+import squidpony.squidmath.LinnormRNG;
+import squidpony.squidmath.NumberTools;
+import squidpony.squidmath.StatefulRNG;
 
 /**
  * Port of Zachary Carter's world generation technique, https://github.com/zacharycarter/mapgen
@@ -56,7 +59,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
     //private static final int width = 700, height = 700;
 //    private static final int width = 512, height = 512;
     
-    private SpriteBatch batch;
+    private FilterBatch batch;
 //    private SquidPanel display;//, overlay;
     private static final int cellWidth = 1, cellHeight = 1;
     private SquidInput input;
@@ -295,7 +298,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
 
     @Override
     public void create() {
-        batch = new SpriteBatch();
+        batch = new FilterBatch();
 //        display = new SquidPanel(width, height, cellWidth, cellHeight);
         //display.getTextCellFactory().font().getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
         view = new StretchViewport(width*cellWidth, height*cellHeight);
@@ -307,13 +310,18 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
 //        stage = new Stage(view, batch);
         seed = 0x0c415cf07774ab2eL;//0x9987a26d1e4d187dL;//0xDEBACL;
         rng = new StatefulRNG(seed);
+        WorldMapGenerator.DEFAULT_NOISE.setNoiseType(FastNoise.SIMPLEX_FRACTAL);
+        WorldMapGenerator.DEFAULT_NOISE.setFractalOctaves(2);
+        WorldMapGenerator.DEFAULT_NOISE.setFractalLacunarity(2.5f);
+        WorldMapGenerator.DEFAULT_NOISE.setFractalGain(0.4f);
+
         //world = new WorldMapGenerator.TilingMap(seed, width, height, WhirlingNoise.instance, 1.25);
 //        world = new WorldMapGenerator.SphereMapAlt(seed, width, height, WhirlingNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalMap(seed, width, height, ClassicNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, ClassicNoise.instance, 0.75);
         //world = new WorldMapGenerator.MimicMap(seed, WhirlingNoise.instance, 0.8);
 //        world = new WorldMapGenerator.SpaceViewMap(seed, width, height, ClassicNoise.instance, 0.7);
-        world = new WorldMapGenerator.RotatingSpaceMap(seed, width, height, FastNoise.instance, 0.7);
+        world = new WorldMapGenerator.RotatingSpaceMap(seed, width, height, 0.7);
         //world = new WorldMapGenerator.RoundSideMap(seed, width, height, ClassicNoise.instance, 0.8);
         //world = new WorldMapGenerator.HyperellipticalMap(seed, width, height, ClassicNoise.instance, 0.7, 0.1, 3.25);
         //cloudNoise = new Noise.Turbulent4D(WhirlingNoise.instance, new Noise.Ridged4D(SeededNoise.instance, 2, 3.7), 3, 5.9);
@@ -536,12 +544,13 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
 //    }
 
     public void putMap() {
+        int tempColor;
         int hc, tc, bc;
         int[][] heightCodeData = world.heightCodeData;
         double[][] heightData = world.heightData;
         int[][] heatCodeData = dbm.heatCodeData;
         int[][] biomeCodeData = dbm.biomeCodeData;
-        pm.setColor(quantize(SColor.DB_INK));
+        pm.setColor(SColor.DB_INK);
         pm.fill();
         for (int y = 0; y < height; y++) {
             PER_CELL:
@@ -557,20 +566,20 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
                         case 1:
                         case 2:
                         case 3:
-                            Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(shallowColor, ice,
+                            tempColor = NumberTools.floatToReversedIntBits(SColor.lerpFloatColors(shallowColor, ice,
                                     (float) ((heightData[x][y] - -1.0) / (WorldMapGenerator.sandLower - -1.0))));
 //                        pm.setColor(tempColor);
 //                        pm.drawRectangle(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-                            pm.drawPixel(x, y, quantize(tempColor));//Color.rgba8888(tempColor));
+                            pm.drawPixel(x, y, tempColor);//Color.rgba8888(tempColor));
                             //display.put(x, y, SColor.lerpFloatColors(shallowColor, ice,
                             //        (float) ((heightData[x][y] - -1.0) / (0.1 - -1.0))));
                             continue PER_CELL;
                         case 4:
-                            Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(lightIce, ice,
+                            tempColor = NumberTools.floatToReversedIntBits(SColor.lerpFloatColors(lightIce, ice,
                                     (float) ((heightData[x][y] - WorldMapGenerator.sandLower) / (WorldMapGenerator.sandUpper - WorldMapGenerator.sandLower))));
 //                        pm.setColor(tempColor);
 //                        pm.drawRectangle(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-                            pm.drawPixel(x, y, quantize(tempColor));//Color.rgba8888(tempColor));
+                            pm.drawPixel(x, y, tempColor);//Color.rgba8888(tempColor));
                             //display.put(x, y, SColor.lerpFloatColors(lightIce, ice,
                             //        (float) ((heightData[x][y] - 0.1) / (0.18 - 0.1))));
                             continue PER_CELL;
@@ -581,14 +590,14 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
                     case 1:
                     case 2:
                     case 3:
-                        Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(
+                        tempColor = NumberTools.floatToReversedIntBits(SColor.lerpFloatColors(
                                 BIOME_COLOR_TABLE[56], coastalColor,
                                 (MathUtils.clamp((float) (((heightData[x][y] + 0.06) * 8.0) / (WorldMapGenerator.sandLower + 1.0)), 0f, 1f))));
 //                        Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(deepColor, coastalColor,
 //                                (float) ((heightData[x][y] - -1.0) / (WorldMapGenerator.sandLower - -1.0))));
 //                    pm.setColor(tempColor);
 //                    pm.drawRectangle(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-                        pm.drawPixel(x, y, quantize(tempColor));//Color.rgba8888(tempColor));
+                        pm.drawPixel(x, y, tempColor);//Color.rgba8888(tempColor));
                         //display.put(x, y, SColor.lerpFloatColors(deepColor, coastalColor,
                         //        (float) ((heightData[x][y] - -1.0) / (0.1 - -1.0))));
                         break;
@@ -602,11 +611,11 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
                                     + shadingData[x][y] * 13) * 0.03125f);
                         */
 
-                        Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(BIOME_COLOR_TABLE[dbm.extractPartB(bc)],
+                        tempColor = NumberTools.floatToReversedIntBits(SColor.lerpFloatColors(BIOME_COLOR_TABLE[dbm.extractPartB(bc)],
                                 BIOME_DARK_COLOR_TABLE[dbm.extractPartA(bc)], dbm.extractMixAmount(bc)));
 //                    pm.setColor(tempColor);
 //                    pm.drawRectangle(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-                        pm.drawPixel(x, y, quantize(tempColor));//Color.rgba8888(tempColor));
+                        pm.drawPixel(x, y, tempColor);//Color.rgba8888(tempColor));
                         //display.put(x, y, SColor.lerpFloatColors(BIOME_COLOR_TABLE[biomeLowerCodeData[x][y]],
                         //        BIOME_DARK_COLOR_TABLE[biomeUpperCodeData[x][y]],
                         //        (float) //(((heightData[x][y] - lowers[hc]) / (differences[hc])) * 11 +
@@ -691,7 +700,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
         final double[][] moistureData = world.moistureData, heatData = world.heatData, heightData = world.heightData;
         double elevation, heat, moisture;
         boolean icy;
-        pm.setColor(quantize(SColor.DB_INK));
+        pm.setColor(SColor.DB_INK);
         pm.fill();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -762,20 +771,21 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
         if(spinning) 
             rotate();
         // need to display the map every frame, since we clear the screen to avoid artifacts.
-        switch (mode)
-        {
-            /*
-            case 3: putHeatMap();
-            break;
-            case 2: putMoistureMap();
-            break;
-            */
-            case 2:
-            case 3: putExperimentMap();
-            break;
-            default: putMap();
-            break;
-        }
+//        switch (mode)
+//        {
+//            /*
+//            case 3: putHeatMap();
+//            break;
+//            case 2: putMoistureMap();
+//            break;
+//            */
+//            case 2:
+//            case 3: putExperimentMap();
+//            break;
+//            default: putMap();
+//            break;
+//        }
+        putMap();
         ++counter;//nation = NumberTools.swayTight(++counter * 0.0125f);
         Gdx.graphics.setTitle("Took " + ttg + " ms to generate");
 

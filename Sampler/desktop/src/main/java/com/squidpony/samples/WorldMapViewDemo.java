@@ -23,7 +23,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
 //    private static final int width = 64, height = 64;
 //    private static final int width = 1024, height = 512;
 //    private static final int width = 512, height = 256;
-    private static final int width = 256, height = 256;
+    private static final int width = 128, height = 128;
 //    private static final int width = 400, height = 400;
 //    private static final int width = 300, height = 300;
 //    private static final int width = 1600, height = 800;
@@ -56,7 +56,11 @@ public class WorldMapViewDemo extends ApplicationAdapter {
         rng = new StatefulRNG(seed);
         //// NOTE: this FastNoise has a different frequency (1f) than the default (1/32f), and that
         //// makes a huge difference on world map quality. It also uses extra octaves.
-        noise = new FastNoise(1337, 1f, FastNoise.SIMPLEX_FRACTAL, 2);//, 1.25f, 0.8f);
+        WorldMapGenerator.DEFAULT_NOISE.setNoiseType(FastNoise.SIMPLEX_FRACTAL);
+        WorldMapGenerator.DEFAULT_NOISE.setFractalOctaves(4);
+        WorldMapGenerator.DEFAULT_NOISE.setFractalLacunarity(2.5f);
+        WorldMapGenerator.DEFAULT_NOISE.setFractalGain(0.4f);
+        world = new WorldMapGenerator.LocalMap(seed, width, height, 1.1);
 //        world = new WorldMapGenerator.TilingMap(seed, width, height, new FastNoise(1337, 1f), 1.25);
 //        world = new WorldMapGenerator.EllipticalMap(seed, width, height, WhirlingNoise.instance, 0.875);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, ClassicNoise.instance, 0.75);
@@ -66,7 +70,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
         //world = new WorldMapGenerator.RoundSideMap(seed, width, height, ClassicNoise.instance, 0.8);
 //        world = new WorldMapGenerator.HyperellipticalMap(seed, width, height, noise, 1.2, 0.0625, 2.5);
 //        world = new WorldMapGenerator.SphereMap(seed, width, height, new FastNoise(1337, 1f), 0.6);
-        world = new WorldMapGenerator.LocalMap(seed, width, height, noise, 0.8);
+//        world = new WorldMapGenerator.LocalMap(seed, width, height, noise, 1.1);
 //        world = new WorldMapGenerator.LocalMimicMap(seed, ((WorldMapGenerator.LocalMimicMap) world).earth.not(), new FastNoise(1337, 1f), 0.9);
         
         wmv = new WorldMapView(world);
@@ -128,7 +132,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     public void zoomIn() {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomIn(8, width / 2, height / 2);
+        world.zoomIn(7, width / 2, height / 2);
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
@@ -137,7 +141,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomIn(8, zoomX, zoomY);
+        world.zoomIn(7, zoomX, zoomY);
 
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
@@ -147,7 +151,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomOut(8, width / 2, height / 2);
+        world.zoomOut(7, width / 2, height / 2);
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
@@ -156,7 +160,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     {
         long startTime = System.nanoTime();
 //        noiseCalls = 0;
-        world.zoomOut(8, zoomX, zoomY);
+        world.zoomOut(7, zoomX, zoomY);
         wmv.generate(world.seedA, world.seedB, world.landModifier, world.heatModifier);
         wmv.show();
         ttg = System.nanoTime() - startTime >> 20;
