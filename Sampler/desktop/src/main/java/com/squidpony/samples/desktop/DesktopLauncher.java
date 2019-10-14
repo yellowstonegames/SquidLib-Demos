@@ -19,7 +19,7 @@ public class DesktopLauncher {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("Sampler");
         configuration.setWindowedMode(400, 500);
-        configuration.useVsync(false);
+        configuration.useVsync(true);
         configuration.setIdleFPS(5);
         configuration.setWindowIcon(FileType.Internal
                 , "libgdx128.png"
