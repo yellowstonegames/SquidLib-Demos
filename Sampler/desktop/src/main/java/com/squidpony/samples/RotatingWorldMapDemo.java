@@ -32,8 +32,8 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
     //private static final int width = 314 * 3, height = 300;
     //private static final int width = 1024, height = 512;
 //    private static final int width = 512, height = 256;
-    private static final int width = 400, height = 400;
-//    private static final int width = 300, height = 300;
+//    private static final int width = 400, height = 400;
+    private static final int width = 300, height = 300;
     //private static final int width = 1600, height = 800;
     ///private static final int width = 1000, height = 1000;
     //private static final int width = 700, height = 700;
@@ -53,7 +53,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
     private boolean spinning = false;
 
     private long ttg = 0; // time to generate
-    private long ttd = 0; // time to draw
+//    private long ttd = 0; // time to draw
     
 
     @Override
@@ -212,7 +212,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
             }
         }
         batch.end();
-        ttd = System.nanoTime() - startTime >> 20;
+        //ttd = System.nanoTime() - startTime >> 20;
     }
 
     @Override
@@ -225,7 +225,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
             rotate();
         // need to display the map every frame, since we clear the screen to avoid artifacts.
         putMap();
-        Gdx.graphics.setTitle("Took " + ttg + " ms to generate, took " + ttd + " ms to draw");
+        Gdx.graphics.setTitle("Took " + ttg + " ms to generate");//, took " + ttd + " ms to draw");
 
         // if we are waiting for the player's input and get input, process it.
         if (input.hasNext()) {
