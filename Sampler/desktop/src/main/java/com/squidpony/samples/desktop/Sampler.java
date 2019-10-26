@@ -34,7 +34,8 @@ public class Sampler extends ApplicationAdapter {
                 DetailedWorldMapDemo.config,
                 RotatingWorldMapDemo.config,
                 LocalMapDemo.config,
-                WorldMapViewDemo.config
+                WorldMapViewDemo.config,
+                WildMapDemo.config
         );
         button = new VisTextButton("Launch!", new ChangeListener() {
             @Override
