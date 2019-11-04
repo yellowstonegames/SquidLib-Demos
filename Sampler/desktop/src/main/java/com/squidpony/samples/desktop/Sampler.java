@@ -36,7 +36,8 @@ public class Sampler extends ApplicationAdapter {
                 LocalMapDemo.config,
                 WorldMapViewDemo.config,
                 WildMapDemo.config,
-                WorldMapTextDemo.config
+                WorldMapTextDemo.config,
+                WorldWildMapDemo.config
         );
         button = new VisTextButton("Launch!", new ChangeListener() {
             @Override
@@ -52,7 +53,13 @@ public class Sampler extends ApplicationAdapter {
         });
         Table table = new Table(VisUI.getSkin());
         table.setFillParent(true);
-        table.add(choices, new Separator(), button);
+        table.add(new Separator()).height(32f);
+        table.row();
+        table.add(choices);
+        table.add(new Separator());
+        table.add(button);
+        table.row();
+        table.add(new Separator()).expandY();
         stage.addActor(table);
         Gdx.input.setInputProcessor(stage);
     }
