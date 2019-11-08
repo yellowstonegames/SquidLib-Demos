@@ -453,26 +453,26 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(Lathe32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
     private int runLong(LightRNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
     private int runLong(RandomXS128 rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
     private void addIntTest(final VerticalPanel vp, final GWTRNG rs, final String name)
     {
@@ -648,11 +648,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(GWTRNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
     private void addIntTest(final VerticalPanel vp, final SilkRNG rs, final String name)
@@ -783,11 +783,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(SilkRNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
 
@@ -893,11 +893,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(Mover32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
     private void addIntTest(final VerticalPanel vp, final Cake32RNG rs, final String name)
@@ -996,11 +996,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(Cake32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
 
@@ -1106,11 +1106,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(XoshiroStarStar32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
 
@@ -1210,11 +1210,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(XoshiroStarPhi32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
     private void addIntTest(final VerticalPanel vp, final MoverCounter32RNG rs, final String name)
@@ -1313,11 +1313,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(MoverCounter32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
     private void addIntTest(final VerticalPanel vp, final XoshiroAra32RNG rs, final String name)
@@ -1416,11 +1416,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(XoshiroAra32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
 
@@ -1520,11 +1520,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(Starfish32RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
     private void addIntTest(final VerticalPanel vp, final RNG rs, final String name)
@@ -1677,11 +1677,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runLong(RNG rs) {
-        int xor = 0;
+        long xor = 0L;
         for (int i = 0; i < 10000; i++) {
             xor ^= rs.nextLong();
         }
-        return xor;
+        return (int) xor;
     }
 
 
