@@ -45,9 +45,9 @@ public class WorldMapViewDemo extends ApplicationAdapter {
     @Override
     public void create() {
         // in your own code you would probably use your own atlas with a 1x1 white pixel TextureRegion in it
-        TextureAtlas atlas = new TextureAtlas("skin/tinted.atlas");
-        // here the 1x1 white pixel image is "t-dot"
-        dot = atlas.findRegion("t-dot");
+        TextureAtlas atlas = new TextureAtlas("skin/neon-ui.atlas");
+        // here the 1x1 white pixel image is called "white"
+        dot = atlas.findRegion("white");
         batch = new FilterBatch();
         view = new StretchViewport(width * 4, height * 4);
         seed = 42;
