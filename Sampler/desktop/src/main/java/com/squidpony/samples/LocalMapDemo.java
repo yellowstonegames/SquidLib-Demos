@@ -1,9 +1,6 @@
 package com.squidpony.samples;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -544,12 +541,16 @@ public class LocalMapDemo extends ApplicationAdapter {
         view.update(width, height, true);
         view.apply(true);
     }
-
-    public static CustomConfig config = new CustomConfig(LocalMapDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: Local Map");
-        config.setWindowedMode(width * cellWidth, height * cellHeight);
-        config.useVsync(true);
-        config.setIdleFPS(1);
-    }
+    public static CustomConfig config = new CustomConfig("LocalMapDemo"){
+        {
+            setTitle("SquidLib Demo: Local Map");
+            setWindowedMode(width * cellWidth, height * cellHeight);
+            useVsync(true);
+            setIdleFPS(1);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new LocalMapDemo();
+        }
+    };
 }

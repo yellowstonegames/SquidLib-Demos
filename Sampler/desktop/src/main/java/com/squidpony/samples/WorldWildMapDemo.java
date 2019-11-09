@@ -1,9 +1,6 @@
 package com.squidpony.samples;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -194,7 +191,13 @@ public class WorldWildMapDemo extends ApplicationAdapter {
                     position.set(cellWidth * 0.5f * shownWidth, cellHeight * (bigHeight - 0.5f * shownHeight), position.z);
                     zoomed = true;
                     final int hash = Noise.IntPointHash.hashAll(screenX, screenY, 0x13579BDF);
-                    wildView.setWildMap(new WildMap(shownWidth, shownHeight, wmv.getBiomeMapper().getBiomeCode((int)(nextPosition.x / cellWidth), (int) (bigHeight - nextPosition.y / cellHeight)), hash, ~hash));
+                    wildView.setWildMap(new WildMap.MixedWildMap(
+                            new WildMap(shownWidth, shownHeight, wmv.getBiomeMapper().getBiomeCode((int)(nextPosition.x / cellWidth)+1, (int) (bigHeight - nextPosition.y / cellHeight)-1), hash, ~hash),
+                            new WildMap(shownWidth, shownHeight, wmv.getBiomeMapper().getBiomeCode((int)(nextPosition.x / cellWidth)+1, (int) (bigHeight - nextPosition.y / cellHeight)), hash, ~hash),
+                            new WildMap(shownWidth, shownHeight, wmv.getBiomeMapper().getBiomeCode((int)(nextPosition.x / cellWidth), (int) (bigHeight - nextPosition.y / cellHeight)), hash, ~hash),
+                            new WildMap(shownWidth, shownHeight, wmv.getBiomeMapper().getBiomeCode((int)(nextPosition.x / cellWidth), (int) (bigHeight - nextPosition.y / cellHeight)-1), hash, ~hash),
+                            rng
+                    ));
                     wildView.generate();
                     nextPosition.set(previousPosition);
                 }
@@ -377,12 +380,17 @@ public class WorldWildMapDemo extends ApplicationAdapter {
         view.update(width, height, true);
         view.apply(true);
     }
-    public static CustomConfig config = new CustomConfig(WorldWildMapDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: WorldMap with Right-Click zoom to WildMap");
-        config.setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
-        config.useVsync(true);
-        config.setIdleFPS(1);
-    }
+    public static CustomConfig config = new CustomConfig("WorldWildMapDemo"){
+        {
+            setTitle("SquidLib Demo: WorldMap with Right-Click zoom to WildMap");
+            setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
+            useVsync(true);
+            setIdleFPS(1);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new WorldWildMapDemo();
+        }
+    };
 
 }

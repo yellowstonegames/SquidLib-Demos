@@ -5,7 +5,7 @@ apply plugin: 'application'
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.squidpony.samples.desktop.DesktopLauncher'
 eclipse.project.name = appName + '-desktop'
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 
 dependencies {
   api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
@@ -20,7 +20,7 @@ dependencies {
 jar {
   archiveFileName = "${appName}.jar"
   //from files(sourceSets.main.output.classesDirs)
-  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it).matching{exclude{it.path.contains('META-INF/versions/')}} } }
   manifest {
     attributes 'Main-Class': project.mainClassName
   }

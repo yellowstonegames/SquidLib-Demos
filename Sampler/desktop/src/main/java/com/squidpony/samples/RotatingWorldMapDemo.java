@@ -1,9 +1,6 @@
 package com.squidpony.samples;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -240,13 +237,18 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
         view.apply(true);
     }
 
-    public static CustomConfig config = new CustomConfig(RotatingWorldMapDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: Rotating World Map");
-        config.setWindowedMode(width, height);
-        config.setResizable(false);
-//        config.setWindowedMode(width, height);
-        config.useVsync(true);
-        config.setIdleFPS(1);
-    }
+    public static CustomConfig config = new CustomConfig("RotatingWorldMapDemo"){
+        {
+            setTitle("SquidLib Demo: Rotating World Map");
+            setWindowedMode(width, height);
+            useVsync(true);
+            setResizable(false);
+            setIdleFPS(1);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new RotatingWorldMapDemo();
+        }
+    };
+
 }

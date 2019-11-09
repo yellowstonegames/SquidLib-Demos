@@ -1,6 +1,7 @@
 package com.squidpony.samples;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
@@ -384,11 +385,17 @@ public class WorldMapTextDemo extends ApplicationAdapter {
         view.update(width, height, true);
         view.apply(true);
     }
-    public static CustomConfig config = new CustomConfig(WorldMapTextDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: Earth-Mimic WorldMap With Text");
-        config.setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
-        config.useVsync(true);
-        config.setIdleFPS(1);
-    }
+    public static CustomConfig config = new CustomConfig("WorldMapTextDemo"){
+        {
+            setTitle("SquidLib Demo: Earth-Mimic WorldMap With Text");
+            setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
+            useVsync(true);
+            setIdleFPS(1);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new WorldMapTextDemo();
+        }
+    };
+
 }

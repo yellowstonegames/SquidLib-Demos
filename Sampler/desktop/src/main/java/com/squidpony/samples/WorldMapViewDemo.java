@@ -1,9 +1,6 @@
 package com.squidpony.samples;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -232,11 +229,17 @@ public class WorldMapViewDemo extends ApplicationAdapter {
         view.update(width, height, true);
     }
 
-    public static CustomConfig config = new CustomConfig(WorldMapViewDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: WorldMapView usage");
-        config.setWindowedMode(width * 4, height  * 4);
-        config.useVsync(true);
-        config.setIdleFPS(1);
-    }
+    public static CustomConfig config = new CustomConfig("WorldMapViewDemo"){
+        {
+            setTitle("SquidLib Demo: WorldMapView Usage");
+            setWindowedMode(width * 4, height * 4);
+            useVsync(true);
+            setIdleFPS(1);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new WorldMapViewDemo();
+        }
+    };
+
 }

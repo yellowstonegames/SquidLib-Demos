@@ -1,9 +1,6 @@
 package com.squidpony.samples;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
@@ -741,11 +738,17 @@ public class SparseLightingDemo extends ApplicationAdapter {
         stage.getViewport().update(width, height, false);
         stage.getViewport().setScreenBounds(0, (int)languageDisplay.getHeight(), width, height - (int)languageDisplay.getHeight());
 	}
-    public static CustomConfig config = new CustomConfig(SparseLightingDemo.class);
-    static {
-        config.setTitle("SquidLib Colorful Lighting Demo");
-        config.setWindowedMode(gridWidth * cellWidth, (gridHeight + bonusHeight) * cellHeight);
-        config.useVsync(false);
-        config.setIdleFPS(0);
-    }
+    public static CustomConfig config = new CustomConfig("LightingDemo"){
+        {
+            setTitle("SquidLib Demo: Colorful Lighting");
+            setWindowedMode(gridWidth * cellWidth, (gridHeight + bonusHeight) * cellHeight);
+            useVsync(false);
+            setIdleFPS(0);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new SparseLightingDemo();
+        }
+    };
+
 }

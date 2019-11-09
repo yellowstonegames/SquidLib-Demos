@@ -44,11 +44,7 @@ public class Sampler extends ApplicationAdapter {
             public void changed(ChangeEvent event, Actor actor) {
                 final CustomConfig sel = choices.getSelected();
                 System.out.println(sel.name);
-                try {
-                    ((Lwjgl3Application)Gdx.app).newWindow(sel.launcher.newInstance(), sel);
-                } catch (InstantiationException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                ((Lwjgl3Application)Gdx.app).newWindow(sel.instantiate(), sel);
             }
         });
         Table table = new Table(VisUI.getSkin());

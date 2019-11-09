@@ -1,6 +1,7 @@
 package com.squidpony.samples;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
@@ -255,11 +256,16 @@ public class WildMapDemo extends ApplicationAdapter {
         view.update(width, height, true);
         view.apply(true);
     }
-    public static CustomConfig config = new CustomConfig(WildMapDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: WildMapView usage");
-        config.setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
-        config.useVsync(true);
-        config.setIdleFPS(1);
-    }
+    public static CustomConfig config = new CustomConfig("WildMapDemo"){
+        {
+            setTitle("SquidLib Demo: WildMapView Usage");
+            setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
+            useVsync(true);
+            setIdleFPS(1);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new WildMapDemo();
+        }
+    };
 }

@@ -7,20 +7,19 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 /**
  * Created by Tommy Ettinger on 9/11/2018.
  */
-public class CustomConfig extends Lwjgl3ApplicationConfiguration {
+public abstract class CustomConfig extends Lwjgl3ApplicationConfiguration {
     public String name;
-    public Class<? extends ApplicationListener> launcher;
-    public CustomConfig(Class<? extends ApplicationListener> launcherClass) {
+    public CustomConfig(String name) {
         super();
-        setTitle(name = launcherClass.getSimpleName());
-        launcher = launcherClass;
+        setTitle(this.name = name);
         setWindowIcon(Files.FileType.Internal
                 , "libgdx128.png"
                 , "libgdx64.png"
                 , "libgdx32.png"
                 , "libgdx16.png");
-
     }
+    
+    public abstract ApplicationListener instantiate();
     
 
     @Override

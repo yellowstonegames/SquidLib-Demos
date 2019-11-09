@@ -1,9 +1,6 @@
 package com.squidpony.samples;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -19,7 +16,10 @@ import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidgrid.gui.gdx.SquidMouse;
 import squidpony.squidgrid.mapping.FantasyPoliticalMapper;
 import squidpony.squidgrid.mapping.WorldMapGenerator;
-import squidpony.squidmath.*;
+import squidpony.squidmath.FastNoise;
+import squidpony.squidmath.LinnormRNG;
+import squidpony.squidmath.NumberTools;
+import squidpony.squidmath.StatefulRNG;
 
 /**
  * Port of Zachary Carter's world generation technique, https://github.com/zacharycarter/mapgen
@@ -681,11 +681,16 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
         view.apply(true);
     }
 
-    public static CustomConfig config = new CustomConfig(DetailedWorldMapDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: Detailed World Map");
-        config.setWindowedMode(width, height);
-        config.useVsync(true);
-        config.setIdleFPS(1);
-    }
+    public static CustomConfig config = new CustomConfig("DetailedWorldMapDemo"){
+        {
+            setTitle("SquidLib Demo: Detailed World Map");
+            setWindowedMode(width, height);
+            useVsync(true);
+            setIdleFPS(1);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new DetailedWorldMapDemo();
+        }
+    };
 }

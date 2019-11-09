@@ -1,9 +1,6 @@
 package com.squidpony.samples;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -767,13 +764,20 @@ public class TsarDemo extends ApplicationAdapter {
         stage.getViewport().setScreenBounds(0, (int) messageDisplay.getHeight(),
                 width, height - (int) messageDisplay.getHeight());
 	}
-    public static CustomConfig config = new CustomConfig(TsarDemo.class);
-    static {
-        config.setTitle("SquidLib Demo: Escape The Tsar!");
-        config.setWindowedMode(gridWidth * cellWidth, (gridHeight + bonusHeight) * cellHeight);
-        config.useVsync(false);
-        config.setIdleFPS(20);
-    }
+
+    public static CustomConfig config = new CustomConfig("TsarDemo"){
+        {
+            setTitle("SquidLib Demo: Escape The Tsar!");
+            setWindowedMode(gridWidth * cellWidth, (gridHeight + bonusHeight) * cellHeight);
+            useVsync(false);
+            setIdleFPS(20);
+        }
+        @Override
+        public ApplicationListener instantiate() {
+            return new TsarDemo();
+        }
+    };
+
 }
 // An explanation of hexadecimal float/double literals was mentioned earlier, so here it is.
 // The literal 0x1p-9f is a good example; it is essentially the same as writing 0.001953125f,
