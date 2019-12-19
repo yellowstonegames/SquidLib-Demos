@@ -8,7 +8,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-//import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -34,7 +35,7 @@ import static com.badlogic.gdx.Input.Keys.*;
  */
 public class GraphicalDemo extends ApplicationAdapter {
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
-    private MutantBatch batch;
+    private SpriteBatch batch;
     private Phase phase = Phase.WAIT;
 
     // random number generator, optimized for when you build for the web browser (with GWT)
@@ -156,7 +157,7 @@ public class GraphicalDemo extends ApplicationAdapter {
         rng = new GWTRNG();
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        batch = new MutantBatch();
+        batch = new SpriteBatch();
         mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
@@ -642,7 +643,7 @@ public class GraphicalDemo extends ApplicationAdapter {
                     if((monster = monsters.get(Coord.get(i, j))) != null)
                     {
                         monster.setAlpha(1f);
-                        batch.setPackedColor(monster.getPackedColor());
+                        batch.setColor(monster.getColor());
                         monster.draw(batch);
                     }
                     if(monster == null && visible[i][j] < 1.0)

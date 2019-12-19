@@ -1,43 +1,46 @@
 buildscript {
-  repositories {
-    mavenLocal()
-    mavenCentral()
-    jcenter()
-    google()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-  }
-  dependencies {
-    classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-    classpath "com.android.tools.build:gradle:$androidPluginVersion"
-    classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
-  }
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		google()
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+		jcenter()
+	}
+	dependencies {
+		classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
+		classpath "com.android.tools.build:gradle:$androidPluginVersion"
+		classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
+	}
 }
 
 allprojects {
-  apply plugin: 'eclipse'
-  apply plugin: 'idea'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
 }
 
 configure(subprojects - project(':android')) {
-  apply plugin: 'java'
-  sourceCompatibility = 1.7
+	apply plugin: 'java-library'
+	sourceCompatibility = 1.8
+	compileJava {
+		options.incremental = true
+	}
 }
 
 subprojects {
-  version = '0.0.1-SNAPSHOT'
-  ext.appName = 'GraphicalDemo'
-  repositories {
-    mavenLocal()
-    mavenCentral()
-    jcenter()
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-  }
+	version = '0.0.1-SNAPSHOT'
+	ext.appName = 'GraphicalDemo'
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+		maven { url 'https://jitpack.io' }
+		jcenter()
+	}
 }
 
 // Clearing Eclipse project data in root folder:
 tasks.eclipse.doLast {
-  delete '.project'
-  delete '.classpath'
-  delete '.settings/'
+	delete '.project'
+	delete '.classpath'
+	delete '.settings/'
 }
