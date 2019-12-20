@@ -55,16 +55,16 @@ public class GraphicalDemo extends ApplicationAdapter {
     private Vector3 pos = new Vector3();
 
     //Here, gridHeight refers to the total number of rows to be displayed on the screen.
-    //We're displaying 25 rows of dungeon, then 7 more rows of text generation to show some tricks with language.
-    //gridHeight is 25 because that variable will be used for generating the dungeon (the actual size of the dungeon
-    //will be triple gridWidth and triple gridHeight), and determines how much off the dungeon is visible at any time.
+    //We're displaying 32 rows of dungeon, then 1 more row of player stats, like current health.
+    //gridHeight is 32 because that variable will be used for generating the dungeon (the actual size of the dungeon
+    //will be double gridWidth and double gridHeight), and determines how much off the dungeon is visible at any time.
     //The bonusHeight is the number of additional rows that aren't handled like the dungeon rows and are shown in a
-    //separate area; here we use them for translations. The gridWidth is 90, which means we show 90 grid spaces
-    //across the whole screen, but the actual dungeon is larger. The cellWidth and cellHeight are 10 and 20, which will
-    //match the starting dimensions of a cell in pixels, but won't be stuck at that value because we use a "Stretchable"
-    //font, and so the cells can change size (they don't need to be scaled by equal amounts, either). While gridWidth
-    //and gridHeight are measured in spaces on the grid, cellWidth and cellHeight are the initial pixel dimensions of
-    //one cell; resizing the window can make the units cellWidth and cellHeight use smaller or larger than a pixel.
+    //separate area; here we use one row for player stats. The gridWidth is 48, which means we show 48 grid spaces
+    //across the whole screen, but the actual dungeon is larger. The cellWidth and cellHeight are each 16, which will
+    //match the starting dimensions of a cell in pixels, but won't be stuck at that value because a PixelPerfectViewport
+    //is used and will increase the cell size in multiples of 16 when the window is resized. While gridWidth and
+    //gridHeight are measured in spaces on the grid, cellWidth and cellHeight are the initial pixel dimensions of one
+    //cell; resizing the window can make the units cellWidth and cellHeight use smaller or larger than a pixel.
 
     /** In number of cells */
     public static final int gridWidth = 48;
@@ -72,12 +72,12 @@ public class GraphicalDemo extends ApplicationAdapter {
     public static final int gridHeight = 32;
 
     /** In number of cells */
-    public static final int bigWidth = gridWidth;
+    public static final int bigWidth = gridWidth * 2;
     /** In number of cells */
-    public static final int bigHeight = gridHeight;
+    public static final int bigHeight = gridHeight * 2;
 
     /** In number of cells */
-    public static final int bonusHeight = 0;
+    public static final int bonusHeight = 1;
     /** The pixel width of a cell */
     public static final int cellWidth = 16;
     /** The pixel height of a cell */
@@ -85,7 +85,7 @@ public class GraphicalDemo extends ApplicationAdapter {
     
     private boolean onGrid(int screenX, int screenY)
     {
-        return screenX >= 0 && screenX < gridWidth && screenY >= 0 && screenY < gridHeight;
+        return screenX >= 0 && screenX < bigWidth && screenY >= 0 && screenY < bigHeight;
     }
 
 
@@ -162,10 +162,11 @@ public class GraphicalDemo extends ApplicationAdapter {
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
         camera.update();
-        //Here we make sure our Stage, which holds any text-based grids we make, uses our Batch.
+
         atlas = new TextureAtlas("Scroll.atlas");
-        font = new BitmapFont(Gdx.files.internal("NanoOKExtended.fnt"), atlas.findRegion("NanoOKExtended"));
-        font.getData().scale(2f);
+        font = new BitmapFont(Gdx.files.internal("font.fnt"), atlas.findRegion("font"));
+        font.setUseIntegerPositions(false);
+        font.getData().markupEnabled = true;
         bgColors = ArrayTools.fill(FLOAT_BLACK, bigWidth, bigHeight);
         colors = ArrayTools.fill(FLOAT_WHITE, bigWidth, bigHeight);
         solid = atlas.findRegion("Other_Solid");
@@ -492,9 +493,8 @@ public class GraphicalDemo extends ApplicationAdapter {
                 pos.set(screenX, screenY, 0f);
                 mainViewport.unproject(pos);
                 if (onGrid(screenX = MathUtils.floor(pos.x) >> 4, screenY = MathUtils.floor(pos.y) >> 4)) {
-                    // we also need to check if screenX or screenY is out of bounds.
-                    if (screenX < 0 || screenY < 0 || screenX >= bigWidth || screenY >= bigHeight ||
-                            (cursor.x == screenX && cursor.y == screenY)) {
+                    // we also need to check if screenX or screenY is the same cell.
+                    if (cursor.x == screenX && cursor.y == screenY) {
                         return false;
                     }
                     cursor = Coord.get(screenX, screenY);
@@ -696,11 +696,11 @@ public class GraphicalDemo extends ApplicationAdapter {
             float wide = mainViewport.getWorldWidth(),
                     x = playerSprite.getX() - mainViewport.getWorldWidth() * 0.5f,
                     y = playerSprite.getY();
-            font.setColor(Color.RED);
-            font.draw(batch, "YOUR CRAWL IS OVER!", x, y + 48, wide, Align.center, true);
+            
+            font.draw(batch, "[RED]YOUR CRAWL IS OVER![WHITE]", x, y + 48, wide, Align.center, true);
             font.draw(batch, "A monster sniffs your corpse and says,", x, y + 16, wide, Align.center, true);
             font.draw(batch, lang, x, y - 16, wide, Align.center, true);
-            font.draw(batch, "q to quit.", x, y - 80, wide, Align.center, true);
+            font.draw(batch, "[LIGHT_GRAY]q[WHITE] to quit.", x, y - 80, wide, Align.center, true);
             batch.end();
             if(Gdx.input.isKeyPressed(Q))
                 Gdx.app.exit();
@@ -763,6 +763,9 @@ public class GraphicalDemo extends ApplicationAdapter {
                 }
             }
         }
+        pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight, 0);
+        mainViewport.unproject(pos);
+        font.draw(batch, "Current Health: [RED]" + health + "[WHITE]", pos.x, pos.y);
         batch.end();
     }     
     @Override

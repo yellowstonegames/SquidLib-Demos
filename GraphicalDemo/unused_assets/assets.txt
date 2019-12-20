@@ -253,4 +253,4 @@ Wall_NSW.png
 Wall_NW.png
 Wall_SW.png
 
-NanoOKExtended.png
+font.png
