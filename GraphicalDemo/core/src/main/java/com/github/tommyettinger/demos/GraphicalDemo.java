@@ -76,8 +76,8 @@ public class GraphicalDemo extends ApplicationAdapter {
     /** In number of cells */
     public static final int bigHeight = gridHeight * 2;
 
-    /** In number of cells */
-    public static final int bonusHeight = 1;
+//    /** In number of cells */
+//    public static final int bonusHeight = 0;
     /** The pixel width of a cell */
     public static final int cellWidth = 16;
     /** The pixel height of a cell */
@@ -572,8 +572,8 @@ public class GraphicalDemo extends ApplicationAdapter {
         Coord[] playerArray = {player};
         // in some cases you can use keySet() to get a Set of keys, but that makes a read-only view, and we want
         // a copy of the key set that we can edit (so monsters don't move into each others' spaces)
-        OrderedSet<Coord> monplaces = monsters.keysAsOrderedSet();
-        int monCount = monplaces.size();
+//        OrderedSet<Coord> monplaces = monsters.keysAsOrderedSet();
+        int monCount = monsters.size();
 
         // recalculate FOV, store it in fovmap for the render to use.
         FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
@@ -584,12 +584,12 @@ public class GraphicalDemo extends ApplicationAdapter {
         ArrayList<Coord> nextMovePositions;
         for(int ci = 0; ci < monCount; ci++)
         {
-            Coord pos = monplaces.removeFirst();
-            Sprite mon = monsters.get(pos);
+            Coord pos = monsters.firstKey();
+            Sprite mon = monsters.removeFirst();
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (visible[pos.x][pos.y] > 0.1) {
                 getToPlayer.clearGoals();
-                nextMovePositions = getToPlayer.findPath(1, 7, monplaces, null, pos, playerArray);
+                nextMovePositions = getToPlayer.findPath(1, 7, monsters.keySet(), null, pos, playerArray);
                 if (nextMovePositions != null && !nextMovePositions.isEmpty()) {
                     Coord tmp = nextMovePositions.get(0);
                     // if we would move into the player, instead damage the player and give newMons the current
@@ -599,7 +599,7 @@ public class GraphicalDemo extends ApplicationAdapter {
                         playerSprite.setPackedColor(FLOAT_BLOOD);
                         health--;
                         // make sure the monster is still actively stalking/chasing the player
-                        monplaces.add(pos);
+                        monsters.put(pos, mon);
                     }
                     // otherwise store the new position in newMons.
                     else {
@@ -607,15 +607,15 @@ public class GraphicalDemo extends ApplicationAdapter {
                         monsters.alter(pos, tmp);
                         mon.setPosition(tmp.x * cellWidth, tmp.y * cellHeight);
                         //display.slide(mon, pos.x, pos.y, tmp.x, tmp.y, 0.125f, null);
-                        monplaces.add(tmp);
+                        monsters.put(tmp, mon);
                     }
                 } else {
-                    monplaces.add(pos);
+                    monsters.put(pos, mon);
                 }
             }
             else
             {
-                monplaces.add(pos);
+                monsters.put(pos, mon);
             }
         }
 
