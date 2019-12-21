@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
@@ -25,7 +24,10 @@ import squidpony.squidgrid.Measurement;
 import squidpony.squidgrid.Radius;
 import squidpony.squidgrid.mapping.DungeonGenerator;
 import squidpony.squidgrid.mapping.DungeonUtility;
-import squidpony.squidmath.*;
+import squidpony.squidmath.Coord;
+import squidpony.squidmath.GWTRNG;
+import squidpony.squidmath.GreasedRegion;
+import squidpony.squidmath.OrderedMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +100,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private PixelPerfectViewport mainViewport;
     private Camera camera;
     
-    private OrderedMap<Coord, Sprite> monsters;
+    private OrderedMap<Coord, Glider> monsters;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
     private List<Coord> toCursor;
@@ -938,10 +940,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
         for (int i = 0; i < numMonsters; i++) {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
-            Sprite monster = new Sprite(atlas.findRegion(rng.getRandomElement(possibleEnemies)));
+            Glider monster = new Glider(atlas.findRegion(rng.getRandomElement(possibleEnemies)), monPos);
 //            monster.setPackedColor(ColorTools.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
-            monster.setPosition(monPos.x * cellWidth, monPos.y * cellHeight);
             monsters.put(monPos, monster);
         }
         //This is used to allow clicks or taps to take the player to the desired area.
@@ -1166,7 +1167,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         for(int ci = 0; ci < monCount; ci++)
         {
             Coord pos = monsters.firstKey();
-            Sprite mon = monsters.removeFirst();
+            Glider mon = monsters.removeFirst();
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (visible[pos.x][pos.y] > 0.1) {
                 getToPlayer.clearGoals();
@@ -1186,7 +1187,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     else {
                         // alter is a method on OrderedMap and OrderedSet that changes a key in-place
                         monsters.alter(pos, tmp);
-                        mon.setPosition(tmp.x * cellWidth, tmp.y * cellHeight);
+                        mon.start = pos;
+                        mon.end = tmp;
+                        mon.change = 0f;
                         //display.slide(mon, pos.x, pos.y, tmp.x, tmp.y, 0.125f, null);
                         monsters.put(tmp, mon);
                     }
@@ -1212,7 +1215,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
-        Sprite monster;
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
@@ -1223,12 +1225,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.get('.', solid), pos.x, pos.y, cellWidth, cellHeight);
                     batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y, cellWidth, cellHeight);
-                    if((monster = monsters.get(Coord.get(i, j))) != null)
-                    {
-                        monster.setAlpha(1f);
-                        //batch.setPackedColor(FLOAT_WHITE);
-                        monster.draw(batch);
-                    }
                 } else if(seen.contains(i, j)) {
                     pos.set(i * cellWidth, j * cellHeight, 0f);
                     batch.setPackedColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
@@ -1238,11 +1234,17 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 }
             }
         }
-//        for (int i = 0; i < monsters.size(); i++) {
-//            monsters.getAt(i).draw(batch);
-//        }
-//        playerSprite.setPackedColor(playerColor);
         batch.setPackedColor(FLOAT_WHITE);
+        Glider monster;
+        for (int i = 0; i < bigWidth; i++) {
+            for (int j = 0; j < bigHeight; j++) {
+                if (visible[i][j] > 0.0) {
+                    if ((monster = monsters.get(Coord.get(i, j))) != null) {
+                        batch.draw(monster, monster.getX() * cellWidth, monster.getY() * cellHeight);
+                    }
+                }
+            }
+        }
         batch.draw(playerSprite, playerSprite.getX() * cellWidth, playerSprite.getY() * cellHeight);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
@@ -1281,8 +1283,23 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         // need to display the map every frame, since we clear the screen to avoid artifacts.
         putMap();
-        // if the user clicked, we have a list of moves to perform.
-        if(phase == Phase.WAIT && !awaitedMoves.isEmpty())
+        
+        if(phase == Phase.MONSTER_ANIM) {
+            float t = TimeUtils.timeSinceMillis(animationStart) * 0.008f;
+            for (int i = 1; i < monsters.size(); i++) {
+                monsters.getAt(i).change = t;
+            }
+            if (t >= 1f) {
+                phase = Phase.WAIT;
+                if (!awaitedMoves.isEmpty()) {
+                    Coord m = awaitedMoves.remove(0);
+                    if (!toCursor.isEmpty())
+                        toCursor.remove(0);
+                    move(m.x, m.y);
+                }
+            }
+        }
+        else if(phase == Phase.WAIT && !awaitedMoves.isEmpty())
         {
             Coord m = awaitedMoves.remove(0);
             if (!toCursor.isEmpty())
@@ -1290,7 +1307,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
             move(m.x, m.y);
         }
         else if(phase == Phase.PLAYER_ANIM) {
-            playerSprite.change = TimeUtils.timeSinceMillis(animationStart) * 0.006f;
+            playerSprite.change = TimeUtils.timeSinceMillis(animationStart) * 0.008f;
             if (playerSprite.change >= 1f) {
                 phase = Phase.MONSTER_ANIM;
                 animationStart = TimeUtils.millis();
