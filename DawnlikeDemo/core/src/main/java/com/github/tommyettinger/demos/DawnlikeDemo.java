@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.TimeUtils;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -37,6 +38,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
     private SpriteBatch batch;
     private Phase phase = Phase.WAIT;
+    private long animationStart;
 
     // random number generator, optimized for when you build for the web browser (with GWT)
     private GWTRNG rng;
@@ -122,7 +124,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     // of TextCellFactory (which most text in SquidLib is drawn with) instead of the different and not-very-compatible
     // rules of Label, which older SquidLib code used when it needed text in an Actor. Glyphs are also lighter-weight in
     // memory usage and time taken to draw than Labels.
-    private Sprite playerSprite;
+    private Glider playerSprite;
     // libGDX can use a kind of packed float (yes, the number type) to efficiently store colors, but it also uses a
     // heavier-weight Color object sometimes; SquidLib has a large list of SColor objects that are often used as easy
     // predefined colors since SColor extends Color. SparseLayers makes heavy use of packed float colors internally,
@@ -145,7 +147,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
             FLOAT_GRAY = ColorTools.floatGetHSV(0f, 0f, 0.25f, 1f);
                     //-0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
     // the player's color as a float
-    private float playerColor;
+//    private float playerColor;
     @Override
     public void create () {
         // Gotta have a random number generator.
@@ -159,6 +161,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
+        animationStart = TimeUtils.millis();
         mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
@@ -905,10 +908,10 @@ public class DawnlikeDemo extends ApplicationAdapter {
         //if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
         //don't seed the RNG, any valid cell should be possible.
         player = floors.singleRandom(rng);
-        playerSprite = new Sprite(atlas.findRegion(rng.getRandomElement(possibleCharacters)));
-        playerColor = ColorTools.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
-        playerSprite.setPackedColor(playerColor);
-        playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);
+        playerSprite = new Glider(atlas.findRegion(rng.getRandomElement(possibleCharacters)), player);
+//        playerColor = ColorTools.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
+//        playerSprite.setPackedColor(playerColor);
+//        playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);
         // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
         FOV.reuseFOV(resistance, visible, player.x, player.y, 9.0, Radius.CIRCLE);
         // 0.0 is the upper bound (inclusive), so any Coord in visible that is more well-lit than 0.0 will _not_ be in
@@ -1099,12 +1102,11 @@ public class DawnlikeDemo extends ApplicationAdapter {
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
      * In a fully-fledged game, this would not be organized like this, but this is a one-file demo.
-     * @param xmod
-     * @param ymod
+     * @param newX
+     * @param newY
      */
-    private void move(int xmod, int ymod) {
+    private void move(int newX, int newY) {
         if (health <= 0) return;
-        int newX = player.x + xmod, newY = player.y + ymod;
         if (newX >= 0 && newY >= 0 && newX < bigWidth && newY < bigHeight
                 && bareDungeon[newX][newY] != '#') {
             // '+' is a door.
@@ -1124,8 +1126,11 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 blockage.refill(visible, 0.0);
                 seen.or(blockage.not());
                 blockage.fringe8way();
-                playerSprite.setPosition(newX * cellWidth, newY * cellHeight);
-                player = Coord.get(newX, newY);
+                playerSprite.start = player;
+                playerSprite.end = (player = Coord.get(newX, newY));
+                playerSprite.change = 0f;
+                phase = Phase.PLAYER_ANIM;
+                animationStart = TimeUtils.millis();
                 // if a monster was at the position we moved into, and so was successfully removed...
                 if(monsters.containsKey(player))
                 {
@@ -1172,7 +1177,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     // position of this monster.
                     if (tmp.x == player.x && tmp.y == player.y) {
                         // not sure if this stays red for very long
-                        playerSprite.setPackedColor(FLOAT_BLOOD);
+                        playerSprite.color = (FLOAT_BLOOD);
                         health--;
                         // make sure the monster is still actively stalking/chasing the player
                         monsters.put(pos, mon);
@@ -1237,8 +1242,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
 //            monsters.getAt(i).draw(batch);
 //        }
 //        playerSprite.setPackedColor(playerColor);
-        playerSprite.setPackedColor(FLOAT_WHITE);
-        playerSprite.draw(batch);
+        batch.setPackedColor(FLOAT_WHITE);
+        batch.draw(playerSprite, playerSprite.getX() * cellWidth, playerSprite.getY() * cellHeight);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     @Override
@@ -1248,8 +1253,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // center the camera on the player's position
-        camera.position.x = playerSprite.getX();
-        camera.position.y =  playerSprite.getY();
+        camera.position.x = playerSprite.getX() * cellWidth;
+        camera.position.y =  playerSprite.getY() * cellHeight;
         camera.update();
 
         mainViewport.apply(false);
@@ -1261,8 +1266,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
             // still need to display the map, then write over it with a message.
             putMap();
             float wide = mainViewport.getWorldWidth(),
-                    x = playerSprite.getX() - mainViewport.getWorldWidth() * 0.5f,
-                    y = playerSprite.getY();
+                    x = playerSprite.getX() * cellWidth - mainViewport.getWorldWidth() * 0.5f,
+                    y = playerSprite.getY() * cellHeight;
             
             font.draw(batch, "[RED]YOUR CRAWL IS OVER![WHITE]", x, y + 48, wide, Align.center, true);
             font.draw(batch, "A monster sniffs your corpse and says,", x, y + 16, wide, Align.center, true);
@@ -1277,23 +1282,19 @@ public class DawnlikeDemo extends ApplicationAdapter {
         // need to display the map every frame, since we clear the screen to avoid artifacts.
         putMap();
         // if the user clicked, we have a list of moves to perform.
-        if(!awaitedMoves.isEmpty())
+        if(phase == Phase.WAIT && !awaitedMoves.isEmpty())
         {
-            // this doesn't check for input, but instead processes and removes Coords from awaitedMoves.
-            if (System.currentTimeMillis() - lastDrawTime >= 80) {
-                lastDrawTime = System.currentTimeMillis();
-                switch (phase) {
-                    case WAIT:
-                    case MONSTER_ANIM:
-                        Coord m = awaitedMoves.remove(0);
-                        if(!toCursor.isEmpty())
-                            toCursor.remove(0);
-                        move(m.x - player.x, m.y - player.y);
-                        break;
-                    case PLAYER_ANIM:
-                        postMove();
-                        break;
-                }
+            Coord m = awaitedMoves.remove(0);
+            if (!toCursor.isEmpty())
+                toCursor.remove(0);
+            move(m.x, m.y);
+        }
+        else if(phase == Phase.PLAYER_ANIM) {
+            playerSprite.change = TimeUtils.timeSinceMillis(animationStart) * 0.006f;
+            if (playerSprite.change >= 1f) {
+                phase = Phase.MONSTER_ANIM;
+                animationStart = TimeUtils.millis();
+                postMove();
                 // this only happens if we just removed the last Coord from awaitedMoves, and it's only then that we need to
                 // re-calculate the distances from all cells to the player. We don't need to calculate this information on
                 // each part of a many-cell move (just the end), nor do we need to calculate it whenever the mouse moves.
