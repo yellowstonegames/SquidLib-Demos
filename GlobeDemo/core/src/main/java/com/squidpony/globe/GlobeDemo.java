@@ -14,10 +14,7 @@ import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidgrid.gui.gdx.SquidMouse;
 import squidpony.squidgrid.gui.gdx.WorldMapView;
 import squidpony.squidgrid.mapping.WorldMapGenerator;
-import squidpony.squidmath.DiverRNG;
-import squidpony.squidmath.FastNoise;
-import squidpony.squidmath.NumberTools;
-import squidpony.squidmath.StatefulRNG;
+import squidpony.squidmath.*;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GlobeDemo extends ApplicationAdapter {
@@ -33,14 +30,13 @@ public class GlobeDemo extends ApplicationAdapter {
     //private static final int width = 700, height = 700;
 //    private static final int width = 512, height = 512;
 
-    private static final int cellWidth = 1, cellHeight = 1;
     private WorldMapGenerator.RotatingSpaceMap world;
 
 
     private ImmediateModeRenderer20 batch;
     private SquidInput input;
     private Viewport view;
-    private StatefulRNG rng;
+    private GWTRNG rng;
     private long seed;
     private WorldMapView wmv;
 
@@ -57,8 +53,9 @@ public class GlobeDemo extends ApplicationAdapter {
         //// for your game; here it always renders pixels
         batch = new ImmediateModeRenderer20(width * height, false, true, 0);
         view = new StretchViewport(width, height);
-        seed = 0x0c415cf07774ab2eL;//0x9987a26d1e4d187dL;//0xDEBACL;
-        rng = new StatefulRNG(seed);
+        //seed = 0x0c415cf07774ab2eL;//0x9987a26d1e4d187dL;//0xDEBACL;
+        rng = new GWTRNG();
+        seed = rng.getState();
         //// NOTE: this FastNoise has a different frequency (1f) than the default (1/32f), and that
         //// makes a huge difference on world map quality. It also uses extra octaves.
         WorldMapGenerator.DEFAULT_NOISE.setNoiseType(FastNoise.SIMPLEX_FRACTAL);
@@ -83,6 +80,9 @@ public class GlobeDemo extends ApplicationAdapter {
             public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
                 switch (key) {
                     case SquidInput.ENTER:
+                    case ' ':
+                    case '\r':
+                    case '\n':
                         seed = rng.nextLong();
                         generate(seed);
                         rng.setState(seed);
@@ -112,7 +112,7 @@ public class GlobeDemo extends ApplicationAdapter {
         {
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                if(button == Input.Buttons.RIGHT)
+                if(Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT))
                 {
                     zoomOut(screenX, screenY);
 //                    Gdx.graphics.requestRendering();
@@ -191,7 +191,6 @@ public class GlobeDemo extends ApplicationAdapter {
 
 
     public void putMap() {
-        long startTime = System.currentTimeMillis();
         float[][] cm = wmv.getColorMap();
         //// everything after this part of putMap() should be customized to your rendering setup
         batch.begin(view.getCamera().combined, GL20.GL_POINTS);
@@ -206,7 +205,6 @@ public class GlobeDemo extends ApplicationAdapter {
             }
         }
         batch.end();
-        //ttd = System.currentTimeMillis() - startTime >> 10;
     }
 
     @Override
@@ -215,16 +213,15 @@ public class GlobeDemo extends ApplicationAdapter {
         Gdx.gl.glClearColor(SColor.DB_INK.r, SColor.DB_INK.g, SColor.DB_INK.b, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glDisable(GL20.GL_BLEND);
+        // if we are waiting for the player's input and get input, process it.
+        if (input.hasNext()) {
+            input.next();
+        }
         if(spinning)
             rotate();
         // need to display the map every frame, since we clear the screen to avoid artifacts.
         putMap();
         Gdx.graphics.setTitle("Took " + ttg + " ms to generate");//, took " + ttd + " ms to draw");
-
-        // if we are waiting for the player's input and get input, process it.
-        if (input.hasNext()) {
-            input.next();
-        }
     }
 
     @Override
