@@ -28,65 +28,6 @@ public class ColorTools {
     }
 
     /**
-     * Gets a packed float representation of a color given an RGBA8888-format long. LibGDX expects ABGR format
-     * in some places, but not all, and it can be confusing to track when it wants RGBA, ABGR, or ARGB. Generally,
-     * packed floats like what this returns are ABGR format, the kind that can be passed directly to
-     * {@link com.badlogic.gdx.graphics.g2d.Batch#setPackedColor(float)} without constructing intermediate objects.
-     * SquidPanel also uses floats internally instead of LibGDX Color objects in its internal 2D array that
-     * associates colors to cells; this has changed from earlier releases and should be much more efficient.
-     * <br>
-     * This method is probably not what you want unless you specifically have RGBA8888-format longs that you
-     * want converted to packed floats. You probably should look at {@link #floatGet(float, float, float, float)} if
-     * you have alpha and/or float components, or {@link #floatGetI(int, int, int)} for the common case of the 3 RGB
-     * components as ints and alpha simply opaque.
-     *
-     * @param c a long with format {@code 32 unused bits, 8 red bits, 8 green bits, 8 blue bits, 7 alpha bits, 1 unused bit}
-     * @return a packed float that can be given to the setColor method in LibGDX's Batch classes
-     */
-    public static float floatGet(long c) {
-        return NumberTools.intBitsToFloat((int) ((c >>> 24 & 0xff) | (c >>> 8 & 0xff00) | (c << 8 & 0xff0000)
-                | (c << 24 & 0xfe000000)));
-    }
-
-    /**
-     * Gets a packed float representation of a color given an RGBA8888-format int. LibGDX expects ABGR format
-     * in some places, but not all, and it can be confusing to track when it wants RGBA, ABGR, or ARGB. Generally,
-     * packed floats like what this returns are ABGR format, the kind that can be passed directly to
-     * {@link com.badlogic.gdx.graphics.g2d.Batch#setPackedColor(float)} without constructing intermediate objects.
-     * SquidPanel also uses floats internally instead of LibGDX Color objects in its internal 2D array that
-     * associates colors to cells; this has changed from earlier releases and should be much more efficient.
-     * <br>
-     * This method is probably not what you want unless you specifically have RGBA8888-format ints that you
-     * want converted to packed floats. You probably should look at {@link #floatGet(float, float, float, float)} if
-     * you have alpha and/or float components, or {@link #floatGetI(int, int, int)} for the common case of the 3 RGB
-     * components as ints and alpha simply opaque.
-     *
-     * @param c an int with format {@code 8 red bits, 8 green bits, 8 blue bits, 7 alpha bits, 1 unused bit}
-     * @return a packed float that can be given to the setColor method in LibGDX's Batch classes
-     */
-    public static float floatGet(int c) {
-        return NumberTools.intBitsToFloat(Integer.reverseBytes(c) & 0xFEFFFFFF);
-    }
-
-    /**
-     * Gets a packed float representation of a color given as 3 RGB int components, setting alpha to opaque. LibGDX
-     * expects ABGR format in some places, but not all, and it can be confusing to track when it wants RGBA, ABGR,
-     * or ARGB. Generally, packed floats like what this returns are ABGR format, the kind that can be passed
-     * directly to {@link com.badlogic.gdx.graphics.g2d.Batch#setPackedColor(float)} without constructing intermediate
-     * objects. SquidPanel also uses floats internally instead of LibGDX Color objects in its internal 2D array that
-     * associates colors to cells; this has changed from earlier releases and should be much more efficient.
-     *
-     * @param r an int from 0 to 255 (both inclusive) for red
-     * @param g an int from 0 to 255 (both inclusive) for green
-     * @param b an int from 0 to 255 (both inclusive) for blue
-     * @return a packed float that can be given to the setColor method in LibGDX's Batch classes
-     */
-    public static float floatGetI(int r, int g, int b) {
-        return NumberTools.intBitsToFloat((r & 0xff) | (g << 8 & 0xff00) | (b << 16 & 0xff0000)
-                | 0xfe000000); //rgbToFloatColor((b & 0xff) | (g << 8 & 0xff00) | (r << 16));
-    }
-
-    /**
      * Gets a color as a packed float given floats representing hue, saturation, value, and opacity.
      * All parameters should normally be between 0 and 1 inclusive, though hue is tolerated if it is negative down to
      * -6f at the lowest or positive up to any finite value, though precision loss may affect the color if the hue is

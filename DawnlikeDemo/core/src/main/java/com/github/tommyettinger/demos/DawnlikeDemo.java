@@ -319,9 +319,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 "geryon",
                 "sandestin",
                 "lesser devil",
-                "nalfeshnee",
                 "pit fiend",
-                "horned devil",
+                "nalzok",
+                "ixoth",
                 "minion of huhetotl",
                 "water demon",
                 "mail daemon",
@@ -334,7 +334,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 "balrog",
                 "bone devil",
                 "ice devil",
-                "fire devil",
+                "horned devil",
                 "homunculus",
                 "manes",
                 "lemure",
@@ -432,7 +432,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 "kop kaptain",
                 "shopkeeper",
                 "executioner",
-                "ninja",
+                "assassin",
                 "prisoner",
                 "forest sprite",
                 "forest fairy",
@@ -527,7 +527,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 "ratzilla",
                 "snowy owlbear",
                 "owlbear",
-                "werebat",
+                "spriggan",
                 "pegasus",
                 "kirin",
                 "gremlin",
@@ -753,6 +753,17 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 "rust monster",
                 "rock mole",
                 "wererat",
+                "gray ooze",
+                "brown pudding",
+                "black pudding",
+                "acid blob",
+                "quivering blob",
+                "gelatinous cube",
+                "blue jelly",
+                "spotted jelly",
+                "ochre jelly",
+                "green slime",
+                "blue slime",
                 "kobold zombie",
                 "gnome zombie",
                 "orc zombie",
@@ -934,14 +945,15 @@ public class DawnlikeDemo extends ApplicationAdapter {
         // impossible to enter.
         blockage.fringe8way();
         floors.remove(player);
-        int numMonsters = 50;
+        int numMonsters = 100;
         monsters = new OrderedMap<>(numMonsters);
         for (int i = 0; i < numMonsters; i++) {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
+            String enemy = rng.getRandomElement(possibleEnemies);
             AnimatedGlider monster =
                     new AnimatedGlider(new Animation<>(DURATION,
-                            atlas.findRegions(rng.getRandomElement(possibleEnemies)), Animation.PlayMode.LOOP), monPos);
+                            atlas.findRegions(enemy), Animation.PlayMode.LOOP), monPos);
 //            monster.setPackedColor(ColorTools.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monsters.put(monPos, monster);
@@ -1273,10 +1285,10 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     x = playerSprite.getX() * cellWidth - mainViewport.getWorldWidth() * 0.5f,
                     y = playerSprite.getY() * cellHeight;
             
-            font.draw(batch, "[RED]YOUR CRAWL IS OVER![WHITE]", x, y + 48, wide, Align.center, true);
+            font.draw(batch, "[RED]YOUR CRAWL IS OVER![WHITE]", x, y + 32, wide, Align.center, true);
             font.draw(batch, "A monster sniffs your corpse and says,", x, y + 16, wide, Align.center, true);
-            font.draw(batch, lang, x, y - 16, wide, Align.center, true);
-            font.draw(batch, "[LIGHT_GRAY]q[WHITE] to quit.", x, y - 80, wide, Align.center, true);
+            font.draw(batch, lang, x, y, wide, Align.center, true);
+            font.draw(batch, "[LIGHT_GRAY]q[WHITE] to quit.", x, y - 32, wide, Align.center, true);
             batch.end();
             if(Gdx.input.isKeyPressed(Q))
                 Gdx.app.exit();
