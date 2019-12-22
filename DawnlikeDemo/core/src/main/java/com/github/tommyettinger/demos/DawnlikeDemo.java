@@ -7,9 +7,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
@@ -37,6 +35,8 @@ import static com.badlogic.gdx.Input.Keys.*;
 /**
  */
 public class DawnlikeDemo extends ApplicationAdapter {
+    private static final float DURATION = 0.375f;
+    private long startTime;
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
     private SpriteBatch batch;
     private Phase phase = Phase.WAIT;
@@ -100,7 +100,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private PixelPerfectViewport mainViewport;
     private Camera camera;
     
-    private OrderedMap<Coord, Glider> monsters;
+    private OrderedMap<Coord, AnimatedGlider> monsters;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
     private List<Coord> toCursor;
@@ -122,11 +122,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     // the player's vision that blocks pathfinding to areas we can't see a path to, and we also store all cells that we
     // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
     private GreasedRegion floors, blockage, seen;
-    // a Glyph is a kind of scene2d Actor that only holds one char in a specific color, but is drawn using the behavior
-    // of TextCellFactory (which most text in SquidLib is drawn with) instead of the different and not-very-compatible
-    // rules of Label, which older SquidLib code used when it needed text in an Actor. Glyphs are also lighter-weight in
-    // memory usage and time taken to draw than Labels.
-    private Glider playerSprite;
+    private AnimatedGlider playerSprite;
     // libGDX can use a kind of packed float (yes, the number type) to efficiently store colors, but it also uses a
     // heavier-weight Color object sometimes; SquidLib has a large list of SColor objects that are often used as easy
     // predefined colors since SColor extends Color. SparseLayers makes heavy use of packed float colors internally,
@@ -152,6 +148,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
 //    private float playerColor;
     @Override
     public void create () {
+        // Starting time for the game; other times are measured relative to this so they aren't huge numbers.
+        startTime = TimeUtils.millis();
         // Gotta have a random number generator.
         // We can seed a GWTRNG, which is optimized for the HTML target, with any int or long
         // we want. You can also hash a String with CrossHash.hash64("Some seed") to get a
@@ -910,7 +908,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         //if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
         //don't seed the RNG, any valid cell should be possible.
         player = floors.singleRandom(rng);
-        playerSprite = new Glider(atlas.findRegion(rng.getRandomElement(possibleCharacters)), player);
+        playerSprite = new AnimatedGlider(new Animation<>(DURATION,
+                atlas.findRegions(rng.getRandomElement(possibleCharacters)), Animation.PlayMode.LOOP), player);
 //        playerColor = ColorTools.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
 //        playerSprite.setPackedColor(playerColor);
 //        playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);
@@ -940,7 +939,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
         for (int i = 0; i < numMonsters; i++) {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
-            Glider monster = new Glider(atlas.findRegion(rng.getRandomElement(possibleEnemies)), monPos);
+            AnimatedGlider monster =
+                    new AnimatedGlider(new Animation<>(DURATION,
+                            atlas.findRegions(rng.getRandomElement(possibleEnemies)), Animation.PlayMode.LOOP), monPos);
 //            monster.setPackedColor(ColorTools.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monsters.put(monPos, monster);
@@ -1167,7 +1168,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         for(int ci = 0; ci < monCount; ci++)
         {
             Coord pos = monsters.firstKey();
-            Glider mon = monsters.removeFirst();
+            AnimatedGlider mon = monsters.removeFirst();
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (visible[pos.x][pos.y] > 0.1) {
                 getToPlayer.clearGoals();
@@ -1211,6 +1212,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
      */
     public void putMap()
     {
+        final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
         //In many other situations, you would clear the drawn characters to prevent things that had been drawn in the
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
@@ -1235,17 +1237,17 @@ public class DawnlikeDemo extends ApplicationAdapter {
             }
         }
         batch.setPackedColor(FLOAT_WHITE);
-        Glider monster;
+        AnimatedGlider monster;
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if (visible[i][j] > 0.0) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
-                        batch.draw(monster, monster.getX() * cellWidth, monster.getY() * cellHeight);
+                        batch.draw(monster.animate(time), monster.getX() * cellWidth, monster.getY() * cellHeight);
                     }
                 }
             }
         }
-        batch.draw(playerSprite, playerSprite.getX() * cellWidth, playerSprite.getY() * cellHeight);
+        batch.draw(playerSprite.animate(time), playerSprite.getX() * cellWidth, playerSprite.getY() * cellHeight);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     @Override

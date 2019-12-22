@@ -1,6 +1,7 @@
 package com.github.tommyettinger.demos;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import squidpony.squidmath.Coord;
@@ -12,33 +13,42 @@ import squidpony.squidmath.Coord;
  * <br>
  * Created by Tommy Ettinger on 12/20/2019.
  */
-public class Glider extends TextureRegion {
+public class AnimatedGlider extends TextureRegion {
+    public Animation<TextureRegion> animation;
     public float change;
     public Coord start = Coord.get(0, 0); // you could also use GridPoint2 or Vector2 here
     public Coord end = Coord.get(0, 0);
     public float color;
 
-    private Glider()
+    private AnimatedGlider()
     {
         super();
         this.color = Color.WHITE_FLOAT_BITS;
     }
-    public Glider(TextureRegion textureRegion) {
+    public AnimatedGlider(Animation<TextureRegion> animation) {
         super();
-        setRegion(textureRegion);
+        this.animation = animation;
+        setRegion(animation.getKeyFrame(0f));
         this.color = Color.WHITE_FLOAT_BITS;
     }
 
-    public Glider(TextureRegion textureRegion, Coord coord) {
-        this(textureRegion, coord, coord);
+    public AnimatedGlider(Animation<TextureRegion> animation, Coord coord) {
+        this(animation, coord, coord);
     }
 
-    public Glider(TextureRegion textureRegion, Coord start, Coord end) {
+    public AnimatedGlider(Animation<TextureRegion> animation, Coord start, Coord end) {
         super();
-        setRegion(textureRegion);
+        this.animation = animation;
+        setRegion(animation.getKeyFrame(0f));
         this.color = Color.WHITE_FLOAT_BITS;
         this.start = start;
         this.end = end;
+    }
+
+    public AnimatedGlider animate(final float stateTime)
+    {
+        setRegion(animation.getKeyFrame(stateTime));
+        return this;
     }
     
     public float getX()
