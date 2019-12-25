@@ -352,7 +352,8 @@ public class ColorfulDemo extends ApplicationAdapter {
             AnimatedGlider monster =
                     new AnimatedGlider(new Animation<>(DURATION,
                             atlas.findRegions(enemy), Animation.PlayMode.LOOP), monPos);
-            monster.setTweakedColor(Palette.LIST.get((int)(((i+257)*0x9E3779B9 & 0xFFFFFFFFL)*255L >>> 32)+1), FloatColors.floatColor(0.4f, 0.25f, 0.25f, 0.75f));
+            float monColor = Palette.LIST.get((int)(((i+257)*0x9E3779B9 & 0xFFFFFFFFL)*255L >>> 32)+1);
+            monster.setTweakedColor(FloatColors.floatColor(luma(monColor) * 0.5f + 0.4f, chromaWarm(monColor), chromaMild(monColor), alpha(monColor)), FloatColors.floatColor(0.4f, 0.25f, 0.25f, 0.75f));
 //            monster.setPackedColor(FloatColors.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monsters.put(monPos, monster);
@@ -684,11 +685,11 @@ public class ColorfulDemo extends ApplicationAdapter {
             float wide = mainViewport.getWorldWidth(),
                     x = playerSprite.getX() - mainViewport.getWorldWidth() * 0.5f,
                     y = playerSprite.getY();
-            
+            batch.setTweak(0.55f, 0.5f, 0.5f, 0.8f);
             font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2, wide, Align.center, true);
             font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + 1, wide, Align.center, true);
             font.draw(batch, "[GRAY]" + lang, x, y, wide, Align.center, true);
-            font.draw(batch, "[WHITE]q[GRAY] to quit.", x, y - 2, wide, Align.center, true);
+            font.draw(batch, "[GRAY]q to quit.", x, y - 2, wide, Align.center, true);
             batch.end();
             if(Gdx.input.isKeyPressed(Q))
                 Gdx.app.exit();
