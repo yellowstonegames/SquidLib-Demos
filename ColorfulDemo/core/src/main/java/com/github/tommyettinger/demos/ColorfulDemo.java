@@ -766,7 +766,8 @@ public class ColorfulDemo extends ApplicationAdapter {
         }
         pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight);
         mainViewport.unproject(pos);
-        font.draw(batch, "[WHITE]Current Health: [RED]" + health + "[WHITE]", pos.x, pos.y);
+        batch.setTweak(0.55f, 0.5f, 0.5f, 0.8f);
+        font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[GRAY]", pos.x, pos.y);
         batch.end();
     }     
     @Override
