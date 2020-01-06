@@ -1045,7 +1045,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     toCursor.clear();
                     awaitedMoves.add(player.translate(1, 1));
                     break;
-                case '.':
+                case PERIOD:
                 case NUMPAD_5:
                     toCursor.clear();
                     awaitedMoves.add(player);

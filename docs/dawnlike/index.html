@@ -15,6 +15,9 @@
               <br>
               <br>
               <br>
+              <p>Use the mouse to select a path; click to confirm move.
+                     You can also move using arrow keys, WASD, or the numpad, and can stay in place with '.' or numpad 5.
+                     Move into enemies to destroy them. Press 'b' to toggle an alternate, bolder shader.</p>
               <br>
               <p>This demo uses the <a href="https://opengameart.org/content/dawnlike-16x16-universal-rogue-like-tileset-v181">DawnLike tileset by DragonDePlatino and DawnBringer</a>.
                      The specific variant used is <a href="https://github.com/tommyettinger/DawnLikeAtlas">DawnLikeAtlas</a>, which splits up DawnLike into individual tiles for usage by libGDX in a TextureAtlas.
@@ -35,5 +38,14 @@
               }
               document.getElementById('embed-html').addEventListener('mousedown', handleMouseDown, false);
               document.getElementById('embed-html').addEventListener('mouseup', handleMouseUp, false);
+              
+              window.onkeydown =
+              function(event) {
+                  // prevent all navigation keys except the space key
+                  if([33, 34, 35, 36, 37, 38, 39, 40, 97, 98, 99, 100, 101, 102, 103, 104, 105, 190, 65, 68, 83, 87, 66].indexOf(event.keyCode) > -1) {
+                      event.preventDefault();
+                      return false;
+                  }
+              };
        </script>
 </html>
