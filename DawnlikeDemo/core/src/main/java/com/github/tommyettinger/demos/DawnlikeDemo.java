@@ -38,7 +38,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
     private long startTime;
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
-    private SpriteBatch batch;
+    private SpriteBatch batch, simpleBatch, contrastBatch;
     private Phase phase = Phase.WAIT;
     private long animationStart;
 
@@ -141,7 +141,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
             FLOAT_WHITE = Color.WHITE.toFloatBits(), 
             FLOAT_BLACK = Color.BLACK.toFloatBits(),
             FLOAT_BLOOD = -0x1.564f86p125F,  // same result as SColor.PURE_CRIMSON.toFloatBits()
-            FLOAT_LIGHTING = ColorTools.floatGetHSV(0.17f, 0.12f, 0.8f, 1f),//-0x1.cff1fep126F, // same result as SColor.COSMIC_LATTE.toFloatBits()
+            FLOAT_LIGHTING = ColorTools.floatGetHSV(0.17f, 0.0625f, 0.875f, 1f),
+//            FLOAT_LIGHTING = ColorTools.floatGetHSV(0.17f, 0.12f, 0.8f, 1f),
+// -0x1.cff1fep126F, // same result as SColor.COSMIC_LATTE.toFloatBits()
             FLOAT_GRAY = ColorTools.floatGetHSV(0f, 0f, 0.25f, 1f);
                     //-0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
     // the player's color as a float
@@ -160,7 +162,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
         rng = new GWTRNG();
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        batch = new SpriteBatch();
+        contrastBatch = new SpriteBatch(1000, ColorTools.createContrastShader());
+        simpleBatch = new SpriteBatch();
+        batch = simpleBatch;
         animationStart = TimeUtils.millis();
         mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
@@ -998,62 +1002,60 @@ public class DawnlikeDemo extends ApplicationAdapter {
         input = new InputAdapter() {
             @Override
             public boolean keyUp(int keycode) {
-                switch (keycode)
-                {
-                    case UP:
-                    case 'w':
-                    case 'W':
-                    case NUMPAD_8:
-                        toCursor.clear();
-                        //+1 is up on the screen
-                        awaitedMoves.add(player.translate(0, 1));
-                        break;
-                    case DOWN:
-                    case 's':
-                    case 'S':
-                    case NUMPAD_2:
-                        toCursor.clear();
-                        //-1 is down on the screen
-                        awaitedMoves.add(player.translate(0, -1));
-                        break;
-                    case LEFT:
-                    case 'a':
-                    case 'A':
-                    case NUMPAD_4:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(-1, 0));
-                        break;
-                    case RIGHT:
-                    case 'd':
-                    case 'D':
-                    case NUMPAD_6:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(1, 0));
-                        break;
-                    case NUMPAD_1:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(-1, -1));
-                        break;
-                    case NUMPAD_3:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(1, -1));
-                        break;
-                    case NUMPAD_7:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(-1, 1));
-                        break;
-                    case NUMPAD_9:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(1, 1));
-                        break;
-                    case '.':
-                    case NUMPAD_5:
-                        toCursor.clear();
-                        awaitedMoves.add(player);
-                        break;
-                    case ESCAPE:
-                        Gdx.app.exit();
-                        break;
+                switch (keycode) {
+                case UP:
+                case W:
+                case NUMPAD_8:
+                    toCursor.clear();
+                    //+1 is up on the screen
+                    awaitedMoves.add(player.translate(0, 1));
+                    break;
+                case DOWN:
+                case S:
+                case NUMPAD_2:
+                    toCursor.clear();
+                    //-1 is down on the screen
+                    awaitedMoves.add(player.translate(0, -1));
+                    break;
+                case LEFT:
+                case A:
+                case NUMPAD_4:
+                    toCursor.clear();
+                    awaitedMoves.add(player.translate(-1, 0));
+                    break;
+                case RIGHT:
+                case D:
+                case NUMPAD_6:
+                    toCursor.clear();
+                    awaitedMoves.add(player.translate(1, 0));
+                    break;
+                case NUMPAD_1:
+                    toCursor.clear();
+                    awaitedMoves.add(player.translate(-1, -1));
+                    break;
+                case NUMPAD_3:
+                    toCursor.clear();
+                    awaitedMoves.add(player.translate(1, -1));
+                    break;
+                case NUMPAD_7:
+                    toCursor.clear();
+                    awaitedMoves.add(player.translate(-1, 1));
+                    break;
+                case NUMPAD_9:
+                    toCursor.clear();
+                    awaitedMoves.add(player.translate(1, 1));
+                    break;
+                case '.':
+                case NUMPAD_5:
+                    toCursor.clear();
+                    awaitedMoves.add(player);
+                    break;
+                case B:
+                    batch = (batch == simpleBatch) ? contrastBatch : simpleBatch;
+                    break;
+                case ESCAPE:
+                    Gdx.app.exit();
+                    break;
                 }
                 return true;
             }

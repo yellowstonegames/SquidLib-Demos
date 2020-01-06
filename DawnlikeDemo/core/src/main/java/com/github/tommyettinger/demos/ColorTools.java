@@ -1,5 +1,6 @@
 package com.github.tommyettinger.demos;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import squidpony.squidmath.NumberTools;
 
@@ -96,6 +97,61 @@ public class ColorTools {
                 | (((int) (gs + change * (ge - gs)) & 0xFF) << 8)
                 | (((int) (bs + change * (be - bs)) & 0xFF) << 16)
                 | as);
+    }
+    /**
+     * An alternate shader for libGDX applications that use the standard SpriteBatch and RGBA color setup, but want to
+     * have more contrast and saturation using the tools colorful has for YCwCmA colors. This can take an image like
+     * <a href="https://i.imgur.com/yinuYzF.png">this, taken of the great game Sigma Finite Dungeon</a>, to
+     * <a href="https://i.imgur.com/MUKe3St.png">this, with higher saturation and contrast</a>. There's issues with this
+     * approach (gray often gets saturated too much and becomes somewhat cyan, and colors like brown may change their
+     * appearance significantly with higher saturation), but it does tend to make drab or muted areas "pop" more.
+     * @return a ShaderProgram that will increase saturation and contrast, and slightly decrease overall lightness
+     */
+    public static ShaderProgram createContrastShader () {
+        String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
+           + "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
+           + "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
+           + "uniform mat4 u_projTrans;\n" //
+           + "varying vec4 v_color;\n" //
+           + "varying vec2 v_texCoords;\n" //
+           + "\n" //
+           + "void main()\n" //
+           + "{\n" //
+           + "   v_color = " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
+           + "   v_color.a = v_color.a * (255.0/254.0);\n" //
+           + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
+           + "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
+           + "}\n";
+        String fragmentShader =
+           "#ifdef GL_ES\n" +
+              "#define LOWP lowp\n" +
+              "precision mediump float;\n" +
+              "#else\n" +
+              "#define LOWP \n" +
+              "#endif\n" +
+              "varying vec2 v_texCoords;\n" +
+              "varying LOWP vec4 v_color;\n" +
+              "uniform sampler2D u_texture;\n" +
+              "const vec3 bright = vec3(0.375, 0.5, 0.125);\n" +
+              "void main()\n" +
+              "{\n" +
+              "   vec4 tgt = texture2D( u_texture, v_texCoords );\n" +
+              "   vec3 ycc = vec3(\n" +
+// the constants 0.43 (lightness multiplier, 0.5 is middle), 1.4642634172891231 (higher means sharper contrast), and 2.714829459393612 are adjustable for luma
+              "     (dot(v_color.rgb, bright) * 0.75 - 0.75 + 0.43 * pow(dot(tgt.rgb, bright), 1.4642634172891231) * 2.714829459393612),\n" + // luma
+// the constant 1.5 is adjustable for both of the next two lines; 1.0 is neutral saturation, 1.5 is high saturation, 0.5 is low saturation
+              "     ((v_color.r - v_color.b) + (tgt.r - tgt.b) * 1.5),\n" + // warmth
+              "     ((v_color.g - v_color.b) + (tgt.g - tgt.b) * 1.5));\n" + // mildness
+              "   gl_FragColor = clamp(vec4(\n" +
+              "     dot(ycc, vec3(1.0, 0.625, -0.5)),\n" + // back to red
+              "     dot(ycc, vec3(1.0, -0.375, 0.5)),\n" + // back to green
+              "     dot(ycc, vec3(1.0, -0.375, -0.5)),\n" + // back to blue
+              "     v_color.a * tgt.a), 0.0, 1.0);\n" + // back to alpha and clamp
+              "}";
+
+        ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShader);
+        if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+        return shader;
     }
 
 }
