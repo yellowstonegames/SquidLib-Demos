@@ -13,11 +13,13 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.colorful.ColorfulBatch;
 import com.github.tommyettinger.colorful.FloatColors;
 import com.github.tommyettinger.colorful.Palette;
-import com.github.tommyettinger.colorful.TrigTools;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -34,8 +36,26 @@ import squidpony.squidmath.OrderedMap;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.badlogic.gdx.Input.Keys.*;
-import static com.github.tommyettinger.colorful.FloatColors.*;
+import static com.badlogic.gdx.Input.Keys.DOWN;
+import static com.badlogic.gdx.Input.Keys.ESCAPE;
+import static com.badlogic.gdx.Input.Keys.LEFT;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_1;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_2;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_3;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_4;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_5;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_6;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_7;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_8;
+import static com.badlogic.gdx.Input.Keys.NUMPAD_9;
+import static com.badlogic.gdx.Input.Keys.Q;
+import static com.badlogic.gdx.Input.Keys.RIGHT;
+import static com.badlogic.gdx.Input.Keys.UP;
+import static com.github.tommyettinger.colorful.FloatColors.alpha;
+import static com.github.tommyettinger.colorful.FloatColors.chromaMild;
+import static com.github.tommyettinger.colorful.FloatColors.chromaWarm;
+import static com.github.tommyettinger.colorful.FloatColors.floatGetHSV;
+import static com.github.tommyettinger.colorful.FloatColors.luma;
 
 /**
  */
@@ -128,25 +148,25 @@ public class ColorfulDemo extends ApplicationAdapter {
     private AnimatedGlider playerSprite;
 
 
-    /**
-     * This is just a hotfix for an incorrect method in Colorful 0.2.0 .
-     * @see FloatColors#floatGetHSV(float, float, float, float) the method that should act like this
-     * @param hue        0f to 1f, color wheel position
-     * @param saturation 0f to 1f, 0f is grayscale and 1f is brightly colored
-     * @param value      0f to 1f, 0f is black and 1f is bright or light
-     * @param opacity    0f to 1f, 0f is fully transparent and 1f is opaque
-     * @return a float encoding a color with the given properties
-     */
-    public static float floatGetHSV(float hue, float saturation, float value, float opacity) {
-        if (value <= 0.001f) {
-            return NumberUtils.intBitsToFloat((int) (opacity * 255f) << 24 & 0xFE000000);
-        } else {
-            saturation = MathUtils.clamp(saturation, 0f, 1f) * 0.70710677f;
-            final float cw = MathUtils.clamp(TrigTools.cos_(hue) * saturation + 0.5f, 0f, 255f);
-            final float cm = MathUtils.clamp(TrigTools.sin_(hue) * saturation + 0.5f, 0f, 255f);
-            return FloatColors.floatColor(value, cw, cm, opacity);
-        }
-    }
+//    /**
+//     * This is just a hotfix for an incorrect method in Colorful 0.2.0 .
+//     * @see FloatColors#floatGetHSV(float, float, float, float) the method that should act like this
+//     * @param hue        0f to 1f, color wheel position
+//     * @param saturation 0f to 1f, 0f is grayscale and 1f is brightly colored
+//     * @param value      0f to 1f, 0f is black and 1f is bright or light
+//     * @param opacity    0f to 1f, 0f is fully transparent and 1f is opaque
+//     * @return a float encoding a color with the given properties
+//     */
+//    public static float floatGetHSV(float hue, float saturation, float value, float opacity) {
+//        if (value <= 0.001f) {
+//            return NumberUtils.intBitsToFloat((int) (opacity * 255f) << 24 & 0xFE000000);
+//        } else {
+//            saturation = MathUtils.clamp(saturation, 0f, 1f) * 0.70710677f;
+//            final float cw = MathUtils.clamp(TrigTools.cos_(hue) * saturation + 0.5f, 0f, 1f);
+//            final float cm = MathUtils.clamp(TrigTools.sin_(hue) * saturation + 0.5f, 0f, 1f);
+//            return FloatColors.floatColor(value, cw, cm, opacity);
+//        }
+//    }
 
 
     // libGDX can use a kind of packed float (yes, the number type) to efficiently store colors, but it also uses a
