@@ -9,16 +9,21 @@ import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.StreamUtils;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.zip.CRC32;
-import java.util.zip.CheckedOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 /**
- * Indexed-mode APNG encoder with compression. An instance can be reused to encode multiple APNGs with low allocation.
+ * Indexed-mode AnimatedPNG encoder with compression. An instance can be reused to encode multiple APNGs with low allocation.
  * You can configure the target palette and how this can dither colors via the {@link #palette} field, which is a
  * {@link PaletteReducer} object that is allowed to be null and can be reused. The methods
  * {@link PaletteReducer#exact(Color[])} or {@link PaletteReducer#analyze(Pixmap)} can be used to make the target
@@ -56,7 +61,7 @@ import java.util.zip.DeflaterOutputStream;
  * @author Tommy Ettinger (PNG-8 parts only)
  */
 
-public class IndexedAPNG implements Disposable {
+public class AnimatedPNG8 implements Disposable {
     static private final byte[] SIGNATURE = {(byte) 137, 80, 78, 71, 13, 10, 26, 10};
     static private final int IHDR = 0x49484452, IDAT = 0x49444154, IEND = 0x49454E44,
             PLTE = 0x504C5445, TRNS = 0x74524E53,
@@ -76,11 +81,11 @@ public class IndexedAPNG implements Disposable {
 
     public PaletteReducer palette;
 
-    public IndexedAPNG() {
+    public AnimatedPNG8 () {
         this(128 * 128);
     }
 
-    public IndexedAPNG(int initialBufferSize) {
+    public AnimatedPNG8 (int initialBufferSize) {
         buffer = new ChunkBuffer(initialBufferSize);
         deflater = new Deflater();
     }
@@ -497,31 +502,7 @@ public class IndexedAPNG implements Disposable {
     public void dispose() {
         deflater.end();
     }
-
-    static class ChunkBuffer extends DataOutputStream {
-        final ByteArrayOutputStream buffer;
-        final CRC32 crc;
-
-        ChunkBuffer(int initialSize) {
-            this(new ByteArrayOutputStream(initialSize), new CRC32());
-        }
-
-        private ChunkBuffer(ByteArrayOutputStream buffer, CRC32 crc) {
-            super(new CheckedOutputStream(buffer, crc));
-            this.buffer = buffer;
-            this.crc = crc;
-        }
-
-        public void endChunk(DataOutputStream target) throws IOException {
-            flush();
-            target.writeInt(buffer.size() - 4);
-            buffer.writeTo(target);
-            target.writeInt((int) crc.getValue());
-            buffer.reset();
-            crc.reset();
-        }
-    }
-
+    
     /**
      * Simple PNG IO from https://www.java-tips.org/java-se-tips-100019/23-java-awt-image/2283-png-file-format-decoder-in-java.html .
      *
@@ -573,9 +554,10 @@ public class IndexedAPNG implements Disposable {
             for (HashMap.Entry<String, byte[]> ent : chunks.entrySet()) {
                 out.writeInt(ent.getValue().length);
                 out.writeBytes(ent.getKey());
-                crc.update(ent.getKey().getBytes("UTF8"));
+                byte[] bytes = ent.getKey().getBytes(StandardCharsets.UTF_8);
+                crc.update(bytes, 0, bytes.length);
                 out.write(ent.getValue());
-                crc.update(ent.getValue());
+                crc.update(ent.getValue(), 0, ent.getValue().length);
                 out.writeInt((int) crc.getValue());
                 crc.reset();
             }

@@ -7,13 +7,10 @@ import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.StreamUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.util.zip.CRC32;
-import java.util.zip.CheckedOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -46,8 +43,9 @@ import java.util.zip.DeflaterOutputStream;
  *
  * @author Matthias Mann
  * @author Nathan Sweet
+ * @author Tommy Ettinger
  */
-public class APNG implements Disposable {
+public class AnimatedPNG implements Disposable {
     static private final byte[] SIGNATURE = {(byte) 137, 80, 78, 71, 13, 10, 26, 10};
     static private final int IHDR = 0x49484452, acTL = 0x6163544C,
             fcTL = 0x6663544C, IDAT = 0x49444154,
@@ -64,17 +62,17 @@ public class APNG implements Disposable {
     private boolean flipY = true;
     private int lastLineLen;
 
-    public APNG() {
+    public AnimatedPNG () {
         this(128 * 128);
     }
 
-    public APNG(int initialBufferSize) {
+    public AnimatedPNG (int initialBufferSize) {
         buffer = new ChunkBuffer(initialBufferSize);
         deflater = new Deflater();
     }
 
     /**
-     * If true, the resulting APNG is flipped vertically. Default is true.
+     * If true, the resulting AnimatedPNG is flipped vertically. Default is true.
      */
     public void setFlipY(boolean flipY) {
         this.flipY = flipY;
@@ -87,6 +85,12 @@ public class APNG implements Disposable {
         deflater.setLevel(level);
     }
 
+    /**
+     * Writes an animated PNG file consisting of the given {@code frames} to the given {@code file}, at 60 frames per second.
+     * @param file the file location to write to; any existing file with this name will be overwritten
+     * @param frames an Array of Pixmap frames to write in order to the animated PNG
+     * @throws IOException
+     */
     public void write(FileHandle file, Array<Pixmap> frames) throws IOException {
         OutputStream output = file.write(false);
         try {
@@ -96,6 +100,14 @@ public class APNG implements Disposable {
         }
     }
 
+    /**
+     * Writes an animated PNG file consisting of the given {@code frames} to the given {@code file},
+     * at {@code fps} frames per second.
+     * @param file the file location to write to; any existing file with this name will be overwritten
+     * @param frames an Array of Pixmap frames to write in order to the animated PNG
+     * @param fps how many frames per second the animated PNG should display
+     * @throws IOException
+     */
     public void write(FileHandle file, Array<Pixmap> frames, int fps) throws IOException {
         OutputStream output = file.write(false);
         try {
@@ -106,7 +118,12 @@ public class APNG implements Disposable {
     }
 
     /**
-     * Writes the pixmap to the stream without closing the stream.
+     * Writes animated PNG data consisting of the given {@code frames} to the given {@code output} stream without
+     * closing the stream, at {@code fps} frames per second.
+     * @param output the stream to write to; the stream will not be closed
+     * @param frames an Array of Pixmap frames to write in order to the animated PNG
+     * @param fps how many frames per second the animated PNG should display
+     * @throws IOException
      */
     public void write(OutputStream output, Array<Pixmap> frames, int fps) throws IOException {
         Pixmap pixmap = frames.first();
@@ -233,34 +250,11 @@ public class APNG implements Disposable {
     /**
      * Disposal should probably be done explicitly, especially if using JRE versions after 8.
      * In Java 8 and earlier, you could rely on finalize() doing what this does, but that isn't
-     * a safe assumption in Java 9 and later. Note, don't use the same APNG object after you call
+     * a safe assumption in Java 9 and later. Note, don't use the same AnimatedPNG object after you call
      * this method; you'll need to make a new one if you need to write again after disposing.
      */
     public void dispose() {
         deflater.end();
     }
 
-    static class ChunkBuffer extends DataOutputStream {
-        final ByteArrayOutputStream buffer;
-        final CRC32 crc;
-
-        ChunkBuffer(int initialSize) {
-            this(new ByteArrayOutputStream(initialSize), new CRC32());
-        }
-
-        private ChunkBuffer(ByteArrayOutputStream buffer, CRC32 crc) {
-            super(new CheckedOutputStream(buffer, crc));
-            this.buffer = buffer;
-            this.crc = crc;
-        }
-
-        public void endChunk(DataOutputStream target) throws IOException {
-            flush();
-            target.writeInt(buffer.size() - 4);
-            buffer.writeTo(target);
-            target.writeInt((int) crc.getValue());
-            buffer.reset();
-            crc.reset();
-        }
-    }
 }

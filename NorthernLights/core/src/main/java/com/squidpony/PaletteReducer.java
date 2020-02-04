@@ -1208,7 +1208,7 @@ public class PaletteReducer {
     }
 
     /**
-     * Builds the palette information this IndexedAPNG stores from the RGBA8888 ints in {@code rgbaPalette}, up to 256 colors.
+     * Builds the palette information this AnimatedPNG8 stores from the RGBA8888 ints in {@code rgbaPalette}, up to 256 colors.
      * Alpha is not preserved except for the first item in rgbaPalette, and only if it is {@code 0} (fully transparent
      * black); otherwise all items are treated as opaque. If rgbaPalette is null, empty, or only has one color, then
      * this defaults to DawnBringer's Aurora palette with 256 hand-chosen colors (including transparent).
@@ -1219,7 +1219,7 @@ public class PaletteReducer {
         exact(rgbaPalette, basicMetric);
     }
     /**
-     * Builds the palette information this IndexedAPNG stores from the RGBA8888 ints in {@code rgbaPalette}, up to 256 colors.
+     * Builds the palette information this AnimatedPNG8 stores from the RGBA8888 ints in {@code rgbaPalette}, up to 256 colors.
      * Alpha is not preserved except for the first item in rgbaPalette, and only if it is {@code 0} (fully transparent
      * black); otherwise all items are treated as opaque. If rgbaPalette is null, empty, or only has one color, then
      * this defaults to DawnBringer's Aurora palette with 256 hand-chosen colors (including transparent).
@@ -1431,15 +1431,15 @@ public class PaletteReducer {
      * too many colors to store in a PNG-8 palette. If there are 256 or less colors, this uses the exact colors
      * (although with at most one transparent color, and no alpha for other colors); if there are more than 256 colors
      * or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even if the image has no
-     * transparency). Because calling {@link #reduce(Pixmap)} (or any of IndexedAPNG's write methods) will dither colors that
+     * transparency). Because calling {@link #reduce(Pixmap)} (or any of AnimatedPNG8's write methods) will dither colors that
      * aren't exact, and dithering works better when the palette can choose colors that are sufficiently different, this
      * uses a threshold value to determine whether it should permit a less-common color into the palette, and if the
      * second color is different enough (as measured by {@link #difference(int, int)}) by a value of at least 400, it is
      * allowed in the palette, otherwise it is kept out for being too similar to existing colors. This doesn't return a
      * value but instead stores the palette info in this object; a PaletteReducer can be assigned to the
-     * {@link IndexedAPNG#palette} field or can be used directly to {@link #reduce(Pixmap)} a Pixmap.
+     * {@link AnimatedPNG8#palette} field or can be used directly to {@link #reduce(Pixmap)} a Pixmap.
      *
-     * @param pixmap a Pixmap to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)} or by IndexedAPNG
+     * @param pixmap a Pixmap to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)} or by AnimatedPNG8
      */
     public void analyze(Pixmap pixmap) {
         analyze(pixmap, 400);
@@ -1458,16 +1458,16 @@ public class PaletteReducer {
      * too many colors to store in a PNG-8 palette. If there are 256 or less colors, this uses the exact colors
      * (although with at most one transparent color, and no alpha for other colors); if there are more than 256 colors
      * or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even if the image has no
-     * transparency). Because calling {@link #reduce(Pixmap)} (or any of IndexedAPNG's write methods) will dither colors that
+     * transparency). Because calling {@link #reduce(Pixmap)} (or any of AnimatedPNG8's write methods) will dither colors that
      * aren't exact, and dithering works better when the palette can choose colors that are sufficiently different, this
      * takes a threshold value to determine whether it should permit a less-common color into the palette, and if the
      * second color is different enough (as measured by {@link #difference(int, int)}) by a value of at least
      * {@code threshold}, it is allowed in the palette, otherwise it is kept out for being too similar to existing
      * colors. The threshold is usually between 250 and 1000, and 400 is a good default. This doesn't return a value but
-     * instead stores the palette info in this object; a PaletteReducer can be assigned to the {@link IndexedAPNG#palette}
+     * instead stores the palette info in this object; a PaletteReducer can be assigned to the {@link AnimatedPNG8#palette}
      * field or can be used directly to {@link #reduce(Pixmap)} a Pixmap.
      *
-     * @param pixmap    a Pixmap to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)} or by IndexedAPNG
+     * @param pixmap    a Pixmap to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)} or by AnimatedPNG8
      * @param threshold a minimum color difference as produced by {@link #difference(int, int)}; usually between 250 and 1000, 400 is a good default
      */
     public void analyze(Pixmap pixmap, int threshold) {
@@ -1478,16 +1478,16 @@ public class PaletteReducer {
      * too many colors to store in a PNG-8 palette. If there are 256 or less colors, this uses the exact colors
      * (although with at most one transparent color, and no alpha for other colors); if there are more than 256 colors
      * or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even if the image has no
-     * transparency). Because calling {@link #reduce(Pixmap)} (or any of IndexedAPNG's write methods) will dither colors that
+     * transparency). Because calling {@link #reduce(Pixmap)} (or any of AnimatedPNG8's write methods) will dither colors that
      * aren't exact, and dithering works better when the palette can choose colors that are sufficiently different, this
      * takes a threshold value to determine whether it should permit a less-common color into the palette, and if the
      * second color is different enough (as measured by {@link #difference(int, int)}) by a value of at least
      * {@code threshold}, it is allowed in the palette, otherwise it is kept out for being too similar to existing
      * colors. The threshold is usually between 250 and 1000, and 400 is a good default. This doesn't return a value but
-     * instead stores the palette info in this object; a PaletteReducer can be assigned to the {@link IndexedAPNG#palette}
+     * instead stores the palette info in this object; a PaletteReducer can be assigned to the {@link AnimatedPNG8#palette}
      * field or can be used directly to {@link #reduce(Pixmap)} a Pixmap.
      *
-     * @param pixmap    a Pixmap to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)} or by IndexedAPNG
+     * @param pixmap    a Pixmap to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)} or by AnimatedPNG8
      * @param threshold a minimum color difference as produced by {@link #difference(int, int)}; usually between 250 and 1000, 400 is a good default
      */
     public void analyze(Pixmap pixmap, int threshold, int limit) {

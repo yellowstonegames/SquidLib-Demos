@@ -40,7 +40,6 @@ public class AnimatedGlider extends ColorfulSprite {
         super();
         this.animation = animation;
         setSize(1, 1);
-//        setSize(0x1p-4f, 0x1p-4f);
         setRegion(animation.getKeyFrame(0f));
         setColor(Palette.GRAY);
         this.start = start;
@@ -55,15 +54,11 @@ public class AnimatedGlider extends ColorfulSprite {
     
     public float getX()
     {
-        if(change >= 1f)
-            return (start = end).x;
         return MathUtils.lerp(start.x, end.x, change);
     }
 
     public float getY()
     {
-        if(change >= 1f)
-            return (start = end).y;
         return MathUtils.lerp(start.y, end.y, change);
     }
 
