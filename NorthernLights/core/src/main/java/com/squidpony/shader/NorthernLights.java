@@ -34,21 +34,29 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		realStartTime = startTime = TimeUtils.millis();
-		int choice = 3;//(int) (startTime >>> 4 & 3L);
+		int choice = (int) (startTime >>> 4 & 3L);
 		switch (choice)
 		{
 			case 0:
 				System.out.println("Using DB Aurora");
 				palette = new Texture(Gdx.files.internal("DB_Aurora_GLSL.png"), Pixmap.Format.RGBA8888, false);
 				break;
-			case 1:
-				System.out.println("Using LAB-like Aurora256");
-				palette = new Texture(Gdx.files.internal("RoughLAB_Aurora256_GLSL.png"), Pixmap.Format.RGBA8888, false);
-				break;
-			case 2:
-				System.out.println("Using Lava256");
-				palette = new Texture(Gdx.files.internal("Lava256_GLSL.png"), Pixmap.Format.RGBA8888, false);
-				break;
+		case 1:
+			System.out.println("Using DB32");
+			palette = new Texture(Gdx.files.internal("DB32_GLSL.png"), Pixmap.Format.RGBA8888, false);
+			break;
+		case 2:
+			System.out.println("Using DB32d");
+			palette = new Texture(Gdx.files.internal("DB32d_GLSL.png"), Pixmap.Format.RGBA8888, false);
+			break;
+//			case 1:
+//				System.out.println("Using LAB-like Aurora256");
+//				palette = new Texture(Gdx.files.internal("RoughLAB_Aurora256_GLSL.png"), Pixmap.Format.RGBA8888, false);
+//				break;
+//			case 2:
+//				System.out.println("Using Lava256");
+//				palette = new Texture(Gdx.files.internal("Lava256_GLSL.png"), Pixmap.Format.RGBA8888, false);
+//				break;
 			default:
 				System.out.println("Using all colors, no dithering");
 				palette = new Texture(Gdx.files.internal("Lava256_GLSL.png"), Pixmap.Format.RGBA8888, false);
