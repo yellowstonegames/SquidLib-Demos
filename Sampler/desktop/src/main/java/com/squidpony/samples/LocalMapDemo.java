@@ -202,7 +202,7 @@ public class LocalMapDemo extends ApplicationAdapter {
         seed = 0x0c415cf07774ab2eL;//0x9987a26d1e4d187dL;//0xDEBACL;
         rng = new StatefulRNG(seed);
 //        world = new WorldMapGenerator.LocalMap(seed, bigWidth, bigHeight, FastNoise.instance, 0.8);
-        world = new WorldMapGenerator.LocalMap(seed, width, height, FastNoise.instance, 0.8);
+        world = new WorldMapGenerator.LocalMap(seed, width, height, new FastNoise(0x31337, 2.25f, FastNoise.FOAM_FRACTAL, 2), 0.8);
         //world = new WorldMapGenerator.SphereMapAlt(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalMap(seed, width, height, FastNoise.instance, 0.8);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, FastNoise.instance, 0.75);
@@ -274,24 +274,6 @@ public class LocalMapDemo extends ApplicationAdapter {
         world.zoomIn(1, zoomX, zoomY);
         dbm.makeBiomes(world);
         zoom++;
-//        if(zoom == 3)
-//        {
-//            System.out.printf("zoomX == %d, old minX == %d\n", zoomX, minX);
-//            System.out.printf("zoomX - (width >> 2) << 4 == %d\n", zoomX - (width >> 2) << 4);
-//            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> 3));
-//            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom + 1)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> 3));
-//            System.out.printf("MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth >> 3) == %d\n",
-//                    minX);
-//        }
-//        else {
-//            zoom = MathUtils.clamp(zoom+1, 0, 3);
-//            System.out.printf("zoomX == %d, old minX == %d, zoom == %d\n", zoomX, minX, zoom);
-//            System.out.printf("zoomX - (width >> 2) << 4 == %d\n", zoomX - (width >> 2) << 4);
-//            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom));
-//            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> zoom));
-//            System.out.printf("MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom)) == %d\n",
-//                    minX);
-//        }
     }
     public void zoomOut()
     {
@@ -304,16 +286,6 @@ public class LocalMapDemo extends ApplicationAdapter {
             dbm.makeBiomes(world);
             zoom--;
         }
-//        zoom = MathUtils.clamp(zoom-1, 0, 3);
-//        if(zoom == 0)
-//        {
-//            minX = minY = 0;
-//        }
-//        else
-//        {
-//            minX = MathUtils.clamp(((zoomX - (width  >> 2) << 4) + (minX + (bigWidth >> zoom + 1)) >> 1) - (bigWidth  >> 1 + zoom), 0, bigWidth - (bigWidth >> zoom));
-//            minY = MathUtils.clamp(((zoomY - (height >> 2) << 4) + (minY + (bigHeight >> zoom + 1)) >> 1) - (bigHeight >> 1 + zoom), 0, bigHeight - (bigHeight >> zoom));
-//        }
     }
     public void generate(final long seed)
     {
@@ -387,119 +359,6 @@ public class LocalMapDemo extends ApplicationAdapter {
         batch.end();
     }
 
-//    public void putHeatMap() {
-//        int hc;
-//        int[][] heightCodeData = world.heightCodeData;
-//        double[][] heatData = world.heatData;
-//        double heat;
-//        pm.setColor(quantize(SColor.DB_INK));
-//        pm.fill();
-//        for (int y = 0; y < height; y++) {
-//            for (int x = 0; x < width; x++) {
-//                hc = heightCodeData[x][y];
-//                if (hc == 1000)
-//                    continue;
-//                heat = heatData[x][y];
-//                if(hc < 4)
-//                    Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(ice, deepColor,
-//                            (float) ((heat - world.minHeat) / (world.maxHeat - world.minHeat + 0.001))));
-//                else
-//                    Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(-0x1.5bbf5ap126F, // SColor.MOSS_GREEN
-//                             -0x1.8081fep125F, // SColor.CORAL_RED
-//                        (float) ((heat - world.minHeat) / (world.maxHeat - world.minHeat + 0.001))));
-//                pm.drawPixel(x, y, quantize(tempColor));
-//            }
-//        }
-//        batch.begin();
-//        pt.draw(pm, 0, 0);
-//        batch.draw(pt, 0, 0, width >> 1, height >> 1);
-//        batch.end();
-//    }
-//    public void putMoistureMap() {
-//        int hc;
-//        int[][] heightCodeData = world.heightCodeData;
-//        double[][] moistureData = world.moistureData;
-//        double moisture;
-//        pm.setColor(quantize(SColor.DB_INK));
-//        pm.fill();
-//        for (int y = 0; y < height; y++) {
-//            for (int x = 0; x < width; x++) {
-//                hc = heightCodeData[x][y];
-//                if (hc == 1000)
-//                    continue;
-//                moisture = moistureData[x][y];
-//                if(hc < 4)
-//                    Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(shallowColor, deepColor,
-//                            (float) ((moisture - world.minWet) / (world.maxWet - world.minWet + 0.001))));
-//                else
-//                    Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(desert, tropicalRainforest,
-//                            (float) ((moisture - world.minWet) / (world.maxWet - world.minWet + 0.001))));
-//                pm.drawPixel(x, y, quantize(tempColor));
-//            }
-//        }
-//        batch.begin();
-//        pt.draw(pm, 0, 0);
-//        batch.draw(pt, 0, 0, width >> 1, height >> 1);
-//        batch.end();
-//    }
-//    private final float emphasize(final float a)
-//    {
-//        return a * a * (3f - 2f * a);
-//    }
-//    private final float extreme(final float a)
-//    {
-//        return a * a * a * (a * (a * 6f - 15f) + 10f);
-//    }
-//    public void putExperimentMap() {
-//        int hc;
-//        final int[][] heightCodeData = world.heightCodeData;
-//        final double[][] moistureData = world.moistureData, heatData = world.heatData, heightData = world.heightData;
-//        double elevation, heat, moisture;
-//        boolean icy;
-//        pm.setColor(quantize(SColor.DB_INK));
-//        pm.fill();
-//        for (int y = 0; y < height; y++) {
-//            for (int x = 0; x < width; x++) {
-//                hc = heightCodeData[x][y];
-//                if (hc == 1000)
-//                    continue;
-//                moisture = moistureData[x][y];
-//                heat = heatData[x][y];
-//                elevation = heightData[x][y];
-//                icy = heat - elevation * 0.25 < 0.16;
-//                if(hc < 4) {
-//                    float a = (MathUtils.clamp((float) (((elevation + 0.06) * 16.0) / (WorldMapGenerator.sandLower + 1.0)), 0f, 1f));
-//                    Color.abgr8888ToColor(tempColor,
-//                            heat < 0.26 ? SColor.lerpFloatColors(shallowColor, ice,
-//                                    (float)((elevation + 1.0) / (WorldMapGenerator.sandLower+1.0)))
-//                                    : SColor.lerpFloatColors(
-//                            BIOME_COLOR_TABLE[56], coastalColor,
-//                            a));
-//                }
-//                else if(hc == 4)
-//                    Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(icy ? BIOME_COLOR_TABLE[0] : SColor.lerpFloatColors(BIOME_DARK_COLOR_TABLE[34], BIOME_COLOR_TABLE[41],
-//                            (float) ((heat - world.minHeat) / (world.maxHeat - world.minHeat))),
-//                            SColor.lerpFloatColors(icy ? ice : SColor.lerpFloatColors(rocky, desertAlt,
-//                                    (float) ((heat - world.minHeat) / (world.maxHeat - world.minHeat))),
-//                                    icy ? lightIce : SColor.lerpFloatColors(woodland, BIOME_COLOR_TABLE[28],
-//                                            (float) ((heat - world.minHeat) / (world.maxHeat - world.minHeat))),
-//                                    (extreme((float) (moisture)))),
-//                            (float) ((elevation - WorldMapGenerator.sandLower) / (WorldMapGenerator.sandUpper - WorldMapGenerator.sandLower))));
-//                else
-//                    Color.abgr8888ToColor(tempColor, SColor.lerpFloatColors(icy ? ice : SColor.lerpFloatColors(rocky, desertAlt,
-//                            (float) ((heat - world.minHeat) / (world.maxHeat - world.minHeat))),
-//                            icy ? lightIce : SColor.lerpFloatColors(woodland, BIOME_COLOR_TABLE[28],
-//                                    (float) ((heat - world.minHeat) / (world.maxHeat - world.minHeat))),
-//                            (extreme((float) (moisture)))));
-//                pm.drawPixel(x, y, quantize(tempColor));
-//            }
-//        }
-//        batch.begin();
-//        pt.draw(pm, 0, 0);
-//        batch.draw(pt, 0, 0, width, height);
-//        batch.end();
-//    }
-    
     public int quantize(Color color)
     {
         // Full 8-bit RGBA channels. No limits on what colors can be displayed.

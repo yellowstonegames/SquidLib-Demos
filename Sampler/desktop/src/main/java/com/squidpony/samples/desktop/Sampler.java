@@ -65,6 +65,8 @@ public class Sampler extends ApplicationAdapter {
 //        table.pack();
         stage.addActor(table);
         Gdx.input.setInputProcessor(stage);
+        // use this during testing to auto-launch a demo
+//        ((Lwjgl3Application)Gdx.app).newWindow(WorldMapTextDemo.config.instantiate(), WorldMapTextDemo.config);
     }
 
     @Override

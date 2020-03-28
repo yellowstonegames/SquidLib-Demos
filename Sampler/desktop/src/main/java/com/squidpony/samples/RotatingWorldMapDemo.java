@@ -64,10 +64,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
         rng = new StatefulRNG(seed);
         //// NOTE: this FastNoise has a different frequency (1f) than the default (1/32f), and that
         //// makes a huge difference on world map quality. It also uses extra octaves.
-        WorldMapGenerator.DEFAULT_NOISE.setNoiseType(FastNoise.SIMPLEX_FRACTAL);
-        WorldMapGenerator.DEFAULT_NOISE.setFractalOctaves(2);
-        WorldMapGenerator.DEFAULT_NOISE.setFractalLacunarity(2.5f);
-        WorldMapGenerator.DEFAULT_NOISE.setFractalGain(0.4f);
+        FastNoise noise = new FastNoise(31337, 2.5f, FastNoise.FOAM_FRACTAL, 2, 2.5f, 0.4f);
 
         //world = new WorldMapGenerator.TilingMap(seed, width, height, WhirlingNoise.instance, 1.25);
 //        world = new WorldMapGenerator.SphereMapAlt(seed, width, height, WhirlingNoise.instance, 0.8);
@@ -75,7 +72,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, ClassicNoise.instance, 0.75);
         //world = new WorldMapGenerator.MimicMap(seed, WhirlingNoise.instance, 0.8);
 //        world = new WorldMapGenerator.SpaceViewMap(seed, width, height, ClassicNoise.instance, 0.7);
-        world = new WorldMapGenerator.RotatingSpaceMap(seed, width, height, 0.7);
+        world = new WorldMapGenerator.RotatingSpaceMap(seed, width, height, noise, 0.7);
         //world = new WorldMapGenerator.RoundSideMap(seed, width, height, ClassicNoise.instance, 0.8);
         //world = new WorldMapGenerator.HyperellipticalMap(seed, width, height, ClassicNoise.instance, 0.7, 0.1, 3.25);
 

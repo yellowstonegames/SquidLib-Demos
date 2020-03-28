@@ -14,10 +14,17 @@ import com.squidpony.samples.desktop.CustomConfig;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.StringKit;
-import squidpony.squidgrid.gui.gdx.*;
+import squidpony.squidgrid.gui.gdx.DefaultResources;
+import squidpony.squidgrid.gui.gdx.FilterBatch;
+import squidpony.squidgrid.gui.gdx.SColor;
+import squidpony.squidgrid.gui.gdx.SparseLayers;
+import squidpony.squidgrid.gui.gdx.SquidInput;
+import squidpony.squidgrid.gui.gdx.SquidMouse;
+import squidpony.squidgrid.gui.gdx.WorldMapView;
 import squidpony.squidgrid.mapping.PoliticalMapper;
 import squidpony.squidgrid.mapping.WorldMapGenerator;
 import squidpony.squidmath.Coord;
+import squidpony.squidmath.FastNoise;
 import squidpony.squidmath.OrderedMap;
 import squidpony.squidmath.StatefulRNG;
 
@@ -84,8 +91,7 @@ public class WorldMapTextDemo extends ApplicationAdapter {
     private StatefulRNG rng;
     private long seed;
     private Vector3 position, previousPosition, nextPosition;
-    private WorldMapGenerator.MimicMap world;
-//    private WorldMapGenerator.HyperellipticalMap world;
+    private WorldMapGenerator world;
     private WorldMapView wmv;
     private PoliticalMapper pm;
     private OrderedMap<Character, FakeLanguageGen> atlas;
@@ -168,8 +174,9 @@ public class WorldMapTextDemo extends ApplicationAdapter {
 //        world = new WorldMapGenerator.LocalMimicMap(seed, basis, FastNoise.instance, 0.8);
 //        pix.dispose();
 
-        world = new WorldMapGenerator.MimicMap(seed, WorldMapGenerator.DEFAULT_NOISE, 0.8); // uses a map of Australia for land
-//        world = new WorldMapGenerator.HyperellipticalMap(seed, bigWidth, bigHeight, WorldMapGenerator.DEFAULT_NOISE, 0.8); // uses a map of Australia for land
+        FastNoise noise = new FastNoise(0x1337BEEF, 2f, FastNoise.FOAM_FRACTAL, 2, 2.5f, 0.4f);
+        world = new WorldMapGenerator.MimicMap(seed, noise, 0.8); // uses a map of Earth for land
+//        world = new WorldMapGenerator.HyperellipticalMap(seed, bigWidth, bigHeight, WorldMapGenerator.DEFAULT_NOISE, 0.8);
         //world = new WorldMapGenerator.TilingMap(seed, bigWidth, bigHeight, WhirlingNoise.instance, 0.9);
         wmv = new WorldMapView(world);
         pm = new PoliticalMapper(FakeLanguageGen.SIMPLISH.word(rng, true));
@@ -332,9 +339,9 @@ public class WorldMapTextDemo extends ApplicationAdapter {
                         codeA = dbm.extractPartA(bc);
                         mix = dbm.extractMixAmount(bc);
                         if(mix <= 0.5) 
-                            display.put(x, y, BIOME_CHARS[codeA], SColor.contrastLuma(wmv.BIOME_COLOR_TABLE[codeB]));
+                            display.put(x, y, BIOME_CHARS[codeA], SColor.contrastLuma(wmv.BIOME_COLOR_TABLE[codeB], wmv.BIOME_COLOR_TABLE[codeA]));
                         else
-                            display.put(x, y, BIOME_CHARS[codeB], SColor.contrastLuma(wmv.BIOME_COLOR_TABLE[codeA]));
+                            display.put(x, y, BIOME_CHARS[codeB], SColor.contrastLuma(wmv.BIOME_COLOR_TABLE[codeA], wmv.BIOME_COLOR_TABLE[codeB]));
                 }
             }
         }
@@ -397,5 +404,4 @@ public class WorldMapTextDemo extends ApplicationAdapter {
             return new WorldMapTextDemo();
         }
     };
-
 }

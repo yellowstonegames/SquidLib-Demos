@@ -54,11 +54,9 @@ public class WorldMapViewDemo extends ApplicationAdapter {
         rng = new StatefulRNG(seed);
         //// NOTE: this FastNoise has a different frequency (1f) than the default (1/32f), and that
         //// makes a huge difference on world map quality. It also uses extra octaves.
-        WorldMapGenerator.DEFAULT_NOISE.setNoiseType(FastNoise.SIMPLEX_FRACTAL);
-        WorldMapGenerator.DEFAULT_NOISE.setFractalOctaves(4);
-        WorldMapGenerator.DEFAULT_NOISE.setFractalLacunarity(2.5f);
-        WorldMapGenerator.DEFAULT_NOISE.setFractalGain(0.4f);
-        world = new WorldMapGenerator.LocalMap(seed, width, height, 1.1);
+        FastNoise noise = new FastNoise(31337, 2.5f, FastNoise.FOAM_FRACTAL, 2, 2.5f, 0.4f);
+
+        world = new WorldMapGenerator.LocalMap(seed, width, height, noise, 1.1);
 //        world = new WorldMapGenerator.TilingMap(seed, width, height, new FastNoise(1337, 1f), 1.25);
 //        world = new WorldMapGenerator.EllipticalMap(seed, width, height, WhirlingNoise.instance, 0.875);
         //world = new WorldMapGenerator.EllipticalHammerMap(seed, width, height, ClassicNoise.instance, 0.75);

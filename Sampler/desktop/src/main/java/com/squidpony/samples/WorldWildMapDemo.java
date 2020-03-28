@@ -16,6 +16,7 @@ import squidpony.squidgrid.mapping.PoliticalMapper;
 import squidpony.squidgrid.mapping.WildMap;
 import squidpony.squidgrid.mapping.WorldMapGenerator;
 import squidpony.squidmath.Coord;
+import squidpony.squidmath.FastNoise;
 import squidpony.squidmath.Noise;
 import squidpony.squidmath.OrderedMap;
 import squidpony.squidmath.StatefulRNG;
@@ -133,8 +134,9 @@ public class WorldWildMapDemo extends ApplicationAdapter {
 //        world = new WorldMapGenerator.LocalMimicMap(seed, basis, FastNoise.instance, 0.8);
 //        pix.dispose();
 
+        FastNoise noise = new FastNoise(31337, 2.5f, FastNoise.FOAM_FRACTAL, 2, 2.5f, 0.4f);
 //        world = new WorldMapGenerator.MimicMap(seed, WorldMapGenerator.DEFAULT_NOISE, 0.8); // uses a map of Australia for land
-        world = new WorldMapGenerator.HyperellipticalMap(seed, bigWidth, bigHeight, WorldMapGenerator.DEFAULT_NOISE, 0.8); // uses a map of Australia for land
+        world = new WorldMapGenerator.HyperellipticalMap(seed, bigWidth, bigHeight, noise, 0.7);
         //world = new WorldMapGenerator.TilingMap(seed, bigWidth, bigHeight, WhirlingNoise.instance, 0.9);
         wmv = new WorldMapView(world);
         wildView = new WildMapView(rng.nextLong(), shownWidth, shownHeight, 1);
