@@ -5,9 +5,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import squidpony.FakeLanguageGen;
 import squidpony.squidgrid.gui.gdx.DefaultResources;
 import squidpony.squidgrid.gui.gdx.FilterBatch;
 import squidpony.squidgrid.gui.gdx.SColor;
@@ -15,6 +15,7 @@ import squidpony.squidgrid.gui.gdx.SparseLayers;
 import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidmath.GWTRNG;
 import text.formic.Stringf;
+
 /**
  * This is a small, not-overly-simple demo that presents some important features of SquidLib and shows a faster,
  * cleaner, and more recently-introduced way of displaying the map and other text. Features include dungeon map
@@ -50,24 +51,17 @@ public class FormicDemo extends ApplicationAdapter {
     //one cell; resizing the window can make the units cellWidth and cellHeight use smaller or larger than a pixel.
 
     /** In number of cells */
-    private static final int gridWidth = 90;
+    public static final int gridWidth = 120;
     /** In number of cells */
-    private static final int gridHeight = 25;
-
-    /** In number of cells */
-    private static final int bigWidth = gridWidth * 2;
-    /** In number of cells */
-    private static final int bigHeight = gridHeight * 2;
+    public static final int gridHeight = 25;
 
     /** The pixel width of a cell */
-    private static final int cellWidth = 10;
+    public static final int cellWidth = 8;
     /** The pixel height of a cell */
-    private static final int cellHeight = 20;
+    public static final int cellHeight = 20;
     private SquidInput input;
     private Color bgColor;
     private Stage languageStage;
-    private Vector2 screenPosition;
-
 
     private static final float FLOAT_LIGHTING = -0x1.cff1fep126F, // same result as SColor.COSMIC_LATTE.toFloatBits()
             GRAY_FLOAT = -0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
@@ -95,17 +89,10 @@ public class FormicDemo extends ApplicationAdapter {
         languageStage = new Stage(languageViewport, batch);
 
         languageDisplay = new SparseLayers(gridWidth, gridHeight, cellWidth, cellHeight, DefaultResources.getCrispSlabFont());
-        // SparseDisplay doesn't currently use the default background fields, but this isn't really a problem; we can
-        // set the background colors directly as floats with the SparseDisplay.backgrounds field, and it can be handy
-        // to hold onto the current color we want to fill that with in the defaultPackedBackground field.
-        // SparseLayers has fillBackground() and fillArea() methods for coloring all or part of the backgrounds.
-        languageDisplay.defaultPackedBackground = FLOAT_LIGHTING; // happens to be the same color used for lighting
-
+        languageDisplay.defaultPackedBackground = SColor.FLOAT_WHITE;
         languageDisplay.setPosition(0f, 0f);
         
-        languageDisplay.put(20, 10, "Hit some keys!", SColor.GOLDEN);
-        
-        bgColor = SColor.DARK_SLATE_GRAY;
+        bgColor = SColor.WHITE;
         input = new SquidInput(new SquidInput.KeyHandler() {
             @Override
             public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
@@ -128,11 +115,8 @@ public class FormicDemo extends ApplicationAdapter {
         });
         //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
         Gdx.input.setInputProcessor(new InputMultiplexer(languageStage, input));
-        //You might be able to get by with the next line instead of the above line, but the former is preferred.
-        //Gdx.input.setInputProcessor(input);
         languageStage.addActor(languageDisplay);
-
-        screenPosition = new Vector2(cellWidth, cellHeight);
+        putMap();
     }
 
     /**
@@ -143,7 +127,10 @@ public class FormicDemo extends ApplicationAdapter {
         languageDisplay.clear(0);
         languageDisplay.fillBackground(languageDisplay.defaultPackedBackground);
         for (int i = 0; i < gridHeight; i++) {
-            String s = Stringf.format("%08X", GWTRNG.determineInt((int)System.currentTimeMillis() ^ i * 0xDE4D));
+            String s = Stringf.format("%11d %<08X %12s %10.10f %<10.10g %<10.10E %<10.10a",
+                rng.nextInt(), 
+                FakeLanguageGen.CELESTIAL.word(rng, true, 3),
+                rng.nextDouble() / (1.0 - rng.nextDouble()));
             languageDisplay.put(1, i, s,
                 rng.getRandomElement(SColor.COLOR_WHEEL_PALETTE));
         }
