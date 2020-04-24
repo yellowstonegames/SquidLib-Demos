@@ -3,7 +3,6 @@ package com.squidpony.shader;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -34,7 +33,7 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		realStartTime = startTime = TimeUtils.millis();
-		int choice = (int) (startTime >>> 4 & 3L);
+		int choice = 3;//(int) (startTime >>> 4 & 3L);
 		switch (choice)
 		{
 			case 0:
@@ -66,12 +65,12 @@ public class NorthernLights extends ApplicationAdapter {
 		ShaderProgram.pedantic = false;
 		if(choice == 3)
 		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
 //			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
 		}
 		else
 		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment.glsl"));
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
 //			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
 		}
 		if (!shader.isCompiled()) {
@@ -137,11 +136,11 @@ public class NorthernLights extends ApplicationAdapter {
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
 		//swayRandomized(123454321, TimeUtils.timeSinceMillis(startTime) * (1.5E-5f) + 3.141592f + swayRandomized(1234321, TimeUtils.timeSinceMillis(startTime) * (1.5E-4f) - 1.618f + swayRandomized(12321, TimeUtils.timeSinceMillis(startTime) * (1E-4f))));// * 0x3p-14f;
-		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
-		palette.bind();
+//		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
+//		palette.bind();
 		batch.begin();
-		shader.setUniformi("u_palette", 1);
-		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
+//		shader.setUniformi("u_palette", 1);
+//		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
 //		shader.setUniformf("s",
