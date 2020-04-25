@@ -22,7 +22,6 @@ uniform float tm;
 //uniform vec3 s;
 //uniform vec3 c;
 
-
 const float PHI = 1.61803398874989484820459; // inverse of (phi = Golden Ratio)
 const vec2 HAR = vec2(1.324717957244746, 1.754877666246693); // harmonious number for 2D, then its square
 
@@ -32,7 +31,7 @@ float hash(float seed, float p) {
 
 
 float hash(float seed, vec2 p) {
-    return fract(dot(fract((p + seed) * HAR + seed), (HAR.yx + p)));
+    return fract((dot((p + seed), HAR) + seed) * (0.5 + fract(length(HAR.yx * p - seed))));
 }
 
 
