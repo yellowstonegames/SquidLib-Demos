@@ -22,21 +22,19 @@ uniform float tm;
 //uniform vec3 s;
 //uniform vec3 c;
 
-const vec3 hm = vec3(.8191725133961645, .6710436067037893, .5497004779019703);
 
-    //// old, slow
-//    return fract(dot(sin(seed + hm + p), (seed + hm * p)));
+const float PHI = 1.61803398874989484820459; // inverse of (phi = Golden Ratio)
+const vec2 HAR = vec2(1.324717957244746, 1.754877666246693); // harmonious number for 2D, then its square
 
 float hash(float seed, float p) {
-    //// thanks mgsx! https://www.mgsx.net/2015/07/21/006-011-fm-3D-WIP.html
-    return fract(sin((p+seed) * 12.9898) * 43758.5453 + (p+seed) * 2.6180339887498949);
+    return fract(fract((p - seed) * PHI + seed) * (PHI + p));
 }
 
+
 float hash(float seed, vec2 p) {
-    //return fract(length(hm * p.xyx + seed * p.yxy));
-    //// faster way, seems better-distributed than the 1D noise, thanks again mgsx
-    return fract(sin(seed + dot(p, vec2(12.9898,78.233))) * 43758.5453 + seed * 2.6180339887498949);
+    return fract(dot(fract((p + seed) * HAR + seed), (HAR.yx + p)));
 }
+
 
 float noise(float seed, float x) {
     float i = floor(x);
