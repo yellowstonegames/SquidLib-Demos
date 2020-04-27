@@ -63,8 +63,8 @@ uniform sampler2D u_texture;
 #define Source u_texture
 #define vTexCoord v_texCoords
 
-#define SourceSize vec4(TextureSize, 1.0 / TextureSize) //either TextureSize or InputSize
-#define OutSize vec4(OutputSize, 1.0 / OutputSize)
+#define SourceSize vec4(TextureSize * 4.0, 0.25 / TextureSize) //either TextureSize or InputSize
+#define OutSize vec4(OutputSize * 4.0, 0.25 / OutputSize)
 
 #define BLEND_NONE 0
 #define BLEND_NORMAL 1

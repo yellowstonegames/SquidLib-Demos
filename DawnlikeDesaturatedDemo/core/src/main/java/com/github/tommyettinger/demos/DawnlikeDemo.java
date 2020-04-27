@@ -7,14 +7,18 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -99,7 +103,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private long lastDrawTime = 0;
     private Color bgColor;
     private BitmapFont font;
-    private PixelPerfectViewport mainViewport;
+    private Viewport mainViewport;
     private Camera camera;
     
     private OrderedMap<Coord, AnimatedGlider> monsters;
@@ -186,7 +190,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         simpleBatch = new SpriteBatch();
         batch = contrastBatch;
         animationStart = TimeUtils.millis();
-        mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
+//        mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
+        mainViewport = new FillViewport(gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
         camera.update();
@@ -1295,12 +1300,11 @@ public class DawnlikeDemo extends ApplicationAdapter {
         camera.position.y =  playerSprite.getY() * cellHeight;
         camera.update();
 
-//        mainViewport.apply(false);
+        mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        shader.setUniformf("TextureSize", gridWidth * cellWidth << 2, gridHeight * cellHeight << 2);
-//        shader.setUniformf("OutputSize", gridWidth * cellWidth, gridHeight * cellHeight);
-        shader.setUniformf("OutputSize", Gdx.graphics.getWidth() << 2, Gdx.graphics.getHeight() << 2);
+        shader.setUniformf("TextureSize", gridWidth * cellWidth, gridHeight * cellHeight);
+        shader.setUniformf("OutputSize", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         
         // you done bad. you done real bad.
         if (health <= 0) {
