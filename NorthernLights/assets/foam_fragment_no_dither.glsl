@@ -22,18 +22,21 @@ uniform float tm;
 //uniform vec3 s;
 //uniform vec3 c;
 
-const float PHI = 1.61803398874989484820459; // inverse of (phi = Golden Ratio)
-const vec2 HAR = vec2(1.324717957244746, 1.754877666246693); // harmonious number for 2D, then its square
+const float PHI = 1.61803398874989484820459; // phi, the Golden Ratio
+const vec2 H2 = vec2(1.324717957244746, 1.754877666246693); // harmonious numbers for 2D
+const vec3 H3 = vec3(0.8191725134, 0.6710436067, 0.5497004779); // harmonious numbers for 3D
 
 float hash(float seed, float p) {
     return fract(fract((p - seed) * PHI + seed) * (PHI + p));
 }
 
-
 float hash(float seed, vec2 p) {
-    return fract((dot((p + seed), HAR) + seed) * (0.5 + fract(length(HAR.yx * p - seed))));
+    return fract((dot((p + seed), H2) + seed) * (0.5 + fract(length(H2.yx * p - seed))));
 }
 
+//vec3 hash3(vec3 seed, vec3 p) {
+//    return fract(fract((p - seed.yzy) * H3 + seed.zxx) * (H3.yzx + p.zxy));
+//}
 
 float noise(float seed, float x) {
     float i = floor(x);
@@ -66,7 +69,7 @@ float noise(vec2 x) {
 
 
 float noise(float seed, vec3 x) {
-    const vec3 step = vec3(110.0, 241.0, 171.0);
+    const vec3 step = vec3(59.0, 43.0, 37.0); //vec3(110.0, 241.0, 171.0);
 
     vec3 i = floor(x);
     vec3 f = fract(x);
@@ -108,17 +111,17 @@ float foam(float seed, vec3 x) {
                   dot(x, vec3(-0.3333333333333333, -0.4714045207910317, 0.816496580927726)),
                   dot(x, vec3(-0.3333333333333333, -0.4714045207910317, -0.816496580927726)));
     float a = noise(seed, p.yzw);
-    float b = noise(seed + 42.1, p.xzw + a);
-    float c = noise(seed + 84.2, p.xyw + b);
-    float d = noise(seed + 126.3, p.xyz + c);
+    float b = noise(seed + 42.1, p.xzw + a * H3.x);
+    float c = noise(seed + 84.2, p.xyw + b * H3.y);
+    float d = noise(seed + 126.3, p.xyz + c * H3.z);
     return smoothstep(0.0, 1.0, smoothstep(0.0, 1.0, (a + b + c + d) * 0.25));
     
 }
 float foam(vec3 x) { return foam(61.0, x); }
 void main() {
   vec3 i = vec3(gl_FragCoord.xy + 1999.0, tm * 0.3125) * 0.0625;
-  gl_FragColor.r = foam(420.0 + seed, i);
+  gl_FragColor.r = foam(42.0 + seed, i);
   gl_FragColor.g = foam(69.0 + seed, i);
-  gl_FragColor.b = foam(666.0 + seed, i);
+  gl_FragColor.b = foam(23.0 + seed, i);
   gl_FragColor.a = v_color.a;
 }
