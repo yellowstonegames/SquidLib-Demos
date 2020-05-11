@@ -3,11 +3,11 @@
 <module rename-to="html">
 	<source path="" />
 	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
-	<inherits name="com.github.tommyettinger.demos.FormicDemo" />
+	<inherits name="FormicDemo" />
 	<inherits name="regexodus" />
 	<inherits name="squidlib" />
 	<inherits name="squidlib-util" />
-	<inherits name="text.formic" />
+<!--	<inherits name="text.formic" />-->
 	<entry-point class="com.github.tommyettinger.demos.gwt.GwtLauncher" />
 	<set-configuration-property name="gdx.assetpath" value="../assets" />
 	<set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>

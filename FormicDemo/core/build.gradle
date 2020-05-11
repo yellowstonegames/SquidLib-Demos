@@ -1,10 +1,18 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
 
+compileJava.exclude("emu")
+javadoc.exclude("emu")
+
 dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
-  api "com.github.tommyettinger:formic:$formicVersion"
+//  api "com.github.tommyettinger:formic:$formicVersion"
   api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
   api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
   api "com.github.tommyettinger:regexodus:$regExodusVersion"
+
+  api "com.google.jsinterop:base:1.0.0-RC1"
+  api "com.google.elemental2:elemental2-core:1.0.0-RC1"
+  api "com.google.elemental2:elemental2-dom:1.0.0-RC1"
+
 }

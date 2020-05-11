@@ -16,6 +16,8 @@ import squidpony.squidgrid.gui.gdx.SquidInput;
 import squidpony.squidmath.GWTRNG;
 import text.formic.Stringf;
 
+import java.util.Date;
+
 /**
  * This is a small, not-overly-simple demo that presents some important features of SquidLib and shows a faster,
  * cleaner, and more recently-introduced way of displaying the map and other text. Features include dungeon map
@@ -126,13 +128,16 @@ public class FormicDemo extends ApplicationAdapter {
     {
         languageDisplay.clear(0);
         languageDisplay.fillBackground(languageDisplay.defaultPackedBackground);
-        for (int i = 0; i < gridHeight; i++) {
+        for (int i = 0; i < gridHeight - 1; i += 2) {
             String s = Stringf.format("%11d %<08X %12s %10.10f %<10.10g %<10.10E %<10.10a",
                 rng.nextInt(), 
                 FakeLanguageGen.CELESTIAL.word(rng, true, 3),
                 rng.nextDouble() / (1.0 - rng.nextDouble()));
             languageDisplay.put(1, i, s,
-                rng.getRandomElement(SColor.COLOR_WHEEL_PALETTE));
+                rng.getRandomElement(SColor.COLOR_WHEEL_PALETTE_RICH));
+            s = Stringf.format("%tD", new Date());
+            languageDisplay.put(1, i+1, s,
+                    rng.getRandomElement(SColor.COLOR_WHEEL_PALETTE_RICH));
         }
     }
     @Override
