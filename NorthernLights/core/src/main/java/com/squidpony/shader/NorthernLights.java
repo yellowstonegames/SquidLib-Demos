@@ -19,7 +19,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private Texture pixel;
 	private ShaderProgram shader;
 
-	private long startTime, realStartTime;
+	private long startTime;
 	private float seed;
 	private int width, height;
 	private Texture palette;
@@ -32,7 +32,7 @@ public class NorthernLights extends ApplicationAdapter {
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
-		realStartTime = startTime = TimeUtils.millis();
+		startTime = TimeUtils.millis();
 		int choice = 3;//(int) (startTime >>> 4 & 3L);
 		switch (choice)
 		{
@@ -65,13 +65,13 @@ public class NorthernLights extends ApplicationAdapter {
 		ShaderProgram.pedantic = false;
 		if(choice == 3)
 		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
-//			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
+//			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
 		}
 		else
 		{
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
-//			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
+//			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
+			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
 		}
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());

@@ -3,7 +3,6 @@ import com.google.gwt.core.client.JsDate;
 import elemental2.core.JsArray;
 import text.formic.F4JSLibInjector;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public final class Stringf {

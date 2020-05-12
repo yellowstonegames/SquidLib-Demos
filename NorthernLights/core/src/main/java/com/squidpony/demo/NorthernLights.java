@@ -180,6 +180,8 @@ public class NorthernLights extends ApplicationAdapter {
 	@Override
     public void render() {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
+        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
         final float rt = tm * RATE,
                 ftm = rt * 0x5p-13f;
