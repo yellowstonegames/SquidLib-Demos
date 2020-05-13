@@ -32,19 +32,20 @@ float cosmic(float seed, vec3 con)
     return -2.5 + (sum + 2.0 * swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x + con.y + con.z - sum)));
 }
 void main() {
-  vec3 alt = vec3(gl_FragCoord.xy, tm) * 0.015625;
-  float time2 = (tm + swayRandomized(-seed, tm)) * 0.015625;
-  float time3 = (-tm - swayRandomized(seed, -tm)) * 0.015625;
-  float yt = (alt.y * PHI + time2 - alt.x) * 0.5 * (swayRandomized(123.456 + seed, alt.x * 0.2123) + 1.5);
+//  vec3 xyz = vec3(gl_FragCoord.xy, tm);
+  vec3 xyz = vec3(gl_FragCoord.x, (gl_FragCoord.y + 10.0) * sin(tm * 0.04) * 0.25, (gl_FragCoord.y + 10.0) * cos(tm * 0.04) * 0.25);
+  vec3 alt = xyz * 0.01 - xyz.yzx * 0.007 + xyz.zxy * 0.004;
+  
+  float yt = (alt.y * PHI + alt.z - alt.x) * 0.5 * (swayRandomized(123.456 + seed, alt.x * 0.2123) + 1.5);
   float xt = (alt.z * PHI + alt.x - alt.y) * 0.5 * (swayRandomized(seed, alt.y * 0.2123) + 1.5);
-  float xy = (alt.x * PHI + alt.y - time3) * 0.5 * (swayRandomized(789.123 - seed, alt.z * 0.2123) + 1.5);
+  float xy = (alt.x * PHI + alt.y - alt.z) * 0.5 * (swayRandomized(789.123 - seed, alt.z * 0.2123) + 1.5);
   vec3 s = vec3(swayRandomized(-164.31527, xt - 3.11),
                 swayRandomized(776.8142, 1.41 - xt),
                 swayRandomized(-509.5190, xt + 2.61)) - 0.5;
   vec3 c = vec3(swayRandomized(-105.92407, yt - 1.11),
                 swayRandomized(-615.6687, yt + 2.41),
                 swayRandomized(435.8990, 3.61 - yt)) - 0.5;
-  vec3 con = -swayRandomized(-seed, -tm * 0.03125)
+  vec3 con = -swayRandomized(-seed, xyz.z * -0.04)
              + ((length(s) + length(c) + PHI)) * (vec3(
                   swayRandomized(924.10527, -2.4375 - xy),
                   swayRandomized(-566.50993, xy + 1.5625),
