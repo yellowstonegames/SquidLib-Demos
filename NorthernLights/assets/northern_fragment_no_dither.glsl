@@ -33,8 +33,8 @@ float cosmic(float seed, vec3 con)
 }
 void main() {
 //  vec3 xyz = vec3(gl_FragCoord.xy, tm);
-  vec3 xyz = vec3(gl_FragCoord.x, (gl_FragCoord.y + 15.0) * sin(tm * (3.14159265 * 0.02)) * 0.25, (gl_FragCoord.y + 15.0) * cos(tm * (3.14159265 * 0.02)) * 0.25);
-  vec3 alt = xyz * 0.01 - xyz.yzx * 0.007 + xyz.zxy * 0.004;
+  vec3 xyz = vec3(gl_FragCoord.x, (gl_FragCoord.y + 3.0) * sin(tm * (3.14159265 * 0.02)) * 0.2, (gl_FragCoord.y + 3.0) * cos(tm * (3.14159265 * 0.02)) * 0.2);
+  vec3 alt = xyz * 0.009 - xyz.yzx * 0.005 + xyz.zxy * 0.003;
   
   float yt = (alt.y * PHI + alt.z - alt.x) * 0.5 * (swayRandomized(123.456 + seed, alt.x * 0.2123) + 1.5);
   float xt = (alt.z * PHI + alt.x - alt.y) * 0.5 * (swayRandomized(seed, alt.y * 0.2123) + 1.5);
@@ -56,5 +56,5 @@ void main() {
   con.z = cosmic(seed - 456.123, con - PHI);
       
   gl_FragColor.rgb = sin(con * 3.14159265) * 0.5 + 0.5;
-  gl_FragColor.a = v_color.a;
+  gl_FragColor.a = acos(distance(v_texCoords, vec2(0.5, 0.5)) * 2.5) * 0.6366197723675814;
 }

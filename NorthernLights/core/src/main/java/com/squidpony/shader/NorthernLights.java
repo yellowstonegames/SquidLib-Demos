@@ -146,10 +146,10 @@ public class NorthernLights extends ApplicationAdapter {
 		batch.end();
 	}
 	public void renderAPNG () {
-		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 		Array<Pixmap> pixmaps = new Array<>(100);
-		for (int i = 0; i < 100; i++) {
+		for (int i = 1; i <= 101; i++) {
+			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 			batch.begin();
 			shader.setUniformf("seed", seed);
 			shader.setUniformf("tm", (float)i);
