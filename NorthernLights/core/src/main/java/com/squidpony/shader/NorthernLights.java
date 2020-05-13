@@ -7,7 +7,13 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.squidpony.AnimatedPNG;
+
+import java.io.IOException;
 
 /**
  * Credit for the shader adaptation goes to angelickite , a very helpful user on the libGDX Discord.
@@ -87,14 +93,8 @@ public class NorthernLights extends ApplicationAdapter {
 		//startTime -= 0x1000000;
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
-
-
-//		gifRecorder = new GifRecorder(batch);
-//		gifRecorder.setGUIDisabled(true);
-//		gifRecorder.open();
-//		gifRecorder.setBounds(width * -0.5f, height * -0.5f, width, height);
-//		gifRecorder.setFPS(16);
-//		gifRecorder.startRecording();
+		
+		renderAPNG();
 	}
 
 	@Override public void resize (int width, int height) {
@@ -122,9 +122,9 @@ public class NorthernLights extends ApplicationAdapter {
 	}
 
 	@Override public void render () {
-		//Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-		//Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
-		if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && (Gdx.input.isKeyPressed(Input.Keys.ALT_LEFT) || Gdx.input.isKeyPressed(Input.Keys.ALT_RIGHT)))
+		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+		if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && UIUtils.alt())
 		{
 			if(Gdx.graphics.isFullscreen())
 				Gdx.graphics.setWindowedMode(480, 320);
@@ -135,7 +135,6 @@ public class NorthernLights extends ApplicationAdapter {
 		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
-		//swayRandomized(123454321, TimeUtils.timeSinceMillis(startTime) * (1.5E-5f) + 3.141592f + swayRandomized(1234321, TimeUtils.timeSinceMillis(startTime) * (1.5E-4f) - 1.618f + swayRandomized(12321, TimeUtils.timeSinceMillis(startTime) * (1E-4f))));// * 0x3p-14f;
 //		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
 //		palette.bind();
 		batch.begin();
@@ -143,21 +142,27 @@ public class NorthernLights extends ApplicationAdapter {
 //		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
-//		shader.setUniformf("s",
-//				swayRandomized(0x9E3779B9, ftm - 1.11f),
-//				swayRandomized(0xD1B54A32, ftm + 1.41f),
-//				swayRandomized(0xE19B01AA, ftm + 2.61f));
-//		shader.setUniformf("c",
-//				swayRandomized(0xC13FA9A9, ftm - 1.11f),
-//				swayRandomized(0xDB4F0B91, ftm + 1.41f),
-//				swayRandomized(0xE60E2B72, ftm + 2.61f));
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
-//		gifRecorder.update();
-//		if(gifRecorder.isRecording() && TimeUtils.timeSinceMillis(realStartTime) > 7500L){
-//			gifRecorder.finishRecording();
-//			gifRecorder.writeGIF();
-//		}
-
+	}
+	public void renderAPNG () {
+		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+		Array<Pixmap> pixmaps = new Array<>(100);
+		for (int i = 0; i < 100; i++) {
+			batch.begin();
+			shader.setUniformf("seed", seed);
+			shader.setUniformf("tm", (float)i);
+			batch.draw(pixel, 0, 0, width, height);
+			batch.end();
+			pixmaps.add(ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		}
+		AnimatedPNG apng = new AnimatedPNG();
+		apng.setCompression(8);
+		try {
+			apng.write(Gdx.files.local("woahdude"+startTime+".png"), pixmaps, 20);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
