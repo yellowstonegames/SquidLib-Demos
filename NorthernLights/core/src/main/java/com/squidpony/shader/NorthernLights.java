@@ -147,18 +147,18 @@ public class NorthernLights extends ApplicationAdapter {
 	}
 	public void renderAPNG () {
 		Array<Pixmap> pixmaps = new Array<>(100);
-		for (int i = 1; i <= 101; i++) {
+		for (int i = 1; i <= 80; i++) {
 			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 			batch.begin();
 			shader.setUniformf("seed", seed);
-			shader.setUniformf("tm", (float)i);
+			shader.setUniformf("tm", i * 1.25f);
 			batch.draw(pixel, 0, 0, width, height);
 			batch.end();
 			pixmaps.add(ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		}
 		AnimatedPNG apng = new AnimatedPNG();
-		apng.setCompression(8);
+		apng.setCompression(9);
 		try {
 			apng.write(Gdx.files.local("woahdude"+startTime+".png"), pixmaps, 20);
 		} catch (IOException e) {

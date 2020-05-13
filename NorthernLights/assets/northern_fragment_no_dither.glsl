@@ -33,7 +33,8 @@ float cosmic(float seed, vec3 con)
 }
 void main() {
 //  vec3 xyz = vec3(gl_FragCoord.xy, tm);
-  vec3 xyz = vec3(gl_FragCoord.x, (gl_FragCoord.y + 3.0) * sin(tm * (3.14159265 * 0.02)) * 0.2, (gl_FragCoord.y + 3.0) * cos(tm * (3.14159265 * 0.02)) * 0.2);
+  vec2 distort = acos(1.5 * (v_texCoords - 0.5)) * exp(-2.75 + distance(v_texCoords, vec2(0.5, 0.5))) * 600.0;
+  vec3 xyz = vec3(distort.x, (distort.y + 10.0) * sin(tm * (3.14159265 * 0.02)) * 0.4, (distort.y + 10.0) * cos(tm * (3.14159265 * 0.02)) * 0.4);
   vec3 alt = xyz * 0.009 - xyz.yzx * 0.005 + xyz.zxy * 0.003;
   
   float yt = (alt.y * PHI + alt.z - alt.x) * 0.5 * (swayRandomized(123.456 + seed, alt.x * 0.2123) + 1.5);
