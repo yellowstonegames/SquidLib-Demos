@@ -1,8 +1,11 @@
+plugins { id 'org.beryx.runtime' version '1.8.4' }
 apply plugin: 'application'
 
 mainClassName = 'com.squidpony.demo.lwjgl3.Lwjgl3Launcher'
+def osName = System.getProperty('os.name').toLowerCase(Locale.ROOT)
+
 eclipse.project.name = appName + '-lwjgl3'
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 sourceSets.main.resources.srcDirs += [ file('../assets').absolutePath ]
 
 dependencies {
@@ -12,9 +15,37 @@ dependencies {
 }
 
 jar {
+  destinationDirectory = file("$project.buildDir/lib")
   archiveName "${appName}.jar"
   from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
   manifest {
     attributes 'Main-Class': project.mainClassName
+  }
+}
+jpackageImage.dependsOn jar
+
+runtime {
+  options = ['--strip-debug',
+             '--compress', '2',
+             '--no-header-files',
+             '--no-man-pages',
+             '--strip-native-commands',
+             '--vm', 'server']
+  modules = ['java.base' ,
+             'java.desktop',
+             'jdk.unsupported']
+  distDir = file(buildDir)
+  jpackage {
+    imageName = 'NorthernLights'
+    skipInstaller = true
+    jpackageHome = "C:\\Program Files\\AdoptOpenJDK\\jdk-14-hotspot"
+    mainJar = jar.archiveFileName.get()
+    if (osName.contains('windows')) {
+      imageOptions = ["--icon", file("../icons/icon.ico")]
+    } else if (osName.contains('linux')) {
+      imageOptions = ["--icon", file("../icons/icon.png")]
+    } else if (osName.contains('mac')) {
+      imageOptions = ["--icon", file("../icons/icon.icns")]
+    }
   }
 }

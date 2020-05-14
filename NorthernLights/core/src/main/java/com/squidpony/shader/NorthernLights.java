@@ -94,7 +94,7 @@ public class NorthernLights extends ApplicationAdapter {
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		
-		renderAPNG();
+//		renderAPNG();
 	}
 
 	@Override public void resize (int width, int height) {
