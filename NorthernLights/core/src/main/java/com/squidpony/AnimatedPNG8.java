@@ -9,16 +9,12 @@ import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.StreamUtils;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.zip.CRC32;
+import java.util.zip.CheckedOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -595,6 +591,33 @@ public class AnimatedPNG8 implements Disposable {
             writeChunks(output.write(false), chunks);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Copied straight out of libGDX, in the PixmapIO class.
+     */
+    static class ChunkBuffer extends DataOutputStream {
+        final ByteArrayOutputStream buffer;
+        final CRC32 crc;
+
+        ChunkBuffer (int initialSize) {
+            this(new ByteArrayOutputStream(initialSize), new CRC32());
+        }
+
+        private ChunkBuffer (ByteArrayOutputStream buffer, CRC32 crc) {
+            super(new CheckedOutputStream(buffer, crc));
+            this.buffer = buffer;
+            this.crc = crc;
+        }
+
+        public void endChunk (DataOutputStream target) throws IOException {
+            flush();
+            target.writeInt(buffer.size() - 4);
+            buffer.writeTo(target);
+            target.writeInt((int)crc.getValue());
+            buffer.reset();
+            crc.reset();
         }
     }
 }

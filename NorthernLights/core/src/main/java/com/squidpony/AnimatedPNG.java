@@ -7,10 +7,13 @@ import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.StreamUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
@@ -62,10 +65,19 @@ public class AnimatedPNG implements Disposable {
     private boolean flipY = true;
     private int lastLineLen;
 
+    /**
+     * Creates an AnimatedPNG writer with an initial buffer size of 16384. The buffer can resize later if needed.
+     */
     public AnimatedPNG () {
-        this(128 * 128);
+        this(16384);
     }
 
+    /**
+     * Creates an AnimatedPNG writer with the given initial buffer size. The buffer can resize if needed, so using a
+     * small size is only a problem if it slows down writing by forcing a resize for several parts of a PNG. A default
+     * of 16384 is reasonable.
+     * @param initialBufferSize the initial size for the buffer that stores PNG chunks; 16384 is a reasonable default
+     */
     public AnimatedPNG (int initialBufferSize) {
         buffer = new ChunkBuffer(initialBufferSize);
         deflater = new Deflater();
@@ -79,17 +91,20 @@ public class AnimatedPNG implements Disposable {
     }
 
     /**
-     * Sets the deflate compression level. Default is {@link Deflater#DEFAULT_COMPRESSION}.
+     * Sets the deflate compression level. Default is {@link Deflater#DEFAULT_COMPRESSION}, which is currently 6 on all
+     * Java versions in the 8 to 14 range, but is permitted to change.
      */
     public void setCompression(int level) {
         deflater.setLevel(level);
     }
 
     /**
-     * Writes an animated PNG file consisting of the given {@code frames} to the given {@code file}, at 60 frames per second.
+     * Writes an animated PNG file consisting of the given {@code frames} to the given {@code file}, at 60 frames per
+     * second. This doesn't guarantee that the animated PNG will be played back at a steady 60 frames per second, just
+     * that the duration of each frame is 1/60 of a second if playback is optimal.
      * @param file the file location to write to; any existing file with this name will be overwritten
      * @param frames an Array of Pixmap frames to write in order to the animated PNG
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      */
     public void write(FileHandle file, Array<Pixmap> frames) throws IOException {
         OutputStream output = file.write(false);
@@ -106,7 +121,7 @@ public class AnimatedPNG implements Disposable {
      * @param file the file location to write to; any existing file with this name will be overwritten
      * @param frames an Array of Pixmap frames to write in order to the animated PNG
      * @param fps how many frames per second the animated PNG should display
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      */
     public void write(FileHandle file, Array<Pixmap> frames, int fps) throws IOException {
         OutputStream output = file.write(false);
@@ -123,7 +138,7 @@ public class AnimatedPNG implements Disposable {
      * @param output the stream to write to; the stream will not be closed
      * @param frames an Array of Pixmap frames to write in order to the animated PNG
      * @param fps how many frames per second the animated PNG should display
-     * @throws IOException
+     * @throws IOException if an I/O error occurs.
      */
     public void write(OutputStream output, Array<Pixmap> frames, int fps) throws IOException {
         Pixmap pixmap = frames.first();
@@ -255,6 +270,33 @@ public class AnimatedPNG implements Disposable {
      */
     public void dispose() {
         deflater.end();
+    }
+    
+    /**
+     * Copied straight out of libGDX, in the PixmapIO class.
+     */
+    static class ChunkBuffer extends DataOutputStream {
+        final ByteArrayOutputStream buffer;
+        final CRC32 crc;
+
+        ChunkBuffer (int initialSize) {
+            this(new ByteArrayOutputStream(initialSize), new CRC32());
+        }
+
+        private ChunkBuffer (ByteArrayOutputStream buffer, CRC32 crc) {
+            super(new CheckedOutputStream(buffer, crc));
+            this.buffer = buffer;
+            this.crc = crc;
+        }
+
+        public void endChunk (DataOutputStream target) throws IOException {
+            flush();
+            target.writeInt(buffer.size() - 4);
+            buffer.writeTo(target);
+            target.writeInt((int)crc.getValue());
+            buffer.reset();
+            crc.reset();
+        }
     }
 
 }
