@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.squidpony.AnimatedGif;
 import com.squidpony.AnimatedPNG;
 
 import java.io.IOException;
@@ -95,6 +96,7 @@ public class NorthernLights extends ApplicationAdapter {
 		height = Gdx.graphics.getHeight();
 		
 //		renderAPNG();
+		renderGif();
 	}
 
 	@Override public void resize (int width, int height) {
@@ -145,6 +147,7 @@ public class NorthernLights extends ApplicationAdapter {
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 	}
+
 	public void renderAPNG () {
 		Array<Pixmap> pixmaps = new Array<>(100);
 		for (int i = 1; i <= 80; i++) {
@@ -161,6 +164,25 @@ public class NorthernLights extends ApplicationAdapter {
 		apng.setCompression(9);
 		try {
 			apng.write(Gdx.files.local("woahdude"+startTime+".png"), pixmaps, 20);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public void renderGif() {
+		Array<Pixmap> pixmaps = new Array<>(100);
+		for (int i = 1; i <= 80; i++) {
+			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+			batch.begin();
+			shader.setUniformf("seed", seed);
+			shader.setUniformf("tm", i * 1.25f);
+			batch.draw(pixel, 0, 0, width, height);
+			batch.end();
+			pixmaps.add(ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
+		}
+		AnimatedGif gif = new AnimatedGif();
+		try {
+			gif.write(Gdx.files.local("woahdude"+startTime+".gif"), pixmaps, 20);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

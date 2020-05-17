@@ -57,5 +57,5 @@ void main() {
   con.z = cosmic(seed - 456.123, con - PHI);
       
   gl_FragColor.rgb = sin(con * 3.14159265) * 0.5 + 0.5;
-  gl_FragColor.a = acos(distance(v_texCoords, vec2(0.5, 0.5)) * 2.5) * 0.6366197723675814;
+  gl_FragColor.a = 1.0;// acos(distance(v_texCoords, vec2(0.5, 0.5)) * 2.5) * 0.6366197723675814;
 }
