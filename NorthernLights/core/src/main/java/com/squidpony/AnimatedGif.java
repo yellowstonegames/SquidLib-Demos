@@ -51,7 +51,7 @@ public class AnimatedGif {
 
     protected int repeat = 0; // loop repeat
 
-    protected int delay = 16; // frame delay (hundredths)
+    protected int delay = 16; // frame delay (thousandths)
 
     protected boolean started = false; // ready to output frames
 
@@ -59,13 +59,11 @@ public class AnimatedGif {
 
     protected Pixmap image; // current frame
 
-    protected byte[] pixels; // BGR byte array from frame
-
     protected byte[] indexedPixels; // converted frame indexed to palette
 
     protected int colorDepth; // number of bit planes
 
-    protected byte[] colorTab; // RGB palette
+    protected byte[] colorTab; // RGB palette, 3 bytes per color
 
     protected boolean[] usedEntry = new boolean[256]; // active palette entries
 
@@ -80,8 +78,6 @@ public class AnimatedGif {
     protected boolean sizeSet = false; // if false, get size from first frame
 
     public PaletteReducer palette;
-
-    protected float strength = 0.5f;
 
     /**
      * Sets the delay time between each frame, or changes it for subsequent frames
@@ -188,7 +184,6 @@ public class AnimatedGif {
         transIndex = -1;
         out = null;
         image = null;
-        pixels = null;
         indexedPixels = null;
         colorTab = null;
         closeStream = false;
@@ -265,7 +260,7 @@ public class AnimatedGif {
     protected void analyzePixels() {
         int nPix = width * height;
         indexedPixels = new byte[nPix];
-        palette.analyze(image);
+//        palette.analyze(image);
         final int[] paletteArray = palette.paletteArray;
         final byte[] paletteMapping = palette.paletteMapping;
         // initialize quantizer
@@ -280,7 +275,7 @@ public class AnimatedGif {
         // map image pixels to new palette
         int color, used;
         boolean hasTransparent = paletteArray[0] == 0;
-        float pos, adj, strength = this.strength;
+        float pos, adj, strength = palette.ditherStrength * 3.25f;
         for (int y = 0, i = 0; y < height && i < nPix; y++) {
             for (int px = 0; px < width & i < nPix; px++) {
                 color = image.getPixel(px, y) & 0xF8F8F880;
@@ -298,6 +293,7 @@ public class AnimatedGif {
                     pos -= (int) pos;
                     pos *= 52.9829189f;
                     pos -= (int) pos;
+                    // sqrt on a float arg, cast to float, can use specialized JVM instructions
                     adj = ((float) Math.sqrt(pos) * pos - 0.3125f) * strength;
                     rr = MathUtils.clamp((int) (rr + (adj * ((rr - (used >>> 24))))), 0, 0xFF);
                     gg = MathUtils.clamp((int) (gg + (adj * ((gg - (used >>> 16 & 0xFF))))), 0, 0xFF);
@@ -309,7 +305,6 @@ public class AnimatedGif {
                 }
             }
         }
-        pixels = null;
         colorDepth = 8;
         palSize = 7;
         // get closest match to transparent color if specified
@@ -330,9 +325,6 @@ public class AnimatedGif {
             temp.drawPixmap(image, 0, 0);
             image = temp;
         }
-
-        pixels = new byte[width * height * 3];
-        image.getPixels().get(pixels);
     }
 
     /**
