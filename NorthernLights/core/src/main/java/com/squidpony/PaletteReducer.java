@@ -125,6 +125,11 @@ public class PaletteReducer {
      * @param rgbaPalette an array of RGBA8888 ints to use as a palette
      */
     public PaletteReducer(int[] rgbaPalette) {
+        if(rgbaPalette == null)
+        {
+            exact(AURORA, ENCODED_AURORA);
+            return;
+        }
         paletteMapping = new byte[0x8000];
         exact(rgbaPalette);
     }
@@ -136,22 +141,29 @@ public class PaletteReducer {
      * @param colorPalette an array of Color objects to use as a palette
      */
     public PaletteReducer(Color[] colorPalette) {
+        if(colorPalette == null)
+        {
+            exact(AURORA, ENCODED_AURORA);
+            return;
+        }
         paletteMapping = new byte[0x8000];
         exact(colorPalette);
     }
 
     /**
-     * Constructs a PaletteReducer that uses the given Array of Color objects as a palette (see {@link #exact(Color[])}
+     * Constructs a PaletteReducer that uses the given array of Color objects as a palette (see {@link #exact(Color[])}
      * for more info).
      *
      * @param colorPalette an array of Color objects to use as a palette
      */
-    public PaletteReducer(Array<Color> colorPalette) {
-        paletteMapping = new byte[0x8000];
-        if (colorPalette != null)
-            exact(colorPalette.items, colorPalette.size);
-        else
+    public PaletteReducer(Color[] colorPalette, int limit) {
+        if(colorPalette == null)
+        {
             exact(AURORA, ENCODED_AURORA);
+            return;
+        }
+        paletteMapping = new byte[0x8000];
+        exact(colorPalette, limit);
     }
 
     /**
@@ -161,8 +173,29 @@ public class PaletteReducer {
      * @param pixmap a Pixmap to analyze in detail to produce a palette
      */
     public PaletteReducer(Pixmap pixmap) {
+        if(pixmap == null)
+        {
+            exact(AURORA, ENCODED_AURORA);
+            return;
+        }
         paletteMapping = new byte[0x8000];
         analyze(pixmap);
+    }
+
+    /**
+     * Constructs a PaletteReducer that analyzes the given Pixmaps for color count and frequency to generate a palette
+     * (see {@link #analyze(Array)} )} for more info).
+     *
+     * @param pixmaps an Array of Pixmap to analyze in detail to produce a palette
+     */
+    public PaletteReducer(Array<Pixmap> pixmaps) {
+        if(pixmaps == null)
+        {
+            exact(AURORA, ENCODED_AURORA);
+            return;
+        }
+        paletteMapping = new byte[0x8000];
+        analyze(pixmaps);
     }
     /**
      * Constructs a PaletteReducer that uses the given array of RGBA8888 ints as a palette (see {@link #exact(int[])}
@@ -297,16 +330,23 @@ public class PaletteReducer {
 
     /**
      * Builds the palette information this PaletteReducer stores from the given array of RGBA8888 ints as a palette (see
-     * {@link #exact(int[])} for more info) and an encoded String to use to look up pre-loaded color data. The encoded
-     * string is going to be hard to produce if you intend to do this from outside ColorWeaver, but there is a
-     * generatePreloadCode() method in ColorWeaver's tests. For external code, there's slightly
-     * more startup time spent when initially calling {@link #exact(int[])}, but it will produce the same result. 
+     * {@link #exact(int[])} for more info) and an encoded byte array to use to look up pre-loaded color data. The
+     * encoded byte array can be copied out of the {@link #paletteMapping} of an existing PaletteReducer, or just as
+     * likely you can use {@link #ENCODED_AURORA} as a nice default. There's slightly more startup time spent when
+     * initially calling {@link #exact(int[])}, but it will produce the same result. You can store the paletteMapping
+     * from that PaletteReducer once, however you want to store it, and send it back to this on later runs.
      *
      * @param palette an array of RGBA8888 ints to use as a palette
-     * @param preload an ISO-8859-1-encoded String containing preload data
+     * @param preload a byte array with exactly 32768 (or 0x8000) items, containing {@link #paletteMapping} data
      */
     public void exact(int[] palette, byte[] preload)
     {
+        if(palette == null || preload == null)
+        {
+            System.arraycopy(AURORA, 0,  paletteArray, 0, 256);
+            paletteMapping = ENCODED_AURORA;
+            return;
+        }
         for (int i = 0; i < 256 & i < palette.length; i++) {
             int color = palette[i];
             if((color & 0x80) != 0)
@@ -519,6 +559,48 @@ public class PaletteReducer {
 
     /**
      * Analyzes all of the Pixmap items in {@code pixmaps} for color count and frequency (as if they are one image),
+     * building a palette with at most 256 colors. If there are 256 or less colors, this uses the
+     * exact colors (although with at most one transparent color, and no alpha for other colors); if there are more than
+     * 256 colors or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even
+     * if the image has no transparency). Because calling {@link #reduce(Pixmap)} (or any of PNG8's write methods) will
+     * dither colors that aren't exact, and dithering works better when the palette can choose colors that are
+     * sufficiently different, this takes a threshold value to determine whether it should permit a less-common color
+     * into the palette, and if the second color is different enough (as measured by {@link #difference(int, int)}) by a
+     * value of at least 400, it is allowed in the palette, otherwise it is kept out for being too similar to existing
+     * colors. This doesn't return a value but instead stores the palette info in this object; a PaletteReducer can be
+     * assigned to the {@link AnimatedPNG8#palette} or {@link AnimatedGif#palette} fields, or can be used directly to
+     * {@link #reduce(Pixmap)} a Pixmap.
+     *
+     * @param pixmaps   a Pixmap Array to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)}, by AnimatedGif, or by AnimatedPNG8
+     */
+    public void analyze(Array<Pixmap> pixmaps){
+        analyze(pixmaps.items, pixmaps.size, 400, 256);
+    }
+
+    /**
+     * Analyzes all of the Pixmap items in {@code pixmaps} for color count and frequency (as if they are one image),
+     * building a palette with at most 256 colors. If there are 256 or less colors, this uses the
+     * exact colors (although with at most one transparent color, and no alpha for other colors); if there are more than
+     * 256 colors or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even
+     * if the image has no transparency). Because calling {@link #reduce(Pixmap)} (or any of PNG8's write methods) will
+     * dither colors that aren't exact, and dithering works better when the palette can choose colors that are
+     * sufficiently different, this takes a threshold value to determine whether it should permit a less-common color
+     * into the palette, and if the second color is different enough (as measured by {@link #difference(int, int)}) by a
+     * value of at least {@code threshold}, it is allowed in the palette, otherwise it is kept out for being too similar
+     * to existing colors. The threshold is usually between 250 and 1000, and 400 is a good default. This doesn't return
+     * a value but instead stores the palette info in this object; a PaletteReducer can be assigned to the
+     * {@link AnimatedPNG8#palette} or {@link AnimatedGif#palette} fields, or can be used directly to
+     * {@link #reduce(Pixmap)} a Pixmap.
+     *
+     * @param pixmaps   a Pixmap Array to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)}, by AnimatedGif, or by AnimatedPNG8
+     * @param threshold a minimum color difference as produced by {@link #difference(int, int)}; usually between 250 and 1000, 400 is a good default
+     */
+    public void analyze(Array<Pixmap> pixmaps, int threshold){
+        analyze(pixmaps.items, pixmaps.size, threshold, 256);
+    }
+
+    /**
+     * Analyzes all of the Pixmap items in {@code pixmaps} for color count and frequency (as if they are one image),
      * building a palette with at most {@code limit} colors. If there are {@code limit} or less colors, this uses the
      * exact colors (although with at most one transparent color, and no alpha for other colors); if there are more than
      * {@code limit} colors or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even
@@ -537,7 +619,7 @@ public class PaletteReducer {
      * @param limit     the maximum number of colors to allow in the resulting palette; typically no more than 256
      */
     public void analyze(Array<Pixmap> pixmaps, int threshold, int limit){
-        
+        analyze(pixmaps.items, pixmaps.size, threshold, limit);
     }
     /**
      * Analyzes all of the Pixmap items in {@code pixmaps} for color count and frequency (as if they are one image),
@@ -913,9 +995,7 @@ public class PaletteReducer {
         Pixmap.Blending blending = pixmap.getBlending();
         pixmap.setBlending(Pixmap.Blending.None);
         int color, used;
-        float pos;
-        double adj;
-//        final float strength = 0x1.4p-10f * ditherStrength;
+        float pos, adj;
         final float strength = ditherStrength * 3.25f;
         for (int y = 0; y < h; y++) {
             for (int px = 0; px < lineLen; px++) {
@@ -939,19 +1019,23 @@ public class PaletteReducer {
                     pos -= (int)pos;
                     pos *= 52.9829189f;
                     pos -= (int)pos;
-                    adj = (Math.sqrt(pos) * pos - 0.3125) * strength;
-//                    adj = TrigTools.sin(pos * 1.44f - 0.72f) * strength;
+                    adj = ((float) Math.sqrt(pos) * pos - 0.3125f) * strength;
 
-//                    pos *= 0.875f;
-//                    adj = (px * 0.7548776662466927f + y * 0.5698402909980532f);
-//                    adj -= (int)adj;
-//                    adj = TrigTools.asin((pos - adj * 0.3125f) * strength) * 1.25f;
                     rr = MathUtils.clamp((int) (rr + (adj * ((rr - (used >>> 24))))), 0, 0xFF);
                     gg = MathUtils.clamp((int) (gg + (adj * ((gg - (used >>> 16 & 0xFF))))), 0, 0xFF);
                     bb = MathUtils.clamp((int) (bb + (adj * ((bb - (used >>> 8 & 0xFF))))), 0, 0xFF);
                     pixmap.drawPixel(px, y, paletteArray[paletteMapping[((rr << 7) & 0x7C00)
                             | ((gg << 2) & 0x3E0)
                             | ((bb >>> 3))] & 0xFF]);
+
+//                    adj = TrigTools.sin(pos * 1.44f - 0.72f) * strength;
+
+//                    pos *= 0.875f;
+//                    adj = (px * 0.7548776662466927f + y * 0.5698402909980532f);
+//                    adj -= (int)adj;
+//                    adj = TrigTools.asin((pos - adj * 0.3125f) * strength) * 1.25f;
+
+
                 }
             }
 

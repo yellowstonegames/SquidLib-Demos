@@ -101,10 +101,10 @@ public class AnimatedPNG8 implements Disposable {
     }
 
     /**
-     * Writes the given Pixmap to the requested FileHandle, computing an 8-bit palette from the most common colors in
-     * pixmap. If there are 256 or less colors and none are transparent, this will use 256 colors in its palette exactly
-     * with no transparent entry, but if there are more than 256 colors or any are transparent, then one color will be
-     * used for "fully transparent" and 255 opaque colors will be used.
+     * Writes the given Pixmaps to the requested FileHandle at the requested frames per second.
+     * If {@link #palette} is null (the default unless it has been assigned a PaletteReducer value), this will
+     * compute a palette from all of the frames given. Otherwise, this uses the colors already in {@link #palette}.
+     * Always dithers the result.
      *
      * @param file   a FileHandle that must be writable, and will have the given Pixmap written as a PNG-8 image
      * @param frames a Pixmap Array to write as a sequence of frames to the given output stream
@@ -116,10 +116,10 @@ public class AnimatedPNG8 implements Disposable {
     }
 
     /**
-     * Writes the pixmap to the stream without closing the stream, optionally computing an 8-bit palette from the given
+     * Writes the Pixmaps to the stream without closing the stream, optionally computing an 8-bit palette from the given
      * Pixmap. If {@link #palette} is null (the default unless it has been assigned a PaletteReducer value), this will
-     * compute a palette from the given Pixmap regardless of computePalette. Optionally dithers the result if
-     * {@code dither} is true.
+     * compute a palette from all of the frames given. Otherwise, this uses the colors already in {@link #palette}.
+     * Optionally dithers the result if {@code dither} is true.
      *
      * @param file   a FileHandle that must be writable, and will have the given Pixmap written as a PNG-8 image
      * @param frames a Pixmap Array to write as a sequence of frames to the given output stream
@@ -137,10 +137,11 @@ public class AnimatedPNG8 implements Disposable {
     }
 
     /**
-     * Writes the pixmap to the stream without closing the stream, optionally computing an 8-bit palette from the given
-     * Pixmap. If {@link #palette} is null (the default unless it has been assigned a PaletteReducer value), this will
-     * compute a palette from the given Pixmap regardless of computePalette.
-     *
+     * Writes the Pixmaps to the stream without closing the stream, optionally computing an 8-bit palette from the given
+     * Pixmaps. If {@link #palette} is null (the default unless it has been assigned a PaletteReducer value), this will
+     * compute a palette from all of the frames given. Otherwise, this uses the colors already in {@link #palette}.
+     * Optionally dithers the result if {@code dither} is true.
+     * 
      * @param output an OutputStream that will not be closed
      * @param frames a Pixmap Array to write as a sequence of frames to the given output stream
      * @param fps    how many frames per second the animation should run at
@@ -148,7 +149,7 @@ public class AnimatedPNG8 implements Disposable {
      */
     public void write(OutputStream output, Array<Pixmap> frames, int fps, boolean dither) throws IOException {
         if (palette == null)
-            palette = new PaletteReducer();
+            palette = new PaletteReducer(frames);
         if (dither)
             writeDithered(output, frames, fps);
         else
@@ -335,34 +336,13 @@ public class AnimatedPNG8 implements Disposable {
         buffer.endChunk(dataOutput);
 
         byte[] lineOut, curLine, prevLine;
-        byte[] curErrorRed, nextErrorRed, curErrorGreen, nextErrorGreen, curErrorBlue, nextErrorBlue;
-        int color;
-        if (palette.curErrorRedBytes == null) {
-            curErrorRed = (palette.curErrorRedBytes = new ByteArray(width)).items;
-            nextErrorRed = (palette.nextErrorRedBytes = new ByteArray(width)).items;
-            curErrorGreen = (palette.curErrorGreenBytes = new ByteArray(width)).items;
-            nextErrorGreen = (palette.nextErrorGreenBytes = new ByteArray(width)).items;
-            curErrorBlue = (palette.curErrorBlueBytes = new ByteArray(width)).items;
-            nextErrorBlue = (palette.nextErrorBlueBytes = new ByteArray(width)).items;
-        } else {
-            curErrorRed = palette.curErrorRedBytes.ensureCapacity(width);
-            nextErrorRed = palette.nextErrorRedBytes.ensureCapacity(width);
-            curErrorGreen = palette.curErrorGreenBytes.ensureCapacity(width);
-            nextErrorGreen = palette.nextErrorGreenBytes.ensureCapacity(width);
-            curErrorBlue = palette.curErrorBlueBytes.ensureCapacity(width);
-            nextErrorBlue = palette.nextErrorBlueBytes.ensureCapacity(width);
-            for (int i = 0; i < width; i++) {
-                nextErrorRed[i] = 0;
-                nextErrorGreen[i] = 0;
-                nextErrorBlue[i] = 0;
-            }
-        }
+        int color, used;
 
         lastLineLen = width;
 
-        int used, rdiff, gdiff, bdiff;
-        byte er, eg, eb, paletteIndex;
-        float w1 = palette.ditherStrength * 0.125f, w3 = w1 * 3f, w5 = w1 * 5f, w7 = w1 * 7f;
+        byte paletteIndex;
+        float pos, adj;
+        final float strength = palette.ditherStrength * 3.25f;
 
         int seq = 0;
         for (int i = 0; i < frames.size; i++) {
@@ -404,54 +384,34 @@ public class AnimatedPNG8 implements Disposable {
             for (int y = 0; y < height; y++) {
                 int py = flipY ? (height - y - 1) : y;
                 int ny = flipY ? (height - y - 2) : y + 1;
-                for (int x = 0; x < width; x++) {
-                    curErrorRed[x] = nextErrorRed[x];
-                    curErrorGreen[x] = nextErrorGreen[x];
-                    curErrorBlue[x] = nextErrorBlue[x];
-                    nextErrorRed[x] = 0;
-                    nextErrorGreen[x] = 0;
-                    nextErrorBlue[x] = 0;
-                }
                 for (int px = 0; px < width; px++) {
                     color = pixmap.getPixel(px, py) & 0xF8F8F880;
                     if ((color & 0x80) == 0 && hasTransparent)
                         curLine[px] = 0;
                     else {
-                        er = curErrorRed[px];
-                        eg = curErrorGreen[px];
-                        eb = curErrorBlue[px];
                         color |= (color >>> 5 & 0x07070700) | 0xFE;
-                        int rr = MathUtils.clamp(((color >>> 24)) + (er), 0, 0xFF);
-                        int gg = MathUtils.clamp(((color >>> 16) & 0xFF) + (eg), 0, 0xFF);
-                        int bb = MathUtils.clamp(((color >>> 8) & 0xFF) + (eb), 0, 0xFF);
-                        curLine[px] = paletteIndex =
+                        int rr = ((color >>> 24)       );
+                        int gg = ((color >>> 16) & 0xFF);
+                        int bb = ((color >>> 8)  & 0xFF);
+                        paletteIndex =
                                 paletteMapping[((rr << 7) & 0x7C00)
                                         | ((gg << 2) & 0x3E0)
                                         | ((bb >>> 3))];
                         used = paletteArray[paletteIndex & 0xFF];
-                        rdiff = (color >>> 24) - (used >>> 24);
-                        gdiff = (color >>> 16 & 255) - (used >>> 16 & 255);
-                        bdiff = (color >>> 8 & 255) - (used >>> 8 & 255);
-                        if (px < width - 1) {
-                            curErrorRed[px + 1] += rdiff * w7;
-                            curErrorGreen[px + 1] += gdiff * w7;
-                            curErrorBlue[px + 1] += bdiff * w7;
-                        }
-                        if (ny < height) {
-                            if (px > 0) {
-                                nextErrorRed[px - 1] += rdiff * w3;
-                                nextErrorGreen[px - 1] += gdiff * w3;
-                                nextErrorBlue[px - 1] += bdiff * w3;
-                            }
-                            if (px < width - 1) {
-                                nextErrorRed[px + 1] += rdiff * w1;
-                                nextErrorGreen[px + 1] += gdiff * w1;
-                                nextErrorBlue[px + 1] += bdiff * w1;
-                            }
-                            nextErrorRed[px] += rdiff * w5;
-                            nextErrorGreen[px] += gdiff * w5;
-                            nextErrorBlue[px] += bdiff * w5;
-                        }
+                        
+                        pos = (px * 0.06711056f + y * 0.00583715f);
+                        pos -= (int)pos;
+                        pos *= 52.9829189f;
+                        pos -= (int)pos;
+                        adj = ((float) Math.sqrt(pos) * pos - 0.3125f) * strength;
+
+                        rr = MathUtils.clamp((int) (rr + (adj * ((rr - (used >>> 24))))), 0, 0xFF);
+                        gg = MathUtils.clamp((int) (gg + (adj * ((gg - (used >>> 16 & 0xFF))))), 0, 0xFF);
+                        bb = MathUtils.clamp((int) (bb + (adj * ((bb - (used >>> 8 & 0xFF))))), 0, 0xFF);
+                        curLine[px] = paletteMapping[((rr << 7) & 0x7C00)
+                                | ((gg << 2) & 0x3E0)
+                                | ((bb >>> 3))];
+
                     }
                 }
                 lineOut[0] = (byte) (curLine[0] - prevLine[0]);
