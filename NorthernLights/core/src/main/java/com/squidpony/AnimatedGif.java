@@ -30,7 +30,7 @@ public class AnimatedGif {
 
     private void write(OutputStream output, Array<Pixmap> frames, int fps) throws IOException {
         if (palette == null)
-            palette = new PaletteReducer();
+            palette = new PaletteReducer(frames);
         start(output);
         setFrameRate(fps);
         for (int i = 0; i < frames.size; i++) {
@@ -273,12 +273,12 @@ public class AnimatedGif {
             usedEntry[i] = false;
         }
         // map image pixels to new palette
-        int color, used;
+        int color, used, flipped = height - 1;
         boolean hasTransparent = paletteArray[0] == 0;
         float pos, adj, strength = palette.ditherStrength * 3.25f;
         for (int y = 0, i = 0; y < height && i < nPix; y++) {
             for (int px = 0; px < width & i < nPix; px++) {
-                color = image.getPixel(px, y) & 0xF8F8F880;
+                color = image.getPixel(px, flipped - y) & 0xF8F8F880;
                 if ((color & 0x80) == 0 && hasTransparent)
                     indexedPixels[i++] = 0;
                 else {

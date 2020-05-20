@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.squidpony.AnimatedGif;
 import com.squidpony.AnimatedPNG;
 import com.squidpony.AnimatedPNG8;
 import com.squidpony.MutantBatch;
@@ -28,6 +29,7 @@ public class NorthernLights extends ApplicationAdapter {
     private Array<Pixmap> frames;
     private AnimatedPNG animatedPNG;
     private AnimatedPNG8 iapng;
+    private AnimatedGif animatedGif;
     @Override
     public void create() {
         super.create();
@@ -46,6 +48,7 @@ public class NorthernLights extends ApplicationAdapter {
         width = 256;
         height = 256;
         animatedPNG = new AnimatedPNG(width * height * 3 >>> 1);
+        animatedGif = new AnimatedGif();
         iapng = new AnimatedPNG8(width * height * 3 >>> 1);
 //        iapng.palette = new PaletteReducer(new int[]{
 //                0x00000000, 0x19092DFF, 0x213118FF, 0x314A29FF, 0x8C847BFF, 0x6E868EFF, 0x9CA59CFF, 0xAFC7CFFF,
@@ -89,6 +92,7 @@ public class NorthernLights extends ApplicationAdapter {
         try {
             animatedPNG.write(Gdx.files.local("animated" + TimeUtils.millis() + ".png"), frames, 20);
             iapng.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".png"), frames, 20);
+            animatedGif.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".gif"), frames, 20);
         } catch (IOException e) {
             e.printStackTrace();
         }
