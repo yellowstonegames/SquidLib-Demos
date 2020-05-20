@@ -9,7 +9,9 @@ import com.badlogic.gdx.utils.IntIntMap;
 import com.badlogic.gdx.utils.NumberUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Random;
 
 /**
  * Data that can be used to limit the colors present in a Pixmap or other image, here with the goal of using 256 or less
@@ -53,13 +55,17 @@ public class PaletteReducer {
             0xFF50BFFF, 0xFF6AC5FF, 0xFAA0B9FF, 0xFC3A8CFF, 0xE61E78FF, 0xBD1039FF, 0x98344DFF, 0x911437FF,
     };
 
-    public interface ColorMetric{
-        double difference(final int color1, int color2);
-        double difference(final int color1, int r2, int g2, int b2);
-        double difference(final int r1, final int g1, final int b1, final int r2, final int g2, final int b2);
-    }
-    
-    public static final double[][] labs = new double[3][0x8000];
+    /**
+     * Stores CIE LAB components corresponding to RGB555 indices.
+     * LAB[0] stores lightness from 0.0 to 100.0 .
+     * LAB[1] stores CIE A, which is something like a green-red axis, from roughly -128.0 (green) to 128.0 (red).
+     * LAB[2] stores CIE B, which is something like a blue-yellow axis, from roughly -128.0 (blue) to 128.0 (yellow).
+     * <br>
+     * The indices into each of these double[] values store red in bits 10-14, green in bits 5-9, and blue in bits 0-4.
+     * It's usually easier to work with these indices with bitwise operations, as with {@code (r << 10 | g << 5 | b)},
+     * where r, g, and b are all in the 0-31 range inclusive.
+     */
+    public static final double[][] LAB = new double[3][0x8000];
     static {
         double r, g, b, x, y, z;
         int idx = 0;
@@ -81,9 +87,9 @@ public class PaletteReducer {
                     y = (y > 0.008856) ? Math.cbrt(y) : (7.787037037037037 * y) + 0.13793103448275862;
                     z = (z > 0.008856) ? Math.cbrt(z) : (7.787037037037037 * z) + 0.13793103448275862;
 
-                    labs[0][idx] = (116.0 * y) - 16.0;
-                    labs[1][idx] = 500.0 * (x - y);
-                    labs[2][idx] = 200.0 * (y - z);
+                    LAB[0][idx] = (116.0 * y) - 16.0;
+                    LAB[1][idx] = 500.0 * (x - y);
+                    LAB[2][idx] = 200.0 * (y - z);
                     idx++;
                 }
             }
@@ -91,43 +97,13 @@ public class PaletteReducer {
     }
 
 
-    public static final ColorMetric labQuickMetric = new ColorMetric(){
-        @Override
-        public double difference(int color1, int color2) {
-            return difference(color1 >>> 24, color1 >>> 16 & 0xFF, color1 >>> 8 & 0xFF, color2 >>> 24, color2 >>> 16 & 0xFF, color2 >>> 8 & 0xFF);
-        }
-
-        @Override
-        public double difference(int color1, int r2, int g2, int b2) {
-            int indexA = (color1 >>> 17 & 0x7C00) | (color1 >>> 14 & 0x3E0) | (color1 >>> 11 & 0x1F),
-                    indexB = (r2 << 7 & 0x7C00) | (g2 << 2 & 0x3E0) | (b2 >>> 3);
-            final double
-                    L = labs[0][indexA] - labs[0][indexB],
-                    A = labs[1][indexA] - labs[1][indexB],
-                    B = labs[2][indexA] - labs[2][indexB];
-            return L * L * 7 + A * A + B * B;
-        }
-
-        @Override
-        public double difference(int r1, int g1, int b1, int r2, int g2, int b2) {
-            int indexA = (r1 << 7 & 0x7C00) | (g1 << 2 & 0x3E0) | (b1 >>> 3),
-                    indexB = (r2 << 7 & 0x7C00) | (g2 << 2 & 0x3E0) | (b2 >>> 3);
-            final double
-                    L = labs[0][indexA] - labs[0][indexB],
-                    A = labs[1][indexA] - labs[1][indexB],
-                    B = labs[2][indexA] - labs[2][indexB];
-            return L * L * 7 + A * A + B * B;
-//            return L * L * 11.0 + A * A * 0.625 + B * B;
-        }
-    };
-
     public byte[] paletteMapping;
     public final int[] paletteArray = new int[256];
     ByteArray curErrorRedBytes, nextErrorRedBytes, curErrorGreenBytes, nextErrorGreenBytes, curErrorBlueBytes, nextErrorBlueBytes;
     float ditherStrength = 0.5f, halfDitherStrength = 0.25f;
 
     /**
-     * This stores a preload code for a PaletteReducer using {@link #AURORA} with {@link #labQuickMetric}. Using
+     * This stores a preload code for a PaletteReducer using {@link #AURORA} with a CIE LAB-based metric. Using
      * a preload code in the constructor {@link #PaletteReducer(int[], byte[])} eliminates the time needed to fill 32 KB
      * of palette mapping in a somewhat-intricate way that only gets more intricate with better metrics, and replaces it
      * with a straightforward load from a String into a 32KB byte array.
@@ -139,7 +115,6 @@ public class PaletteReducer {
      * Constructs a default PaletteReducer that uses the DawnBringer Aurora palette.
      */
     public PaletteReducer() {
-        //this(Coloring.AURORA);
         exact(AURORA, ENCODED_AURORA);
     }
 
@@ -224,9 +199,9 @@ public class PaletteReducer {
         int indexA = (color1 >>> 17 & 0x7C00) | (color1 >>> 14 & 0x3E0) | (color1 >>> 11 & 0x1F),
                 indexB = (color2 >>> 17 & 0x7C00) | (color2 >>> 14 & 0x3E0) | (color2 >>> 11 & 0x1F);
         final double
-                L = labs[0][indexA] - labs[0][indexB],
-                A = labs[1][indexA] - labs[1][indexB],
-                B = labs[2][indexA] - labs[2][indexB];
+                L = LAB[0][indexA] - LAB[0][indexB],
+                A = LAB[1][indexA] - LAB[1][indexB],
+                B = LAB[2][indexA] - LAB[2][indexB];
         return (L * L * 7 + A * A + B * B);
     }
 
@@ -245,31 +220,32 @@ public class PaletteReducer {
         int indexA = (color1 >>> 17 & 0x7C00) | (color1 >>> 14 & 0x3E0) | (color1 >>> 11 & 0x1F),
                 indexB = (r2 << 7 & 0x7C00) | (g2 << 2 & 0x3E0) | (b2 >>> 3);
         final double
-                L = labs[0][indexA] - labs[0][indexB],
-                A = labs[1][indexA] - labs[1][indexB],
-                B = labs[2][indexA] - labs[2][indexB];
+                L = LAB[0][indexA] - LAB[0][indexB],
+                A = LAB[1][indexA] - LAB[1][indexB],
+                B = LAB[2][indexA] - LAB[2][indexB];
         return (L * L * 7 + A * A + B * B);
     }
 
     /**
-     * Color difference metric; returns large numbers even for smallish differences.
+     * Color difference metric; returns large numbers even for smallish differences -- note that this takes its RGB
+     * channel values in the 0-31 range instead of the 0-255 range.
      * If this returns 250 or more, the colors may be perceptibly different; 500 or more almost guarantees it.
      *
-     * @param r1 red value from 0 to 255, inclusive
-     * @param g1 green value from 0 to 255, inclusive
-     * @param b1 blue value from 0 to 255, inclusive
-     * @param r2 red value from 0 to 255, inclusive
-     * @param g2 green value from 0 to 255, inclusive
-     * @param b2 blue value from 0 to 255, inclusive
+     * @param r1 red value from 0 to 31, inclusive
+     * @param g1 green value from 0 to 31, inclusive
+     * @param b1 blue value from 0 to 31, inclusive
+     * @param r2 red value from 0 to 31, inclusive
+     * @param g2 green value from 0 to 31, inclusive
+     * @param b2 blue value from 0 to 31, inclusive
      * @return the difference between the given colors, as a positive double
      */
     public static double difference(final int r1, final int g1, final int b1, final int r2, final int g2, final int b2) {
-        int indexA = (r1 << 7 & 0x7C00) | (g1 << 2 & 0x3E0) | (b1 >>> 3),
-                indexB = (r2 << 7 & 0x7C00) | (g2 << 2 & 0x3E0) | (b2 >>> 3);
+        int indexA = (r1 << 10 & 0x7C00) | (g1 << 5 & 0x3E0) | (b1 & 0x1F),
+                indexB = (r2 << 10 & 0x7C00) | (g2 << 5 & 0x3E0) | (b2 & 0x1F);
         final double
-                L = labs[0][indexA] - labs[0][indexB],
-                A = labs[1][indexA] - labs[1][indexB],
-                B = labs[2][indexA] - labs[2][indexB];
+                L = LAB[0][indexA] - LAB[0][indexB],
+                A = LAB[1][indexA] - LAB[1][indexB],
+                B = LAB[2][indexA] - LAB[2][indexB];
         return (L * L * 7 + A * A + B * B);
     }
 
@@ -446,21 +422,22 @@ public class PaletteReducer {
         analyze(pixmap, threshold, 256);
     }
     /**
-     * Analyzes {@code pixmap} for color count and frequency, building a palette with at most 256 colors if there are
-     * too many colors to store in a PNG-8 palette. If there are 256 or less colors, this uses the exact colors
-     * (although with at most one transparent color, and no alpha for other colors); if there are more than 256 colors
-     * or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even if the image has no
-     * transparency). Because calling {@link #reduce(Pixmap)} (or any of PNG8's write methods) will dither colors that
-     * aren't exact, and dithering works better when the palette can choose colors that are sufficiently different, this
-     * takes a threshold value to determine whether it should permit a less-common color into the palette, and if the
-     * second color is different enough (as measured by {@link #difference(int, int)}) by a value of at least
-     * {@code threshold}, it is allowed in the palette, otherwise it is kept out for being too similar to existing
-     * colors. The threshold is usually between 250 and 1000, and 400 is a good default. This doesn't return a value but
-     * instead stores the palette info in this object; a PaletteReducer can be assigned to the
-     * {@link AnimatedPNG8#palette} field or can be used directly to {@link #reduce(Pixmap)} a Pixmap.
+     * Analyzes {@code pixmap} for color count and frequency, building a palette with at most {@code limit} colors.
+     * If there are {@code limit} or less colors, this uses the exact colors (although with at most one transparent
+     * color, and no alpha for other colors); if there are more than {@code limit} colors or any colors have 50% or less
+     * alpha, it will reserve a palette entry for transparent (even if the image has no transparency). Because calling
+     * {@link #reduce(Pixmap)} (or any of PNG8's write methods) will dither colors that aren't exact, and dithering
+     * works better when the palette can choose colors that are sufficiently different, this takes a threshold value to
+     * determine whether it should permit a less-common color into the palette, and if the second color is different
+     * enough (as measured by {@link #difference(int, int)}) by a value of at least {@code threshold}, it is allowed in
+     * the palette, otherwise it is kept out for being too similar to existing colors. The threshold is usually between
+     * 250 and 1000, and 400 is a good default. This doesn't return a value but instead stores the palette info in this
+     * object; a PaletteReducer can be assigned to the {@link AnimatedPNG8#palette} or {@link AnimatedGif#palette}
+     * fields, or can be used directly to {@link #reduce(Pixmap)} a Pixmap.
      *
      * @param pixmap    a Pixmap to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)} or by PNG8
      * @param threshold a minimum color difference as produced by {@link #difference(int, int)}; usually between 250 and 1000, 400 is a good default
+     * @param limit     the maximum number of colors to allow in the resulting palette; typically no more than 256
      */
     public void analyze(Pixmap pixmap, int threshold, int limit) {
         Arrays.fill(paletteArray, 0);
@@ -482,7 +459,7 @@ public class PaletteReducer {
             }
         }
         final int cs = counts.size;
-        ArrayList<IntIntMap.Entry> es = new ArrayList<>(cs);
+        Array<IntIntMap.Entry> es = new Array<>(cs);
         for(IntIntMap.Entry e : counts)
         {
             IntIntMap.Entry e2 = new IntIntMap.Entry();
@@ -490,7 +467,130 @@ public class PaletteReducer {
             e2.value = e.value;
             es.add(e2);
         }
-        Collections.sort(es, entryComparator);
+        es.sort(entryComparator);
+        if (cs + hasTransparent <= limit) {
+            int i = hasTransparent;
+            for(IntIntMap.Entry e : es) {
+                color = e.key;
+                paletteArray[i] = color;
+                color = (color >>> 17 & 0x7C00) | (color >>> 14 & 0x3E0) | (color >>> 11 & 0x1F);
+                paletteMapping[color] = (byte) i;
+                reds[i] = color >>> 10;
+                greens[i] = color >>> 5 & 31;
+                blues[i] = color & 31;
+                i++;
+            }
+        } else // reduce color count
+        {
+            int i = 1, c = 0;
+            PER_BEST:
+            for (; i < limit && c < cs;) {
+                color = es.get(c++).key;
+                for (int j = 1; j < i; j++) {
+                    if (difference(color, paletteArray[j]) < threshold)
+                        continue PER_BEST;
+                }
+                paletteArray[i] = color;
+                color = (color >>> 17 & 0x7C00) | (color >>> 14 & 0x3E0) | (color >>> 11 & 0x1F);
+                paletteMapping[color] = (byte) i;
+                reds[i] = color >>> 10;
+                greens[i] = color >>> 5 & 31;
+                blues[i] = color & 31;
+                i++;
+            }
+        }
+        int c2;
+        double dist;
+        for (int r = 0; r < 32; r++) {
+            for (int g = 0; g < 32; g++) {
+                for (int b = 0; b < 32; b++) {
+                    c2 = r << 10 | g << 5 | b;
+                    if (paletteMapping[c2] == 0) {
+                        dist = Double.POSITIVE_INFINITY;
+                        for (int i = 1; i < limit; i++) {
+                            if (dist > (dist = Math.min(dist, difference(reds[i], greens[i], blues[i], r, g, b))))
+                                paletteMapping[c2] = (byte) i;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Analyzes all of the Pixmap items in {@code pixmaps} for color count and frequency (as if they are one image),
+     * building a palette with at most {@code limit} colors. If there are {@code limit} or less colors, this uses the
+     * exact colors (although with at most one transparent color, and no alpha for other colors); if there are more than
+     * {@code limit} colors or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even
+     * if the image has no transparency). Because calling {@link #reduce(Pixmap)} (or any of PNG8's write methods) will
+     * dither colors that aren't exact, and dithering works better when the palette can choose colors that are
+     * sufficiently different, this takes a threshold value to determine whether it should permit a less-common color
+     * into the palette, and if the second color is different enough (as measured by {@link #difference(int, int)}) by a
+     * value of at least {@code threshold}, it is allowed in the palette, otherwise it is kept out for being too similar
+     * to existing colors. The threshold is usually between 250 and 1000, and 400 is a good default. This doesn't return
+     * a value but instead stores the palette info in this object; a PaletteReducer can be assigned to the
+     * {@link AnimatedPNG8#palette} or {@link AnimatedGif#palette} fields, or can be used directly to
+     * {@link #reduce(Pixmap)} a Pixmap.
+     *
+     * @param pixmaps   a Pixmap Array to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)}, by AnimatedGif, or by AnimatedPNG8
+     * @param threshold a minimum color difference as produced by {@link #difference(int, int)}; usually between 250 and 1000, 400 is a good default
+     * @param limit     the maximum number of colors to allow in the resulting palette; typically no more than 256
+     */
+    public void analyze(Array<Pixmap> pixmaps, int threshold, int limit){
+        
+    }
+    /**
+     * Analyzes all of the Pixmap items in {@code pixmaps} for color count and frequency (as if they are one image),
+     * building a palette with at most {@code limit} colors. If there are {@code limit} or less colors, this uses the
+     * exact colors (although with at most one transparent color, and no alpha for other colors); if there are more than
+     * {@code limit} colors or any colors have 50% or less alpha, it will reserve a palette entry for transparent (even
+     * if the image has no transparency). Because calling {@link #reduce(Pixmap)} (or any of PNG8's write methods) will
+     * dither colors that aren't exact, and dithering works better when the palette can choose colors that are
+     * sufficiently different, this takes a threshold value to determine whether it should permit a less-common color
+     * into the palette, and if the second color is different enough (as measured by {@link #difference(int, int)}) by a
+     * value of at least {@code threshold}, it is allowed in the palette, otherwise it is kept out for being too similar
+     * to existing colors. The threshold is usually between 250 and 1000, and 400 is a good default. This doesn't return
+     * a value but instead stores the palette info in this object; a PaletteReducer can be assigned to the
+     * {@link AnimatedPNG8#palette} or {@link AnimatedGif#palette} fields, or can be used directly to
+     * {@link #reduce(Pixmap)} a Pixmap.
+     *
+     * @param pixmaps   a Pixmap array to analyze, making a palette which can be used by this to {@link #reduce(Pixmap)}, by AnimatedGif, or by AnimatedPNG8
+     * @param pixmapCount the maximum number of Pixmap entries in pixmaps to use
+     * @param threshold a minimum color difference as produced by {@link #difference(int, int)}; usually between 250 and 1000, 400 is a good default
+     * @param limit     the maximum number of colors to allow in the resulting palette; typically no more than 256
+     */
+    public void analyze(Pixmap[] pixmaps, int pixmapCount, int threshold, int limit) {
+        Arrays.fill(paletteArray, 0);
+        Arrays.fill(paletteMapping, (byte) 0);
+        int color;
+        IntIntMap counts = new IntIntMap(limit);
+        int hasTransparent = 0;
+        int[] reds = new int[limit], greens = new int[limit], blues = new int[limit];
+        for (int i = 0; i < pixmapCount && i < pixmaps.length; i++) {
+            Pixmap pixmap = pixmaps[i];
+            final int width = pixmap.getWidth(), height = pixmap.getHeight();
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    color = pixmap.getPixel(x, y);
+                    if ((color & 0x80) != 0) {
+                        color |= (color >>> 5 & 0x07070700) | 0xFE;
+                        counts.getAndIncrement(color, 0, 1);
+                    } else {
+                        hasTransparent = 1;
+                    }
+                }
+            }
+        }
+        final int cs = counts.size;
+        Array<IntIntMap.Entry> es = new Array<>(cs);
+        for(IntIntMap.Entry e : counts)
+        {
+            IntIntMap.Entry e2 = new IntIntMap.Entry();
+            e2.key = e.key;
+            e2.value = e.value;
+            es.add(e2);
+        }
+        es.sort(entryComparator);
         if (cs + hasTransparent <= limit) {
             int i = hasTransparent;
             for(IntIntMap.Entry e : es) {
