@@ -275,7 +275,7 @@ public class AnimatedGif {
         // map image pixels to new palette
         int color, used, flipped = height - 1;
         boolean hasTransparent = paletteArray[0] == 0;
-        float pos, adj, strength = palette.ditherStrength * 3.25f;
+        float pos, adj, strength = palette.ditherStrength * 3.333f;
         for (int y = 0, i = 0; y < height && i < nPix; y++) {
             for (int px = 0; px < width & i < nPix; px++) {
                 color = image.getPixel(px, flipped - y) & 0xF8F8F880;
@@ -293,11 +293,10 @@ public class AnimatedGif {
                     pos -= (int) pos;
                     pos *= 52.9829189f;
                     pos -= (int) pos;
-                    // sqrt on a float arg, cast to float, can use specialized JVM instructions
-                    adj = ((float) Math.sqrt(pos) * pos - 0.3125f) * strength;
-                    rr = MathUtils.clamp((int) (rr + (adj * ((rr - (used >>> 24))))), 0, 0xFF);
-                    gg = MathUtils.clamp((int) (gg + (adj * ((gg - (used >>> 16 & 0xFF))))), 0, 0xFF);
-                    bb = MathUtils.clamp((int) (bb + (adj * ((bb - (used >>> 8 & 0xFF))))), 0, 0xFF);
+                    adj = (pos * pos - 0.3f) * strength;
+                    rr = MathUtils.clamp((int) (rr + (adj * (rr - (used >>> 24       )))), 0, 0xFF);
+                    gg = MathUtils.clamp((int) (gg + (adj * (gg - (used >>> 16 & 0xFF)))), 0, 0xFF);
+                    bb = MathUtils.clamp((int) (bb + (adj * (bb - (used >>> 8  & 0xFF)))), 0, 0xFF);
                     usedEntry[(indexedPixels[i] = paletteMapping[((rr << 7) & 0x7C00)
                             | ((gg << 2) & 0x3E0)
                             | ((bb >>> 3))]) & 255] = true;

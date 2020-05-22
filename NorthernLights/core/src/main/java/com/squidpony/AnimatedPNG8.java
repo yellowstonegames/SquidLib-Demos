@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.StreamUtils;
-import com.github.tommyettinger.bluegrass.BlueNoise;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -366,7 +365,7 @@ public class AnimatedPNG8 implements Disposable {
 
         byte paletteIndex;
         float pos, adj;
-        final float strength = palette.ditherStrength * 4f;
+        final float strength = palette.ditherStrength * 3.333f;
 
         int seq = 0;
         for (int i = 0; i < frames.size; i++) {
@@ -421,18 +420,19 @@ public class AnimatedPNG8 implements Disposable {
                                         | ((gg << 2) & 0x3E0)
                                         | ((bb >>> 3))];
                         used = paletteArray[paletteIndex & 0xFF];
-                    adj = (-0.25f + acos_((BlueNoise.getChosen(px, y, i * 31) + 0.5f) * 0.00784313725490196f)
-                            + (BlueNoise.get(~px, ~y, ~i) + 0.5f) * 0.0019607844f) * strength;
+//                        adj = (acos_((BlueNoise.get(px, y, i) + 0.5f) * 0.00784313725490196f) - 0.25f) * strength;
                         
-//                        pos = (px * 0.06711056f + y * 0.00583715f);
-//                        pos -= (int)pos;
-//                        pos *= 52.9829189f;
-//                        pos -= (int)pos;
-//                        adj = ((float)Math.sqrt(pos) * pos - 0.25f) * strength;
+                        pos = (px * 0.06711056f + y * 0.00583715f);
+                        pos -= (int)pos;
+                        pos *= 52.9829189f;
+                        pos -= (int)pos;
+                        adj = (pos * pos - 0.3f) * strength;
+//                        adj = ((float)Math.sqrt(pos) * pos - 0.3125f) * strength;
                         //pos = (BlueNoise.get(y, px, ~i) + 0.5f) * 0.00784313725490196f; // -1f to 1f
-                        rr = MathUtils.clamp((int) (rr + (adj * (0.5f + rr - (used >>> 24       )))), 0, 0xFF);
-                        gg = MathUtils.clamp((int) (gg + (adj * (0.5f + gg - (used >>> 16 & 0xFF)))), 0, 0xFF);
-                        bb = MathUtils.clamp((int) (bb + (adj * (0.5f + bb - (used >>> 8  & 0xFF)))), 0, 0xFF);
+                        // (BlueNoise.get(px, y, i) + 0.5f) * 0.00392156862745098f // -0.5f to 0.5f
+                        rr = MathUtils.clamp((int) (rr + (adj * (rr - (used >>> 24       )))), 0, 0xFF);
+                        gg = MathUtils.clamp((int) (gg + (adj * (gg - (used >>> 16 & 0xFF)))), 0, 0xFF);
+                        bb = MathUtils.clamp((int) (bb + (adj * (bb - (used >>> 8  & 0xFF)))), 0, 0xFF);
                         curLine[px] = paletteMapping[((rr << 7) & 0x7C00)
                                 | ((gg << 2) & 0x3E0)
                                 | ((bb >>> 3))];
