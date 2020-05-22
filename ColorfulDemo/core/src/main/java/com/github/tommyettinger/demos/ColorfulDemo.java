@@ -373,7 +373,7 @@ public class ColorfulDemo extends ApplicationAdapter {
                     new AnimatedGlider(new Animation<>(DURATION,
                             atlas.findRegions(enemy), Animation.PlayMode.LOOP), monPos);
             float monColor = Palette.LIST.get((int)(((i+257)*0x9E3779B9 & 0xFFFFFFFFL)*255L >>> 32)+1);
-            monster.setTweakedColor(FloatColors.floatColor(luma(monColor) * 0.5f + 0.4f, chromaWarm(monColor), chromaMild(monColor), alpha(monColor)), FloatColors.floatColor(0.4f, 0.25f, 0.25f, 0.75f));
+            monster.setColor(luma(monColor) * 0.5f + 0.4f, chromaWarm(monColor), chromaMild(monColor), alpha(monColor));
 //            monster.setPackedColor(FloatColors.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monsters.put(monPos, monster);
@@ -651,7 +651,7 @@ public class ColorfulDemo extends ApplicationAdapter {
                     pos.set(i, j);
                     batch.setPackedColor(bgColors[i][j]);//
                     batch.setTweak(toCursor.contains(Coord.get(i, j)) ? 1f :
-                            (float)visible[i][j] * 0.5f + 0.25f, 0.53125f, 0.53125f, 0.5625f);
+                            (float)visible[i][j] * 0.5f + 0.125f, 0.40625f, 0.40625f, 0.625f);
 //                    batch.setPackedColor(toCursor.contains(Coord.get(i, j))
 //                            ? FloatColors.lerpFloatColors(bgColors[i][j], Palette.ANGEL_WING, 0.9f)
 //                            : FloatColors.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
@@ -662,14 +662,14 @@ public class ColorfulDemo extends ApplicationAdapter {
                     pos.set(i, j);
                     batch.setPackedColor(bgColors[i][j]);
 //                    batch.setPackedColor(FloatColors.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
-                    batch.setTweak(0.2f, 0.2f, 0.2f, 0.25f);
+                    batch.setTweak(0.1f, 0.2f, 0.2f, 0.25f);
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.get('.', solid), pos.x, pos.y, 1, 1);
                     batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y, 1, 1);
                 }
             }
         }
-        batch.setPackedColor(FLOAT_WHITE);
+
         AnimatedGlider monster;
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {

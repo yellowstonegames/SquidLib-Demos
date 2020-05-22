@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.github.tommyettinger.colorful.ColorfulSprite;
+import com.github.tommyettinger.colorful.FloatColors;
 import com.github.tommyettinger.colorful.Palette;
 import squidpony.squidmath.Coord;
 
@@ -23,13 +24,13 @@ public class AnimatedGlider extends ColorfulSprite {
     private AnimatedGlider()
     {
         super();
-        setColor(Palette.GRAY);
+        setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.5f, 0.375f, 0.375f, 0.75f));
     }
     public AnimatedGlider(Animation<TextureRegion> animation) {
         super();
         this.animation = animation;
         setRegion(animation.getKeyFrame(0f));
-        setColor(Palette.GRAY);
+        setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.5f, 0.375f, 0.375f, 0.75f));
     }
 
     public AnimatedGlider(Animation<TextureRegion> animation, Coord coord) {
@@ -41,7 +42,7 @@ public class AnimatedGlider extends ColorfulSprite {
         this.animation = animation;
         setSize(1, 1);
         setRegion(animation.getKeyFrame(0f));
-        setColor(Palette.GRAY);
+        setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.5f, 0.375f, 0.375f, 0.75f));
         this.start = start;
         this.end = end;
     }

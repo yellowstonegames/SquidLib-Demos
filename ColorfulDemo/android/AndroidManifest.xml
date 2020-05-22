@@ -11,7 +11,7 @@
         <activity
                 android:name="com.github.tommyettinger.demos.android.AndroidLauncher"
                 android:label="@string/app_name"
-                android:screenOrientation="landscape"
+                android:screenOrientation="unspecified"
                 android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

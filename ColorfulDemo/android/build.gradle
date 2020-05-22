@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 
 android {
 	compileSdkVersion 28
+	buildToolsVersion '28.0.3'
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -30,7 +31,7 @@ android {
 		exclude 'META-INF/dependencies.txt'
 	}
 	defaultConfig {
-		applicationId 'com.github.tommyettinger.demos'
+		applicationId 'com.github.tommyettinger'
 		minSdkVersion 14
 		targetSdkVersion 28
 		versionCode 1
@@ -46,14 +47,14 @@ repositories {
 configurations { natives }
 
 dependencies {
-  api project(':core')
-  api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+	api project(':core')
+	api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 
-  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
-  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
-  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
-  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
-  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+	natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
 }
 
@@ -67,7 +68,7 @@ task copyAndroidNatives() {
 		file("libs/arm64-v8a/").mkdirs()
 		file("libs/x86_64/").mkdirs()
 		file("libs/x86/").mkdirs()
-		
+
 		configurations.natives.files.each { jar ->
 			def outputDir = null
 			if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
@@ -107,5 +108,5 @@ task run(type: Exec) {
 	}
 
 	def adb = path + "/platform-tools/adb"
-	commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.tommyettinger.demos/com.github.tommyettinger.demos.android.AndroidLauncher'
+	commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.tommyettinger/com.github.tommyettinger.android.AndroidLauncher'
 }
