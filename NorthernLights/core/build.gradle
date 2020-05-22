@@ -3,5 +3,5 @@ eclipse.project.name = appName + '-core'
 
 dependencies {
   compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-//  compile "com.github.Anuken:GdxGifRecorder:1.3"
+  compile "com.github.tommyettinger:bluegrass:0.1.1"
 }

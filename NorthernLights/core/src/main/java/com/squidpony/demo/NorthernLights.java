@@ -9,10 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.squidpony.AnimatedGif;
-import com.squidpony.AnimatedPNG;
-import com.squidpony.AnimatedPNG8;
-import com.squidpony.MutantBatch;
+import com.squidpony.*;
 
 import java.io.IOException;
 
@@ -49,7 +46,9 @@ public class NorthernLights extends ApplicationAdapter {
         height = 256;
         animatedPNG = new AnimatedPNG(width * height * 3 >>> 1);
         animatedGif = new AnimatedGif();
+//        animatedGif.palette = new PaletteReducer(new int[]{0, 255, -1});
         iapng = new AnimatedPNG8(width * height * 3 >>> 1);
+//        iapng.palette = animatedGif.palette;
 //        iapng.palette = new PaletteReducer(new int[]{
 //                0x00000000, 0x19092DFF, 0x213118FF, 0x314A29FF, 0x8C847BFF, 0x6E868EFF, 0x9CA59CFF, 0xAFC7CFFF,
 //                0xD6F7D6FF, 0xFBD7EBFF, 0xFDFBE3FF, 0xE73129FF, 0x7B2921FF, 0xE79C94FF, 0xBF4529FF, 0xE35A00FF,

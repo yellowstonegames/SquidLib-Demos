@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ByteArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.StreamUtils;
+import com.github.tommyettinger.bluegrass.BlueNoise;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -291,6 +292,29 @@ public class AnimatedPNG8 implements Disposable {
 
         output.flush();
     }
+    /**
+     * Inverse cosine function (arccos) but with output measured in turns instead of radians. Possible results for this
+     * range from 0.0f (inclusive) to 0.5f (inclusive).
+     * <br>
+     * This method is extremely similar to the non-turn approximation.
+     * @param n a float from -1.0f to 1.0f (both inclusive), usually the output of sin_() or cos_()
+     * @return one of the values that would produce {@code n} if it were adjusted to 1/2pi range and passed to cos() 
+     */
+    private static float acos_(final float n)
+    {
+        final float ax = Math.abs(n), ay = (float) Math.sqrt(1f - n * n);
+        if(ax < ay)
+        {
+            final float a = ax / ay, s = a * a,
+                    r = 0.25f - (((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a) * 0.15915494309189535f;
+            return (n < 0.0f) ? 0.5f - r : r;
+        }
+        else {
+            final float a = ay / ax, s = a * a,
+                    r = (((-0.0464964749f * s + 0.15931422f) * s - 0.327622764f) * s * a + a) * 0.15915494309189535f;
+            return (n < 0.0f) ? 0.5f - r : r;
+        }
+    }
 
     private void writeDithered(OutputStream output, Array<Pixmap> frames, int fps) throws IOException {
         Pixmap pixmap = frames.first();
@@ -342,7 +366,7 @@ public class AnimatedPNG8 implements Disposable {
 
         byte paletteIndex;
         float pos, adj;
-        final float strength = palette.ditherStrength * 3.25f;
+        final float strength = palette.ditherStrength * 4f;
 
         int seq = 0;
         for (int i = 0; i < frames.size; i++) {
@@ -383,7 +407,6 @@ public class AnimatedPNG8 implements Disposable {
 
             for (int y = 0; y < height; y++) {
                 int py = flipY ? (height - y - 1) : y;
-                int ny = flipY ? (height - y - 2) : y + 1;
                 for (int px = 0; px < width; px++) {
                     color = pixmap.getPixel(px, py) & 0xF8F8F880;
                     if ((color & 0x80) == 0 && hasTransparent)
@@ -398,16 +421,18 @@ public class AnimatedPNG8 implements Disposable {
                                         | ((gg << 2) & 0x3E0)
                                         | ((bb >>> 3))];
                         used = paletteArray[paletteIndex & 0xFF];
+                    adj = (-0.25f + acos_((BlueNoise.getChosen(px, y, i * 31) + 0.5f) * 0.00784313725490196f)
+                            + (BlueNoise.get(~px, ~y, ~i) + 0.5f) * 0.0019607844f) * strength;
                         
-                        pos = (px * 0.06711056f + y * 0.00583715f);
-                        pos -= (int)pos;
-                        pos *= 52.9829189f;
-                        pos -= (int)pos;
-                        adj = ((float) Math.sqrt(pos) * pos - 0.3125f) * strength;
-
-                        rr = MathUtils.clamp((int) (rr + (adj * ((rr - (used >>> 24))))), 0, 0xFF);
-                        gg = MathUtils.clamp((int) (gg + (adj * ((gg - (used >>> 16 & 0xFF))))), 0, 0xFF);
-                        bb = MathUtils.clamp((int) (bb + (adj * ((bb - (used >>> 8 & 0xFF))))), 0, 0xFF);
+//                        pos = (px * 0.06711056f + y * 0.00583715f);
+//                        pos -= (int)pos;
+//                        pos *= 52.9829189f;
+//                        pos -= (int)pos;
+//                        adj = ((float)Math.sqrt(pos) * pos - 0.25f) * strength;
+                        //pos = (BlueNoise.get(y, px, ~i) + 0.5f) * 0.00784313725490196f; // -1f to 1f
+                        rr = MathUtils.clamp((int) (rr + (adj * (0.5f + rr - (used >>> 24       )))), 0, 0xFF);
+                        gg = MathUtils.clamp((int) (gg + (adj * (0.5f + gg - (used >>> 16 & 0xFF)))), 0, 0xFF);
+                        bb = MathUtils.clamp((int) (bb + (adj * (0.5f + bb - (used >>> 8  & 0xFF)))), 0, 0xFF);
                         curLine[px] = paletteMapping[((rr << 7) & 0x7C00)
                                 | ((gg << 2) & 0x3E0)
                                 | ((bb >>> 3))];
