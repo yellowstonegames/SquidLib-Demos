@@ -78,7 +78,7 @@ public class ColorfulDemo extends ApplicationAdapter {
     private DungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
     // these use packed float colors, which avoid the overhead of creating new Color objects
-    private float[][] colors, bgColors;
+    private float[][] bgColors;
     private Coord player;
     private final int fovRange = 8;
     private Vector2 pos = new Vector2();
@@ -225,7 +225,6 @@ public class ColorfulDemo extends ApplicationAdapter {
         font.getData().setScale(0x1p-4f, 0x1p-4f);
         font.getData().markupEnabled = true;
         bgColors = ArrayTools.fill(FLOAT_LIGHTING, bigWidth, bigHeight);
-        colors = ArrayTools.fill(FLOAT_WHITE, bigWidth, bigHeight);
         solid = atlas.findRegion("pixel");
         charMapping = new IntMap<>(64);
 
@@ -338,7 +337,7 @@ public class ColorfulDemo extends ApplicationAdapter {
         player = floors.singleRandom(rng);
         playerSprite = new AnimatedGlider(new Animation<>(DURATION,
                 atlas.findRegions(rng.getRandomElement(Data.possibleCharacters)), Animation.PlayMode.LOOP), player);
-        playerSprite.setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.625f, 0.5f, 0.5f, 0.5f));
+        playerSprite.setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.5625f, 0.5f, 0.5f, 0.75f));
 //        playerColor = FloatColors.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
 //        playerSprite.setPackedColor(playerColor);
 //        playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);
@@ -373,7 +372,11 @@ public class ColorfulDemo extends ApplicationAdapter {
                     new AnimatedGlider(new Animation<>(DURATION,
                             atlas.findRegions(enemy), Animation.PlayMode.LOOP), monPos);
             float monColor = Palette.LIST.get((int)(((i+257)*0x9E3779B9 & 0xFFFFFFFFL)*255L >>> 32)+1);
-            monster.setColor(luma(monColor) * 0.5f + 0.4f, chromaWarm(monColor), chromaMild(monColor), alpha(monColor));
+            monster.setTweakedColor(luma(monColor) * 0.4f + 0.3f, 
+                    (chromaWarm(monColor) - 0.5f) * 0.375f + 0.5f, 
+                    (chromaMild(monColor) - 0.5f) * 0.375f + 0.5f, 
+                    alpha(monColor),
+                    0.46875f, 0.5f, 0.5f, 0.625f);
 //            monster.setPackedColor(FloatColors.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monsters.put(monPos, monster);
@@ -650,7 +653,7 @@ public class ColorfulDemo extends ApplicationAdapter {
                 if(visible[i][j] > 0.0) {
                     pos.set(i, j);
                     batch.setPackedColor(bgColors[i][j]);//
-                    batch.setTweak(toCursor.contains(Coord.get(i, j)) ? 1f :
+                    batch.setTweak(toCursor.contains(Coord.get(i, j)) ? 0.875f :
                             (float)visible[i][j] * 0.5f + 0.125f, 0.40625f, 0.40625f, 0.625f);
 //                    batch.setPackedColor(toCursor.contains(Coord.get(i, j))
 //                            ? FloatColors.lerpFloatColors(bgColors[i][j], Palette.ANGEL_WING, 0.9f)
