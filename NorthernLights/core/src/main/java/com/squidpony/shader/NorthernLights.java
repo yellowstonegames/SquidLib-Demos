@@ -11,9 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.squidpony.AnimatedGif;
-import com.squidpony.AnimatedPNG;
-import com.squidpony.PaletteReducer;
+import com.github.tommyettinger.anim8.AnimatedGif;
+import com.github.tommyettinger.anim8.AnimatedPNG;
 
 import java.io.IOException;
 
@@ -31,7 +30,6 @@ public class NorthernLights extends ApplicationAdapter {
 	private float seed;
 	private int width, height;
 	private Texture palette;
-//	private GifRecorder gifRecorder;
 
 	@Override public void create () {
 		//Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -66,7 +64,6 @@ public class NorthernLights extends ApplicationAdapter {
 //				break;
 			default:
 				System.out.println("Using all colors, no dithering");
-				palette = new Texture(Gdx.files.internal("Lava256_GLSL.png"), Pixmap.Format.RGBA8888, false);
 				break;
 		}
 
@@ -162,7 +159,7 @@ public class NorthernLights extends ApplicationAdapter {
 			pixmaps.add(ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		}
 		AnimatedPNG apng = new AnimatedPNG();
-		apng.setCompression(9);
+		apng.setCompression(7);
 		try {
 			apng.write(Gdx.files.local("woahdude"+startTime+".png"), pixmaps, 20);
 		} catch (IOException e) {
@@ -182,8 +179,8 @@ public class NorthernLights extends ApplicationAdapter {
 			pixmaps.add(ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		}
 		AnimatedGif gif = new AnimatedGif();
-		gif.palette = new PaletteReducer(new int[]{0x00000000, 0x2B2821FF, 0x624C3CFF, 0xD9AC8BFF, 0xE3CFB4FF,
-				0x243D5CFF, 0x5D7275FF, 0x5C8B93FF, 0xB1A58DFF, 0xB03A48FF, 0xD4804DFF, 0xE0C872FF, 0x3E6958FF, });
+//		gif.palette = new PaletteReducer(new int[]{0x00000000, 0x2B2821FF, 0x624C3CFF, 0xD9AC8BFF, 0xE3CFB4FF,
+//				0x243D5CFF, 0x5D7275FF, 0x5C8B93FF, 0xB1A58DFF, 0xB03A48FF, 0xD4804DFF, 0xE0C872FF, 0x3E6958FF, });
 		try {
 			gif.write(Gdx.files.local("woahdude"+startTime+".gif"), pixmaps, 20);
 		} catch (IOException e) {

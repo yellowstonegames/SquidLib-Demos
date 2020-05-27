@@ -5,11 +5,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.squidpony.*;
+import com.github.tommyettinger.anim8.PNG8;
+import com.github.tommyettinger.anim8.AnimatedGif;
+import com.github.tommyettinger.anim8.AnimatedPNG;
 
 import java.io.IOException;
 
@@ -17,7 +20,7 @@ import java.io.IOException;
 public class NorthernLights extends ApplicationAdapter {
     private static final float RATE = 1.5f;
     private int seed;
-    private MutantBatch batch;
+    private SpriteBatch batch;
     private Texture tiny;
     private long startTime;
     private int width, height;
@@ -25,7 +28,7 @@ public class NorthernLights extends ApplicationAdapter {
     private final transient float[] con = new float[3];
     private Array<Pixmap> frames;
     private AnimatedPNG animatedPNG;
-    private AnimatedPNG8 iapng;
+    private PNG8 iapng;
     private AnimatedGif animatedGif;
     @Override
     public void create() {
@@ -37,7 +40,7 @@ public class NorthernLights extends ApplicationAdapter {
                 ((state = ((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) ^ state >>> 28);
         startTime -= seed >>> 16;
         Gdx.gl.glDisable(GL20.GL_BLEND);
-        batch = new MutantBatch();
+        batch = new SpriteBatch();
         batch.disableBlending();
         Pixmap pm = new Pixmap(1, 1, Pixmap.Format.RGB888);
         pm.drawPixel(0, 0, -1); // white pixel
@@ -47,7 +50,7 @@ public class NorthernLights extends ApplicationAdapter {
         animatedPNG = new AnimatedPNG(width * height * 3 >>> 1);
         animatedGif = new AnimatedGif();
 //        animatedGif.palette = new PaletteReducer(new int[]{0, 255, -1});
-        iapng = new AnimatedPNG8(width * height * 3 >>> 1);
+        iapng = new PNG8(width * height * 3 >>> 1);
 //        iapng.palette = animatedGif.palette;
 //        iapng.palette = new PaletteReducer(new int[]{
 //                0x00000000, 0x19092DFF, 0x213118FF, 0x314A29FF, 0x8C847BFF, 0x6E868EFF, 0x9CA59CFF, 0xAFC7CFFF,
@@ -64,7 +67,7 @@ public class NorthernLights extends ApplicationAdapter {
         ih = 1f / height;
 //        width = Gdx.graphics.getWidth();
 //        height = Gdx.graphics.getHeight();
-
+        
         for (int i = 0; i < 50; i++) {
             Pixmap frame = new Pixmap(width, height, Pixmap.Format.RGBA8888);
             final int tm = i << 4;
@@ -73,16 +76,18 @@ public class NorthernLights extends ApplicationAdapter {
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    float ax = x * 0.0075f, ay = y * 0.005f; // adjusted for starting dimensions
+                    final float ax = x * iw, ay = y * ih; // adjusted for starting dimensions
                     con[0] = ftm + ay;
                     con[1] = ftm + ax;
                     con[2] = ax + ay;
                     cosmic(seed ^ 0xC13FA9A9, con, 1, 2, 0);
                     cosmic(seed ^ 0xDB4F0B91, con, 2, 0, 1);
                     cosmic(seed ^ 0x19F1D48E, con, 0, 1, 2);
-                    frame.drawPixel(x, y, swayTight(con[0]) << 24 | swayTight(con[1]) << 16 | swayTight(con[2]) << 8 | 
-                            255
+                    frame.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]), 1f);
+                    frame.drawPixel(x, y
 //                            255 - Math.min(255, (int)(260 * Math.sqrt(((x - 128) * (x - 128) + (y - 128) * (y - 128)) * 0x1p-14)))
+////use as the alpha to get a circle that fades at the edges
+//                            1f - Math.min(1f, (int)(1.02f * Math.sqrt(((x - 128) * (x - 128) + (y - 128) * (y - 128)) * 0x1p-14)))
                     );
                 }
             }
@@ -134,13 +139,13 @@ public class NorthernLights extends ApplicationAdapter {
     }
 
 
-    public static int swayTight(float value)
+    public static float swayTight(float value)
     {
         int floor = (value >= 0f ? (int) value : (int) value - 1);
         value -= floor;
         floor &= 1;
-        return (int)(value * value * (765f - 510f * value) * (-floor | 1) + (-floor & 255));
-//        return value * value * (3f - 2f * value) * (-floor | 1) + floor;
+//        return (int)(value * value * (765f - 510f * value) * (-floor | 1) + (-floor & 255));
+        return value * value * (3f - 2f * value) * (-floor | 1) + floor;
 //        return value * value * value * (value * (value * 6f - 15f) + 10f) * (-floor | 1) + floor;
     }
 
@@ -279,7 +284,7 @@ public class NorthernLights extends ApplicationAdapter {
 //                                + swayRandomized(seed ^ 0xA1FE1575, (con[1]) * 5) * 85.25f)));
 //                final int bright = swayTight(con[0] + con[1] + con[2]);
 //                batch.setColor(bright, bright, bright);
-                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]));
+                batch.setColor(swayTight(con[0]), swayTight(con[1]), swayTight(con[2]), 1f);
 //                batch.setColor((int)(con[0] * 127.99 + 128), (int)(con[1] * 127.99 + 128), (int)(con[2] * 127.99 + 128));
 //                batch.setColor(lerpFloatColors(
 //                        floatGet(swayTight(conn0), swayTight(conn1), swayTight(conn2))
