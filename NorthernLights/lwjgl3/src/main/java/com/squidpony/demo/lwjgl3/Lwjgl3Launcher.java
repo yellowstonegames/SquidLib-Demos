@@ -20,7 +20,7 @@ public class Lwjgl3Launcher {
         configuration.setTitle("NorthernLights");
 //        configuration.setWindowedMode(960, 640);
         configuration.setWindowedMode(300, 300);
-        configuration.useVsync(true);
+        configuration.useVsync(false);
         configuration.setTransparentFramebuffer(true);
         configuration.setIdleFPS(10);
         ShaderProgram.prependFragmentCode = "#version 120\n";

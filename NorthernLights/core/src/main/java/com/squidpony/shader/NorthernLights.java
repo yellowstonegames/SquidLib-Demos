@@ -29,7 +29,6 @@ public class NorthernLights extends ApplicationAdapter {
 	private long startTime;
 	private float seed;
 	private int width, height;
-	private Texture palette;
 
 	@Override public void create () {
 		//Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -39,45 +38,9 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		startTime = TimeUtils.millis();
-		int choice = 3;//(int) (startTime >>> 4 & 3L);
-		switch (choice)
-		{
-			case 0:
-				System.out.println("Using DB Aurora");
-				palette = new Texture(Gdx.files.internal("DB_Aurora_GLSL.png"), Pixmap.Format.RGBA8888, false);
-				break;
-		case 1:
-			System.out.println("Using DB32");
-			palette = new Texture(Gdx.files.internal("DB32_GLSL.png"), Pixmap.Format.RGBA8888, false);
-			break;
-		case 2:
-			System.out.println("Using DB32d");
-			palette = new Texture(Gdx.files.internal("DB32d_GLSL.png"), Pixmap.Format.RGBA8888, false);
-			break;
-//			case 1:
-//				System.out.println("Using LAB-like Aurora256");
-//				palette = new Texture(Gdx.files.internal("RoughLAB_Aurora256_GLSL.png"), Pixmap.Format.RGBA8888, false);
-//				break;
-//			case 2:
-//				System.out.println("Using Lava256");
-//				palette = new Texture(Gdx.files.internal("Lava256_GLSL.png"), Pixmap.Format.RGBA8888, false);
-//				break;
-			default:
-				System.out.println("Using all colors, no dithering");
-				break;
-		}
-
 		ShaderProgram.pedantic = false;
-		if(choice == 3)
-		{
-//			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
-		}
-		else
-		{
-//			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
-			shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment.glsl"));
-		}
+		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
 			Gdx.app.exit();
@@ -102,24 +65,6 @@ public class NorthernLights extends ApplicationAdapter {
 		this.height = height;
 		batch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
 	}
-//	private static float swayRandomized(int seed, float value)
-//	{
-//		final int floor = value >= 0f ? (int) value : (int) value - 1;
-//		final float start = (((seed += floor * 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f,
-//				end = (((seed += 0x6C8D) ^ (seed << 11 | seed >>> 21)) * (seed >>> 13 | 0xA529) >>> 9) * 0x0.9ffffffp-20f;
-//		value -= floor;
-//		value *= value * (3f - 2f * value);
-//		return (1f - value) * start + value * end;
-//	}
-
-	public static float swayRandomized(int seed, float value) {
-		final int floor = value >= 0f ? (int) value : (int) value - 1;
-		final float start = ((((seed += floor * 0x9E377) ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f,
-				end = (((seed + 0x9E377 ^ 0xD1B54A35) * 0x1D2473 & 0x3FFFFF) - 0x200000) * 0x1p-21f;
-		value -= floor;
-		value *= value * (3f - 2f * value);
-		return (1f - value) * start + value * end;
-	}
 
 	@Override public void render () {
 		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
@@ -135,11 +80,7 @@ public class NorthernLights extends ApplicationAdapter {
 		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
-//		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
-//		palette.bind();
 		batch.begin();
-//		shader.setUniformi("u_palette", 1);
-//		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
 		batch.draw(pixel, 0, 0, width, height);
@@ -161,7 +102,7 @@ public class NorthernLights extends ApplicationAdapter {
 		AnimatedPNG apng = new AnimatedPNG();
 		apng.setCompression(7);
 		try {
-			apng.write(Gdx.files.local("woahdude"+startTime+".png"), pixmaps, 20);
+			apng.write(Gdx.files.local("build/woahdude"+startTime+".png"), pixmaps, 20);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -182,7 +123,7 @@ public class NorthernLights extends ApplicationAdapter {
 //		gif.palette = new PaletteReducer(new int[]{0x00000000, 0x2B2821FF, 0x624C3CFF, 0xD9AC8BFF, 0xE3CFB4FF,
 //				0x243D5CFF, 0x5D7275FF, 0x5C8B93FF, 0xB1A58DFF, 0xB03A48FF, 0xD4804DFF, 0xE0C872FF, 0x3E6958FF, });
 		try {
-			gif.write(Gdx.files.local("woahdude"+startTime+".gif"), pixmaps, 20);
+			gif.write(Gdx.files.local("build/woahdude"+startTime+".gif"), pixmaps, 20);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
