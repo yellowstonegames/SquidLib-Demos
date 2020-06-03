@@ -29,7 +29,7 @@ dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
   api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
   api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-//  api "com.github.tommyettinger:formic:$formicVersion:sources"
+  api "com.github.tommyettinger:formic:$formicVersion:sources"
   api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion:sources"
   api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
   api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"

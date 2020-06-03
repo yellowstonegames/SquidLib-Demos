@@ -1,6 +1,6 @@
 buildscript {
 	repositories {
-		mavenLocal()
+//		mavenLocal()
 		mavenCentral()
 		google()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
@@ -29,7 +29,7 @@ subprojects {
 	version = '0.0.1-SNAPSHOT'
 	ext.appName = 'FormicDemo'
 	repositories {
-		mavenLocal()
+//		mavenLocal()
 		mavenCentral()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 		maven { url 'https://jitpack.io' }
