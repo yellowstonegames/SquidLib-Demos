@@ -7,7 +7,6 @@ buildscript {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-    classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     classpath "com.android.tools.build:gradle:$androidPluginVersion"
     classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
   }
@@ -19,7 +18,7 @@ allprojects {
 }
 
 configure(subprojects - project(':android')) {
-  apply plugin: 'java'
+  apply plugin: 'java-library'
   sourceCompatibility = 1.7
 }
 
@@ -29,9 +28,10 @@ subprojects {
   repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
     maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    google()
+    jcenter()
   }
 }
 

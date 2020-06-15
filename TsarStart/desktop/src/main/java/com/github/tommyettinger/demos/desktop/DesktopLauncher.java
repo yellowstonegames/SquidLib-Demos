@@ -22,7 +22,8 @@ public class DesktopLauncher {
         configuration.title = "TsarStart";
         configuration.width = gridWidth * cellWidth;
         configuration.height = (gridHeight + bonusHeight) * cellHeight;
-        configuration.vSyncEnabled = false;
+        configuration.vSyncEnabled = true;
+        configuration.forceExit = false;
         configuration.foregroundFPS = 0;
         for (int size : new int[] { 128, 64, 32, 16 }) {
             configuration.addIcon("libgdx" + size + ".png", FileType.Internal);

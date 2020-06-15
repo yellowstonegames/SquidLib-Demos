@@ -6,13 +6,13 @@ eclipse.project.name = appName + '-desktop'
 sourceCompatibility = 1.7
 
 dependencies {
-  compile project(':core')
-  compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-  compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  implementation project(':core')
+  implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
 jar {
-  archiveName "${appName}-${version}.jar"
+  archiveName "${appName}-${archiveVersion.get()}.jar"
   from { configurations.compile.collect { zipTree(it) } }
   manifest {
     attributes 'Main-Class': project.mainClassName

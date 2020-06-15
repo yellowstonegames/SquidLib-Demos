@@ -2,7 +2,7 @@ apply plugin: 'gwt'
 apply plugin: 'war'
 
 gwt {
-    gwtVersion="2.8.0" // Should match the gwt version used for building the gwt backend
+    gwtVersion="2.8.2" // Should match the gwt version used for building the gwt backend
     maxHeapSize="1G" // Default 256m is not enough for gwt compiler. GWT is HUNGRY
     minHeapSize="1G"
 
@@ -36,13 +36,16 @@ task startHttpServer () {
     }
 }
 dependencies {
-    compile project(':core')
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-    compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-    compile "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion:sources"
-    compile "com.github.SquidPony.SquidLib:squidlib-util:$squidLibVersion:sources"
-    compile "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
+    implementation project(':core')
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+//    implementation "com.squidpony:squidlib:$squidLibVersion:sources"
+//    implementation "com.squidpony:squidlib-util:$squidLibVersion:sources"
+    implementation "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion:sources"
+    implementation "com.github.SquidPony.SquidLib:squidlib-util:$squidLibVersion:sources"
+    implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
+    implementation "com.github.tommyettinger:anim8-gdx:0.1.3:sources"
 }
 
 task superDev(type: GwtSuperDev) {
