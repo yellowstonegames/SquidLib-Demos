@@ -12,6 +12,8 @@ uniform sampler2D u_texture;
 
 uniform float seed;
 uniform float tm;
+//uniform vec3 s;
+//uniform vec3 c;
 
 const float PHI = 1.618034; // phi, the Golden Ratio
 
@@ -26,8 +28,8 @@ float swayRandomized(float seed, float value)
 }
 float cosmic(float seed, vec3 con)
 {
-    float sum = swayRandomized(seed, con.x + con.y + con.z) * 0.6;
-    return (sum + 0.4 * swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x + con.y + con.z - sum)));
+    float sum = swayRandomized(seed, con.x + con.y + con.z) * 3.0;
+    return -2.5 + (sum + 2.0 * swayRandomized(-seed, sum * 0.5698402909980532 + 0.7548776662466927 * (con.x + con.y + con.z - sum)));
 }
 void main() {
 //  vec3 xyz = vec3(gl_FragCoord.xy, tm);
@@ -50,10 +52,10 @@ void main() {
                   swayRandomized(-566.50993, xy + 1.5625),
                   swayRandomized(-281.77664, xy + -3.8125))
                    * swayRandomized(1111.11 + seed, alt.z) + c * swayRandomized(11.1111 + seed, alt.x) + s * swayRandomized(111.111 + seed, alt.y));
-  con.x = cosmic(seed, con * 3.0);
-  con.y = cosmic(seed + 123.456, con * 3.0 + PHI);
-  con.z = cosmic(seed - 456.123, (con + PHI) * 3.0);
+  con.x = cosmic(seed, con);
+  con.y = cosmic(seed + 123.456, con + PHI);
+  con.z = cosmic(seed - 456.123, con - PHI);
       
-  gl_FragColor.rgb = mix(con.zxy, sin(con * 3.14159265), cos(con.yzx * 7.0 + con * 5.0) + 0.5);
+  gl_FragColor.rgb = sin(con * 3.14159265) * 0.5 + 0.5;
   gl_FragColor.a = 1.0;// acos(distance(v_texCoords, vec2(0.5, 0.5)) * 2.5) * 0.6366197723675814;
 }

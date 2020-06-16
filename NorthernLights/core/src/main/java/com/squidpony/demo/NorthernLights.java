@@ -10,11 +10,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.tommyettinger.anim8.PNG8;
 import com.github.tommyettinger.anim8.AnimatedGif;
 import com.github.tommyettinger.anim8.AnimatedPNG;
-
-import java.io.IOException;
+import com.github.tommyettinger.anim8.PNG8;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class NorthernLights extends ApplicationAdapter {
@@ -67,7 +65,7 @@ public class NorthernLights extends ApplicationAdapter {
         ih = 1f / height;
 //        width = Gdx.graphics.getWidth();
 //        height = Gdx.graphics.getHeight();
-        
+
         for (int i = 0; i < 50; i++) {
             Pixmap frame = new Pixmap(width, height, Pixmap.Format.RGBA8888);
             final int tm = i << 4;
@@ -93,13 +91,9 @@ public class NorthernLights extends ApplicationAdapter {
             }
             frames.add(frame);
         }
-        try {
-            animatedPNG.write(Gdx.files.local("animated" + TimeUtils.millis() + ".png"), frames, 20);
-            iapng.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".png"), frames, 20);
-            animatedGif.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".gif"), frames, 20);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        animatedPNG.write(Gdx.files.local("animated" + TimeUtils.millis() + ".png"), frames, 20);
+        iapng.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".png"), frames, 20);
+        animatedGif.write(Gdx.files.local("animatedIndexed" + TimeUtils.millis() + ".gif"), frames, 20);
     }
 
     @Override
