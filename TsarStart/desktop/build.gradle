@@ -11,9 +11,11 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
+sourceSets.main.resources.srcDirs += [ file('../assets').absolutePath ]
+
 jar {
   archiveName "${appName}-${archiveVersion.get()}.jar"
-  from { configurations.compile.collect { zipTree(it) } }
+  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
