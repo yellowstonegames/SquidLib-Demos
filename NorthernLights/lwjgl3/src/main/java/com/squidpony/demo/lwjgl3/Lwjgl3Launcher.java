@@ -23,6 +23,7 @@ public class Lwjgl3Launcher {
         configuration.useVsync(false);
         configuration.setTransparentFramebuffer(true);
         configuration.setIdleFPS(10);
+        configuration.disableAudio(true);
         ShaderProgram.prependFragmentCode = "#version 120\n";
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
