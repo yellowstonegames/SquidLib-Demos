@@ -1,9 +1,9 @@
 apply plugin: 'application'
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-mainClassName = 'squidpony.demo.dungeon.lwjgl3.Lwjgl3Launcher'
+mainClassName = 'com.github.tommyettinger.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
-sourceCompatibility = 1.7
+sourceCompatibility = 8.0
 
 dependencies {
   api project(':core')
@@ -23,8 +23,9 @@ run {
 	}
 }
 jar {
-	archiveFileName = "${appName}-${version}.jar"
-	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
+	archiveFileName = "${appName}-${archiveVersion.get()}.jar"
+	dependsOn configurations.runtimeClasspath
+	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
 	manifest {
 		attributes 'Main-Class': project.mainClassName
 	}

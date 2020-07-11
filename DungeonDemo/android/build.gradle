@@ -1,7 +1,8 @@
-apply plugin: "com.android.application"
+apply plugin: 'com.android.application'
+
 
 android {
-	compileSdkVersion 28
+	compileSdkVersion 27
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -29,9 +30,9 @@ android {
 		exclude 'META-INF/dependencies.txt'
 	}
 	defaultConfig {
-		applicationId 'squidpony.demo.dungeon'
-		minSdkVersion 14
-		targetSdkVersion 28
+		applicationId 'com.github.tommyettinger'
+		minSdkVersion 19
+		targetSdkVersion 27
 		versionCode 1
 		versionName "1.0"
 	}
@@ -82,9 +83,10 @@ task copyAndroidNatives() {
 				}
 			}
 		}
-		
 	}
 }
+
+preBuild.dependsOn(copyAndroidNatives)
 
 task run(type: Exec) {
 	def path
@@ -105,5 +107,5 @@ task run(type: Exec) {
 	}
 
 	def adb = path + "/platform-tools/adb"
-	commandLine "$adb", 'shell', 'am', 'start', '-n', 'squidpony.demo.dungeon/squidpony.demo.dungeon.android.AndroidLauncher'
+	commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.tommyettinger/com.github.tommyettinger.android.AndroidLauncher'
 }

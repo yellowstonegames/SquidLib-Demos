@@ -6,4 +6,5 @@ dependencies {
   api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
   api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
   api "com.github.tommyettinger:regexodus:$regExodusVersion"
+  api "com.github.tommyettinger:anim8-gdx:$anim8Version"
 }
