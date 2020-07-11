@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
 import squidpony.squidgrid.FOV;
 import squidpony.squidgrid.Radius;
@@ -17,7 +16,10 @@ import squidpony.squidgrid.mapping.DungeonUtility;
 import squidpony.squidgrid.mapping.SectionDungeonGenerator;
 import squidpony.squidgrid.mapping.SerpentMapGenerator;
 import squidpony.squidgrid.mapping.styled.TilesetType;
-import squidpony.squidmath.*;
+import squidpony.squidmath.Coord;
+import squidpony.squidmath.GreasedRegion;
+import squidpony.squidmath.OrderedMap;
+import squidpony.squidmath.RNG;
 
 import java.util.ArrayList;
 
@@ -42,7 +44,7 @@ public class DungeonDemo extends ApplicationAdapter {
     public static final int cellWidth = 13;
     /** The pixel height of a cell */
     public static final int cellHeight = 25;
-    private VisualInput input;
+    private SquidInput input;
     private Color bgColor;
     private Stage stage;
     private DijkstraMap playerToCursor;
@@ -51,9 +53,6 @@ public class DungeonDemo extends ApplicationAdapter {
     private ArrayList<Coord> toCursor;
     private ArrayList<Coord> awaitedMoves;
     private float secondsWithoutMoves;
-    private String[] lang = new String[12];
-    private int langIndex = 0;
-    private int INTERNAL_ZOOM = 1;
     private long startTime;
     OrderedMap<Character, Double> costs;
     @Override
@@ -79,11 +78,7 @@ public class DungeonDemo extends ApplicationAdapter {
         // also some TextCellFactory objects for distance field fonts; either one can be passed to this constructor.
         // the font will try to load Inconsolata-LGC-Custom as a bitmap font with a distance field effect.
         display = new SparseLayers(gridWidth, gridHeight, cellWidth, cellHeight, tcf);
-        // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
-        // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
-        // if you use '#' for walls instead of box drawing chars, you don't need this.
-        display.setTextSize(cellWidth + INTERNAL_ZOOM, cellHeight + 2 * INTERNAL_ZOOM);
-
+        
         // this makes animations very fast, which is good for multi-cell movement but bad for attack animations.
         //display.setAnimationDuration(0.125f);
         //display.setLightingColor(SColor.PAPAYA_WHIP);
@@ -105,10 +100,9 @@ public class DungeonDemo extends ApplicationAdapter {
         bgColor = SColor.DB_INK;
 
 
-        lang = new String[FakeLanguageGen.registered.length];
-        for (int i = 0; i < FakeLanguageGen.registered.length; i++) {
-            lang[i] = FakeLanguageGen.registered[i].sentence(rng, 5, 10, new String[]{",", ",", ",", ";"}, new String[]{".", ".", ".", "!", "?", "..."}, 0.2, gridWidth - 2);
-        }
+        //This is used to allow clicks or taps to take the player to the desired area.
+        toCursor = new ArrayList<Coord>(100);
+        awaitedMoves = new ArrayList<Coord>(100);
 
         // this is a big one.
         // SquidInput can be constructed with a KeyHandler (which just processes specific keypresses), a SquidMouse
@@ -121,7 +115,7 @@ public class DungeonDemo extends ApplicationAdapter {
         // You can also set up a series of future moves by clicking within FOV range, using mouseMoved to determine the
         // path to the mouse position with a DijkstraMap (called playerToCursor), and using touchUp to actually trigger
         // the event when someone clicks.
-        input = new VisualInput(new SquidInput.KeyHandler() {
+        input = new SquidInput(new SquidInput.KeyHandler() {
             @Override
             public void handle(char key, boolean alt, boolean ctrl, boolean shift) {
                 switch (key)
@@ -197,7 +191,8 @@ public class DungeonDemo extends ApplicationAdapter {
                                 //to the position the user clicked on.
                                 toCursor = playerToCursor.findPath(250, null, null, player, cursor);
                             }
-                            awaitedMoves = new ArrayList<>(toCursor);
+                            awaitedMoves.clear();
+                            awaitedMoves.addAll(toCursor);
                         }
                         return false;
                     }
@@ -222,8 +217,8 @@ public class DungeonDemo extends ApplicationAdapter {
                         return false;
                     }
                 }));
-        input.eightWay = false;
-        input.init("Rebuild", "Quit");
+//        input.eightWay = false;
+//        input.init("Rebuild", "Quit");
 
         //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, input));
@@ -231,7 +226,7 @@ public class DungeonDemo extends ApplicationAdapter {
         //Gdx.input.setInputProcessor(input);
         // and then add display, our one visual component, to the list of things that act in Stage.
         stage.addActor(display);
-        input.resizeInnerStage(stage);
+//        input.resizeInnerStage(stage);
     }
 
     private void rebuild()
@@ -311,15 +306,12 @@ public class DungeonDemo extends ApplicationAdapter {
         //display.removeAnimatedEntity(playerAE);
         if(playerAE != null)
             display.removeGlyph(playerAE);
-        playerAE = display.glyph('@', SColor.LIMITED_PALETTE[10], player.x, player.y);
+        playerAE = display.glyph('@', SColor.RED_INCENSE, player.x, player.y);
         res = DungeonUtility.generateResistances(decoDungeon);
         fovmap = new double[gridWidth][gridHeight];
         FOV.reuseFOV(res, fovmap, player.x, player.y, 9.0, Radius.CIRCLE);
 
 
-        //This is used to allow clicks or taps to take the player to the desired area.
-        toCursor = new ArrayList<Coord>(100);
-        awaitedMoves = new ArrayList<Coord>(100);
         //DijkstraMap is the pathfinding swiss-army knife we use here to find a path to the latest cursor position.
         playerToCursor.initialize(decoDungeon);
         playerToCursor.initializeCost(DungeonUtility.generateCostMap(decoDungeon, costs, 1.0));
@@ -370,7 +362,7 @@ public class DungeonDemo extends ApplicationAdapter {
                     alter = 10f;
                 else {
                     if (fovmap[i][j] > 0)
-                        alter = (float) fovmap[i][j] * 0.7f + lights[i][j] * 0.035f;
+                        alter = (float) fovmap[i][j] * 0.675f + lights[i][j] * 0.0325f;
                     else
                         alter = -5f;
                 }
@@ -426,7 +418,7 @@ public class DungeonDemo extends ApplicationAdapter {
             secondsWithoutMoves = 0;
         }
 
-        input.show();
+//        input.show();
 
         // stage has its own batch and must be explicitly told to draw().
         stage.getViewport().apply(true);
@@ -438,9 +430,9 @@ public class DungeonDemo extends ApplicationAdapter {
     public void resize(int width, int height) {
         super.resize(width, height);
         //very important to have the mouse behave correctly if the user fullscreens or resizes the game!
-        input.reinitialize((float) width / this.gridWidth, (float)height / (this.gridHeight),
-                this.gridWidth, this.gridHeight, 0, 0, width, height);
-        input.update(width, height, true);
+        input.getMouse().reinitialize((float) width / this.gridWidth, (float)height / (this.gridHeight),
+                this.gridWidth, this.gridHeight, 0, 0);
+//        input.update(width, height, true);
         stage.getViewport().update(width, height, true);
 
     }
