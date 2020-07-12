@@ -13,6 +13,7 @@ import squidpony.squidgrid.FOV;
 import squidpony.squidgrid.Radius;
 import squidpony.squidgrid.gui.gdx.*;
 import squidpony.squidgrid.mapping.DungeonUtility;
+import squidpony.squidgrid.mapping.FlowingCaveGenerator;
 import squidpony.squidgrid.mapping.SectionDungeonGenerator;
 import squidpony.squidgrid.mapping.SerpentMapGenerator;
 import squidpony.squidgrid.mapping.styled.TilesetType;
@@ -29,8 +30,6 @@ public class DungeonDemo extends ApplicationAdapter {
     private RNG rng;
     private SparseLayers display;
     private TextCellFactory tcf;
-    private SerpentMapGenerator serpent;
-    private SectionDungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
     private float[][] colorIndices, bgColorIndices;
     private double[][] res, fovmap;
@@ -49,7 +48,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private Stage stage;
     private DijkstraMap playerToCursor;
     private Coord cursor, player;
-    private TextCellFactory.Glyph playerAE;
+    private TextCellFactory.Glyph playerGlyph;
     private ArrayList<Coord> toCursor;
     private ArrayList<Coord> awaitedMoves;
     private float secondsWithoutMoves;
@@ -85,10 +84,6 @@ public class DungeonDemo extends ApplicationAdapter {
         //These need to have their positions set before adding any entities if there is an offset involved.
         //There is no offset used here, but it's still a good practice here to set positions early on.
         display.setPosition(0, 0);
-
-        //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
-        //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good "ruined" dungeons.
-        dungeonGen = new SectionDungeonGenerator(gridWidth, gridHeight, rng);
 
         fov = new FOV(FOV.RIPPLE_TIGHT);
         playerToCursor = new DijkstraMap(DefaultResources.getGuiRandom());
@@ -217,8 +212,6 @@ public class DungeonDemo extends ApplicationAdapter {
                         return false;
                     }
                 }));
-//        input.eightWay = false;
-//        input.init("Rebuild", "Quit");
 
         //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, input));
@@ -226,17 +219,20 @@ public class DungeonDemo extends ApplicationAdapter {
         //Gdx.input.setInputProcessor(input);
         // and then add display, our one visual component, to the list of things that act in Stage.
         stage.addActor(display);
-//        input.resizeInnerStage(stage);
     }
 
     private void rebuild()
     {
-        serpent = new SerpentMapGenerator(gridWidth, gridHeight, rng, rng.nextDouble(0.15));
+        SerpentMapGenerator serpent = new SerpentMapGenerator(gridWidth, gridHeight, rng, rng.nextDouble(0.15));
 
         serpent.putWalledBoxRoomCarvers(rng.between(5, 10));
         serpent.putWalledRoundRoomCarvers(rng.between(2, 5));
         serpent.putRoundRoomCarvers(rng.between(1, 4));
         serpent.putCaveCarvers(rng.between(8, 15));
+
+        FlowingCaveGenerator flowCaves = new FlowingCaveGenerator(gridWidth, gridHeight, TilesetType.DEFAULT_DUNGEON, rng);
+        
+        SectionDungeonGenerator dungeonGen = new SectionDungeonGenerator(gridWidth, gridHeight, rng);
         dungeonGen.addWater(SectionDungeonGenerator.CAVE, rng.between(10, 30));
         dungeonGen.addWater(SectionDungeonGenerator.ROOM, rng.between(3, 11));
         dungeonGen.addDoors(rng.between(10, 25), false);
@@ -245,24 +241,26 @@ public class DungeonDemo extends ApplicationAdapter {
         dungeonGen.addBoulders(SectionDungeonGenerator.ALL, rng.between(3, 11));
         if(rng.nextInt(3) == 0)
             dungeonGen.addLake(rng.between(5, 30), '£', '¢');
-        else if(rng.nextInt(4) <= 1)
+        else if(rng.nextInt(5) < 3)
             dungeonGen.addLake(rng.between(8, 35));
         else
             dungeonGen.addLake(0);
         //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
         //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
 
-        switch (rng.nextInt(12))
+        switch (rng.nextInt(18))
         {
             case 0:
             case 1:
             case 2:
             case 11:
+            case 12:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(serpent.generate(), serpent.getEnvironment()));
                 break;
             case 3:
             case 4:
             case 5:
+            case 13:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.DEFAULT_DUNGEON));
                 break;
             case 6:
@@ -275,8 +273,14 @@ public class DungeonDemo extends ApplicationAdapter {
             case 9:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROOMS_LIMIT_CONNECTIVITY));
                 break;
-            default:
+            case 10:
                 decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.CORNER_CAVES));
+                break;
+            case 14:
+            case 15:
+            case 16:
+            default: 
+                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(flowCaves.generate(), flowCaves.getEnvironment()));
                 break;
         }
 
@@ -303,10 +307,9 @@ public class DungeonDemo extends ApplicationAdapter {
         player = placement.retract8way().singleRandom(rng);
         if(!player.isWithin(gridWidth, gridHeight))
             rebuild();
-        //display.removeAnimatedEntity(playerAE);
-        if(playerAE != null)
-            display.removeGlyph(playerAE);
-        playerAE = display.glyph('@', SColor.RED_INCENSE, player.x, player.y);
+        if(playerGlyph != null)
+            display.removeGlyph(playerGlyph);
+        playerGlyph = display.glyph('@', SColor.RED_INCENSE, player.x, player.y);
         res = DungeonUtility.generateResistances(decoDungeon);
         fovmap = new double[gridWidth][gridHeight];
         FOV.reuseFOV(res, fovmap, player.x, player.y, 9.0, Radius.CIRCLE);
@@ -319,7 +322,7 @@ public class DungeonDemo extends ApplicationAdapter {
         colorIndices = MapUtility.generateDefaultColorsFloat(decoDungeon, '£', SColor.CW_PALE_GOLD.toFloatBits(), '¢', SColor.CW_BRIGHT_APRICOT.toFloatBits());
         bgColorIndices = MapUtility.generateDefaultBGColorsFloat(decoDungeon, '£', SColor.CW_ORANGE.toFloatBits(), '¢', SColor.CW_RICH_APRICOT.toFloatBits());
         
-        // this does the standard lighting for walls, floors, etc. but also uses counter to do the Simplex noise thing.
+        // this does the standard lighting for walls, floors, etc. but also uses the time to do the Simplex noise thing.
         lights = MapUtility.generateLightnessModifiers(decoDungeon, (System.currentTimeMillis() - startTime) * 0.023, '£', '¢');
 
     }
@@ -345,7 +348,7 @@ public class DungeonDemo extends ApplicationAdapter {
             } else {
                 // recalculate FOV, store it in fovmap for the render to use.
                 fovmap = fov.calculateFOV(res, newX, newY, 9, Radius.CIRCLE);
-                display.slide(playerAE, player.x, player.y, newX, newY, 0.125f, null);
+                display.slide(playerGlyph, player.x, player.y, newX, newY, 0.125f, null);
             }
         }
     }
@@ -362,7 +365,7 @@ public class DungeonDemo extends ApplicationAdapter {
                     alter = 10f;
                 else {
                     if (fovmap[i][j] > 0)
-                        alter = (float) fovmap[i][j] * 0.675f + lights[i][j] * 0.0325f;
+                        alter = (float) fovmap[i][j] * 0.75f + lights[i][j] * 0.0325f;
                     else
                         alter = -5f;
                 }
@@ -401,24 +404,17 @@ public class DungeonDemo extends ApplicationAdapter {
             }
         }
         // if we are waiting for the player's input and get input, process it.
+        // this step is not needed with libGDX InputProcessors by default; SquidInput uses this
+        // to avoid processing key-hold events more often than desired.
         else if(input.hasNext() && !display.hasActiveAnimations()) {
             input.next();
         }
-        // if the previous blocks didn't happen, and there are no active animations, then either change the phase
-        // (because with no animations running the last phase must have ended), or start a new animation soon.
-        else// if(!display.hasActiveAnimations()) {
-        //secondsWithoutMoves += Gdx.graphics.getDeltaTime();
-        //if (secondsWithoutMoves >= 0.02) {
-        //secondsWithoutMoves = 0;
-        //}
-        //}
-        // if we do have an animation running, then how many frames have passed with no animation needs resetting
-        //else
+        // if the previous blocks didn't happen, and there are no active animations, then 
+        // we reset the timer for how long it has been since a move was made.
+        else
         {
             secondsWithoutMoves = 0;
         }
-
-//        input.show();
 
         // stage has its own batch and must be explicitly told to draw().
         stage.getViewport().apply(true);
@@ -432,7 +428,6 @@ public class DungeonDemo extends ApplicationAdapter {
         //very important to have the mouse behave correctly if the user fullscreens or resizes the game!
         input.getMouse().reinitialize((float) width / this.gridWidth, (float)height / (this.gridHeight),
                 this.gridWidth, this.gridHeight, 0, 0);
-//        input.update(width, height, true);
         stage.getViewport().update(width, height, true);
 
     }
