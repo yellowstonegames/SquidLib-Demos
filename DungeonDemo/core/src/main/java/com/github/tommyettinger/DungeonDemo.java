@@ -53,7 +53,7 @@ public class DungeonDemo extends ApplicationAdapter {
     private ArrayList<Coord> awaitedMoves;
     private float secondsWithoutMoves;
     private long startTime;
-    OrderedMap<Character, Double> costs;
+    private OrderedMap<Character, Double> costs;
     @Override
     public void create () {
         startTime = System.currentTimeMillis();

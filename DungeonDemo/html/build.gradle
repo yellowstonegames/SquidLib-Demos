@@ -10,6 +10,7 @@ buildscript {
 apply plugin: "gwt"
 apply plugin: "war"
 apply plugin: "org.gretty"
+import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
 
 gwt {
 	gwtVersion = "2.9.0" // Should match the version used by the libGDX backend.
@@ -24,6 +25,8 @@ gwt {
 	compiler.strict = true
 	compiler.disableCastChecking = true
 	sourceLevel = 1.8
+	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.PRETTY;
+	
 }
 
 dependencies {
@@ -39,7 +42,6 @@ dependencies {
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
-import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
 
 gretty.httpPort = 8080
 gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
