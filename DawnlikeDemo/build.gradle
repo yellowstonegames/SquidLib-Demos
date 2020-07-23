@@ -7,8 +7,6 @@ buildscript {
 		jcenter()
 	}
 	dependencies {
-		classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-		classpath "com.android.tools.build:gradle:$androidPluginVersion"
 		classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
 	}
 }
@@ -18,9 +16,9 @@ allprojects {
 	apply plugin: 'idea'
 }
 
-configure(subprojects - project(':android')) {
+configure(subprojects) {
 	apply plugin: 'java-library'
-	sourceCompatibility = 1.8
+	sourceCompatibility = 11.0
 	compileJava {
 		options.incremental = true
 	}
