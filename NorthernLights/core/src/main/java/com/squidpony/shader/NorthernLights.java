@@ -38,8 +38,9 @@ public class NorthernLights extends ApplicationAdapter {
 		startTime = TimeUtils.millis();
 		ShaderProgram.pedantic = false;
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
-		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("cuatro_fragment_no_dither.glsl"));
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
 			Gdx.app.exit();
@@ -55,8 +56,8 @@ public class NorthernLights extends ApplicationAdapter {
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		
-		renderAPNG();
-//		renderGif();
+//		renderAPNG();
+		renderGif();
 	}
 
 	@Override public void resize (int width, int height) {
@@ -78,7 +79,7 @@ public class NorthernLights extends ApplicationAdapter {
 			}
 		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0.0005f);
 		batch.begin();
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
@@ -87,8 +88,8 @@ public class NorthernLights extends ApplicationAdapter {
 	}
 
 	public void renderAPNG () {
-		Array<Pixmap> pixmaps = new Array<>(100);
-		for (int i = 1; i <= 32; i++) {
+		Array<Pixmap> pixmaps = new Array<>(80);
+		for (int i = 1; i <= 80; i++) {
 			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 			batch.begin();
@@ -103,13 +104,13 @@ public class NorthernLights extends ApplicationAdapter {
 		apng.write(Gdx.files.local("build/HueWow"+startTime+".png"), pixmaps, 16);
 	}
 	public void renderGif() {
-		Array<Pixmap> pixmaps = new Array<>(100);
-		for (int i = 1; i <= 80; i++) {
+		Array<Pixmap> pixmaps = new Array<>(80);
+		for (int i = 1; i <= 160; i++) {
 			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 			batch.begin();
 			shader.setUniformf("seed", seed);
-			shader.setUniformf("tm", i * 1.25f);
+			shader.setUniformf("tm", i * 0.025f);
 			batch.draw(pixel, 0, 0, width, height);
 			batch.end();
 			pixmaps.add(ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
@@ -118,6 +119,6 @@ public class NorthernLights extends ApplicationAdapter {
 //		gif.palette = new PaletteReducer(new int[]{0x00000000, 0x2B2821FF, 0x624C3CFF, 0xD9AC8BFF, 0xE3CFB4FF,
 //				0x243D5CFF, 0x5D7275FF, 0x5C8B93FF, 0xB1A58DFF, 0xB03A48FF, 0xD4804DFF, 0xE0C872FF, 0x3E6958FF, });
 		
-		gif.write(Gdx.files.local("build/woahdude"+startTime+".gif"), pixmaps, 20);
+		gif.write(Gdx.files.local("build/Wobbly"+startTime+".gif"), pixmaps, 20);
 	}
 }
