@@ -23,6 +23,7 @@ gwt {
 
 	compiler.strict = true
 	compiler.disableCastChecking = true
+//	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
 	sourceLevel = 1.11
 }
 

@@ -15,16 +15,22 @@ precision mediump float;
 varying LOWP vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
-//uniform sampler2D u_palette;
 
 uniform float seed;
 uniform float tm;
-//uniform vec3 s;
-//uniform vec3 c;
 
 const float PHI = 1.61803398874989484820459; // phi, the Golden Ratio
 const vec2 H2 = vec2(1.324717957244746, 1.754877666246693); // harmonious numbers for 2D
 const vec3 H3 = vec3(0.8191725134, 0.6710436067, 0.5497004779); // harmonious numbers for 3D
+
+vec3 applyHue(vec3 rgb) {
+    float hue = 0.25 * tm;
+    vec3 k = vec3(0.57735);
+    float c = cos(hue);
+    //Rodrigues' rotation formula
+    return rgb * c + cross(k, rgb) * sin(hue) + k * dot(k, rgb) * (1.0 - c);
+}
+
 
 float hash(float seed, float p) {
     return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
@@ -150,7 +156,7 @@ vec3 foam(vec3 seed, vec3 x) {
 
 void main() {
   vec3 i = vec3(gl_FragCoord.xy + 1999.0, tm * 0.3125) * 0.0625;
-  gl_FragColor = vec4(foam(vec3(42.0, 69.0, 23.0) + seed, i), v_color.a);
+  gl_FragColor = vec4(applyHue(foam(vec3(42.0, 69.0, 23.0) + seed, i)), v_color.a);
 //  gl_FragColor.r = foam(42.0 + seed, i);
 //  gl_FragColor.g = foam(69.0 + seed, i);
 //  gl_FragColor.b = foam(23.0 + seed, i);
