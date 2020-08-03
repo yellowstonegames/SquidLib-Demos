@@ -37,8 +37,8 @@ public class NorthernLights extends ApplicationAdapter {
 		pixel = new Texture(pixmap);
 		startTime = TimeUtils.millis();
 		ShaderProgram.pedantic = false;
-		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
-//		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
@@ -88,7 +88,7 @@ public class NorthernLights extends ApplicationAdapter {
 
 	public void renderAPNG () {
 		Array<Pixmap> pixmaps = new Array<>(100);
-		for (int i = 1; i <= 50; i++) {
+		for (int i = 1; i <= 32; i++) {
 			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 			batch.begin();
@@ -100,7 +100,7 @@ public class NorthernLights extends ApplicationAdapter {
 		}
 		AnimatedPNG apng = new AnimatedPNG();
 		apng.setCompression(7);
-		apng.write(Gdx.files.local("build/HueWow"+startTime+".png"), pixmaps, 20);
+		apng.write(Gdx.files.local("build/HueWow"+startTime+".png"), pixmaps, 16);
 	}
 	public void renderGif() {
 		Array<Pixmap> pixmaps = new Array<>(100);

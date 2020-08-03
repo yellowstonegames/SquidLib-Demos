@@ -13,6 +13,14 @@ uniform float seed;
 uniform float tm;
 const float PHI = 1.618034;
 
+vec3 applyHue(vec3 rgb) {
+    float hue = 0.25 * tm;
+    vec3 k = vec3(0.57735);
+    float c = cos(hue);
+    //Rodrigues' rotation formula
+    return rgb * c + cross(k, rgb) * sin(hue) + k * dot(k, rgb) * (1.0 - c);
+}
+
 float swayRandomized(float seed, float value)
 {
     float f = floor(value);
@@ -43,6 +51,6 @@ void main() {
   con += cosmic(s.zxy, con.yzx);
   con += cosmic(s.xyz, con.zxy);
 
-  gl_FragColor.rgb = cos(con * 3.14159) * 0.5 + 0.5;
+  gl_FragColor.rgb = applyHue(cos(con * 3.14159) * 0.5 + 0.5);
   gl_FragColor.a = v_color.a;
 }

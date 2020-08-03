@@ -31,7 +31,6 @@ vec3 applyHue(vec3 rgb) {
     return rgb * c + cross(k, rgb) * sin(hue) + k * dot(k, rgb) * (1.0 - c);
 }
 
-
 float hash(float seed, float p) {
     return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
 }
