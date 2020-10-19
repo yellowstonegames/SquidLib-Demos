@@ -1003,59 +1003,62 @@ public class DawnlikeDemo extends ApplicationAdapter {
             @Override
             public boolean keyUp(int keycode) {
                 switch (keycode) {
-                case UP:
-                case W:
-                case NUMPAD_8:
-                    toCursor.clear();
-                    //+1 is up on the screen
-                    awaitedMoves.add(player.translate(0, 1));
-                    break;
-                case DOWN:
-                case S:
-                case NUMPAD_2:
-                    toCursor.clear();
-                    //-1 is down on the screen
-                    awaitedMoves.add(player.translate(0, -1));
-                    break;
-                case LEFT:
-                case A:
-                case NUMPAD_4:
-                    toCursor.clear();
-                    awaitedMoves.add(player.translate(-1, 0));
-                    break;
-                case RIGHT:
-                case D:
-                case NUMPAD_6:
-                    toCursor.clear();
-                    awaitedMoves.add(player.translate(1, 0));
-                    break;
-                case NUMPAD_1:
-                    toCursor.clear();
-                    awaitedMoves.add(player.translate(-1, -1));
-                    break;
-                case NUMPAD_3:
-                    toCursor.clear();
-                    awaitedMoves.add(player.translate(1, -1));
-                    break;
-                case NUMPAD_7:
-                    toCursor.clear();
-                    awaitedMoves.add(player.translate(-1, 1));
-                    break;
-                case NUMPAD_9:
-                    toCursor.clear();
-                    awaitedMoves.add(player.translate(1, 1));
-                    break;
-                case PERIOD:
-                case NUMPAD_5:
-                    toCursor.clear();
-                    awaitedMoves.add(player);
-                    break;
-                case B:
-                    batch = (batch == simpleBatch) ? contrastBatch : simpleBatch;
-                    break;
-                case ESCAPE:
-                    Gdx.app.exit();
-                    break;
+                    case UP:
+                    case W:
+                    case NUMPAD_8:
+                        toCursor.clear();
+                        //+1 is up on the screen
+                        awaitedMoves.add(player.translate(0, 1));
+                        break;
+                    case DOWN:
+                    case S:
+                    case NUMPAD_2:
+                        toCursor.clear();
+                        //-1 is down on the screen
+                        awaitedMoves.add(player.translate(0, -1));
+                        break;
+                    case LEFT:
+                    case A:
+                    case NUMPAD_4:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(-1, 0));
+                        break;
+                    case RIGHT:
+                    case D:
+                    case NUMPAD_6:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(1, 0));
+                        break;
+                    case NUMPAD_1:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(-1, -1));
+                        break;
+                    case NUMPAD_3:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(1, -1));
+                        break;
+                    case NUMPAD_7:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(-1, 1));
+                        break;
+                    case NUMPAD_9:
+                        toCursor.clear();
+                        awaitedMoves.add(player.translate(1, 1));
+                        break;
+                    case PERIOD:
+                    case NUMPAD_5:
+                        toCursor.clear();
+                        awaitedMoves.add(player);
+                        break;
+                    case B:
+                        batch = (batch == simpleBatch) ? contrastBatch : simpleBatch;
+                        break;
+                    case P:
+                        DungeonUtility.debugPrint(decoDungeon);
+                        break;
+                    case ESCAPE:
+                        Gdx.app.exit();
+                        break;
                 }
                 return true;
             }
@@ -1087,7 +1090,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     return false;
                 pos.set(screenX, screenY, 0f);
                 mainViewport.unproject(pos);
-                if (onGrid(screenX = MathUtils.floor(pos.x) >> 4, screenY = MathUtils.floor(pos.y) >> 4)) {
+                if (onGrid(screenX = MathUtils.floor(pos.x) >> 4, screenY = bigHeight - (MathUtils.floor(pos.y) >> 4))) {
                     // we also need to check if screenX or screenY is the same cell.
                     if (cursor.x == screenX && cursor.y == screenY) {
                         return false;
@@ -1234,7 +1237,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
-                    pos.set(i * cellWidth, j * cellHeight, 0f);
+                    pos.set(i * cellWidth, (bigHeight - j) * cellHeight, 0f);
                     batch.setPackedColor(toCursor.contains(Coord.get(i, j))
                             ? ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_WHITE, 0.9f)
                             : ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
@@ -1242,7 +1245,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                         batch.draw(charMapping.get('.', solid), pos.x, pos.y, cellWidth, cellHeight);
                     batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y, cellWidth, cellHeight);
                 } else if(seen.contains(i, j)) {
-                    pos.set(i * cellWidth, j * cellHeight, 0f);
+                    pos.set(i * cellWidth, (bigHeight - j) * cellHeight, 0f);
                     batch.setPackedColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.get('.', solid), pos.x, pos.y, cellWidth, cellHeight);
@@ -1256,12 +1259,12 @@ public class DawnlikeDemo extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if (visible[i][j] > 0.0) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
-                        batch.draw(monster.animate(time), monster.getX() * cellWidth, monster.getY() * cellHeight);
+                        batch.draw(monster.animate(time), monster.getX() * cellWidth, (bigHeight - monster.getY()) * cellHeight);
                     }
                 }
             }
         }
-        batch.draw(playerSprite.animate(time), playerSprite.getX() * cellWidth, playerSprite.getY() * cellHeight);
+        batch.draw(playerSprite.animate(time), playerSprite.getX() * cellWidth, (bigHeight - playerSprite.getY()) * cellHeight);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     @Override
@@ -1272,7 +1275,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         // center the camera on the player's position
         camera.position.x = playerSprite.getX() * cellWidth;
-        camera.position.y =  playerSprite.getY() * cellHeight;
+        camera.position.y =  (bigHeight - playerSprite.getY()) * cellHeight;
         camera.update();
 
         mainViewport.apply(false);
