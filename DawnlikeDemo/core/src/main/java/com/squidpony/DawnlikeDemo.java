@@ -823,17 +823,17 @@ public class DawnlikeDemo extends ApplicationAdapter {
         charMapping.put('#', atlas.findRegion("lit brick wall center"     ));
         charMapping.put('+', atlas.findRegion("closed wooden door front")); //front
         charMapping.put('/', atlas.findRegion("open wooden door side"  )); //side
-        charMapping.put('└', atlas.findRegion("lit brick wall right down"            ));
-        charMapping.put('┌', atlas.findRegion("lit brick wall right up"            ));
-        charMapping.put('┬', atlas.findRegion("lit brick wall left right up"           ));
-        charMapping.put('┴', atlas.findRegion("lit brick wall left right down"           ));
+        charMapping.put('┌', atlas.findRegion("lit brick wall right down"            ));
+        charMapping.put('└', atlas.findRegion("lit brick wall right up"            ));
+        charMapping.put('┴', atlas.findRegion("lit brick wall left right up"           ));
+        charMapping.put('┬', atlas.findRegion("lit brick wall left right down"           ));
         charMapping.put('─', atlas.findRegion("lit brick wall left right"            ));
         charMapping.put('│', atlas.findRegion("lit brick wall up down"            ));
         charMapping.put('├', atlas.findRegion("lit brick wall right up down"           ));
         charMapping.put('┼', atlas.findRegion("lit brick wall left right up down"          ));
         charMapping.put('┤', atlas.findRegion("lit brick wall left up down"           ));
-        charMapping.put('┐', atlas.findRegion("lit brick wall left up"            ));
-        charMapping.put('┘', atlas.findRegion("lit brick wall left down"            ));
+        charMapping.put('┘', atlas.findRegion("lit brick wall left up"            ));
+        charMapping.put('┐', atlas.findRegion("lit brick wall left down"            ));
         //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
         //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good winding dungeons
         //with rooms by default, but in the later call to dungeonGen.generate(), you can use a TilesetType such as
@@ -1090,7 +1090,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     return false;
                 pos.set(screenX, screenY, 0f);
                 mainViewport.unproject(pos);
-                if (onGrid(screenX = MathUtils.floor(pos.x) >> 4, screenY = bigHeight - (MathUtils.floor(pos.y) >> 4))) {
+                if (onGrid(screenX = MathUtils.floor(pos.x) >> 4, screenY = flipY(MathUtils.floor(pos.y) >> 4))) {
                     // we also need to check if screenX or screenY is the same cell.
                     if (cursor.x == screenX && cursor.y == screenY) {
                         return false;
@@ -1237,7 +1237,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
-                    pos.set(i * cellWidth, (bigHeight - j) * cellHeight, 0f);
+                    pos.set(i * cellWidth, flipY(j) * cellHeight, 0f);
                     batch.setPackedColor(toCursor.contains(Coord.get(i, j))
                             ? ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_WHITE, 0.9f)
                             : ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
@@ -1245,7 +1245,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                         batch.draw(charMapping.get('.', solid), pos.x, pos.y, cellWidth, cellHeight);
                     batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y, cellWidth, cellHeight);
                 } else if(seen.contains(i, j)) {
-                    pos.set(i * cellWidth, (bigHeight - j) * cellHeight, 0f);
+                    pos.set(i * cellWidth, flipY(j) * cellHeight, 0f);
                     batch.setPackedColor(ColorTools.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.get('.', solid), pos.x, pos.y, cellWidth, cellHeight);
@@ -1259,12 +1259,12 @@ public class DawnlikeDemo extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if (visible[i][j] > 0.0) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
-                        batch.draw(monster.animate(time), monster.getX() * cellWidth, (bigHeight - monster.getY()) * cellHeight);
+                        batch.draw(monster.animate(time), monster.getX() * cellWidth, flipY(monster.getY()) * cellHeight);
                     }
                 }
             }
         }
-        batch.draw(playerSprite.animate(time), playerSprite.getX() * cellWidth, (bigHeight - playerSprite.getY()) * cellHeight);
+        batch.draw(playerSprite.animate(time), playerSprite.getX() * cellWidth, flipY(playerSprite.getY()) * cellHeight);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     @Override
@@ -1275,7 +1275,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         // center the camera on the player's position
         camera.position.x = playerSprite.getX() * cellWidth;
-        camera.position.y =  (bigHeight - playerSprite.getY()) * cellHeight;
+        camera.position.y =  flipY(playerSprite.getY()) * cellHeight;
         camera.update();
 
         mainViewport.apply(false);
@@ -1352,21 +1352,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 }
             }
         }
-        // if the previous blocks didn't happen, and there are no active animations, then either change the phase
-        // (because with no animations running the last phase must have ended), or start a new animation soon.
-        else {
-            switch (phase) {
-                case WAIT:
-                    break;
-                case MONSTER_ANIM: {
-                    phase = Phase.WAIT;
-                }
-                break;
-                case PLAYER_ANIM: {
-                    postMove();
-                }
-            }
-        }
         pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight, 0);
         mainViewport.unproject(pos);
         font.draw(batch, "Current Health: [RED]" + health + "[WHITE]", pos.x, pos.y);
@@ -1377,6 +1362,13 @@ public class DawnlikeDemo extends ApplicationAdapter {
 		super.resize(width, height);
         mainViewport.update(width, height, false);
 	}
+	
+	public float flipY(float y){
+        return bigHeight  - y;
+    }
+	public int flipY(int y){
+        return bigHeight  - y;
+    }
 }
 // An explanation of hexadecimal float/double literals was mentioned earlier, so here it is.
 // The literal 0x1p-9f is a good example; it is essentially the same as writing 0.001953125f,
