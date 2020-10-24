@@ -13,6 +13,30 @@ uniform sampler2D u_texture;
 uniform float seed;
 uniform float tm;
 
+
+
+
+//seeds
+const vec3 S3 = vec3(0.2246822519, 0.3266489917, 0.374761393);
+// harmonious numbers
+const vec3 H3 = vec3(0.8191725134, 0.6710436067, 0.5497004779);
+const vec4 H4 = vec4(0.8566748838545029, 0.733891856627126, 0.6287067210378087, 0.5385972572236101);
+vec3 norl(vec3 p) {
+    return fract(16.0 * mix(
+                 fract(fract(dot((p + S3), H3) + S3.yzx) * fract(dot(H3.zxy - S3.zxy, p.yzx)))
+                 , fract(fract(dot((p + H4.wzy), S3.yzx) + H4.yzx) * fract(dot(S3.zxy - H4.yxw, p.yzx)))
+                 , normalize(p.zxy)));
+}
+float nrl(vec3 p) {
+    return fract(32.0 * dot(
+                 fract(dot(p + S3, H3) + S3.yzx) * fract(dot(H3.zxy - S3.zxy, p.yzx)),
+                 fract(dot(p + H4.wzy, S3.yzx) + H4.yzx) * fract(dot(S3.zxy - H4.yxw, p.yzx))));
+}
+
+
+
+
+
 const float PHI = 1.618034; // phi, the Golden Ratio
 
 float swayRandomized(float seed, float value)

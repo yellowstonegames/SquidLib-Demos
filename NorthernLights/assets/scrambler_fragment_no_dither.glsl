@@ -51,6 +51,7 @@ void main() {
   con += cosmic(s.zxy, con.yzx);
   con += cosmic(s.xyz, con.zxy);
 
-  gl_FragColor.rgb = applyHue(cos(con * 3.14159) * 0.5 + 0.5);
+  //gl_FragColor.rgb = applyHue(cos(con * 3.14159) * 0.5 + 0.5);
+  gl_FragColor.rgb = cos(con * 3.14159265) * 0.5 + 0.5;;
   gl_FragColor.a = v_color.a;
 }

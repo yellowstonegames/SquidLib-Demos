@@ -14,6 +14,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.anim8.AnimatedGif;
 import com.github.tommyettinger.anim8.AnimatedPNG;
 
+import static com.github.tommyettinger.anim8.Dithered.DitherAlgorithm.SCATTER;
+
 /**
  * Credit for the shader adaptation goes to angelickite , a very helpful user on the libGDX Discord.
  * The Discord can be found at <a href="https://discord.gg/crTrDEK">this link</a>.
@@ -40,7 +42,8 @@ public class NorthernLights extends ApplicationAdapter {
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
-		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("cuatro_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("cuatro_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("standoff_fragment_no_dither.glsl"));
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
 			Gdx.app.exit();
@@ -79,7 +82,7 @@ public class NorthernLights extends ApplicationAdapter {
 			}
 		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0.0005f);
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0.02f);
 		batch.begin();
 		shader.setUniformf("seed", seed);
 		shader.setUniformf("tm", ftm);
@@ -116,6 +119,7 @@ public class NorthernLights extends ApplicationAdapter {
 			pixmaps.add(ScreenUtils.getFrameBufferPixmap(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 		}
 		AnimatedGif gif = new AnimatedGif();
+		gif.setDitherAlgorithm(SCATTER);
 //		gif.palette = new PaletteReducer(new int[]{0x00000000, 0x2B2821FF, 0x624C3CFF, 0xD9AC8BFF, 0xE3CFB4FF,
 //				0x243D5CFF, 0x5D7275FF, 0x5C8B93FF, 0xB1A58DFF, 0xB03A48FF, 0xD4804DFF, 0xE0C872FF, 0x3E6958FF, });
 		
