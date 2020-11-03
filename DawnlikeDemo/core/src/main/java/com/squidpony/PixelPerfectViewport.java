@@ -18,7 +18,6 @@ package com.squidpony;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -60,7 +59,6 @@ public class PixelPerfectViewport extends Viewport {
 
     @Override
     public void update(int screenWidth, int screenHeight, boolean centerCamera) {
-        Vector2 scaled = scaling.apply(getWorldWidth(), getWorldHeight(), screenWidth, screenHeight);
         float worldWidth = getWorldWidth(), worldHeight = getWorldHeight();
 
         int viewportWidth = 0;

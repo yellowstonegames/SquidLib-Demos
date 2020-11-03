@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Align;
@@ -162,10 +163,12 @@ public class DawnlikeDemo extends ApplicationAdapter {
         rng = new GWTRNG();
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        contrastBatch = new SpriteBatch(1000, ColorTools.createContrastShader());
+        contrastBatch = new SpriteBatch(1000, new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt")));
+//        contrastBatch = new SpriteBatch(1000, ColorTools.createContrastShader());
         simpleBatch = new SpriteBatch();
-        batch = simpleBatch;
+        batch = contrastBatch;
         animationStart = TimeUtils.millis();
+        
         mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
@@ -1280,6 +1283,11 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
+        if(batch.getShader() == contrastBatch.getShader()) {
+            batch.getShader().setUniformf("TextureSize", 2048f, 1024f);
+//            batch.getShader().setUniformf("InputSize", mainViewport.getWorldWidth(), mainViewport.getWorldHeight());
+//            batch.getShader().setUniformf("OutputSize", mainViewport.getScreenWidth(), mainViewport.getScreenHeight());
+        }
         batch.begin();
         
         // you done bad. you done real bad.
