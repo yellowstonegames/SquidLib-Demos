@@ -70,7 +70,7 @@ COMPAT_VARYING vec4 t7;
 #define XBR_LV2_COEFFICIENT 2.0
 #define corner_type 3.0
 
-const mat3 yuv = mat3(0.299, 0.587, 0.114, -0.169, -0.331, 0.499, 0.499, -0.418, -0.0813);
+const mat4 yuv = mat4(0.299, 0.587, 0.114, 0.0, -0.169, -0.331, 0.499, 0.0, 0.499, -0.418, -0.0813, 0.0, 1.0, 1.0, 1.0, 1.0);
 const vec4 delta = vec4(0.4, 0.4, 0.4, 0.4);
 const vec3 bright = vec3(0.375, 0.5, 0.125);
 
@@ -79,9 +79,32 @@ vec4 df(vec4 A, vec4 B)
 	return vec4(abs(A-B));
 }
 
-float c_df(vec3 c1, vec3 c2) {
-	vec3 df = abs(c1 - c2);
-	return df.r + df.g + df.b;
+float c_df(vec4 c1, vec4 c2) {
+//  vec3 df = abs(c1.rgb * c1.a - c2.rgb * c2.a);
+//  return (df.r + df.g + df.b);
+
+//  vec3 df = abs(c1.rgb - c2.rgb);
+//  return (df.r + df.g + df.b) * c1.a * c2.a;
+
+  vec3 df = abs(c1.rgb - c2.rgb);
+  return (df.r + df.g + df.b) * (2.0 - c1.a * c2.a);
+}
+
+mat4 transpose(mat4 val) {
+    mat4 result;
+    result[0][1] = val[1][0];
+    result[0][2] = val[2][0];
+    result[0][3] = val[3][0];
+    result[1][0] = val[0][1];
+    result[1][2] = val[2][1];
+    result[1][3] = val[3][1];
+    result[2][0] = val[0][2];
+    result[2][1] = val[1][2];
+    result[2][3] = val[3][2];
+    result[3][0] = val[0][3];
+    result[3][1] = val[1][3];
+    result[3][2] = val[2][3];
+    return result;
 }
 
 bvec4 eq(vec4 A, vec4 B)
@@ -116,52 +139,51 @@ void main()
 	bvec4 interp_restriction_lv3_left, interp_restriction_lv3_up;
 	bvec4 nc, nc30, nc60, nc45, nc15, nc75; // new_color
 	vec4 fx, fx_left, fx_up, finalfx, fx3_left, fx3_up; // inequalities of straight lines.
-	vec3 res1, res2, pix1, pix2;
+	vec4 res1, res2, pix1, pix2;
 	float blend1, blend2;
 
     vec2 fp = fract(vTexCoord * SourceSize.xy);
 
-    vec3 A1 = COMPAT_TEXTURE(Texture, t1.xw).rgb;
-    vec3 B1 = COMPAT_TEXTURE(Texture, t1.yw).rgb;
-    vec3 C1 = COMPAT_TEXTURE(Texture, t1.zw).rgb;
+    vec4 A1 = COMPAT_TEXTURE(Texture, t1.xw).rgba;
+    vec4 B1 = COMPAT_TEXTURE(Texture, t1.yw).rgba;
+    vec4 C1 = COMPAT_TEXTURE(Texture, t1.zw).rgba;
 
-    vec3 A = COMPAT_TEXTURE(Texture, t2.xw).rgb;
-    vec3 B = COMPAT_TEXTURE(Texture, t2.yw).rgb;
-    vec3 C = COMPAT_TEXTURE(Texture, t2.zw).rgb;
+    vec4 A = COMPAT_TEXTURE(Texture, t2.xw).rgba;
+    vec4 B = COMPAT_TEXTURE(Texture, t2.yw).rgba;
+    vec4 C = COMPAT_TEXTURE(Texture, t2.zw).rgba;
 
-    vec3 D = COMPAT_TEXTURE(Texture, t3.xw).rgb;
-    vec4 E_ = COMPAT_TEXTURE(Texture, t3.yw).rgba;
-    vec3 E = E_.rgb;
-    vec3 F = COMPAT_TEXTURE(Texture, t3.zw).rgb;
+    vec4 D = COMPAT_TEXTURE(Texture, t3.xw).rgba;
+    vec4 E = COMPAT_TEXTURE(Texture, t3.yw).rgba;
+    vec4 F = COMPAT_TEXTURE(Texture, t3.zw).rgba;
 
-    vec3 G = COMPAT_TEXTURE(Texture, t4.xw).rgb;
-    vec3 H = COMPAT_TEXTURE(Texture, t4.yw).rgb;
-    vec3 I = COMPAT_TEXTURE(Texture, t4.zw).rgb;
+    vec4 G = COMPAT_TEXTURE(Texture, t4.xw).rgba;
+    vec4 H = COMPAT_TEXTURE(Texture, t4.yw).rgba;
+    vec4 I = COMPAT_TEXTURE(Texture, t4.zw).rgba;
 
-    vec3 G5 = COMPAT_TEXTURE(Texture, t5.xw).rgb;
-    vec3 H5 = COMPAT_TEXTURE(Texture, t5.yw).rgb;
-    vec3 I5 = COMPAT_TEXTURE(Texture, t5.zw).rgb;
+    vec4 G5 = COMPAT_TEXTURE(Texture, t5.xw).rgba;
+    vec4 H5 = COMPAT_TEXTURE(Texture, t5.yw).rgba;
+    vec4 I5 = COMPAT_TEXTURE(Texture, t5.zw).rgba;
 
-    vec3 A0 = COMPAT_TEXTURE(Texture, t6.xy).rgb;
-    vec3 D0 = COMPAT_TEXTURE(Texture, t6.xz).rgb;
-    vec3 G0 = COMPAT_TEXTURE(Texture, t6.xw).rgb;
+    vec4 A0 = COMPAT_TEXTURE(Texture, t6.xy).rgba;
+    vec4 D0 = COMPAT_TEXTURE(Texture, t6.xz).rgba;
+    vec4 G0 = COMPAT_TEXTURE(Texture, t6.xw).rgba;
 
-    vec3 C4 = COMPAT_TEXTURE(Texture, t7.xy).rgb;
-    vec3 F4 = COMPAT_TEXTURE(Texture, t7.xz).rgb;
-    vec3 I4 = COMPAT_TEXTURE(Texture, t7.xw).rgb;
+    vec4 C4 = COMPAT_TEXTURE(Texture, t7.xy).rgba;
+    vec4 F4 = COMPAT_TEXTURE(Texture, t7.xz).rgba;
+    vec4 I4 = COMPAT_TEXTURE(Texture, t7.xw).rgba;
 
-	vec4 b = transpose(mat4x3(B, D, H, F)) * (XBR_Y_WEIGHT * yuv[0]);
-	vec4 c = transpose(mat4x3(C, A, G, I)) * (XBR_Y_WEIGHT * yuv[0]);
-	vec4 e = transpose(mat4x3(E, E, E, E)) * (XBR_Y_WEIGHT * yuv[0]);
+	vec4 b = transpose(mat4(B, D, H, F)) * (XBR_Y_WEIGHT * yuv[0]);
+	vec4 c = transpose(mat4(C, A, G, I)) * (XBR_Y_WEIGHT * yuv[0]);
+	vec4 e = transpose(mat4(E, E, E, E)) * (XBR_Y_WEIGHT * yuv[0]);
 	vec4 d = b.yzwx;
 	vec4 f = b.wxyz;
 	vec4 g = c.zwxy;
 	vec4 h = b.zwxy;
 	vec4 i = c.wxyz;
 
-	vec4 i4 = transpose(mat4x3(I4, C1, A0, G5)) * (XBR_Y_WEIGHT*yuv[0]);
-	vec4 i5 = transpose(mat4x3(I5, C4, A1, G0)) * (XBR_Y_WEIGHT*yuv[0]);
-	vec4 h5 = transpose(mat4x3(H5, F4, B1, D0)) * (XBR_Y_WEIGHT*yuv[0]);
+	vec4 i4 = transpose(mat4(I4, C1, A0, G5)) * (XBR_Y_WEIGHT*yuv[0]);
+	vec4 i5 = transpose(mat4(I5, C4, A1, G0)) * (XBR_Y_WEIGHT*yuv[0]);
+	vec4 h5 = transpose(mat4(H5, F4, B1, D0)) * (XBR_Y_WEIGHT*yuv[0]);
 	vec4 f4 = h5.yzwx;
 
 	vec4 c1 = i4.yzwx;
@@ -193,27 +215,30 @@ void main()
 	fx3_up  = (Aw*fp.y+Bw*fp.x);
 
 	// It uses CORNER_C if none of the others are defined.
-if(corner_type == 1.0)
-	{interp_restriction_lv1 = and(notEqual(e, f), notEqual(e, h));}
-else if(corner_type == 2.0)
-	{interp_restriction_lv1      = and(and(notEqual(e,f) , notEqual(e,h))  ,
-									( or(or(and(and(or(and(not(eq(f,b)) ,  not(eq(h,d))) ,
-									eq(e,i)) , not(eq(f,i4))) , not(eq(h,i5))) , eq(e,g)) , eq(e,c)) ) );}
-//commenting this one out because something got broken
-/*else if(corner_type == 6.0)
-	{interp_restriction_lv1      = and(and(and(notEqual(e,f) , notEqual(e,h))  , 
-									( or(or(and(and(or(and(not(eq(f,b)) , not(eq(h,d))) ,
-									eq(e,i)) , not(eq(f,i4))) , not(eq(h,i5))) , eq(e,g)) ,
-									eq(e,c)) )) , (and(or(or(or(or(and(notEqual(f,f4) , notEqual(f,i)) ,
-									and(notEqual(h,h5) , notEqual(h,i))) , notEqual(h,g)) , notEqual(f,c)) ,
-									eq(b,c1)) , eq(d,g0))));} */
-else
-	{interp_restriction_lv1 = and(and(notEqual(e, f), notEqual(e, h)),
+//if(corner_type == 1.0) {
+//interp_restriction_lv1 = and(notEqual(e, f), notEqual(e, h));
+//}
+//else if(corner_type == 2.0) {
+//interp_restriction_lv1      = and(and(notEqual(e,f) , notEqual(e,h))  ,
+//									( or(or(and(and(or(and(not(eq(f,b)) ,  not(eq(h,d))) ,
+//									eq(e,i)) , not(eq(f,i4))) , not(eq(h,i5))) , eq(e,g)) , eq(e,c)) ) );
+//}
+////commenting this one out because something got broken
+///*else if(corner_type == 6.0)
+//	{interp_restriction_lv1      = and(and(and(notEqual(e,f) , notEqual(e,h))  , 
+//									( or(or(and(and(or(and(not(eq(f,b)) , not(eq(h,d))) ,
+//									eq(e,i)) , not(eq(f,i4))) , not(eq(h,i5))) , eq(e,g)) ,
+//									eq(e,c)) )) , (and(or(or(or(or(and(notEqual(f,f4) , notEqual(f,i)) ,
+//									and(notEqual(h,h5) , notEqual(h,i))) , notEqual(h,g)) , notEqual(f,c)) ,
+//									eq(b,c1)) , eq(d,g0))));} */
+//else {
+interp_restriction_lv1 = and(and(notEqual(e, f), notEqual(e, h)),
 	                             or(or(and(not(eq(f,b)), not(eq(f,c))),
 	                                   and(not(eq(h,d)), not(eq(h,g)))),
 	                                or(and(eq(e,i), or(and(not(eq(f,f4)), not(eq(f,i4))),
 	                                                   and(not(eq(h,h5)), not(eq(h,i5))))),
-	                                   or(eq(e,g), eq(e,c)))));}
+	                                   or(eq(e,g), eq(e,c)))));
+//}
 
     interp_restriction_lv2_left = and(notEqual(e, g), notEqual(d, g));
 	interp_restriction_lv2_up   = and(notEqual(e, c), notEqual(b, c));
@@ -262,16 +287,17 @@ else
 
     res1 = mix(E, pix1, blend1);
     res2 = mix(E, pix2, blend2);
-    vec3 res = mix(res1, res2, step(c_df(E, res1), c_df(E, res2)));
+    vec4 res = mix(res1, res2, step(c_df(E, res1), c_df(E, res2)));
     
     //vec3 ycc = vec3(
     //  (dot(COL0.rgb, bright) * 0.75 - 0.75 + 0.43 * pow(dot(res, bright), 1.4642634172891231) * 2.714829459393612),
     //  ((COL0.r - COL0.b) + (res.r - res.b) * 1.5),
     //  ((COL0.g - COL0.b) + (res.g - res.b) * 1.5));
-    FragColor = clamp(vec4(
-      res * COL0.rgb,
+    FragColor = res * COL0;
+//      clamp(vec4(
+//      res.rgb * COL0.rgb,
 //      dot(ycc, vec3(1.0, 0.625, -0.5)),
 //      dot(ycc, vec3(1.0, -0.375, 0.5)),
 //      dot(ycc, vec3(1.0, -0.375, -0.5)),
-      COL0.a * E_.a), 0.0, 1.0);
+//      COL0.a * E.a), 0.0, 1.0);
 }
