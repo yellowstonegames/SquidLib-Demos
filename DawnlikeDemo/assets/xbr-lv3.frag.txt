@@ -1,5 +1,3 @@
-#version 130
-
 /*
    Hyllian's xBR-lv3 Shader
    
@@ -62,7 +60,7 @@ COMPAT_VARYING vec4 t7;
 #define Source Texture
 #define vTexCoord TEX0.xy
 
-#define SourceSize vec4(TextureSize, 1.0 / TextureSize) //either TextureSize or InputSize
+#define SourceSize vec4(TextureSize, 1.0 / TextureSize)
 
 #define XBR_Y_WEIGHT 48.0
 #define XBR_EQ_THRESHOLD 10.0

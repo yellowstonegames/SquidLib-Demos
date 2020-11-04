@@ -7,7 +7,10 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -161,9 +164,10 @@ public class DawnlikeDemo extends ApplicationAdapter {
         // seeds; having more possible seeds means more maps and other procedural content
         // become possible. Here we don't seed the GWTRNG, so its seed will be random.
         rng = new GWTRNG();
-
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        contrastBatch = new SpriteBatch(1000, new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt")));
+        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
+        if (!shader.isCompiled()) { Gdx.app.error("Shader", shader.getLog()); }
+        contrastBatch = new SpriteBatch(1000, shader);
 //        contrastBatch = new SpriteBatch(1000, ColorTools.createContrastShader());
         simpleBatch = new SpriteBatch();
         batch = contrastBatch;
@@ -1283,6 +1287,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
+        batch.getShader().bind();
         if(batch.getShader() == contrastBatch.getShader()) {
             batch.getShader().setUniformf("TextureSize", 2048f, 1024f);
 //            batch.getShader().setUniformf("InputSize", mainViewport.getWorldWidth(), mainViewport.getWorldHeight());
