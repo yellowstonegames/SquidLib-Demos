@@ -75,9 +75,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
     //cell; resizing the window can make the units cellWidth and cellHeight use smaller or larger than a pixel.
 
     /** In number of cells */
-    public static final int gridWidth = 48;
+    public static final int gridWidth = 32;
     /** In number of cells */
-    public static final int gridHeight = 32;
+    public static final int gridHeight = 24;
 
     /** In number of cells */
     public static final int bigWidth = gridWidth * 2;

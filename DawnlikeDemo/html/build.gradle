@@ -29,9 +29,9 @@ gwt {
 
 dependencies {
   api project(':core')
-  api "com.badlogicgames.gdx:gdx:1.9.11:sources"
-  api "com.github.tommyettinger:gdx-backend-gwt:1.911.2"
-  api "com.github.tommyettinger:gdx-backend-gwt:1.911.2:sources"
+  api "com.badlogicgames.gdx:gdx:1.9.12:sources"
+  api "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:9475e5b8ab"
+  api "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:9475e5b8ab:sources"
   api "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
   api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 }
