@@ -68,9 +68,11 @@ COMPAT_VARYING vec4 t7;
 #define XBR_LV2_COEFFICIENT 2.0
 
 //const mat4 yuv = mat4(0.299, 0.587, 0.114, 0.0, -0.169, -0.331, 0.499, 0.0, 0.499, -0.418, -0.0813, 0.0, 1.0, 1.0, 1.0, 1.0);
-const vec4 yuv0 = vec4(0.299, 0.587, 0.114, 0.0);
+//const mat3 yuv = mat3(0.299, 0.587, 0.114, -0.169, -0.331, 0.499, 0.499, -0.418, -0.0813);
+const mat3 rgbToIPT = mat3(0.189786, 0.669665 , 0.286498, 0.576951, -0.73741 , 0.655205, 0.233221, 0.0681367, -0.941748);
+const mat3 iptToRGB = mat3(0.999779, 1.00015, 0.999769, 1.07094, -0.377744, 0.0629496, 0.324891, 0.220439, -0.809638);
+const vec4 ipt0 = vec4(0.189786, 0.576951, 0.233221, 0.0);
 const vec4 delta = vec4(0.4, 0.4, 0.4, 0.4);
-const vec3 bright = vec3(0.375, 0.5, 0.125);
 
 vec4 df(vec4 A, vec4 B)
 {
@@ -168,18 +170,18 @@ void main()
     vec4 F4 = COMPAT_TEXTURE(Texture, t7.xz).rgba;
     vec4 I4 = COMPAT_TEXTURE(Texture, t7.xw).rgba;
 
-	vec4 b = transpose(mat4(B, D, H, F)) * (XBR_Y_WEIGHT * yuv0);
-	vec4 c = transpose(mat4(C, A, G, I)) * (XBR_Y_WEIGHT * yuv0);
-	vec4 e = transpose(mat4(E, E, E, E)) * (XBR_Y_WEIGHT * yuv0);
+	vec4 b = transpose(mat4(B, D, H, F)) * (XBR_Y_WEIGHT * ipt0);
+	vec4 c = transpose(mat4(C, A, G, I)) * (XBR_Y_WEIGHT * ipt0);
+	vec4 e = transpose(mat4(E, E, E, E)) * (XBR_Y_WEIGHT * ipt0);
 	vec4 d = b.yzwx;
 	vec4 f = b.wxyz;
 	vec4 g = c.zwxy;
 	vec4 h = b.zwxy;
 	vec4 i = c.wxyz;
 
-	vec4 i4 = transpose(mat4(I4, C1, A0, G5)) * (XBR_Y_WEIGHT*yuv0);
-	vec4 i5 = transpose(mat4(I5, C4, A1, G0)) * (XBR_Y_WEIGHT*yuv0);
-	vec4 h5 = transpose(mat4(H5, F4, B1, D0)) * (XBR_Y_WEIGHT*yuv0);
+	vec4 i4 = transpose(mat4(I4, C1, A0, G5)) * (XBR_Y_WEIGHT*ipt0);
+	vec4 i5 = transpose(mat4(I5, C4, A1, G0)) * (XBR_Y_WEIGHT*ipt0);
+	vec4 h5 = transpose(mat4(H5, F4, B1, D0)) * (XBR_Y_WEIGHT*ipt0);
 	vec4 f4 = h5.yzwx;
 
 	vec4 c1 = i4.yzwx;
@@ -267,16 +269,10 @@ void main()
     vec4 res = mix(res1, res2, step(c_df(E, res1), c_df(E, res2)));
     
     //// normal colors
-    FragColor = res * COL0;
+    //FragColor = res * COL0;
     
     //// high-contrast shader
-    //vec3 ycc = vec3(
-    //  (dot(COL0.rgb, bright) * 0.75 - 0.5 + pow(dot(res.rgb, bright), 1.25) * 0.75),
-    //  ((COL0.r - COL0.b) + (res.r - res.b) * 1.25),
-    //  ((COL0.g - COL0.b) + (res.g - res.b) * 1.25));
-    //FragColor = clamp(vec4(
-    //  dot(ycc, vec3(1.0, 0.625, -0.5)),
-    //  dot(ycc, vec3(1.0, -0.375, 0.5)),
-    //  dot(ycc, vec3(1.0, -0.375, -0.5)),
-    //  COL0.a * res.a), 0.0, 1.0);
+    vec3 ipt = rgbToIPT * (res.rgb + COL0.rgb * 0.75 - 0.375);
+    ipt.x *= ipt.x * 0.625;
+    FragColor = clamp(vec4(iptToRGB * ipt, COL0.a * res.a), 0.0, 1.0);
 }

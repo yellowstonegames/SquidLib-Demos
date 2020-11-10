@@ -61,12 +61,12 @@ public class PixelPerfectViewport extends Viewport {
     public void update(int screenWidth, int screenHeight, boolean centerCamera) {
         float worldWidth = getWorldWidth(), worldHeight = getWorldHeight();
 
-        int viewportWidth = 0;
-        int viewportHeight = 0;
+        int viewportWidth;
+        int viewportHeight;
 
         switch (scaling) {
             case fit: {
-                float screenRatio = screenHeight / screenWidth;
+                float screenRatio = screenHeight / (float)screenWidth;
                 float worldRatio = worldHeight / worldWidth;
                 float scale = (int) (screenRatio > worldRatio ? screenWidth / worldWidth : screenHeight / worldHeight);
                 if (scale < 1) scale = 0.5f;
@@ -75,7 +75,7 @@ public class PixelPerfectViewport extends Viewport {
                 break;
             }
             case fill: {
-                float screenRatio = screenHeight / screenWidth;
+                float screenRatio = screenHeight / (float)screenWidth;
                 float worldRatio = worldHeight / worldWidth;
                 float scale = (int) Math.ceil(screenRatio < worldRatio ? screenWidth / worldWidth : screenHeight / worldHeight);
                 if (scale < 1) scale = 0.5f;
