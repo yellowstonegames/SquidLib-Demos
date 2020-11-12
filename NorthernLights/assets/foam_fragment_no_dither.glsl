@@ -33,20 +33,85 @@ vec3 applyHue(vec3 rgb) {
     return rgb * c + cross(k, rgb) * sin(hue) + k * dot(k, rgb) * (1.0 - c);
 }
 
+// Hash without Sine, https://www.shadertoy.com/view/4djSRW
+float hashwithoutsine11(float p)
+{
+    p = fract(p * .1031);
+    p *= p + 33.33;
+    p *= p + p;
+    return fract(p);
+}
+
+float hashwithoutsine12(vec2 p)
+{
+	vec3 p3  = fract(vec3(p.xyx) * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+float hashwithoutsine13(vec3 p3)
+{
+    p3  = fract(p3 * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+vec2 hashwithoutsine21(float p)
+{
+	vec3 p3 = fract(vec3(p,p,p) * vec3(.1031, .1030, .0973));
+	p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
+
+vec2 hashwithoutsine22(vec2 p)
+{
+	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx+33.33);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
+
+vec2 hashwithoutsine23(vec3 p3)
+{
+	p3 = fract(p3 * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yzx+33.33);
+    return fract((p3.xx+p3.yz)*p3.zy);
+}
+
+vec3 hashwithoutsine31(float p)
+{
+   vec3 p3 = fract(vec3(p,p,p) * vec3(.1031, .1030, .0973));
+   p3 += dot(p3, p3.yzx+33.33);
+   return fract((p3.xxy+p3.yzz)*p3.zyx);
+}
+
+vec3 hashwithoutsine32(vec2 p)
+{
+	vec3 p3 = fract(vec3(p.xyx) * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yxz+33.33);
+    return fract((p3.xxy+p3.yzz)*p3.zyx);
+}
+
+vec3 hashwithoutsine33(vec3 p3)
+{
+	p3 = fract(p3 * vec3(.1031, .1030, .0973));
+    p3 += dot(p3, p3.yxz+33.33);
+    return fract((p3.xxy + p3.yxx)*p3.zyx);
+}
+
 float hash(float seed, float p) {
-    return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
+    return hashwithoutsine11(hashwithoutsine11(p) + seed);
 }
 
 float hash(float seed, vec2 p) {
-    return fract((dot((p + seed), H2) + seed) * (0.5 + fract(dot(H2.yx - seed, p))));
+    return hashwithoutsine12(hashwithoutsine22(p) + seed);
 }
 
 vec3 hash(vec3 seed, float p) {
-    return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
+    return hashwithoutsine33(hashwithoutsine31(p) + seed);
 }
 
 vec3 hash(vec3 seed, vec3 p) {
-    return fract((dot((p + seed), H3) + seed) * (0.5 + fract(dot(H3.zxy - seed, p.yzx))));
+    return hashwithoutsine33(hashwithoutsine33(p) + seed);
 }
 
 float noise(float seed, float x) {
