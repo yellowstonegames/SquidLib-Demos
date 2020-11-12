@@ -1,7 +1,7 @@
 d:assets:assets:0:application/unknown:1
 b:assets:assets-d41d8cd98f00b204e9800998ecf8427e:0:application/unknown:1
 t:cuatro_fragment_no_dither.glsl:cuatro_fragment_no_dither-e33dfae9d163d51bdf4372086b925074.glsl:4539:application/unknown:1
-t:foam_fragment_no_dither.glsl:foam_fragment_no_dither-218371527c5b99a50add19e3e32d3c1d.glsl:6070:application/unknown:1
+t:foam_fragment_no_dither.glsl:foam_fragment_no_dither-14fca9bd0315923e106ef52c70089d1e.glsl:5872:application/unknown:1
 t:foam_vertex.glsl:foam_vertex-ea75eceaeb6fc10f63783e42bb81d800.glsl:345:application/unknown:1
 i:libgdx128.png:libgdx128-5711160caf1d6b67a04b02c121ec1d79.png:6532:image/png:1
 i:libgdx16.png:libgdx16-0f5121a19211955b174777b52c539152.png:741:image/png:1

@@ -119,7 +119,7 @@ float foam(float seed, float x) {
 float foam(float x) { return foam(61.0, x); }
 
 float foam(float seed, vec2 x) {
-    vec3 p = vec3(x.x, dot(x, vec2(-0.5, 0.8660254037844386)), dot(x, vec2(-0.5, -0.8660254037844386)));
+    vec3 p = vec3(x.x, dot(x, vec2(-0.5, 0.86602)), dot(x, vec2(-0.5, -0.86602)));
     float a = noise(seed, p.yz);
     float b = noise(seed + 42.1, p.xz + a);
     float c = noise(seed + 84.2, p.xy + b);
@@ -130,9 +130,9 @@ float foam(vec2 x) { return foam(61.0, x); }
 
 float foam(float seed, vec3 x) {
     vec4 p = vec4(x.x, 
-                  dot(x.xy, vec2(-0.3333333333333333, 0.9428090415820634)),
-                  dot(x, vec3(-0.3333333333333333, -0.4714045207910317, 0.816496580927726)),
-                  dot(x, vec3(-0.3333333333333333, -0.4714045207910317, -0.816496580927726)));
+                  dot(x.xy, vec2(-0.33333, 0.9428)),
+                  dot(x, vec3(-0.33333, -0.4714,  0.81649)),
+                  dot(x, vec3(-0.33333, -0.4714, -0.81649)));
     float a = noise(seed, p.yzw);
     float b = noise(seed + 42.1, p.xzw + a * H3.x);
     float c = noise(seed + 84.2, p.xyw + b * H3.y);
@@ -145,9 +145,9 @@ float foam(vec3 x) { return foam(61.0, x); }
 
 vec3 foam(vec3 seed, vec3 x) {
     vec4 p = vec4(x.x, 
-                  dot(x.xy, vec2(-0.3333333333333333, 0.9428090415820634)),
-                  dot(x, vec3(-0.3333333333333333, -0.4714045207910317, 0.816496580927726)),
-                  dot(x, vec3(-0.3333333333333333, -0.4714045207910317, -0.816496580927726)));
+                  dot(x.xy, vec2(-0.33333, 0.9428)),
+                  dot(x, vec3(-0.33333, -0.4714,  0.81649)),
+                  dot(x, vec3(-0.33333, -0.4714, -0.81649)));
     vec3 a = noise(seed, p.yzw);
     vec3 b = noise(seed + 42.1, p.xzw + a * H3.x);
     vec3 c = noise(seed + 84.2, p.xyw + b * H3.y);
