@@ -9,7 +9,7 @@ buildscript {
   dependencies {
 //    classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
-//    classpath "com.android.tools.build:gradle:$androidPluginVersion"
+    classpath "com.android.tools.build:gradle:$androidPluginVersion"
   }
 }
 
@@ -18,8 +18,8 @@ allprojects {
   apply plugin: 'idea'
 }
 
-//configure(subprojects - project(":android")) {
-configure(subprojects) {
+configure(subprojects - project(":android")) {
+//configure(subprojects) {
   apply plugin: 'java-library'
   sourceCompatibility = 1.8
 }
@@ -29,6 +29,7 @@ subprojects{
   ext.appName = 'NorthernLights'
   repositories {
     mavenCentral()
+    google()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
     jcenter()

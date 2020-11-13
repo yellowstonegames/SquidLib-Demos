@@ -1,7 +1,7 @@
-apply plugin: 'com.android.application'
+apply plugin: "com.android.application"
 
 android {
-  compileSdkVersion 27
+  compileSdkVersion 30
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
@@ -30,9 +30,18 @@ android {
   }
   defaultConfig {
     applicationId 'com.squidpony.demo'
-    minSdkVersion 14
-    targetSdkVersion 27
+    minSdkVersion 19
+    targetSdkVersion 30
+    versionCode 1
+    versionName "1.0"
   }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+
 }
 
 repositories {
@@ -80,6 +89,11 @@ task copyAndroidNatives() {
     }
   }
 }
+tasks.whenTaskAdded { packageTask ->
+  if (packageTask.name.contains("package")) {
+    packageTask.dependsOn 'copyAndroidNatives'
+  }
+}
 
 task run(type: Exec) {
   def path
@@ -100,5 +114,7 @@ task run(type: Exec) {
   }
 
   def adb = path + "/platform-tools/adb"
-  commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.squidpony.demo/com.squidpony.demo.android.AndroidLauncher'
+  commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.squidpony.demo/com.squidpony.demo.AndroidLauncher'
 }
+
+eclipse.project.name = appName + "-android"
