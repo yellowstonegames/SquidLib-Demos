@@ -1,15 +1,16 @@
 #ifdef GL_ES
 #define LOWP lowp
-precision mediump float;
-const float PHI = 1.618; // phi, the Golden Ratio
-const vec2 H2 = vec2(1.324, 1.754); // harmonious numbers for 2D
-const vec3 H3 = vec3(0.819, 0.671, 0.549); // harmonious numbers for 3D
+precision highp float;
+//const float PHI = 1.61803; // phi, the Golden Ratio
+//const vec2 H2 = vec2(1.32471, 1.75487); // harmonious numbers for 2D
+//const vec3 H3 = vec3(0.81917, 0.67104, 0.54970); // harmonious numbers for 3D
 #else
 #define LOWP 
+#endif
+
 const float PHI = 1.61803398874989484820459; // phi, the Golden Ratio
 const vec2 H2 = vec2(1.324717957244746, 1.754877666246693); // harmonious numbers for 2D
 const vec3 H3 = vec3(0.8191725134, 0.6710436067, 0.5497004779); // harmonious numbers for 3D
-#endif
 
 // This Shadertoy ( https://www.shadertoy.com/view/wssBz8 ) shows "Foam Noise" by Tommy Ettinger.
 // It's just value noise that's rotated and domain warps the next result.
@@ -25,8 +26,20 @@ uniform sampler2D u_texture;
 uniform float seed;
 uniform float tm;
 
-float hash(float seed, float p) {
-    return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
+//float hash(float seed, float p) {
+//    return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
+//}
+
+// Interleaved Gradient Noise,
+//  - Jimenez, Next Generation Post Processing in Call of Duty: Advanced Warfare
+//    Advances in Real-time Rendering, SIGGRAPH 2014
+// slightly tweaked so the input, instead of v.xy, is vec2(dot(v, H2), dot(v.yxy * v.yxx, H3))
+// H2 and H3 are harmonious number vectors.
+float hash(float seed, float p)
+{
+    vec3 magic = vec3(0.06711f, 0.00583f, 52.982f);
+    vec2 v = vec2(seed, p);
+    return fract(magic.z * fract(dot(vec2(dot(v, H2), dot(v.yxy * v.yxx, H3)), magic.xy)));
 }
 
 //float hash(float seed, vec2 p) {
