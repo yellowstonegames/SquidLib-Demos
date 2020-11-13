@@ -26,21 +26,21 @@ uniform sampler2D u_texture;
 uniform float seed;
 uniform float tm;
 
-//float hash(float seed, float p) {
-//    return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
-//}
+float hash(float seed, float p) {
+    return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
+}
 
 // Interleaved Gradient Noise,
 //  - Jimenez, Next Generation Post Processing in Call of Duty: Advanced Warfare
 //    Advances in Real-time Rendering, SIGGRAPH 2014
 // slightly tweaked so the input, instead of v.xy, is vec2(dot(v, H2), dot(v.yxy * v.yxx, H3))
 // H2 and H3 are harmonious number vectors.
-float hash(float seed, float p)
-{
-    vec3 magic = vec3(0.06711f, 0.00583f, 52.982f);
-    vec2 v = vec2(seed, p);
-    return fract(magic.z * fract(dot(vec2(dot(v, H2), dot(v.yxy * v.yxx, H3)), magic.xy)));
-}
+//float hash(float seed, float p)
+//{
+//    vec3 magic = vec3(0.06711f, 0.00583f, 52.982f);
+//    vec2 v = vec2(seed, p);
+//    return fract(magic.z * fract(dot(vec2(dot(v, H2), dot(v.yxy * v.yxx, H3)), magic.xy)));
+//}
 
 //float hash(float seed, vec2 p) {
 //    return fract((dot((p + seed), H2) + seed) * (0.5 + fract(dot(H2.yx - seed, p))));
@@ -162,7 +162,7 @@ float foam(float seed, vec3 x) {
 void main() {
   vec3 i = vec3(gl_FragCoord.xy + 99.0, tm * 0.3125) * 0.0625;
   gl_FragColor.r = foam(4.0 + seed, i);
-  gl_FragColor.g = foam(6.0 + seed, i);
-  gl_FragColor.b = foam(2.0 + seed, i);
+  gl_FragColor.g = foam(61.0 + seed, i);
+  gl_FragColor.b = foam(257.0 + seed, i);
   gl_FragColor.a = v_color.a;
 }
