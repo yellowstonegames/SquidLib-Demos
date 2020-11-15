@@ -22,7 +22,7 @@ public class GwtLauncher extends GwtApplication {
         cfg.alpha = true;
         Window.enableScrolling(false);
         Window.setMargin("0");
-        Window.addResizeHandler(new ResizeListener());
+        //Window.addResizeHandler(new ResizeListener());
         return cfg;
     }
 

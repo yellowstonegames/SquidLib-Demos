@@ -18,6 +18,8 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -101,7 +103,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private long lastDrawTime = 0;
     private Color bgColor;
     private BitmapFont font;
-    private PixelPerfectViewport mainViewport;
+    private Viewport mainViewport;
     private Camera camera;
     
     private OrderedMap<Coord, AnimatedGlider> monsters;
@@ -173,7 +175,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         batch = contrastBatch;
         animationStart = TimeUtils.millis();
         
-        mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
+        mainViewport = new ScalingViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
         camera.update();
