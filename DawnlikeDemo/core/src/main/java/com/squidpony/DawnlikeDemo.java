@@ -1,9 +1,6 @@
 package com.squidpony;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -44,7 +41,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
     private long startTime;
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
-    private SpriteBatch batch, simpleBatch, contrastBatch;
+    private SpriteBatch batch;
+    private ShaderProgram shader;
+    private boolean scalingShader = false;
     private Phase phase = Phase.WAIT;
     private long animationStart;
 
@@ -156,6 +155,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
 //    private float playerColor;
     @Override
     public void create () {
+        Gdx.app.setLogLevel(Application.LOG_DEBUG);
         // Starting time for the game; other times are measured relative to this so they aren't huge numbers.
         startTime = TimeUtils.millis();
         // Gotta have a random number generator.
@@ -167,12 +167,16 @@ public class DawnlikeDemo extends ApplicationAdapter {
         // become possible. Here we don't seed the GWTRNG, so its seed will be random.
         rng = new GWTRNG();
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        ShaderProgram shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
-        if (!shader.isCompiled()) { Gdx.app.error("Shader", shader.getLog()); }
-        contrastBatch = new SpriteBatch(1000, shader);
-//        contrastBatch = new SpriteBatch(1000, ColorTools.createContrastShader());
-        simpleBatch = new SpriteBatch();
-        batch = contrastBatch;
+        batch = new SpriteBatch();
+        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
+        if (!shader.isCompiled()) {
+            Gdx.app.error("Shader", shader.getLog());
+            scalingShader = false;
+        }
+        else{
+            batch.setShader(shader);
+            scalingShader = true;
+        }
         animationStart = TimeUtils.millis();
         
         mainViewport = new ScalingViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
@@ -1060,7 +1064,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
                         awaitedMoves.add(player);
                         break;
                     case B:
-                        batch = (batch == simpleBatch) ? contrastBatch : simpleBatch;
+                        batch.setShader(scalingShader ? null : shader);
+                        scalingShader = !scalingShader;
                         break;
                     case P:
                         DungeonUtility.debugPrint(decoDungeon);
@@ -1289,10 +1294,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
-        if(batch.getShader() == contrastBatch.getShader()) {
-            batch.getShader().setUniformf("TextureSize", 2048f, 1024f);
-//            batch.getShader().setUniformf("InputSize", mainViewport.getWorldWidth(), mainViewport.getWorldHeight());
-//            batch.getShader().setUniformf("OutputSize", mainViewport.getScreenWidth(), mainViewport.getScreenHeight());
+        if(scalingShader) {
+            shader.bind(); // prevents an OpenGL error, though it runs without this line
+            shader.setUniformf("TextureSize", 2048f, 1024f);
         }
         batch.begin();
         

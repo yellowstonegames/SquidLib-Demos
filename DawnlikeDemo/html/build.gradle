@@ -12,7 +12,7 @@ apply plugin: "war"
 apply plugin: "org.gretty"
 
 gwt {
-	gwtVersion = "2.9.0" // Should match the version used by the libGDX backend.
+	gwtVersion = gwtFrameworkVersion // Should match the version used by the libGDX backend.
 	maxHeapSize = '1G' // Default 256m is not enough for the GWT compiler. GWT is HUNGRY.
 	minHeapSize = '1G'
 
@@ -26,10 +26,13 @@ gwt {
 //	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
 	sourceLevel = 1.11
 }
+sourceCompatibility = 11.0
 
 dependencies {
   api project(':core')
   api "com.badlogicgames.gdx:gdx:1.9.12:sources"
+//  api "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12"
+//  api "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12:sources"
   api "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
   api "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
   api "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
@@ -101,7 +104,6 @@ task addSource {
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 
-sourceCompatibility = 11.0
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"
