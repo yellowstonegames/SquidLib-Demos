@@ -182,7 +182,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         atlas = new TextureAtlas("Dawnlike.atlas");
         font = new BitmapFont(Gdx.files.internal("font.fnt"), atlas.findRegion("font"));
-        font.setUseIntegerPositions(false);
+        font.setUseIntegerPositions(true);
         font.getData().markupEnabled = true;
         bgColors = ArrayTools.fill(FLOAT_BLACK, bigWidth, bigHeight);
         colors = ArrayTools.fill(FLOAT_WHITE, bigWidth, bigHeight);
@@ -1289,7 +1289,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
-        batch.getShader().bind();
         if(batch.getShader() == contrastBatch.getShader()) {
             batch.getShader().setUniformf("TextureSize", 2048f, 1024f);
 //            batch.getShader().setUniformf("InputSize", mainViewport.getWorldWidth(), mainViewport.getWorldHeight());
@@ -1301,10 +1300,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
         if (health <= 0) {
             // still need to display the map, then write over it with a message.
             putMap();
-            float wide = mainViewport.getWorldWidth(),
-                    x = playerSprite.getX() * cellWidth - mainViewport.getWorldWidth() * 0.5f,
-                    y = playerSprite.getY() * cellHeight;
-            
+            float wide = gridWidth * cellWidth,
+                    x = playerSprite.getX() * cellWidth - wide * 0.5f,
+                    y = flipY(playerSprite.getY()) * cellHeight;
             font.draw(batch, "[RED]YOUR CRAWL IS OVER![WHITE]", x, y + 32, wide, Align.center, true);
             font.draw(batch, "A monster sniffs your corpse and says,", x, y + 16, wide, Align.center, true);
             font.draw(batch, lang, x, y, wide, Align.center, true);

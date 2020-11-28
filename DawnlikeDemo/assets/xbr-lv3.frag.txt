@@ -269,10 +269,10 @@ void main()
     vec4 res = mix(res1, res2, step(c_df(E, res1), c_df(E, res2)));
     
     //// normal colors
-    //FragColor = res * COL0;
+    FragColor = res * COL0;
     
     //// high-contrast shader
-    vec3 ipt = rgbToIPT * (res.rgb + COL0.rgb * 0.75 - 0.375);
-    ipt.x *= ipt.x * 0.625;
-    FragColor = clamp(vec4(iptToRGB * ipt, COL0.a * res.a), 0.0, 1.0);
+    //vec3 ipt = rgbToIPT * (res.rgb + COL0.rgb * 0.75 - 0.375);
+    //ipt.x *= ipt.x * 0.625;
+    //FragColor = clamp(vec4(iptToRGB * ipt, COL0.a * res.a), 0.0, 1.0);
 }
