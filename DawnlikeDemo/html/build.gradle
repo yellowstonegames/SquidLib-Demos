@@ -26,17 +26,16 @@ gwt {
 //	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
 	sourceLevel = 1.11
 }
-sourceCompatibility = 11.0
 
 dependencies {
-  api project(':core')
-  api "com.badlogicgames.gdx:gdx:1.9.12:sources"
-//  api "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12"
-//  api "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12:sources"
-  api "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
-  api "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
-  api "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
-  api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
+	implementation project(':core')
+	implementation "com.badlogicgames.gdx:gdx:1.9.12:sources"
+//  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12"
+//  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12:sources"
+	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
+	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
+	implementation "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
+	implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
