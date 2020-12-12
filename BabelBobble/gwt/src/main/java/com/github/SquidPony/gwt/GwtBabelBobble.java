@@ -30,17 +30,29 @@ public class GwtBabelBobble extends GwtBareApp {
     public TextBox seedField;
     public Slider[] sliderBunch;
     public OrderedSet<String> names = Maker.makeOS(
-            "Simple", "Arabic", "English", "French", "Greek", "Ελληνικά",
-            "Hindi", "Inuktitut", "Japanese", "Korean", "Mongolian", "Nahuatl",
-            "Norse", "Russian", "Русский", "Somali", "Swahili",
-            "Mónazôr", "Nyeighi", "Xorgogh", "Áhìphon", "Ilthiê", "Dwupdagorg",
+            "Simple", "Arabic", "English", "French", "Spanish",
+            "Norse", "Greek", "Ελληνικά",
+            "Russian", "Русский", "Hindi",
+            "Chinese",  "Japanese", "Korean",
+            "Vietnamese", "Mongolian", "Malay", "Maori",
+            "Inuktitut", "Crow", "Cherokee", "Nahuatl",
+            "Somali", "Swahili", "Ancient Egyptian",
+            "Mónazôr", "Nyeighi", "Xorgogh", "Áhìphon", "Edyilon",
+            "Ilthiê", "Dwupdagorg", "Kiathaegioth", "Trarark", "Tsarrit",
+            "Riadííí", "Luuvohrm", "Khluzrelkeb",
             "Qraisojlea", "Zagtsarg", "Nralthóshos", "Hmoieloreo", "Vuŕeħid",
             "Random 1", "Random 2");
     public ArrayList<FakeLanguageGen> languages = Maker.makeList(
-            SIMPLISH, ARABIC_ROMANIZED, ENGLISH, FRENCH, GREEK_ROMANIZED, GREEK_AUTHENTIC,
-            HINDI_ROMANIZED, INUKTITUT, JAPANESE_ROMANIZED, KOREAN_ROMANIZED, MONGOLIAN, NAHUATL,
-            NORSE, RUSSIAN_ROMANIZED, RUSSIAN_AUTHENTIC, SOMALI, SWAHILI,
-            FANCY_FANTASY_NAME, LOVECRAFT, DEMONIC, INFERNAL, ELF, GOBLIN,
+            SIMPLISH, ARABIC_ROMANIZED, ENGLISH, FRENCH, SPANISH,
+            NORSE_SIMPLIFIED, GREEK_ROMANIZED, GREEK_AUTHENTIC,
+            RUSSIAN_ROMANIZED, RUSSIAN_AUTHENTIC, HINDI_ROMANIZED,
+            CHINESE_ROMANIZED, JAPANESE_ROMANIZED, KOREAN_ROMANIZED,
+            VIETNAMESE, MONGOLIAN, MALAY, MAORI,
+            INUKTITUT, CROW, CHEROKEE_ROMANIZED, NAHUATL,
+            SOMALI, SWAHILI, ANCIENT_EGYPTIAN,
+            FANCY_FANTASY_NAME, LOVECRAFT, DEMONIC, INFERNAL, CELESTIAL,
+            ELF, GOBLIN, DRAGON, KOBOLD, INSECT,
+            IMP, DEEP_SPEECH, HLETKIP,
             ALIEN_A, ALIEN_E, ALIEN_I, ALIEN_O, ALIEN_U,
             FakeLanguageGen.randomLanguage(9999L), FakeLanguageGen.randomLanguage(-99999999L));
     public Object[] mixer;
@@ -118,15 +130,15 @@ public class GwtBabelBobble extends GwtBareApp {
         currentArea.setText(currentText);
         currentArea.setVisibleLines(16);
         currentArea.setWidth("500px");
-        currentArea.setHeight("500px");
+        currentArea.setHeight("350px");
         langArea = new TextArea();
         langArea.setVisibleLines(16);
         langArea.setWidth("500px");
-        langArea.setHeight("500px");
+        langArea.setHeight("350px");
         langArea.setReadOnly(true);
         root.add(new Label("Random language cipher demo"));
         HorizontalPanel texts = new HorizontalPanel();
-        texts.setSize("1000px", "500px");
+        texts.setSize("1000px", "350px");
         texts.add(currentArea);
         texts.add(langArea);
         root.add(texts);
@@ -206,6 +218,7 @@ public class GwtBabelBobble extends GwtBareApp {
         buttonRow.add(generateButton);
         RootPanel.get().sinkEvents(Event.ONCLICK); //Event.ONCHANGE |
         buttonRow.setWidth("1000px");
+        buttonRow.setHeight("32px");
         buttonRow.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
         RootPanel.get("embed-html").add(buttonRow);
 
@@ -224,13 +237,15 @@ public class GwtBabelBobble extends GwtBareApp {
     {
         char[] c = (StringKit.hex(CrossHash.Curlup.chi.hash64(txt))
                 + StringKit.hex(CrossHash.Curlup.upsilon.hash64(txt))
-                + StringKit.hex(CrossHash.Curlup.sigma.hash64(txt))).substring(0, languages.size() + 16).toCharArray();
-        c[21] = '0';
-        c[30] = '0';
+                + StringKit.hex(CrossHash.Curlup.sigma.hash64(txt))
+                + StringKit.hex(CrossHash.Curlup.omega.hash64(txt))).substring(0, languages.size() + 16).toCharArray();
+        c[16 + 7] = '0';
+        c[16 + 9] = '0';
         return String.valueOf(c);
     }
     public void setFromSeed(String txt)
     {
+        if(txt.length() < 16 + sliderBunch.length) txt = StringKit.padRight(txt, '0', 16 + sliderBunch.length);
         currentSeed = StringKit.longFromHex(txt, 0, 16);
         // Long.parseLong(txt.substring(1, 16), 16) | ((long)Character.digit(txt.charAt(0), 16) << 60);
         rng.setState(currentSeed);

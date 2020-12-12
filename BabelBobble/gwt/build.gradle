@@ -26,7 +26,7 @@ gwt {
 }
 
 dependencies {
-  implementation project(':core')
+//  implementation project(':core')
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
 	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
@@ -95,16 +95,6 @@ task dist(dependsOn: [clean, compileGwt]) {
 		}
 	}
 }
-
-task addSource {
-	doLast {
-		sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-		
-	}
-}
-
-tasks.compileGwt.dependsOn(addSource)
-tasks.draftCompileGwt.dependsOn(addSource)
 
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
