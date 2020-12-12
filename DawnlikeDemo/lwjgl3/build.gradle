@@ -23,7 +23,7 @@ run {
 	}
 }
 jar {
-	archiveBaseName = appName
+	archiveBaseName.set(appName)
 	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
 	manifest {
 		attributes 'Main-Class': project.mainClassName

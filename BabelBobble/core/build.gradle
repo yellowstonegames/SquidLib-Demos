@@ -2,13 +2,13 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    //compile "com.squidpony:squidlib-util:$squidlibVersion"
-    //compile "com.squidpony:squidlib-extra:$squidlibVersion"
-    compile("com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion")
-    compile("com.github.SquidPony.SquidLib:squidlib-extra:$squidlibVersion")
-    compile "com.github.tommyettinger:regexodus:$regExodusVersion"
-    compile "com.kotcrab.vis:vis-ui:$visUiVersion"
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api "com.squidpony:squidlib-util:$squidlibVersion"
+    api "com.squidpony:squidlib-extra:$squidlibVersion"
+    //api "com.github.SquidPony.SquidLib:squidlib-util:$squidlibVersion"
+    //api "com.github.SquidPony.SquidLib:squidlib-extra:$squidlibVersion"
+    api "com.github.tommyettinger:regexodus:$regExodusVersion"
+    api "com.kotcrab.vis:vis-ui:$visUiVersion"
 }
 
         

@@ -243,9 +243,9 @@ public class BabelBobble extends ApplicationAdapter {
     }
     public String fixSeed(String txt)
     {
-        return StringKit.hex(CrossHash.Storm.chi.hash64(txt))
-                + StringKit.hex(CrossHash.Storm.upsilon.hash(txt))
-                + StringKit.hex((short) (CrossHash.Storm.sigma.hash(txt)));
+        return StringKit.hex(CrossHash.Curlup.chi.hash64(txt))
+                + StringKit.hex(CrossHash.Curlup.upsilon.hash(txt))
+                + StringKit.hex((short) (CrossHash.Curlup.sigma.hash(txt)));
     }
     public void setFromSeed(String txt)
     {

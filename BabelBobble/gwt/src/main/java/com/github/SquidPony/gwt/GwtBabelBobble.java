@@ -222,9 +222,9 @@ public class GwtBabelBobble extends GwtBareApp {
     }
     public String fixSeed(String txt)
     {
-        char[] c = (StringKit.hex(CrossHash.Storm.chi.hash64(txt))
-                + StringKit.hex(CrossHash.Storm.upsilon.hash64(txt))
-                + StringKit.hex(CrossHash.Storm.sigma.hash64(txt))).substring(0, languages.size() + 16).toCharArray();
+        char[] c = (StringKit.hex(CrossHash.Curlup.chi.hash64(txt))
+                + StringKit.hex(CrossHash.Curlup.upsilon.hash64(txt))
+                + StringKit.hex(CrossHash.Curlup.sigma.hash64(txt))).substring(0, languages.size() + 16).toCharArray();
         c[21] = '0';
         c[30] = '0';
         return String.valueOf(c);

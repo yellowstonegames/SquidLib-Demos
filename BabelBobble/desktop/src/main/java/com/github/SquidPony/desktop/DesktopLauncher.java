@@ -1,8 +1,8 @@
 package com.github.SquidPony.desktop;
 
 import com.badlogic.gdx.Files.FileType;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.github.SquidPony.BabelBobble;
 
 /** Launches the desktop (LWJGL) application. */
@@ -11,18 +11,15 @@ public class DesktopLauncher {
         createApplication();
     }
 
-    private static LwjglApplication createApplication() {
-        return new LwjglApplication(new BabelBobble(null), getDefaultConfiguration());
+    private static Lwjgl3Application createApplication() {
+        return new Lwjgl3Application(new BabelBobble(null), getDefaultConfiguration());
     }
 
-    private static LwjglApplicationConfiguration getDefaultConfiguration() {
-        LwjglApplicationConfiguration configuration = new LwjglApplicationConfiguration();
-        configuration.title = "BabelBobble";
-        configuration.width = 1000;
-        configuration.height = 700;
-        for (int size : new int[] { 128, 64, 32, 16 }) {
-            configuration.addIcon("libgdx" + size + ".png", FileType.Internal);
-        }
+    private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
+        Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
+        configuration.setTitle("BabelBobble");
+        configuration.setWindowedMode(1000, 700);
+        configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
     }
 }

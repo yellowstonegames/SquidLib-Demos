@@ -72,6 +72,7 @@ task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
 
 task superDev(type: GwtSuperDev) {
 	doFirst {
+		gwt.compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
 		gwt.modules = gwt.devModules
 	}
 }

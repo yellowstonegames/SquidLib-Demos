@@ -23,7 +23,7 @@ public class Lwjgl3Launcher {
         configuration.setTitle("DawnlikeDemo");
         configuration.setResizable(true);
         configuration.useVsync(false);
-        configuration.setForegroundFPS(60);
+        configuration.setForegroundFPS(120);
         configuration.setWindowListener(new Lwjgl3WindowAdapter() {
             @Override
             public void iconified(boolean isIconified) {
@@ -33,19 +33,19 @@ public class Lwjgl3Launcher {
                     Gdx.app.getApplicationListener().resume();
                 }
             }
-
-            @Override
-            public void maximized(boolean isMaximized) {
-                if(isMaximized)
-                    Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-                else
-                    Gdx.graphics.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
-            }
-
-            @Override
-            public void focusLost() {
-                Gdx.app.postRunnable(() -> maximized(false));
-            }
+//
+//            @Override
+//            public void maximized(boolean isMaximized) {
+//                if(isMaximized)
+//                    Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+//                else
+//                    Gdx.graphics.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+//            }
+//
+//            @Override
+//            public void focusLost() {
+//                Gdx.app.postRunnable(() -> maximized(false));
+//            }
 
             @Override
             public void focusGained() {
