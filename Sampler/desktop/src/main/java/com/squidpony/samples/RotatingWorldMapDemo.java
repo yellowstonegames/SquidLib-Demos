@@ -1,6 +1,7 @@
 package com.squidpony.samples;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -47,7 +48,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
     private long seed;
     private WorldMapView wmv;
 
-    private boolean spinning = false;
+    private boolean spinning = true;
 
     private long ttg = 0; // time to generate
 //    private long ttd = 0; // time to draw
@@ -104,7 +105,7 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
                     case 'Q':
                     case 'q':
                     case SquidInput.ESCAPE: {
-                        Gdx.app.exit();
+                        ((Lwjgl3Graphics)Gdx.graphics).getWindow().closeWindow();
                     }
                 }
             }

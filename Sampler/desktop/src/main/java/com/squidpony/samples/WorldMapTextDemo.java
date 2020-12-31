@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
@@ -209,7 +210,7 @@ public class WorldMapTextDemo extends ApplicationAdapter {
                     case 'Q':
                     case 'q':
                     case SquidInput.ESCAPE: {
-                        Gdx.app.exit();
+                        ((Lwjgl3Graphics)Gdx.graphics).getWindow().closeWindow();
                     }
                 }
             }

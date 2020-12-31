@@ -1,6 +1,7 @@
 package com.squidpony.samples;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -241,7 +242,7 @@ public class LocalMapDemo extends ApplicationAdapter {
                     case 'Q':
                     case 'q':
                     case SquidInput.ESCAPE: {
-                        Gdx.app.exit();
+                        ((Lwjgl3Graphics)Gdx.graphics).getWindow().closeWindow();
                     }
                 }
             }

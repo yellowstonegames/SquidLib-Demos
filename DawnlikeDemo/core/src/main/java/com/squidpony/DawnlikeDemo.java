@@ -1371,7 +1371,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         }
         pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight, 0);
         mainViewport.unproject(pos);
-        font.draw(batch, "Current Health: [RED]" + health + "[WHITE]", pos.x, pos.y);
+        font.draw(batch, "Current Health: [RED]" + health + "[WHITE] at "
+                + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
         batch.end();
     }     
     @Override

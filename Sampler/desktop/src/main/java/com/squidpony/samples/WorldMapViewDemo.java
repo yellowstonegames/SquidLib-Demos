@@ -1,6 +1,7 @@
 package com.squidpony.samples;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -100,7 +101,7 @@ public class WorldMapViewDemo extends ApplicationAdapter {
                     case 'Q':
                     case 'q':
                     case SquidInput.ESCAPE: {
-                        Gdx.app.exit();
+                        ((Lwjgl3Graphics)Gdx.graphics).getWindow().closeWindow();
                     }
                 }
             }

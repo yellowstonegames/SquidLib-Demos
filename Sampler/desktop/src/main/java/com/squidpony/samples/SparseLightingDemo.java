@@ -1,6 +1,7 @@
 package com.squidpony.samples;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
@@ -440,7 +441,7 @@ public class SparseLightingDemo extends ApplicationAdapter {
                     case 'q':
                     case SquidInput.ESCAPE:
                     {
-                        Gdx.app.exit();
+                        ((Lwjgl3Graphics)Gdx.graphics).getWindow().closeWindow();
                         break;
                     }
                     // changes the filter to the next in the sequence, wrapping around after PaletteFilter.
