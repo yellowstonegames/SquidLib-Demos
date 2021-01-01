@@ -771,6 +771,7 @@ public class TsarDemo extends ApplicationAdapter {
             setTitle("SquidLib Demo: Escape The Tsar!");
             setWindowedMode(gridWidth * cellWidth, (gridHeight + bonusHeight) * cellHeight);
             useVsync(false);
+            setForegroundFPS(60);
             setIdleFPS(20);
         }
         @Override

@@ -239,7 +239,8 @@ public class RotatingWorldMapDemo extends ApplicationAdapter {
         {
             setTitle("SquidLib Demo: Rotating World Map");
             setWindowedMode(width, height);
-            useVsync(true);
+            useVsync(false);
+            setForegroundFPS(0);
             setResizable(false);
             setIdleFPS(1);
         }

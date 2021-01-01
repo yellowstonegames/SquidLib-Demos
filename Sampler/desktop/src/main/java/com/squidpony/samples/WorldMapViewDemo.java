@@ -232,7 +232,8 @@ public class WorldMapViewDemo extends ApplicationAdapter {
         {
             setTitle("SquidLib Demo: WorldMapView Usage");
             setWindowedMode(width * 4, height * 4);
-            useVsync(true);
+            useVsync(false);
+            setForegroundFPS(16);
             setIdleFPS(1);
         }
         @Override

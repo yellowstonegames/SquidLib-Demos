@@ -383,7 +383,8 @@ public class WorldWildMapDemo extends ApplicationAdapter {
         {
             setTitle("SquidLib Demo: WorldMap with Right-Click zoom to WildMap");
             setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
-            useVsync(true);
+            useVsync(false);
+            setForegroundFPS(16);
             setIdleFPS(1);
         }
         @Override

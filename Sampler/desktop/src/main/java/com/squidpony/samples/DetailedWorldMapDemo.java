@@ -580,7 +580,8 @@ public class DetailedWorldMapDemo extends ApplicationAdapter {
         {
             setTitle("SquidLib Demo: Detailed World Map");
             setWindowedMode(width, height);
-            useVsync(true);
+            useVsync(false);
+            setForegroundFPS(16);
             setIdleFPS(1);
         }
         @Override

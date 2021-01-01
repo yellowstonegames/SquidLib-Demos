@@ -20,7 +20,8 @@ public class DesktopLauncher {
         configuration.setTitle("Sampler");
         configuration.setWindowedMode(400, 500);
         configuration.useVsync(true);
-        configuration.setIdleFPS(5);
+        configuration.setForegroundFPS(240);
+        configuration.disableAudio(true);
         configuration.setWindowIcon(FileType.Internal
                 , "libgdx128.png"
                 , "libgdx64.png"

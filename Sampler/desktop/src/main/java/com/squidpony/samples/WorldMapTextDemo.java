@@ -397,7 +397,8 @@ public class WorldMapTextDemo extends ApplicationAdapter {
         {
             setTitle("SquidLib Demo: Earth-Mimic WorldMap With Text");
             setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
-            useVsync(true);
+            useVsync(false);
+            setForegroundFPS(16);
             setIdleFPS(1);
         }
         @Override

@@ -261,7 +261,8 @@ public class WildMapDemo extends ApplicationAdapter {
         {
             setTitle("SquidLib Demo: WildMapView Usage");
             setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
-            useVsync(true);
+            useVsync(false);
+            setForegroundFPS(16);
             setIdleFPS(1);
         }
         @Override

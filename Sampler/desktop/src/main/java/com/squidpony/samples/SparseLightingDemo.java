@@ -744,6 +744,7 @@ public class SparseLightingDemo extends ApplicationAdapter {
             setTitle("SquidLib Demo: Colorful Lighting");
             setWindowedMode(gridWidth * cellWidth, (gridHeight + bonusHeight) * cellHeight);
             useVsync(false);
+            setForegroundFPS(0);
             setIdleFPS(0);
         }
         @Override

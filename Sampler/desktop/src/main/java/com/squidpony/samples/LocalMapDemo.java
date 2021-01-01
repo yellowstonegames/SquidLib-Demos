@@ -405,7 +405,8 @@ public class LocalMapDemo extends ApplicationAdapter {
         {
             setTitle("SquidLib Demo: Local Map");
             setWindowedMode(width * cellWidth, height * cellHeight);
-            useVsync(true);
+            useVsync(false);
+            setForegroundFPS(16);
             setIdleFPS(1);
         }
         @Override
