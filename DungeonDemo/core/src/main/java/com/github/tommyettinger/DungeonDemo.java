@@ -211,6 +211,11 @@ public class DungeonDemo extends ApplicationAdapter {
                         toCursor = playerToCursor.findPath(250, null, null, player, cursor);
                         return false;
                     }
+
+                    @Override
+                    public boolean scrolled(float amountX, float amountY) {
+                        return super.scrolled(amountX, amountY);
+                    }
                 }));
 
         //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
