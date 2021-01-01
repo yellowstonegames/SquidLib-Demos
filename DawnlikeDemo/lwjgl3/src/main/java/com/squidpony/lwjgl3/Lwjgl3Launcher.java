@@ -22,8 +22,8 @@ public class Lwjgl3Launcher {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("DawnlikeDemo");
         configuration.setResizable(true);
-        configuration.useVsync(false);
-//        configuration.setForegroundFPS(120);
+        configuration.useVsync(true);
+        configuration.setForegroundFPS(120);
         configuration.setWindowListener(new Lwjgl3WindowAdapter() {
             @Override
             public void iconified(boolean isIconified) {
@@ -36,10 +36,13 @@ public class Lwjgl3Launcher {
 
             @Override
             public void maximized(boolean isMaximized) {
-                if(isMaximized)
+                if (isMaximized) {
                     Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-                else
+                    Gdx.graphics.setVSync(true);
+                } else {
                     Gdx.graphics.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+                    Gdx.graphics.setVSync(false);
+                }
             }
 
             @Override
