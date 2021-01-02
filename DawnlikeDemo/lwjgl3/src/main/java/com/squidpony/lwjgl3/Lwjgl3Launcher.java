@@ -26,15 +26,6 @@ public class Lwjgl3Launcher {
         configuration.setForegroundFPS(120);
         configuration.setWindowListener(new Lwjgl3WindowAdapter() {
             @Override
-            public void iconified(boolean isIconified) {
-                if(isIconified)
-                    Gdx.app.getApplicationListener().pause();
-                else {
-                    Gdx.app.getApplicationListener().resume();
-                }
-            }
-
-            @Override
             public void maximized(boolean isMaximized) {
                 if (isMaximized) {
                     Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
@@ -53,6 +44,15 @@ public class Lwjgl3Launcher {
             @Override
             public void focusGained() {
                 Gdx.app.postRunnable(() -> maximized(true));
+            }
+
+            @Override
+            public void iconified(boolean isIconified) {
+                if(isIconified)
+                    Gdx.app.getApplicationListener().pause();
+                else {
+                    Gdx.app.getApplicationListener().resume();
+                }
             }
 
             @Override

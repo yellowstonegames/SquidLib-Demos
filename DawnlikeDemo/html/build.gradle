@@ -24,16 +24,16 @@ gwt {
 	compiler.strict = true
 	compiler.disableCastChecking = true
 //	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
-	sourceLevel = 1.11
+	sourceLevel = 1.8
 }
 
 dependencies {
 	implementation project(':core')
-	implementation "com.badlogicgames.gdx:gdx:1.9.12:sources"
-//  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12"
-//  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.9.12:sources"
-	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
-	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
+	implementation "com.badlogicgames.gdx:gdx:1.9.13:sources"
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.9.13"
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.9.13:sources"
+//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
+//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
 	implementation "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
 	implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 }
