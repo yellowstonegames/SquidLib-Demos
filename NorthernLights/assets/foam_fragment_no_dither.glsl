@@ -8,7 +8,7 @@ precision highp float;
 #define LOWP 
 #endif
 
-const float PHI = 1.61803398874989484820459; // phi, the Golden Ratio
+const float PHI = 0.61803398874989484820459; // phi, the Golden Ratio
 const vec2 H2 = vec2(1.324717957244746, 1.754877666246693); // harmonious numbers for 2D
 const vec3 H3 = vec3(0.8191725134, 0.6710436067, 0.5497004779); // harmonious numbers for 3D
 
@@ -160,7 +160,7 @@ float foam(float seed, vec3 x) {
 //}
 
 void main() {
-  vec3 i = vec3(gl_FragCoord.xy + 99.0, tm * 0.3125) * 0.0625;
+  vec3 i = vec3(gl_FragCoord.xy + 99.0, tm * 0.625) * 0.03125;
   gl_FragColor.r = foam(4.0 + seed, i);
   gl_FragColor.g = foam(61.0 + seed, i);
   gl_FragColor.b = foam(257.0 + seed, i);

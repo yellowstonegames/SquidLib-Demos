@@ -21,6 +21,7 @@ public class Lwjgl3Launcher {
 //        configuration.setWindowedMode(960, 640);
         configuration.setWindowedMode(300, 300);
         configuration.useVsync(false);
+        configuration.setForegroundFPS(600);
         configuration.setTransparentFramebuffer(true);
         configuration.setIdleFPS(10);
         configuration.disableAudio(true);
