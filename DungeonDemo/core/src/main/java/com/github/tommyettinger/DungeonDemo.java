@@ -23,6 +23,7 @@ import squidpony.squidmath.OrderedMap;
 import squidpony.squidmath.RNG;
 
 import java.util.ArrayList;
+import squidpony.squidgrid.mapping.PacMazeGenerator;
 
 public class DungeonDemo extends ApplicationAdapter {
     private FilterBatch batch;
@@ -223,6 +224,8 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private void rebuild()
     {
+        PacMazeGenerator pac = new PacMazeGenerator(gridWidth, gridHeight, rng);
+        
         SerpentMapGenerator serpent = new SerpentMapGenerator(gridWidth, gridHeight, rng, rng.nextDouble(0.15));
 
         serpent.putWalledBoxRoomCarvers(rng.between(5, 10));
@@ -248,41 +251,43 @@ public class DungeonDemo extends ApplicationAdapter {
         //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
         //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
 
-        switch (rng.nextInt(18))
-        {
-            case 0:
-            case 1:
-            case 2:
-            case 11:
-            case 12:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(serpent.generate(), serpent.getEnvironment()));
-                break;
-            case 3:
-            case 4:
-            case 5:
-            case 13:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.DEFAULT_DUNGEON));
-                break;
-            case 6:
-            case 7:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS));
-                break;
-            case 8:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.REFERENCE_CAVES));
-                break;
-            case 9:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROOMS_LIMIT_CONNECTIVITY));
-                break;
-            case 10:
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.CORNER_CAVES));
-                break;
-            case 14:
-            case 15:
-            case 16:
-            default: 
-                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(flowCaves.generate(), flowCaves.getEnvironment()));
-                break;
-        }
+        decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(pac.generate(), pac.getEnvironment()));
+        
+//        switch (rng.nextInt(18))
+//        {
+//            case 0:
+//            case 1:
+//            case 2:
+//            case 11:
+//            case 12:
+//                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(serpent.generate(), serpent.getEnvironment()));
+//                break;
+//            case 3:
+//            case 4:
+//            case 5:
+//            case 13:
+//                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.DEFAULT_DUNGEON));
+//                break;
+//            case 6:
+//            case 7:
+//                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS));
+//                break;
+//            case 8:
+//                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.REFERENCE_CAVES));
+//                break;
+//            case 9:
+//                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.ROOMS_LIMIT_CONNECTIVITY));
+//                break;
+//            case 10:
+//                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(TilesetType.CORNER_CAVES));
+//                break;
+//            case 14:
+//            case 15:
+//            case 16:
+//            default: 
+//                decoDungeon = DungeonUtility.closeDoors(dungeonGen.generate(flowCaves.generate(), flowCaves.getEnvironment()));
+//                break;
+//        }
 
         //There are lots of options for dungeon generation in SquidLib; you can pass a TilesetType enum to generate()
         //as shown on the following lines to change the style of dungeon generated from ruined areas, which are made
@@ -304,9 +309,15 @@ public class DungeonDemo extends ApplicationAdapter {
         cursor = Coord.get(-1, -1);
         //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
         //creatures, and possibly a subclass for the player.
-        player = placement.retract8way().singleRandom(rng);
-        if(!player.isWithin(gridWidth, gridHeight))
-            rebuild();
+        
+        // Let's make sure that if the map is thin, there's still a place for the player to stand
+        GreasedRegion standingRoom = placement.retract8way();
+        if (standingRoom.isEmpty()){
+            standingRoom = placement;
+        }
+
+        player = standingRoom.singleRandom(rng);
+
         if(playerGlyph != null)
             display.removeGlyph(playerGlyph);
         playerGlyph = display.glyph('@', SColor.RED_INCENSE, player.x, player.y);
