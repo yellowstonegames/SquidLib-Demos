@@ -17,10 +17,10 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.tommyettinger.colorful.ycwcm.ColorfulBatch;
 import com.github.tommyettinger.colorful.FloatColors;
-import com.github.tommyettinger.colorful.ycwcm.Palette;
-import com.github.tommyettinger.colorful.ycwcm.ColorTools;
+import com.github.tommyettinger.colorful.ipt_hq.ColorfulBatch;
+import com.github.tommyettinger.colorful.ipt_hq.Palette;
+import com.github.tommyettinger.colorful.ipt_hq.ColorTools;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -52,11 +52,11 @@ import static com.badlogic.gdx.Input.Keys.NUMPAD_9;
 import static com.badlogic.gdx.Input.Keys.Q;
 import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.UP;
-import static com.github.tommyettinger.colorful.ycwcm.ColorTools.alpha;
-import static com.github.tommyettinger.colorful.ycwcm.ColorTools.chromaMild;
-import static com.github.tommyettinger.colorful.ycwcm.ColorTools.chromaWarm;
-import static com.github.tommyettinger.colorful.ycwcm.ColorTools.floatGetHSL;
-import static com.github.tommyettinger.colorful.ycwcm.ColorTools.luma;
+import static com.github.tommyettinger.colorful.ipt_hq.ColorTools.alpha;
+import static com.github.tommyettinger.colorful.ipt_hq.ColorTools.protan;
+import static com.github.tommyettinger.colorful.ipt_hq.ColorTools.tritan;
+import static com.github.tommyettinger.colorful.ipt_hq.ColorTools.floatGetHSL;
+import static com.github.tommyettinger.colorful.ipt_hq.ColorTools.intensity;
 
 /**
  */
@@ -199,7 +199,7 @@ public class ColorfulDemo extends ApplicationAdapter {
         for(Color c : Colors.getColors().values())
         {
             final float f = ColorTools.fromColor(c);
-            c.set(luma(f), chromaWarm(f), chromaMild(f), c.a);
+            c.set(intensity(f), protan(f), tritan(f), c.a);
         }
         // Starting time for the game; other times are measured relative to this so they aren't huge numbers.
         startTime = TimeUtils.millis();
@@ -338,7 +338,7 @@ public class ColorfulDemo extends ApplicationAdapter {
         player = floors.singleRandom(rng);
         playerSprite = new AnimatedGlider(new Animation<>(DURATION,
                 atlas.findRegions(rng.getRandomElement(Data.possibleCharacters)), Animation.PlayMode.LOOP), player);
-        playerSprite.setTweakedColor(Palette.GRAY, ColorTools.ycwcm(0.55f, 0.5625f, 0.5625f, 0.75f));
+        playerSprite.setTweakedColor(Palette.GRAY, ColorTools.ipt(0.55f, 0.5625f, 0.5625f, 0.75f));
 //        playerColor = FloatColors.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
 //        playerSprite.setPackedColor(playerColor);
 //        playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);
@@ -373,9 +373,9 @@ public class ColorfulDemo extends ApplicationAdapter {
                     new AnimatedGlider(new Animation<>(DURATION,
                             atlas.findRegions(enemy), Animation.PlayMode.LOOP), monPos);
             float monColor = Palette.LIST.get((int)(((i+257)*0x9E3779B9 & 0xFFFFFFFFL)*255L >>> 32)+1);
-            monster.setTweakedColor(luma(monColor) * 0.4f + 0.25f, 
-                    (chromaWarm(monColor) - 0.5f) * 0.375f + 0.5f, 
-                    (chromaMild(monColor) - 0.5f) * 0.375f + 0.5f, 
+            monster.setTweakedColor(intensity(monColor) * 0.4f + 0.25f,
+                    (protan(monColor) - 0.5f) * 0.375f + 0.5f,
+                    (tritan(monColor) - 0.5f) * 0.375f + 0.5f,
                     alpha(monColor),
                     0.425f, 0.45f, 0.45f, 0.5f);
 //            monster.setPackedColor(FloatColors.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
@@ -645,6 +645,11 @@ public class ColorfulDemo extends ApplicationAdapter {
     public void putMap()
     {
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
+//// using day/night cycle
+        float st = MathUtils.sin(time), ct = MathUtils.cos(time),
+                dawnDusk = (float) Math.sqrt(Math.abs(ct));
+        float color = ColorTools.ipt(0.25f * st + 0.5f, 0.1f * Math.max(dawnDusk, st) + 0.5f, 0.1f * st + 0.5f, 1f),
+                tweak = ColorTools.ipt(0.1f * st + 0.5f, 0.5f, 0.5f, -0.125f * st + 0.5f);
         //In many other situations, you would clear the drawn characters to prevent things that had been drawn in the
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
@@ -653,9 +658,15 @@ public class ColorfulDemo extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
                     pos.set(i, j);
-                    batch.setPackedColor(bgColors[i][j]);//
-                    batch.setTweak(toCursor.contains(Coord.get(i, j)) ? 0.875f :
-                            (float)visible[i][j] * 0.5f + 0.125f, 0.40625f, 0.40625f, 0.4375f);
+////when not using day/night cycle
+//                    batch.setPackedColor(bgColors[i][j]);//
+//                    batch.setTweak(toCursor.contains(Coord.get(i, j)) ? 0.875f :
+//                            (float)visible[i][j] * 0.5f + 0.125f, 0.40625f, 0.40625f, 0.4375f);
+
+//// using day/night cycle
+                    batch.setPackedColor(FloatColors.lerpFloatColors(bgColors[i][j], color, 0.5f));//
+                    batch.setTweak(FloatColors.lerpFloatColors(ColorTools.ipt(toCursor.contains(Coord.get(i, j)) ? 0.875f :
+                            (float)visible[i][j] * 0.5f + 0.125f, 0.40625f, 0.40625f, 0.4375f), tweak, 0.5f));
 //                    batch.setPackedColor(toCursor.contains(Coord.get(i, j))
 //                            ? FloatColors.lerpFloatColors(bgColors[i][j], Palette.ANGEL_WING, 0.9f)
 //                            : FloatColors.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
