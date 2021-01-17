@@ -17,9 +17,10 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.tommyettinger.colorful.ColorfulBatch;
+import com.github.tommyettinger.colorful.ycwcm.ColorfulBatch;
 import com.github.tommyettinger.colorful.FloatColors;
-import com.github.tommyettinger.colorful.Palette;
+import com.github.tommyettinger.colorful.ycwcm.Palette;
+import com.github.tommyettinger.colorful.ycwcm.ColorTools;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -51,11 +52,11 @@ import static com.badlogic.gdx.Input.Keys.NUMPAD_9;
 import static com.badlogic.gdx.Input.Keys.Q;
 import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.UP;
-import static com.github.tommyettinger.colorful.FloatColors.alpha;
-import static com.github.tommyettinger.colorful.FloatColors.chromaMild;
-import static com.github.tommyettinger.colorful.FloatColors.chromaWarm;
-import static com.github.tommyettinger.colorful.FloatColors.floatGetHSV;
-import static com.github.tommyettinger.colorful.FloatColors.luma;
+import static com.github.tommyettinger.colorful.ycwcm.ColorTools.alpha;
+import static com.github.tommyettinger.colorful.ycwcm.ColorTools.chromaMild;
+import static com.github.tommyettinger.colorful.ycwcm.ColorTools.chromaWarm;
+import static com.github.tommyettinger.colorful.ycwcm.ColorTools.floatGetHSL;
+import static com.github.tommyettinger.colorful.ycwcm.ColorTools.luma;
 
 /**
  */
@@ -187,8 +188,8 @@ public class ColorfulDemo extends ApplicationAdapter {
             FLOAT_WHITE = Palette.GRAY, 
             FLOAT_BLACK = Palette.BLACK,
             FLOAT_BLOOD = Palette.SIENNA,
-            FLOAT_LIGHTING = floatGetHSV(0.125f, 0.12f, 0.55f, 1f),
-            FLOAT_GRAY = floatGetHSV(0f, 0f, 0.25f, 1f);
+            FLOAT_LIGHTING = floatGetHSL(0.125f, 0.12f, 0.55f, 1f),
+            FLOAT_GRAY = floatGetHSL(0f, 0f, 0.25f, 1f);
                     //-0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
     // the player's color as a float
 //    private float playerColor;
@@ -197,7 +198,7 @@ public class ColorfulDemo extends ApplicationAdapter {
         
         for(Color c : Colors.getColors().values())
         {
-            final float f = FloatColors.fromColor(c);
+            final float f = ColorTools.fromColor(c);
             c.set(luma(f), chromaWarm(f), chromaMild(f), c.a);
         }
         // Starting time for the game; other times are measured relative to this so they aren't huge numbers.
@@ -337,7 +338,7 @@ public class ColorfulDemo extends ApplicationAdapter {
         player = floors.singleRandom(rng);
         playerSprite = new AnimatedGlider(new Animation<>(DURATION,
                 atlas.findRegions(rng.getRandomElement(Data.possibleCharacters)), Animation.PlayMode.LOOP), player);
-        playerSprite.setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.55f, 0.5625f, 0.5625f, 0.75f));
+        playerSprite.setTweakedColor(Palette.GRAY, ColorTools.ycwcm(0.55f, 0.5625f, 0.5625f, 0.75f));
 //        playerColor = FloatColors.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
 //        playerSprite.setPackedColor(playerColor);
 //        playerSprite.setPosition(player.x * cellWidth, player.y * cellHeight);

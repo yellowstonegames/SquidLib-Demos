@@ -34,7 +34,7 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.9.13:sources"
 //	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
 //	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
-	implementation "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
+	implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
 	implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 }
 

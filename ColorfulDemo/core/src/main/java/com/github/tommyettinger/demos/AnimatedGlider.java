@@ -3,9 +3,10 @@ package com.github.tommyettinger.demos;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
-import com.github.tommyettinger.colorful.ColorfulSprite;
+import com.github.tommyettinger.colorful.ycwcm.ColorTools;
+import com.github.tommyettinger.colorful.ycwcm.ColorfulSprite;
 import com.github.tommyettinger.colorful.FloatColors;
-import com.github.tommyettinger.colorful.Palette;
+import com.github.tommyettinger.colorful.ycwcm.Palette;
 import squidpony.squidmath.Coord;
 
 /**
@@ -24,13 +25,13 @@ public class AnimatedGlider extends ColorfulSprite {
     private AnimatedGlider()
     {
         super();
-        setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.5f, 0.375f, 0.375f, 0.75f));
+        setTweakedColor(Palette.GRAY, ColorTools.ycwcm(0.5f, 0.375f, 0.375f, 0.75f));
     }
     public AnimatedGlider(Animation<TextureRegion> animation) {
         super();
         this.animation = animation;
         setRegion(animation.getKeyFrame(0f));
-        setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.5f, 0.375f, 0.375f, 0.75f));
+        setTweakedColor(Palette.GRAY, ColorTools.ycwcm(0.5f, 0.375f, 0.375f, 0.75f));
     }
 
     public AnimatedGlider(Animation<TextureRegion> animation, Coord coord) {
@@ -42,7 +43,7 @@ public class AnimatedGlider extends ColorfulSprite {
         this.animation = animation;
         setSize(1, 1);
         setRegion(animation.getKeyFrame(0f));
-        setTweakedColor(Palette.GRAY, FloatColors.floatColor(0.5f, 0.375f, 0.375f, 0.75f));
+        setTweakedColor(Palette.GRAY, ColorTools.ycwcm(0.5f, 0.375f, 0.375f, 0.75f));
         this.start = start;
         this.end = end;
     }
