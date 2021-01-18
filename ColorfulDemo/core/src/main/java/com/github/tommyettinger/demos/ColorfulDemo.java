@@ -13,10 +13,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.github.tommyettinger.colorful.FloatColors;
 import com.github.tommyettinger.colorful.ipt_hq.ColorfulBatch;
 import com.github.tommyettinger.colorful.ipt_hq.Palette;
@@ -647,9 +644,9 @@ public class ColorfulDemo extends ApplicationAdapter {
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
 //// using day/night cycle
         float st = MathUtils.sin(time), ct = MathUtils.cos(time),
-                dawnDusk = (float) Math.sqrt(Math.abs(ct));
-        float color = ColorTools.ipt(0.25f * st + 0.5f, 0.1f * Math.max(dawnDusk, st) + 0.5f, 0.1f * st + 0.5f, 1f),
-                tweak = ColorTools.ipt(0.1f * st + 0.5f, 0.5f, 0.5f, -0.125f * st + 0.5f);
+                dawnDusk = ct * ct;
+        float color = ColorTools.ipt(0.25f * st + 0.5f, 0.0625f * dawnDusk + 0.03125f * st + 0.5f, 0.125f * st + 0.5f, 1f),
+                tweak = ColorTools.ipt(0.1f * st + 0.5f, 0.2f * st + 0.5f, 0.2f * st + 0.5f, -0.125f * st + 0.5f);
         //In many other situations, you would clear the drawn characters to prevent things that had been drawn in the
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.

@@ -61,11 +61,18 @@ public class Lwjgl3Launcher {
                 return true;
             }
         });
+
+        //// these are a different way of handling alt-tab better.
 //        configuration.setDecorated(false);
 //        configuration.setAutoIconify(true);
+
+        //// useful to know if something's wrong in a shader.
+        //// you should remove the next line for a release.
         configuration.enableGLDebugOutput(true, System.out);
         ShaderProgram.prependVertexCode = "#version 110\n";
         ShaderProgram.prependFragmentCode = "#version 110\n";
+        // these are constants in the main game class; they should match your
+        // initial viewport size in pixels before it gets resized to fullscreen.
         configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
