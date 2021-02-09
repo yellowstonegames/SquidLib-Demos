@@ -108,5 +108,5 @@ task run(type: Exec) {
 	}
 
 	def adb = path + "/platform-tools/adb"
-	commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.tommyettinger/com.github.tommyettinger.android.AndroidLauncher'
+	commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.tommyettinger/com.github.tommyettinger.demos.android.AndroidLauncher'
 }
