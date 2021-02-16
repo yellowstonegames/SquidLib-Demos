@@ -207,7 +207,7 @@ public class ColorfulDemo extends ApplicationAdapter {
         // because it can produce 64-bit seeds and String.hashCode() will only produce 32-bit
         // seeds; having more possible seeds means more maps and other procedural content
         // become possible. Here we don't seed the GWTRNG, so its seed will be random.
-        rng = new GWTRNG();
+        rng = new GWTRNG(12345678);
 
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new ColorfulBatch();
@@ -799,8 +799,10 @@ public class ColorfulDemo extends ApplicationAdapter {
         pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight);
         mainViewport.unproject(pos);
         batch.setTweak(0.55f, 0.5f, 0.5f, 0.8f);
-        font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[GRAY]", pos.x, pos.y);
+        font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[GRAY] FPS: " + Gdx.graphics.getFramesPerSecond(), pos.x, pos.y);
         batch.end();
+        if(Gdx.graphics.isFullscreen() && (System.currentTimeMillis() & 0x3FFL) < 5)
+            System.out.println(Gdx.graphics.getFramesPerSecond());
     }     
     @Override
 	public void resize(int width, int height) {

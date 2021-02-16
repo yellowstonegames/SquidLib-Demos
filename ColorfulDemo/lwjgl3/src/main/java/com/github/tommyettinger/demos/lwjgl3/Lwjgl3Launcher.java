@@ -1,5 +1,6 @@
 package com.github.tommyettinger.demos.lwjgl3;
 
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.github.tommyettinger.demos.ColorfulDemo;
@@ -19,9 +20,11 @@ public class Lwjgl3Launcher {
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("ColorfulDemo");
-        configuration.useVsync(true);
-        configuration.setForegroundFPS(60);
-        configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+        configuration.useVsync(false);
+        configuration.setForegroundFPS(0);
+        configuration.setAutoIconify(true);
+        configuration.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+//        configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
     }
