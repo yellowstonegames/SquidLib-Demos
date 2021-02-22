@@ -21,6 +21,7 @@ public class Lwjgl3Launcher {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("ColorfulDemo");
         configuration.useVsync(false);
+        configuration.disableAudio(true);
         configuration.setForegroundFPS(0);
         configuration.setAutoIconify(true);
         configuration.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());

@@ -187,9 +187,6 @@ public class ColorfulDemo extends ApplicationAdapter {
             FLOAT_BLOOD = Palette.SIENNA,
             FLOAT_LIGHTING = floatGetHSL(0.125f, 0.12f, 0.55f, 1f),
             FLOAT_GRAY = floatGetHSL(0f, 0f, 0.25f, 1f);
-                    //-0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
-    // the player's color as a float
-//    private float playerColor;
     @Override
     public void create () {
         
@@ -206,10 +203,14 @@ public class ColorfulDemo extends ApplicationAdapter {
         // random-seeming long to use for a seed. CrossHash is preferred over String.hashCode()
         // because it can produce 64-bit seeds and String.hashCode() will only produce 32-bit
         // seeds; having more possible seeds means more maps and other procedural content
-        // become possible. Here we don't seed the GWTRNG, so its seed will be random.
+        // become possible. Here we seed the GWTRNG, so will produce the same map each time.
+        // This is extremely useful for debugging!
         rng = new GWTRNG(12345678);
+        // Uncomment the next line (and comment the above one) to randomize the seed.
+//        rng = new GWTRNG();
 
-        //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
+        // ColorfulBatch is an extended version of libGDX's SpriteBatch that takes colors as
+        // Oklab values: L for lightness, A for... green-to-red, and B for blue-to-yellow.
         batch = new ColorfulBatch();
         animationStart = TimeUtils.millis();
         mainViewport = new PixelPerfectViewport(Scaling.fill, gridWidth, gridHeight);
@@ -801,8 +802,8 @@ public class ColorfulDemo extends ApplicationAdapter {
         batch.setTweak(0.55f, 0.5f, 0.5f, 0.8f);
         font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[GRAY] FPS: " + Gdx.graphics.getFramesPerSecond(), pos.x, pos.y);
         batch.end();
-        if(Gdx.graphics.isFullscreen() && (System.currentTimeMillis() & 0x3FFL) < 5)
-            System.out.println(Gdx.graphics.getFramesPerSecond());
+//        if(Gdx.graphics.isFullscreen() && (System.currentTimeMillis() & 0x3FFL) < 5)
+//            System.out.println(Gdx.graphics.getFramesPerSecond());
     }     
     @Override
 	public void resize(int width, int height) {
