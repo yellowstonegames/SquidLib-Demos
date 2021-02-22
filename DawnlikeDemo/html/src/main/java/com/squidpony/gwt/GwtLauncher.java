@@ -11,7 +11,7 @@ import static com.squidpony.DawnlikeDemo.*;
 public class GwtLauncher extends GwtApplication {
     @Override
     public GwtApplicationConfiguration getConfig() {
-        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(1200, 675);
+        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(gridWidth * cellWidth * 2, gridHeight * cellHeight * 2);
         return configuration;
     }
 

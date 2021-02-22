@@ -165,7 +165,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         // because it can produce 64-bit seeds and String.hashCode() will only produce 32-bit
         // seeds; having more possible seeds means more maps and other procedural content
         // become possible. Here we don't seed the GWTRNG, so its seed will be random.
-        rng = new GWTRNG();
+        rng = new GWTRNG(123456);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
         shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
@@ -1321,8 +1321,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         putMap();
         
         if(phase == Phase.MONSTER_ANIM) {
-            float t = TimeUtils.timeSinceMillis(animationStart) * 0.008f;
-            for (int i = 1; i < monsters.size(); i++) {
+            float t = TimeUtils.timeSinceMillis(animationStart) * 0x1p-7f;
+            for (int i = 0; i < monsters.size(); i++) {
                 monsters.getAt(i).change = t;
             }
             if (t >= 1f) {

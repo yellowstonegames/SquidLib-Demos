@@ -203,11 +203,12 @@ public class ColorfulDemo extends ApplicationAdapter {
         // random-seeming long to use for a seed. CrossHash is preferred over String.hashCode()
         // because it can produce 64-bit seeds and String.hashCode() will only produce 32-bit
         // seeds; having more possible seeds means more maps and other procedural content
-        // become possible. Here we seed the GWTRNG, so will produce the same map each time.
-        // This is extremely useful for debugging!
-        rng = new GWTRNG(12345678);
+        // become possible.
+        // Here we seed the GWTRNG, so will produce the same map each time.
+        // This is extremely useful for debugging! But for now we want to see different maps.
+//        rng = new GWTRNG(12345678);
         // Uncomment the next line (and comment the above one) to randomize the seed.
-//        rng = new GWTRNG();
+        rng = new GWTRNG();
 
         // ColorfulBatch is an extended version of libGDX's SpriteBatch that takes colors as
         // Oklab values: L for lightness, A for... green-to-red, and B for blue-to-yellow.
@@ -733,8 +734,8 @@ public class ColorfulDemo extends ApplicationAdapter {
         putMap();
         
         if(phase == Phase.MONSTER_ANIM) {
-            float t = TimeUtils.timeSinceMillis(animationStart) * 0.008f;
-            for (int i = 1; i < monsters.size(); i++) {
+            float t = TimeUtils.timeSinceMillis(animationStart) * (1f/128f);
+            for (int i = 0; i < monsters.size(); i++) {
                 monsters.getAt(i).change = t;
             }
             if (t >= 1f) {
