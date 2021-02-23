@@ -24,8 +24,10 @@ public class Lwjgl3Launcher {
         configuration.disableAudio(true);
         configuration.setForegroundFPS(0);
         configuration.setAutoIconify(true);
-        configuration.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
-//        configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+//        configuration.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+        configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+        // just testing how centering the window works.
+        configuration.setWindowPosition(-1, -1);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
     }

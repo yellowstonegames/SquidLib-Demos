@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.*;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.squidpony.DawnlikeDemo;
 
 import static com.squidpony.DawnlikeDemo.*;
@@ -38,12 +39,14 @@ public class Lwjgl3Launcher {
 
             @Override
             public void focusLost() {
-                Gdx.app.postRunnable(() -> maximized(false));
+                if(!UIUtils.isMac) // focus is handled differently by MacOS
+                    Gdx.app.postRunnable(() -> maximized(false));
             }
 
             @Override
             public void focusGained() {
-                Gdx.app.postRunnable(() -> maximized(true));
+                if(!UIUtils.isMac) // focus is handled differently by MacOS
+                    Gdx.app.postRunnable(() -> maximized(true));
             }
 
             @Override
