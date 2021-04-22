@@ -24,8 +24,16 @@ run {
 }
 jar {
 	archiveBaseName.set(appName)
-	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
+	duplicatesStrategy(DuplicatesStrategy.INCLUDE)
+	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+	exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+	dependencies {
+		exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+	}
 	manifest {
 		attributes 'Main-Class': project.mainClassName
+	}
+	doLast {
+		file(archiveFile).setExecutable(true, false)
 	}
 }
