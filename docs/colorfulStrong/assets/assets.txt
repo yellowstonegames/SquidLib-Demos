@@ -1,0 +1,8 @@
+d:assets:assets:0:application/unknown:1
+t:Dawnlike.atlas:Dawnlike-82fd582c9a2e802234606f046610a53e.atlas:220428:application/unknown:1
+i:Dawnlike.png:Dawnlike-f41ee6297b00332a8596c8e4f84326a6.png:407270:image/png:1
+t:font.fnt:font-f7c6d1c88f1774ac3d1327643a01bd82.fnt:19067:application/unknown:1
+i:libgdx128.png:libgdx128-f9b34f89e4270352ff6f4f06b0e07665.png:339:image/png:1
+i:libgdx16.png:libgdx16-c70b07b2942ed1e75c438b0e91bc446e.png:227:image/png:1
+i:libgdx32.png:libgdx32-c0c793a4ff45bbc1dc56a63c9c37ad74.png:246:image/png:1
+i:libgdx64.png:libgdx64-e0c112ef15c013d39f9d94fb7e20d7e3.png:295:image/png:1

@@ -23,6 +23,13 @@ configure(subprojects) {
 		options.incremental = true
 	}
 }
+if(JavaVersion.current().isJava9Compatible()) {
+	allprojects {
+		tasks.withType(JavaCompile) {
+			options.release.set(8)
+		}
+	}
+}
 
 subprojects {
 	version = '0.0.1-SNAPSHOT'
