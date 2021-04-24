@@ -641,11 +641,11 @@ public class ColorfulDemo extends ApplicationAdapter {
      */
     public void putMap()
     {
-        final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
+        final float time = TimeUtils.timeSinceMillis(startTime) * 0.0007f;
 //// using day/night cycle
         float st = MathUtils.sinDeg(90f * MathUtils.sin(time)), ct = MathUtils.sinDeg(90f * MathUtils.cos(time)),
                 dawnDusk = ct * ct;
-        float color = ColorTools.oklab(0.3125f * st + 0.5f, 0.0625f * dawnDusk + 0.03125f * st + 0.5f, 0.1f * st + 0.5f, 1f),
+        float color = ColorTools.oklab((0.3125f * 0.25f) * st + 0.5f, (0.125f * 0.25f) * dawnDusk + (0.03125f * 0.25f) * st + 0.5f, (0.1f * 0.25f) * st + 0.5f, 1f),
                 tweak = ColorTools.oklab(0.2f * st + 0.5f, 0.2f * st + 0.5f, 0.2f * st + 0.5f, -0.125f * st + 0.5f);
         //In many other situations, you would clear the drawn characters to prevent things that had been drawn in the
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had

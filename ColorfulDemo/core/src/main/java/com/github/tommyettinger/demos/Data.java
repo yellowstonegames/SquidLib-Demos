@@ -1,6 +1,8 @@
 package com.github.tommyettinger.demos;
 
 /**
+ * Stores big lists of sprite names to be looked up in the atlas.
+ * <br>
  * Created by Tommy Ettinger on 12/24/2019.
  */
 public class Data {
