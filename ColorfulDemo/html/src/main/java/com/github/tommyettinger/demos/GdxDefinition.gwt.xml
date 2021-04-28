@@ -5,6 +5,7 @@
 	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
 	<inherits name="com.github.tommyettinger.demos.ColorfulDemo" />
 	<inherits name="squidlib-util" />
+	<inherits name="jdkgdxds" />
 	<inherits name="com.github.tommyettinger.colorful.colorful" />
 	<entry-point class="com.github.tommyettinger.demos.gwt.GwtLauncher" />
 	<set-configuration-property name="gdx.assetpath" value="../assets" />
