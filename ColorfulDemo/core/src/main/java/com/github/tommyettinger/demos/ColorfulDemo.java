@@ -16,7 +16,6 @@ import com.github.tommyettinger.colorful.FloatColors;
 import com.github.tommyettinger.colorful.oklab.ColorfulBatch;
 import com.github.tommyettinger.colorful.oklab.Palette;
 import com.github.tommyettinger.colorful.oklab.ColorTools;
-import com.github.tommyettinger.ds.IntObjectMap;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -70,7 +69,7 @@ public class ColorfulDemo extends ApplicationAdapter {
     // Stores all images we use here efficiently, as well as the font image 
     private TextureAtlas atlas;
     // This maps chars, such as '#', to specific images, such as a pillar.
-    private IntObjectMap<TextureAtlas.AtlasRegion> charMapping;
+    private IntMap<TextureAtlas.AtlasRegion> charMapping;
     
     private DungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
@@ -225,7 +224,7 @@ public class ColorfulDemo extends ApplicationAdapter {
         font.getData().markupEnabled = true;
         bgColors = ArrayTools.fill(FLOAT_LIGHTING, bigWidth, bigHeight);
         solid = atlas.findRegion("pixel");
-        charMapping = new IntObjectMap<>(64);
+        charMapping = new IntMap<>(64);
 
         charMapping.put('.', atlas.findRegion("day tile floor c"));
         charMapping.put(',', atlas.findRegion("brick clear pool center"      ));
@@ -669,16 +668,16 @@ public class ColorfulDemo extends ApplicationAdapter {
 //                            ? FloatColors.lerpFloatColors(bgColors[i][j], Palette.ANGEL_WING, 0.9f)
 //                            : FloatColors.lerpFloatColors(bgColors[i][j], FLOAT_LIGHTING, (float)visible[i][j] * 0.75f + 0.25f));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
-                        batch.draw(charMapping.getOrDefault('.', solid), pos.x, pos.y, 1, 1);
-                    batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), pos.x, pos.y, 1, 1);
+                        batch.draw(charMapping.get('.', solid), pos.x, pos.y, 1, 1);
+                    batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y, 1, 1);
                 } else if(seen.contains(i, j)) {
                     pos.set(i, j);
                     batch.setPackedColor(bgColors[i][j]);
 //                    batch.setPackedColor(FloatColors.lerpFloatColors(bgColors[i][j], FLOAT_GRAY, 0.7f));
                     batch.setTweak(0.1f, 0.2f, 0.2f, 0.25f);
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
-                        batch.draw(charMapping.getOrDefault('.', solid), pos.x, pos.y, 1, 1);
-                    batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), pos.x, pos.y, 1, 1);
+                        batch.draw(charMapping.get('.', solid), pos.x, pos.y, 1, 1);
+                    batch.draw(charMapping.get(lineDungeon[i][j], solid), pos.x, pos.y, 1, 1);
                 }
             }
         }
