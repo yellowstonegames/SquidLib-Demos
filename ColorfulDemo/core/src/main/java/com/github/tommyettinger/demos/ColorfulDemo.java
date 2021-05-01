@@ -5,10 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.*;
@@ -70,6 +67,9 @@ public class ColorfulDemo extends ApplicationAdapter {
     private TextureAtlas atlas;
     // This maps chars, such as '#', to specific images, such as a pillar.
     private IntMap<TextureAtlas.AtlasRegion> charMapping;
+
+    private ParticleEffectPool bloodEffectPool;
+    private final Array<ParticleEffectPool.PooledEffect> effects = new Array<>(ParticleEffectPool.PooledEffect.class);
     
     private DungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
@@ -244,6 +244,21 @@ public class ColorfulDemo extends ApplicationAdapter {
         charMapping.put('┤', atlas.findRegion("lit brick wall left up down"           ));
         charMapping.put('┐', atlas.findRegion("lit brick wall left up"            ));
         charMapping.put('┘', atlas.findRegion("lit brick wall left down"            ));
+
+
+//Set up the particle effect that will act as the pool's template
+        ParticleEffect bloodEffect = new ParticleEffect();
+        bloodEffect.load(Gdx.files.internal("blood.p"), atlas);
+
+//If your particle effect includes additive or pre-multiplied particle emitters
+//you can turn off blend function clean-up to save a lot of draw calls, but
+//remember to switch the Batch back to GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA
+//before drawing "regular" sprites or your Stage.
+//        bloodEffect.setEmittersCleanUpBlendFunction(false);
+
+        bloodEffectPool = new ParticleEffectPool(bloodEffect, 1, 30);
+
+
         //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
         //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good winding dungeons
         //with rooms by default, but in the later call to dungeonGen.generate(), you can use a TilesetType such as
@@ -566,12 +581,16 @@ public class ColorfulDemo extends ApplicationAdapter {
                 if(monsters.containsKey(player))
                 {
                     monsters.remove(player);
-                    for (int x = -1; x <= 1; x++) {
-                        for (int y = -1; y <= 1; y++) {
-                            if(rng.nextBoolean()) 
-                                bgColors[newX+x][newY+y] = FLOAT_BLOOD;
-                        }
-                    }
+
+                    ParticleEffectPool.PooledEffect effect = bloodEffectPool.obtain();
+                    effect.setPosition(newX, newY);
+                    effects.add(effect);
+//                    for (int x = -1; x <= 1; x++) {
+//                        for (int y = -1; y <= 1; y++) {
+//                            if(rng.nextBoolean())
+//                                bgColors[newX+x][newY+y] = FLOAT_BLOOD;
+//                        }
+//                    }
                 }
             }
             phase = Phase.PLAYER_ANIM;
@@ -693,6 +712,15 @@ public class ColorfulDemo extends ApplicationAdapter {
             }
         }
         playerSprite.animate(time).draw(batch);
+        batch.setTweakedColor(Palette.GRAY, ColorfulBatch.TWEAK_RESET);
+        for (int i = effects.size - 1; i >= 0; i--) {
+            ParticleEffectPool.PooledEffect effect = effects.get(i);
+            effect.draw(batch, Gdx.graphics.getDeltaTime());
+            if (effect.isComplete()) {
+                effect.free();
+                effects.removeIndex(i);
+            }
+        }
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     @Override
