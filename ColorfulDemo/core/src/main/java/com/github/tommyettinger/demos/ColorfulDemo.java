@@ -248,7 +248,7 @@ public class ColorfulDemo extends ApplicationAdapter {
 
 //Set up the particle effect that will act as the pool's template
         ParticleEffect bloodEffect = new ParticleEffect();
-        bloodEffect.load(Gdx.files.internal("blood.p"), atlas);
+        bloodEffect.load(Gdx.files.internal("fire_big.p"), atlas);
 
 //If your particle effect includes additive or pre-multiplied particle emitters
 //you can turn off blend function clean-up to save a lot of draw calls, but
