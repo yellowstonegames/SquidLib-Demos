@@ -4,18 +4,24 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.colorful.FloatColors;
+import com.github.tommyettinger.colorful.oklab.ColorTools;
 import com.github.tommyettinger.colorful.oklab.ColorfulBatch;
 import com.github.tommyettinger.colorful.oklab.Palette;
-import com.github.tommyettinger.colorful.oklab.ColorTools;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
 import squidpony.squidai.DijkstraMap;
@@ -32,26 +38,8 @@ import squidpony.squidmath.OrderedMap;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.badlogic.gdx.Input.Keys.DOWN;
-import static com.badlogic.gdx.Input.Keys.ESCAPE;
-import static com.badlogic.gdx.Input.Keys.LEFT;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_1;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_2;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_3;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_4;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_5;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_6;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_7;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_8;
-import static com.badlogic.gdx.Input.Keys.NUMPAD_9;
-import static com.badlogic.gdx.Input.Keys.Q;
-import static com.badlogic.gdx.Input.Keys.RIGHT;
-import static com.badlogic.gdx.Input.Keys.UP;
-import static com.github.tommyettinger.colorful.oklab.ColorTools.alpha;
-import static com.github.tommyettinger.colorful.oklab.ColorTools.channelL;
-import static com.github.tommyettinger.colorful.oklab.ColorTools.channelA;
-import static com.github.tommyettinger.colorful.oklab.ColorTools.channelB;
-import static com.github.tommyettinger.colorful.oklab.ColorTools.floatGetHSL;
+import static com.badlogic.gdx.Input.Keys.*;
+import static com.github.tommyettinger.colorful.oklab.ColorTools.*;
 
 /**
  */
@@ -116,7 +104,7 @@ public class ColorfulDemo extends ApplicationAdapter {
 
     private InputProcessor input;
     private BitmapFont font;
-    private PixelPerfectViewport mainViewport;
+    private Viewport mainViewport;
     private Camera camera;
     
     private OrderedMap<Coord, AnimatedGlider> monsters;
@@ -180,11 +168,9 @@ public class ColorfulDemo extends ApplicationAdapter {
     // The format used for the floats is a hex literal; these are explained at the bottom of this file, in case you
     // aren't familiar with them (they're a rather obscure feature of Java 5 and newer).
     private static final float
-            FLOAT_WHITE = Palette.GRAY, 
-            FLOAT_BLACK = Palette.BLACK,
             FLOAT_BLOOD = Palette.SIENNA,
-            FLOAT_LIGHTING = floatGetHSL(0.125f, 0.12f, 0.55f, 1f),
-            FLOAT_GRAY = floatGetHSL(0f, 0f, 0.25f, 1f);
+            FLOAT_LIGHTING = floatGetHSL(0.125f, 0.12f, 0.35f, 1f);
+
     @Override
     public void create () {
         

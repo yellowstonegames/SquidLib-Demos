@@ -98,6 +98,8 @@ task addSource {
     }
 }
 
+tasks.checkGwt.dependsOn(addSource)
+checkGwt.war = file("war")
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 

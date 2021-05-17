@@ -199,7 +199,7 @@ public class PixelPerfectViewport extends Viewport {
             }
         }
         // Center.
-        setScreenBounds((screenWidth - viewportWidth * conversionX) / 2, (screenHeight - viewportHeight * conversionY) / 2, viewportWidth * conversionX, viewportHeight * conversionX);
+        setScreenBounds((screenWidth - viewportWidth * conversionX) / 2, (screenHeight - viewportHeight * conversionY) / 2, viewportWidth * conversionX, viewportHeight * conversionY);
 
         apply(centerCamera);
     }

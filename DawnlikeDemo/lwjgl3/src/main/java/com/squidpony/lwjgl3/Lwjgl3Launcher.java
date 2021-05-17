@@ -21,10 +21,9 @@ public class Lwjgl3Launcher {
 
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("DawnlikeDemo");
         configuration.setResizable(true);
         configuration.useVsync(true);
-        configuration.setForegroundFPS(120);
+        configuration.setForegroundFPS(120); // upper bound in case vsync fails
         configuration.setWindowListener(new Lwjgl3WindowAdapter() {
             @Override
             public void maximized(boolean isMaximized) {
@@ -68,6 +67,8 @@ public class Lwjgl3Launcher {
         //// these are a different way of handling alt-tab better.
 //        configuration.setDecorated(false);
 //        configuration.setAutoIconify(true);
+
+        configuration.setTitle("DawnlikeDemo");
 
         //// useful to know if something's wrong in a shader.
         //// you should remove the next line for a release.
