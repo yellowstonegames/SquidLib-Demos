@@ -668,17 +668,20 @@ public class ColorfulDemo extends ApplicationAdapter {
             }
         }
 
+        font.setColor(0.63f, 0.5f, 0.5f, 1f);
         AnimatedGlider monster;
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if (visible[i][j] > 0.0) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
                         monster.animate(time).draw(batch);
+                        font.draw(batch, "[RED]"+((int)(visible[i][j] * 9.999)), monster.getX() + 0.375f, monster.getY() + 1.375f, 24, Align.left, false);
                     }
                 }
             }
         }
         playerSprite.animate(time).draw(batch);
+        font.draw(batch, "[SKY]"+(health), playerSprite.getX() + 0.375f, playerSprite.getY() + 1.375f, 24, Align.left, false);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     @Override
