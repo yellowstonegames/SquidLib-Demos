@@ -1,9 +1,10 @@
 buildscript {
 	repositories {
-		jcenter()
+		mavenCentral()
+		maven { url 'https://jitpack.io' }
 	}
 	dependencies {
-		classpath 'org.gretty:gretty:3.0.2'
+		classpath "com.github.tommyettinger.gretty:gretty:3.0.4.5"
 	}
 }
 apply plugin: "gwt"
@@ -25,14 +26,15 @@ gwt {
 }
 
 dependencies {
-  api project(':core')
-  api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-  api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-  api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-  api "com.github.tommyettinger:formic:$formicVersion:sources"
-  api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion:sources"
-  api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
-  api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
+	api project(':core')
+	api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+	api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+	api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+	api "com.github.tommyettinger:formic:$formicVersion:sources"
+	api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion:sources"
+	api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
+	api "com.github.tommyettinger:anim8-gdx:0.2.9:sources"
+	api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 }
 
 
@@ -97,6 +99,8 @@ task addSource {
 	}
 }
 
+tasks.checkGwt.dependsOn(addSource)
+checkGwt.war = file("war")
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 

@@ -19,17 +19,8 @@ import text.formic.Stringf;
 import java.util.Date;
 
 /**
- * This is a small, not-overly-simple demo that presents some important features of SquidLib and shows a faster,
- * cleaner, and more recently-introduced way of displaying the map and other text. Features include dungeon map
- * generation, field of view, pathfinding (to the mouse position), continuous noise (used for a wavering torch effect),
- * language generation/ciphering, a colorful glow effect, and ever-present random number generation (with a seed).
- * You can increase the size of the map on most target platforms (but GWT struggles with large... anything) by
- * changing gridHeight and gridWidth to affect the visible area or bigWidth and bigHeight to adjust the size of the
- * dungeon you can move through, with the camera following your '@' symbol.
- * <br>
- * The assets folder of this project, if it was created with SquidSetup, will contain the necessary font files (just one
- * .fnt file and one .png are needed, but many more are included by default). You should move any font files you don't
- * use out of the assets directory when you produce a release JAR, APK, or GWT build.
+ * This is a tiny demo that tests various features of Formic ( https://github.com/tommyettinger/formic ),
+ * a String formatting library for GWT.
  */
 public class FormicDemo extends ApplicationAdapter {
     // FilterBatch is almost the same as SpriteBatch, but is a bit faster with SquidLib and allows color filtering
@@ -129,13 +120,14 @@ public class FormicDemo extends ApplicationAdapter {
         languageDisplay.clear(0);
         languageDisplay.fillBackground(languageDisplay.defaultPackedBackground);
         for (int i = 0; i < gridHeight - 1; i += 2) {
+            //////////////////////////(dec  hex)  str (float   decsci   sci      hexfloat)
             String s = Stringf.format("%11d %<08X %12s %10.10f %<10.10g %<10.10E %<10.10a",
                 rng.nextInt(), 
                 FakeLanguageGen.CELESTIAL.word(rng, true, 3),
                 rng.nextDouble() / (1.0 - rng.nextDouble()));
             languageDisplay.put(1, i, s,
                 rng.getRandomElement(SColor.COLOR_WHEEL_PALETTE_RICH));
-            s = Stringf.format("%tD", new Date());
+            s = Stringf.format("%tD %<tT", new Date()); // date and time
             languageDisplay.put(1, i+1, s,
                     rng.getRandomElement(SColor.COLOR_WHEEL_PALETTE_RICH));
         }

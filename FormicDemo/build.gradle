@@ -1,13 +1,12 @@
 buildscript {
 	repositories {
-//		mavenLocal()
+		mavenLocal()
 		mavenCentral()
 		google()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-		jcenter()
+		gradlePluginPortal()
 	}
 	dependencies {
-		classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
 		classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
 	}
 }
@@ -33,13 +32,6 @@ subprojects {
 		mavenCentral()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 		maven { url 'https://jitpack.io' }
-		jcenter()
+		gradlePluginPortal()
 	}
-}
-
-// Clearing Eclipse project data in root folder:
-tasks.eclipse.doLast {
-	delete '.project'
-	delete '.classpath'
-	delete '.settings/'
 }
