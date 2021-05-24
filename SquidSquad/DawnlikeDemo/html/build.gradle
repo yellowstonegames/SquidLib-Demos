@@ -34,6 +34,8 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+	api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
+	api "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
 	api "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
 	api "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
 	api "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
@@ -80,20 +82,24 @@ task superDev(type: GwtSuperDev) {
 		gwt.modules = gwt.devModules
 	}
 }
+var outputPath = "../../../docs/squidsquad/dawnlike/"
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
-		file("build/dist").mkdirs()
+		file(outputPath).mkdirs()
 		copy {
 			from "build/gwt/out"
-			into "build/dist"
+			into outputPath
 		}
 		copy {
-			from "webapp"
-			into "build/dist"
+			from("webapp") {
+				include '**/*.html'
+				filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
+			}
+			into outputPath
 			}
 		copy {
 			from "war"
-			into "build/dist"
+			into outputPath
 		}
 	}
 }

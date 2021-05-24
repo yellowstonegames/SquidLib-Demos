@@ -3,7 +3,6 @@
 <module rename-to="html">
 	<source path="" />
 	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
-	<inherits name="regexodus" />
 	<inherits name="squidcore" />
 	<inherits name="squidgrid" />
 	<inherits name="squidplace" />

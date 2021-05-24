@@ -5,14 +5,16 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.github.tommyettinger.DawnlikeDemo;
 
+import static com.github.tommyettinger.DawnlikeDemo.*;
+
 /** Launches the GWT application. */
 public class GwtLauncher extends GwtApplication {
 		@Override
 		public GwtApplicationConfiguration getConfig () {
 			// Resizable application, uses available space in browser
-			return new GwtApplicationConfiguration(true);
+//			return new GwtApplicationConfiguration(true);
 			// Fixed size application:
-			//return new GwtApplicationConfiguration(480, 320);
+			return new GwtApplicationConfiguration(gridWidth * cellWidth, gridHeight * cellHeight);
 		}
 
 		@Override
