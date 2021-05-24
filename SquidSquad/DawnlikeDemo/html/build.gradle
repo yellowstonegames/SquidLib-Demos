@@ -92,6 +92,13 @@ task dist(dependsOn: [clean, compileGwt]) {
 		}
 		copy {
 			from("webapp") {
+				exclude '**/*.html'
+				exclude '**/refresh.png'
+			}
+			into outputPath
+			}
+		copy {
+			from("webapp") {
 				include '**/*.html'
 				filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
 			}
