@@ -14,7 +14,7 @@ public class GwtLauncher extends GwtApplication {
 			// Resizable application, uses available space in browser
 //			return new GwtApplicationConfiguration(true);
 			// Fixed size application:
-			return new GwtApplicationConfiguration(gridWidth * cellWidth, gridHeight * cellHeight);
+			return new GwtApplicationConfiguration(gridWidth * cellWidth * 2, gridHeight * cellHeight * 2);
 		}
 
 		@Override

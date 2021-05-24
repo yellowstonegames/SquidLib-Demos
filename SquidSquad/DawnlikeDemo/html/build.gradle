@@ -87,7 +87,9 @@ task dist(dependsOn: [clean, compileGwt]) {
     doLast {
 		file(outputPath).mkdirs()
 		copy {
-			from "build/gwt/out"
+			from("build/gwt/out"){
+				exclude '**/*.symbolMap'
+			}
 			into outputPath
 		}
 		copy {
