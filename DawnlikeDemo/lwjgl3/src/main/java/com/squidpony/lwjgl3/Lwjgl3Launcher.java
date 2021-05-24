@@ -19,6 +19,7 @@ public class Lwjgl3Launcher {
         return new Lwjgl3Application(new DawnlikeDemo(), getDefaultConfiguration());
     }
 
+    private static Lwjgl3Window mainWindow;
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setResizable(true);
@@ -26,27 +27,34 @@ public class Lwjgl3Launcher {
         configuration.setForegroundFPS(120); // upper bound in case vsync fails
         configuration.setWindowListener(new Lwjgl3WindowAdapter() {
             @Override
-            public void maximized(boolean isMaximized) {
-                if (isMaximized) {
-                    Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
-                    Gdx.graphics.setVSync(true);
-                } else {
-                    Gdx.graphics.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
-                    Gdx.graphics.setVSync(false);
-                }
+            public void created(Lwjgl3Window window) {
+                super.created(window);
+                mainWindow = window;
+                mainWindow.maximizeWindow();
             }
 
-            @Override
-            public void focusLost() {
-                if(!UIUtils.isMac) // focus is handled differently by MacOS
-                    Gdx.app.postRunnable(() -> maximized(false));
-            }
-
-            @Override
-            public void focusGained() {
-                if(!UIUtils.isMac) // focus is handled differently by MacOS
-                    Gdx.app.postRunnable(() -> maximized(true));
-            }
+//            @Override
+//            public void maximized(boolean isMaximized) {
+//                if (isMaximized) {
+//                    Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+//                    Gdx.graphics.setVSync(true);
+//                } else {
+//                    Gdx.graphics.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+//                    Gdx.graphics.setVSync(false);
+//                }
+//            }
+//
+//            @Override
+//            public void focusLost() {
+//                if(!UIUtils.isMac) // focus is handled differently by MacOS
+//                    Gdx.app.postRunnable(() -> maximized(false));
+//            }
+//
+//            @Override
+//            public void focusGained() {
+//                if(!UIUtils.isMac) // focus is handled differently by MacOS
+//                    Gdx.app.postRunnable(() -> maximized(true));
+//            }
 
             @Override
             public void iconified(boolean isIconified) {
