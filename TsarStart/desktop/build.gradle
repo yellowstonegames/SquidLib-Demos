@@ -3,7 +3,7 @@ apply plugin: 'application'
 //sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.tommyettinger.demos.desktop.DesktopLauncher'
 eclipse.project.name = appName + '-desktop'
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 
 dependencies {
   implementation project(':core')
@@ -14,13 +14,28 @@ dependencies {
 sourceSets.main.resources.srcDirs += [ file('../assets').absolutePath ]
 
 jar {
-  archiveName "${appName}-${archiveVersion.get()}.jar"
-  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+// sets the name of the .jar file this produces to the name of the game or app.
+  archiveBaseName.set(appName)
+// the duplicatesStrategy will matter starting in Gradle 7.0; this setting works.
+  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+  dependsOn configurations.runtimeClasspath
+  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+// these "exclude" lines remove some unnecessary duplicate files in the output JAR.
+  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+  dependencies {
+    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+  }
+// setting the manifest makes the JAR runnable.
   manifest {
     attributes 'Main-Class': project.mainClassName
+  }
+// this last step may help on some OSes that need extra instruction to make runnable JARs.
+  doLast {
+    file(archiveFile).setExecutable(true, false)
   }
 }
 
 run {
-  ignoreExitValue = true
+  workingDir = rootProject.file('assets').path
+  ignoreExitValue(true)
 }

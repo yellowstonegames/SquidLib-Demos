@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
 
+
 android {
-  compileSdkVersion 29
+  compileSdkVersion 30
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
@@ -9,7 +10,7 @@ android {
       aidl.srcDirs = ['src/main/java']
       renderscript.srcDirs = ['src/main/java']
       res.srcDirs = ['res']
-      //assets.srcDirs = ['../assets']
+      assets.srcDirs = ['../assets']
       jniLibs.srcDirs = ['libs']
     }
   }
@@ -29,25 +30,25 @@ android {
     exclude 'META-INF/dependencies.txt'
   }
   defaultConfig {
-    applicationId 'com.github.tommyettinger.demos'
+    applicationId 'com.github.tommyettinger'
     minSdkVersion 19
-    targetSdkVersion 29
+    targetSdkVersion 30
+    versionCode 1
+    versionName "1.0"
   }
 }
 
-configurations { natives }
 repositories {
-  mavenCentral()
-  jcenter()
+  // needed for AAPT2, may be needed for other tools
   google()
-  maven { url 'https://jitpack.io' }
-  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 }
-dependencies {
-  implementation project(':core')
-  implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 
-  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
+configurations { natives }
+
+dependencies {
+  api project(':core')
+  api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
@@ -59,28 +60,31 @@ dependencies {
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
 task copyAndroidNatives() {
-  file("libs/armeabi/").mkdirs();
-  file("libs/armeabi-v7a/").mkdirs();
-  file("libs/arm64-v8a/").mkdirs();
-  file("libs/x86_64/").mkdirs();
-  file("libs/x86/").mkdirs();
+  doFirst {
+    file("libs/armeabi-v7a/").mkdirs()
+    file("libs/arm64-v8a/").mkdirs()
+    file("libs/x86_64/").mkdirs()
+    file("libs/x86/").mkdirs()
 
-  configurations.natives.files.each { jar ->
-    def outputDir = null
-    if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-    if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-    if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-    if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-    if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-    if(outputDir != null) {
-      copy {
-        from zipTree(jar)
-        into outputDir
-        include "*.so"
+    configurations.natives.files.each { jar ->
+      def outputDir = null
+      if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
+      if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+      if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+      if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+      if(outputDir != null) {
+        copy {
+//          duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+          from zipTree(jar)
+          into outputDir
+          include "*.so"
+        }
       }
     }
   }
 }
+
+preBuild.dependsOn(copyAndroidNatives)
 
 task run(type: Exec) {
   def path
@@ -101,5 +105,5 @@ task run(type: Exec) {
   }
 
   def adb = path + "/platform-tools/adb"
-  commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.tommyettinger.demos/com.github.tommyettinger.demos.android.AndroidLauncher'
+  commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.tommyettinger/com.github.tommyettinger.demos.android.AndroidLauncher'
 }

@@ -1,10 +1,11 @@
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+
 dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
-  api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
-  api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibVersion"
+  api "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion"
+  api "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibVersion"
   api "com.github.tommyettinger:regexodus:$regExodusVersion"
 }
         
