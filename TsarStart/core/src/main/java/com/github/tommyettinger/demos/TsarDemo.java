@@ -181,7 +181,7 @@ public class TsarDemo extends ApplicationAdapter {
         // the "Crisp" fonts use an MSDF effect, while "Stretchable" ones use an SDF effect. MSDF is a little faster to
         // render than SDF, but SDF can resize to smaller sizes while remaining closer to legible. MSDF also generally
         // looks better at large sizes because the corners stay sharp, instead of rounding as SDF does.
-        font = DefaultResources.getCrispSlabFont();
+        font = DefaultResources.getCrispSlabFont().setSmoothingMultiplier(1f);
         display = new SparseLayers(bigWidth, bigHeight + bonusHeight, cellWidth, cellHeight, font);
 
         messageDisplay = new SquidMessageBox(gridWidth, bonusHeight - 1, display.font);

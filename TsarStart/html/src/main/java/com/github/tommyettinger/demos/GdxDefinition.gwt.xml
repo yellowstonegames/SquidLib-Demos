@@ -8,12 +8,13 @@
     <inherits name="regexodus" />
     <inherits name="squidlib" />
     <inherits name="squidlib-util" />
-    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidmath" />
-    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid" />
-    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidai" />
-    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid.mapping" />
-    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid.mapping.styled" />
-    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid.gui.gdx" />
+    <inherits name="squidlib-extra" />
+<!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidmath" />-->
+<!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid" />-->
+<!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidai" />-->
+<!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid.mapping" />-->
+<!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid.mapping.styled" />-->
+<!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid.gui.gdx" />-->
     <entry-point class="com.github.tommyettinger.demos.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
     <set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>

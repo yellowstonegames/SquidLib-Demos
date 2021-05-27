@@ -34,6 +34,7 @@ dependencies {
 //    implementation "com.squidpony:squidlib-util:$squidLibVersion:sources"
     implementation "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion:sources"
     implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibVersion:sources"
+    implementation "com.github.yellowstonegames.SquidLib:squidlib-extra:$squidLibVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
     implementation "com.github.tommyettinger:anim8-gdx:0.2.9:sources"
 }
