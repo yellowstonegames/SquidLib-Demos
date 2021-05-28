@@ -5,10 +5,8 @@
     <source path="" />
     <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
     <inherits name="com.github.tommyettinger.demos.TsarDemo" />
-    <inherits name="regexodus" />
     <inherits name="squidlib" />
     <inherits name="squidlib-util" />
-    <inherits name="squidlib-extra" />
 <!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidmath" />-->
 <!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidgrid" />-->
 <!--    <extend-configuration-property name="gdx.reflect.include" value="squidpony.squidai" />-->

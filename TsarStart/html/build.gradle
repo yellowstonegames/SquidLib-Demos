@@ -28,13 +28,14 @@ gwt {
 dependencies {
     implementation project(':core')
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-//    implementation "com.squidpony:squidlib:$squidLibVersion:sources"
-//    implementation "com.squidpony:squidlib-util:$squidLibVersion:sources"
+
+//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3006b7d2d5'
+    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3006b7d2d5:sources'
+
     implementation "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion:sources"
     implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibVersion:sources"
-    implementation "com.github.yellowstonegames.SquidLib:squidlib-extra:$squidLibVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
     implementation "com.github.tommyettinger:anim8-gdx:0.2.9:sources"
 }
