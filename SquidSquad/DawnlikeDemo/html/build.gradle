@@ -32,16 +32,20 @@ gwt {
 dependencies {
 	implementation project(':core')
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-	api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
-	api "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
-	api "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
-	api "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
-	api "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
-	api "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
-	api "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
-	api "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
+
+//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+	implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3006b7d2d5'
+	implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3006b7d2d5:sources'
+
+	implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
+	implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
+	implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
+	implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
+	implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
+	implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
+	implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
+	implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
 
 }
 
