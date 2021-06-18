@@ -8,13 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.tommyettinger.anim8.AnimatedGif;
-import com.github.tommyettinger.anim8.AnimatedPNG;
-
-import static com.github.tommyettinger.anim8.Dithered.DitherAlgorithm.SCATTER;
 
 /**
  * Credit for the shader adaptation goes to angelickite , a very helpful user on the libGDX Discord.
@@ -39,7 +33,8 @@ public class NorthernLights extends ApplicationAdapter {
 		pixel = new Texture(pixmap);
 		startTime = TimeUtils.millis();
 		ShaderProgram.pedantic = false;
-		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("warble_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("cuatro_fragment_no_dither.glsl"));
@@ -82,10 +77,10 @@ public class NorthernLights extends ApplicationAdapter {
 			}
 		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0.0625f);
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0x1p-11f);
 		batch.begin();
-		shader.setUniformf("seed", seed);
-		shader.setUniformf("tm", ftm);
+		shader.setUniformf("u_seed", seed);
+		shader.setUniformf("u_time", ftm);
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 	}

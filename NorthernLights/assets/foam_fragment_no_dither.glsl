@@ -23,8 +23,8 @@ varying LOWP vec4 v_color;
 varying vec2 v_texCoords;
 uniform sampler2D u_texture;
 
-uniform float seed;
-uniform float tm;
+uniform float u_seed;
+uniform float u_time;
 
 float hash(float seed, float p) {
     return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
@@ -160,9 +160,9 @@ float foam(float seed, vec3 x) {
 //}
 
 void main() {
-  vec3 i = vec3(gl_FragCoord.xy + 99.0, tm * 0.625) * 0.03125;
-  gl_FragColor.r = foam(4.0 + seed, i);
-  gl_FragColor.g = foam(61.0 + seed, i);
-  gl_FragColor.b = foam(257.0 + seed, i);
+  vec3 i = vec3(gl_FragCoord.xy + 99.0, u_time * 0.625) * 0.03125;
+  gl_FragColor.r = foam(4.0 + u_seed, i);
+  gl_FragColor.g = foam(61.0 + u_seed, i);
+  gl_FragColor.b = foam(257.0 + u_seed, i);
   gl_FragColor.a = v_color.a;
 }
