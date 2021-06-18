@@ -627,7 +627,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
         camera.position.x = playerSprite.getX();
         camera.position.y =  playerSprite.getY();
         camera.update();
-
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();

@@ -126,14 +126,14 @@ task dist(dependsOn: [clean, compileGwt]) {
 		}
 		copy {
 			from("webapp") {
-				exclude '**/*.html'
+				exclude 'index.html'
 				exclude '**/refresh.png'
 			}
 			into outputPath
 			}
 		copy {
 			from("webapp") {
-				include '**/*.html'
+				include 'index.html'
 				filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
 			}
 			into outputPath
@@ -152,16 +152,10 @@ task addSource {
 }
 
 task distZip(type: Zip, dependsOn: dist){
-	//// The next lines copy the dist but remove the recompile button (circling arrow) from the HTML page.
-	from('build/dist/') {
-		exclude '**/*.html'
-	}
-	from('build/dist/') {
-		include '**/*.html'
-		filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
-	}
+	//// This uses the output of the dist task, which removes the superdev buttons from index.html .
+	from(outputPath)
 	archiveBaseName.set("${appName}-dist")
-	//// The result will be in html/build/ with a name containing "dist".
+	//// The result will be in html/build/ with a name containing "-dist".
 	destinationDir(file("build"))
 }
 
