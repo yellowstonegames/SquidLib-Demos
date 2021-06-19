@@ -32,7 +32,8 @@ public class NorthernLights extends ApplicationAdapter {
 		pixel = new Texture(pixmap);
 		startTime = TimeUtils.millis();
 		ShaderProgram.pedantic = false;			
-		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("warble_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 		if (!shader.isCompiled()) {
 			Gdx.app.error("Shader", "error compiling shader:\n" + shader.getLog());
@@ -59,11 +60,11 @@ public class NorthernLights extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
 		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
 //		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-5f;
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-10f;
 		batch.begin();
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
-		shader.setUniformf("seed", seed);
-		shader.setUniformf("tm", ftm);
+		shader.setUniformf("u_seed", seed);
+		shader.setUniformf("u_time", ftm);
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 	}

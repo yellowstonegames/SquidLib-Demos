@@ -77,7 +77,7 @@ public class NorthernLights extends ApplicationAdapter {
 			}
 		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0x1p-11f);
+		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0x1p-10f);
 		batch.begin();
 		shader.setUniformf("u_seed", seed);
 		shader.setUniformf("u_time", ftm);
