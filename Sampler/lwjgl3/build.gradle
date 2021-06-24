@@ -1,0 +1,69 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+apply plugin: 'application'
+apply plugin: 'java-library'
+
+sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+sourceCompatibility = 8.0
+mainClassName = 'com.squidpony.samples.lwjgl3.Lwjgl3Launcher'
+eclipse.project.name = appName + '-desktop'
+sourceSets.main.java.srcDirs = [ "src/main/java/" ]
+
+dependencies {
+  api("com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion") {
+    exclude group: 'org.lwjgl', module: 'lwjgl-openal' //// only removes audio
+    exclude group: 'org.jcraft', module: 'jorbis' // removes audio
+    exclude group: 'com.badlogicgames.jlayer', module: 'jlayer'
+  }
+  api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"
+  api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
+  api "com.github.tommyettinger:regexodus:$regExodusVersion"
+}
+
+import org.gradle.internal.os.OperatingSystem
+
+run {
+  workingDir = rootProject.file('assets').path
+  setIgnoreExitValue(true)
+
+  if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+    // Required to run LWJGL3 Java apps on MacOS
+    jvmArgs += "-XstartOnFirstThread"
+  }
+}
+
+jar {
+  archiveFileName = "${appName}.jar"
+  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+  destinationDirectory = file("$project.buildDir/lib")
+  dependsOn configurations.runtimeClasspath
+  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+  dependencies {
+    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+  }
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+// this last step may help on some OSes that need extra instruction to make runnable JARs.
+  doLast {
+    file(archiveFile).setExecutable(true, false)
+  }
+}
+
+//task proguard(type: proguard.gradle.ProGuardTask) {
+//  outputs.upToDateWhen { false }
+//  configuration 'proguard-rules.pro'
+//  //printmapping 'build/lib/out.map'
+//  if (System.getProperty('java.version').startsWith('1.')) {
+//    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+//  } else {
+////		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//    libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//  }
+//  injars "build/lib/${appName}-Large.jar"
+//  outjars "build/lib/${appName}.jar"
+//}
+//
+//proguard.dependsOn jar
