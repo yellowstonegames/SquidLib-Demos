@@ -35,11 +35,13 @@ import java.util.ArrayList;
  */
 public class TsarDemo extends ApplicationAdapter {
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
-    SpriteBatch batch;
+    private FilterBatch batch;
     private Phase phase = Phase.WAIT;
 
     private GWTRNG rng;
     private SparseLayers display;
+    private FloatFilter[] filters;
+    private int currentFilter;
     private SquidMessageBox messageDisplay;
     private DungeonGenerator dungeonGen;
     private char[][] decoDungeon, bareDungeon, lineDungeon;
@@ -89,7 +91,7 @@ public class TsarDemo extends ApplicationAdapter {
     private double[][] resistance;
     private double[][] visible;
     private int health = 9;
-    
+
     // GreasedRegion is a hard-to-explain class, but it's an incredibly useful one for map generation and many other
     // tasks; it stores a region of "on" cells where everything not in that region is considered "off," and can be used
     // as a Collection of Coord points. However, it's more than that! Because of how it is implemented, it can perform
@@ -125,6 +127,63 @@ public class TsarDemo extends ApplicationAdapter {
 
     @Override
     public void create () {
+
+
+        // for demo purposes, we allow changing the SquidColorCenter and the filter effect associated with it.
+        // next, we populate the filters array with the SquidColorCenters that will modify any colors we request
+        // of them using the filter we specify. Only one SquidColorCenter will be used at any time for foreground, and
+        // sometimes another will be used for background.
+        filters = new FloatFilter[20];
+        // MultiLerpFilter here is given two colors to tint everything toward one of; this is meant to reproduce the
+        // "Hollywood action movie poster" style of using primarily light orange (explosions) and gray-blue (metal).
+
+        filters[0] = (new FloatFilters.MultiLerpFilter(0.25f,
+                new Color[]{SColor.GAMBOGE_DYE, SColor.COLUMBIA_BLUE}
+        ));
+        filters[1] = filters[0];
+
+        // MultiLerpFilter here is given three colors to tint everything toward one of; this is meant to look bolder.
+
+        filters[2] = new FloatFilters.MultiLerpFilter(0.25f,
+                new Color[]{SColor.RED_PIGMENT, SColor.MEDIUM_BLUE, SColor.LIME_GREEN});
+        filters[3] = filters[2];
+
+        // ColorizeFilter here is given a slightly-grayish dark brown to imitate a sepia tone.
+
+        filters[4] = (new FloatFilters.ColorizeFilter(SColor.CLOVE_BROWN, 0.7f, -0.05f));
+        filters[5] = (new FloatFilters.ColorizeFilter(SColor.CLOVE_BROWN, 0.65f, 0.07f));
+
+        // HallucinateFilter makes all the colors very saturated and move even when you aren't doing anything.
+
+        filters[6] = (new FloatFilters.HallucinateFilter());
+        filters[7] = filters[6];
+
+        // SaturationFilter here is used to over-saturate the colors slightly. Background is less saturated.
+
+        filters[8] = (new FloatFilters.HSVFilter(0.35f, 0f));
+        filters[9] = (new FloatFilters.HSVFilter(0.15f, 0f));
+
+        // SaturationFilter here is used to de-saturate the colors slightly. Background is less saturated.
+
+        filters[10] = (new FloatFilters.HSVFilter(-0.3f, 0f));
+        filters[11] = (new FloatFilters.HSVFilter(-0.5f, 0f));
+
+        // WiggleFilter here is used to randomize the colors slightly.
+
+        filters[12] = (new FloatFilters.WiggleFilter());
+        filters[13] = filters[12];
+
+        // PaletteFilter here is used to limit colors to specific sets.
+
+        filters[14] = (new FloatFilters.PaletteFilter(SColor.DAWNBRINGER_16));
+        filters[15] = (new FloatFilters.PaletteFilter(SColor.DAWNBRINGER_16));
+
+        filters[16] = (new FloatFilters.DistinctRedGreenFilter());
+        filters[17] = filters[16];
+
+        filters[18] = new FloatFilters.IdentityFilter();
+        filters[19] = filters[18];
+
         // Gotta have a random number generator.
         // We can seed a GWTRNG, which is optimized for the HTML target, with any int or long
         // we want. You can also hash a String with CrossHash.hash64("Some seed") to get a
@@ -134,8 +193,11 @@ public class TsarDemo extends ApplicationAdapter {
         // become possible. Here we don't seed the GWTRNG, so its seed will be random.
         rng = new GWTRNG();
 
-        //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
-        batch = new SpriteBatch();
+        // The display is almost all set up, so now we can tell it to use the filtered color centers we want.
+        // 9 is unfiltered. You can change this to 0-9 to use different filters, or press 'f' in play.
+        currentFilter = 9;
+        batch = new FilterBatch(filters[currentFilter * 2]);
+
         StretchViewport mainViewport = new StretchViewport(gridWidth * cellWidth, gridHeight * cellHeight),
                 messageViewport = new StretchViewport(gridWidth * cellWidth, bonusHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
@@ -172,11 +234,11 @@ public class TsarDemo extends ApplicationAdapter {
         //display.font.tweakHeight(cellHeight * 1.1f).initBySize();
 
         messageDisplay.appendWrappingMessage(GDXMarkup.instance.colorString(
-                        "Use numpad or vi-keys ([@0.0 0.8 1]h[@0.1 0.8 1]j[@0.17 0.8 1]k[@0.21 0.8 1]l" +
-                                "[@0.37 0.8 1]y[@0.53 0.8 1]u[@0.65 0.8 1]b[@0.81 0.8 1]n[]) to move. Use " +
-                                "[CW Pale Indigo]?[] for help, [#BFA38A]f[] to filter colors, [CW Gray White]q[] to quit. " + //CW Faded Brown
-                                "Click the [/]top[/] or [/]bottom[/] border of [*]this [/]box[] to scroll."));
-        
+                "Use numpad or vi-keys ([@0.0 0.8 1]h[@0.1 0.8 1]j[@0.17 0.8 1]k[@0.21 0.8 1]l" +
+                        "[@0.37 0.8 1]y[@0.53 0.8 1]u[@0.65 0.8 1]b[@0.81 0.8 1]n[]) to move. Use " +
+                        "[CW Pale Indigo]?[] for help, [#BFA38A]f[] to filter colors, [CW Gray White]q[] to quit. " + //CW Faded Brown
+                        "Click the [/]top[/] or [/]bottom[/] border of [*]this [/]box[] to scroll."));
+
         //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
         //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good winding dungeons
         //with rooms by default, but in the later call to dungeonGen.generate(), you can use a TilesetType such as
@@ -323,7 +385,7 @@ public class TsarDemo extends ApplicationAdapter {
         //same size as decoDungeon that store the colors for the foregrounds and backgrounds of each cell as packed
         //floats (a format SparseLayers can use throughout its API), using the colors for the cell with the same x and
         //y. By changing an item in SColor.LIMITED_PALETTE, we also change the color assigned by MapUtility to floors.
-        bgColor = SColor.DARK_SLATE_GRAY;
+        bgColor = SColor.DB_INK;
         SColor.LIMITED_PALETTE[3] = SColor.DB_GRAPHITE;
         colors = MapUtility.generateDefaultColorsFloat(decoDungeon);
         bgColors = MapUtility.generateDefaultBGColorsFloat(decoDungeon);
@@ -402,6 +464,13 @@ public class TsarDemo extends ApplicationAdapter {
                         ((Lwjgl3Graphics)Gdx.graphics).getWindow().closeWindow();
                         break;
                     }
+                    case 'F':
+                    case 'f':
+                    {
+                        currentFilter = (currentFilter + 1) % 10;
+                        batch.setFilter(filters[currentFilter * 2]);
+                        break;
+                    }
                     case 'c': // cheat vision
                     case 'C':
                     {
@@ -417,57 +486,57 @@ public class TsarDemo extends ApplicationAdapter {
                 // and screenY as 2 (since 51 divided by 20 rounded down is 2)).
                 new SquidMouse(cellWidth, cellHeight, gridWidth, gridHeight, 0, 0, new InputAdapter() {
 
-            // if the user clicks and mouseMoved hasn't already assigned a path to toCursor, then we call mouseMoved
-            // ourselves and copy toCursor over to awaitedMoves.
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                mouseMoved(screenX, screenY);
-                awaitedMoves.addAll(toCursor);
-                return true;
-            }
+                    // if the user clicks and mouseMoved hasn't already assigned a path to toCursor, then we call mouseMoved
+                    // ourselves and copy toCursor over to awaitedMoves.
+                    @Override
+                    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                        mouseMoved(screenX, screenY);
+                        awaitedMoves.addAll(toCursor);
+                        return true;
+                    }
 
-            @Override
-            public boolean touchDragged(int screenX, int screenY, int pointer) {
-                return mouseMoved(screenX, screenY);
-            }
+                    @Override
+                    public boolean touchDragged(int screenX, int screenY, int pointer) {
+                        return mouseMoved(screenX, screenY);
+                    }
 
-            // causes the path to the mouse position to become highlighted (toCursor contains a list of Coords that
-            // receive highlighting). Uses DijkstraMap.findPathPreScanned() to find the path, which is rather fast.
-            @Override
-            public boolean mouseMoved(int screenX, int screenY) {
-                if(!awaitedMoves.isEmpty())
-                    return false;
-                // This is needed because we center the camera on the player as he moves through a dungeon that is
-                // multiple screens wide and tall, but the mouse still only can receive input on one screen's worth
-                // of cells. (gridWidth >> 1) halves gridWidth, pretty much, and that we use to get the centered
-                // position after adding to the player's position (along with the gridHeight).
-                screenX += player.x - (gridWidth >> 1);
-                screenY += player.y - (gridHeight >> 1);
-                // we also need to check if screenX or screenY is out of bounds.
-                if(screenX < 0 || screenY < 0 || screenX >= bigWidth || screenY >= bigHeight ||
-                        (cursor.x == screenX && cursor.y == screenY))
-                {
-                    return false;
-                }
-                cursor = Coord.get(screenX, screenY);
-                // This uses DijkstraMap.findPathPreScannned() to fill the ArrayList of Coord toCursor with the path
-                // from the current player position to the position the user clicked on. The "PreScanned" part is an
-                // optimization that's special to DijkstraMap; because the part of the map that is viable to move into
-                // has already been fully analyzed by the DijkstraMap.partialScan() method at the start of the
-                // program, and re-calculated whenever the player moves, we only need to do a fraction of the
-                // work to find the best path with that info.
-                toCursor.clear();
-                playerToCursor.findPathPreScanned(toCursor, cursor);
-                // findPathPreScanned includes the current cell (goal) by default, which is helpful when
-                // you're finding a path to a monster or loot, and want to bump into it, but here can be
-                // confusing because you would "move into yourself" as your first move without this.
-                if(!toCursor.isEmpty())
-                {
-                    toCursor.remove(0);
-                }
-                return false;
-            }
-        }));
+                    // causes the path to the mouse position to become highlighted (toCursor contains a list of Coords that
+                    // receive highlighting). Uses DijkstraMap.findPathPreScanned() to find the path, which is rather fast.
+                    @Override
+                    public boolean mouseMoved(int screenX, int screenY) {
+                        if(!awaitedMoves.isEmpty())
+                            return false;
+                        // This is needed because we center the camera on the player as he moves through a dungeon that is
+                        // multiple screens wide and tall, but the mouse still only can receive input on one screen's worth
+                        // of cells. (gridWidth >> 1) halves gridWidth, pretty much, and that we use to get the centered
+                        // position after adding to the player's position (along with the gridHeight).
+                        screenX += player.x - (gridWidth >> 1);
+                        screenY += player.y - (gridHeight >> 1);
+                        // we also need to check if screenX or screenY is out of bounds.
+                        if(screenX < 0 || screenY < 0 || screenX >= bigWidth || screenY >= bigHeight ||
+                                (cursor.x == screenX && cursor.y == screenY))
+                        {
+                            return false;
+                        }
+                        cursor = Coord.get(screenX, screenY);
+                        // This uses DijkstraMap.findPathPreScannned() to fill the ArrayList of Coord toCursor with the path
+                        // from the current player position to the position the user clicked on. The "PreScanned" part is an
+                        // optimization that's special to DijkstraMap; because the part of the map that is viable to move into
+                        // has already been fully analyzed by the DijkstraMap.partialScan() method at the start of the
+                        // program, and re-calculated whenever the player moves, we only need to do a fraction of the
+                        // work to find the best path with that info.
+                        toCursor.clear();
+                        playerToCursor.findPathPreScanned(toCursor, cursor);
+                        // findPathPreScanned includes the current cell (goal) by default, which is helpful when
+                        // you're finding a path to a monster or loot, and want to bump into it, but here can be
+                        // confusing because you would "move into yourself" as your first move without this.
+                        if(!toCursor.isEmpty())
+                        {
+                            toCursor.remove(0);
+                        }
+                        return false;
+                    }
+                }));
         //Setting the InputProcessor is ABSOLUTELY NEEDED TO HANDLE INPUT
         Gdx.input.setInputProcessor(new InputMultiplexer(stage, input));
         //You might be able to get by with the next line instead of the above line, but the former is preferred.
@@ -477,7 +546,7 @@ public class TsarDemo extends ApplicationAdapter {
         //we add messageDisplay to messageStage, where it will be unchanged by camera moves in the main Stage.
         messageStage.addActor(messageDisplay);
     }
-    
+
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
      * In a fully-fledged game, this would not be organized like this, but this is a one-file demo.
@@ -635,7 +704,7 @@ public class TsarDemo extends ApplicationAdapter {
     @Override
     public void render () {
         // standard clear the background routine for libGDX
-        Gdx.gl.glClearColor(bgColor.r / 255.0f, bgColor.g / 255.0f, bgColor.b / 255.0f, 1.0f);
+        Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // center the camera on the player's position
@@ -738,11 +807,12 @@ public class TsarDemo extends ApplicationAdapter {
         batch.begin();
         stage.getRoot().draw(batch, 1);
         batch.end();
+        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
 
     @Override
-	public void resize(int width, int height) {
-		super.resize(width, height);
+    public void resize(int width, int height) {
+        super.resize(width, height);
 
         // message box won't respond to clicks on the far right if the stage hasn't been updated with a larger size
         float currentZoomX = (float)width / gridWidth;
@@ -764,7 +834,7 @@ public class TsarDemo extends ApplicationAdapter {
         stage.getViewport().update(width, height, false);
         stage.getViewport().setScreenBounds(0, (int) messageDisplay.getHeight(),
                 width, height - (int) messageDisplay.getHeight());
-	}
+    }
 
     public static CustomConfig config = new CustomConfig("TsarDemo"){
         {
