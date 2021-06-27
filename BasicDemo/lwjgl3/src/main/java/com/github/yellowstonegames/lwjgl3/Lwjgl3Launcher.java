@@ -1,9 +1,10 @@
-package com.github.tommyettinger.demos.lwjgl3;
+package com.github.yellowstonegames.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.github.tommyettinger.demos.BasicDemo;
-import static com.github.tommyettinger.demos.BasicDemo.*;
+import com.github.yellowstonegames.BasicDemo;
+
+import static com.github.yellowstonegames.BasicDemo.*;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -18,8 +19,7 @@ public class Lwjgl3Launcher {
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("BasicDemo");
-        configuration.useVsync(false);
-        configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+        configuration.setWindowedMode(gridWidth * cellWidth, (gridHeight + bonusHeight) * cellHeight);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
     }

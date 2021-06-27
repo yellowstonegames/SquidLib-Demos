@@ -1,4 +1,4 @@
-package com.github.tommyettinger.demos;
+package com.github.yellowstonegames;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -80,19 +80,19 @@ public class BasicDemo extends ApplicationAdapter {
     private float[][] colors, bgColors;
 
     //Here, gridHeight refers to the total number of rows to be displayed on the screen.
-    //We're displaying 25 rows of dungeon, then 7 more rows of text generation to show some tricks with language.
+    //We're displaying 25 rows of dungeon.
     //gridHeight is 25 because that variable will be used for generating the dungeon (the actual size of the dungeon
-    //will be triple gridWidth and triple gridHeight), and determines how much off the dungeon is visible at any time.
+    //will be 5x gridWidth and 5x gridHeight), and determines how much off the dungeon is visible at any time.
     //The bonusHeight is the number of additional rows that aren't handled like the dungeon rows and are shown in a
-    //separate area; here we use them for translations. The gridWidth is 90, which means we show 90 grid spaces
-    //across the whole screen, but the actual dungeon is larger. The cellWidth and cellHeight are 10 and 20, which will
+    //separate area; here this space isn't used. The gridWidth is 90, which means we show 90 grid spaces
+    //across the whole screen, but the actual dungeon is larger. The cellWidth and cellHeight are 12 and 20, which will
     //match the starting dimensions of a cell in pixels, but won't be stuck at that value because we use a "Stretchable"
     //font, and so the cells can change size (they don't need to be scaled by equal amounts, either). While gridWidth
     //and gridHeight are measured in spaces on the grid, cellWidth and cellHeight are the initial pixel dimensions of
     //one cell; resizing the window can make the units cellWidth and cellHeight use smaller or larger than a pixel.
 
     /** In number of cells */
-    public static final int gridWidth = 90;
+    public static final int gridWidth = 60;
     /** In number of cells */
     public static final int gridHeight = 25;
 
@@ -104,15 +104,14 @@ public class BasicDemo extends ApplicationAdapter {
     /** In number of cells */
     public static final int bonusHeight = 0;
     /** The pixel width of a cell */
-    public static final int cellWidth = 10;
+    public static final int cellWidth = 12;
     /** The pixel height of a cell */
     public static final int cellHeight = 20;
-    
+
     private static final float DURATION = 0.15f;
     private SquidInput input;
     private Color bgColor;
     private Stage stage;
-//    private Stage languageStage;
     private DijkstraMap playerToCursor;
     private Coord cursor, player;
     private ArrayList<Coord> toCursor;
@@ -121,28 +120,9 @@ public class BasicDemo extends ApplicationAdapter {
     private Vector2 screenPosition;
 
 
-    // a passage from the ancient text The Art of War, which remains relevant in any era but is mostly used as a basis
-    // for translation to imaginary languages using the NaturalLanguageCipher and FakeLanguageGen classes.
-    private final String artOfWar =
-            "[@ 0.8 0.06329113 0.30980393][/]Sun Tzu[/] said: In the [!]practical[!] art of war, the best thing of all is " +
-                    "to take the enemy's country whole and intact; to shatter and destroy it is not so good. So, " +
-                    "too, it is better to recapture an army entire than to destroy it, to capture " +
-                    "a regiment, a detachment or a company entire than to destroy them. Hence to fight " +
-                    "and conquer in all your battles is not [!]supreme[,] excellence; [!]supreme[=] EXCELLENCE[,] " +
-                    "consists in breaking the enemy's resistance without fighting.[]";
-    // A translation dictionary for going back and forth between English and an imaginary language that this generates
-    // words for, using some of the rules that the English language tends to follow to determine if two words should
-    // share a common base word (such as "read" and "reader" needing similar translations). This is given randomly
-    // selected languages from the FakeLanguageGen class, which is able to produce text that matches a certain style,
-    // usually that of a natural language but some imitations of fictional languages, such as languages spoken by elves,
-    // goblins, or demons, are present as well. An unusual trait of FakeLanguageGen is that it can mix two or more
-    // languages to make a new one, which most other kinds of generators have a somewhat-hard time doing.
-//    private NaturalLanguageCipher translator;
-    // this is initialized with the word-wrapped contents of artOfWar, then has translations of that text to imaginary
-    // languages appended after the plain-English version. The contents have the first item removed with each step, and
-    // have new translations added whenever the line count is too low.
-//    private ArrayList<IColoredString<Color>> lang;
+    // how much each cell on the grid resists light passing through; 1.0 is a wall, 0.0 is air.
     private double[][] resistance;
+    // how well-lit each cell is currently as the player sees it.
     private double[][] visible;
     // GreasedRegion is a hard-to-explain class, but it's an incredibly useful one for map generation and many other
     // tasks; it stores a region of "on" cells where everything not in that region is considered "off," and can be used
@@ -175,7 +155,7 @@ public class BasicDemo extends ApplicationAdapter {
     private static final float FLOAT_LIGHTING = -0x1.cff1fep126F, // same result as SColor.COSMIC_LATTE.toFloatBits()
             GRAY_FLOAT = -0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
     // This filters colors in a way we adjust over time, producing a sort of hue shift effect.
-    // It can also be used to over- or under-saturate colors, change their brightness, or any combination of these. 
+    // It can also be used to over- or under-saturate colors, change their brightness, or any combination of these.
     private FloatFilters.YCbCrFilter filter;
 
     //    private FloatFilter sepia;
@@ -185,10 +165,10 @@ public class BasicDemo extends ApplicationAdapter {
         // gotta have a random number generator. We can seed an RNG with any long we want, or even a String.
         // if the seed is identical between two runs, any random factors will also be identical (until user input may
         // cause the usage of an RNG to change). You can randomize the dungeon and several other initial settings by
-        // just removing the String seed, making the line "rng = new RNG();" . Keeping the seed as a default allows
-        // changes to be more easily reproducible, and using a fixed seed is strongly recommended for tests. 
-        rng = new GWTRNG(CrossHash.hash64(artOfWar));
-        // testing FloatFilter; YCbCrFilter multiplies the brightness (Y) and chroma (Cb, Cr) of a color 
+        // just removing the String seed, making the line "rng = new GWTRNG();" . Keeping the seed as a default allows
+        // changes to be more easily reproducible, and using a fixed seed is strongly recommended for tests.
+        rng = new GWTRNG(123456789);
+        // testing FloatFilter; YCbCrFilter multiplies the brightness (Y) and chroma (Cb, Cr) of a color.
         filter = new FloatFilters.YCbCrFilter(0.875f, 0.6f, 0.6f);
 //        sepia = new FloatFilters.ColorizeFilter(SColor.CLOVE_BROWN, 0.6f, 0.0f);
 
@@ -196,15 +176,11 @@ public class BasicDemo extends ApplicationAdapter {
         // FilterBatch is exactly like the normal libGDX SpriteBatch except that it filters all colors used for text or
         // for tinting images.
         batch = new FilterBatch(filter);
-        StretchViewport mainViewport = new StretchViewport(gridWidth * cellWidth, gridHeight * cellHeight),
-                languageViewport = new StretchViewport(gridWidth * cellWidth, bonusHeight * cellHeight);
+        StretchViewport mainViewport = new StretchViewport(gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
-        languageViewport
-                .setScreenBounds(0, 0, gridWidth * cellWidth, bonusHeight * cellHeight);
         //Here we make sure our Stage, which holds any text-based grids we make, uses our Batch.
         stage = new Stage(mainViewport, batch);
-//        languageStage = new Stage(languageViewport, batch);
-        // the font will try to load Iosevka Slab as an embedded bitmap font with a MSDF effect (multi scale distance
+        // the font will try to load Inconsolata-LGC as an embedded bitmap font with a MSDF effect (multi scale distance
         // field, a way to allow a bitmap font to stretch while still keeping sharp corners and round curves).
         // the MSDF effect is handled internally by a shader in SquidLib, and will switch to a different shader if a SDF
         // effect is used (SDF is called "Stretchable" in DefaultResources, where MSDF is called "Crisp").
@@ -212,22 +188,12 @@ public class BasicDemo extends ApplicationAdapter {
         // it also includes 4 text faces (regular, bold, oblique, and bold oblique) so methods in GDXMarkup can make
         // italic or bold text without switching fonts (they can color sections of text too).
         display = new SparseLayers(bigWidth, bigHeight + bonusHeight, cellWidth, cellHeight,
-                DefaultResources.getCrispSlabFont());
+                DefaultResources.getCrispSmoothFont());
 
-        // a bit of a hack to increase the text height slightly without changing the size of the cells they're in.
-        // this causes a tiny bit of overlap between cells, which gets rid of an annoying gap between vertical lines.
-        // if you use '#' for walls instead of box drawing chars, you don't need this.
-        display.font.tweakWidth(cellWidth * 1.075f).tweakHeight(cellHeight * 1.1f).initBySize();
         // for some reason, this eliminates ugly jitter in the FPS display text, which
         // only happened when moving and usually when the window was resized.
         // The smoothness of the font thanks to the MSDF (crisp) effect seems to remain clear.
         display.font.font().setUseIntegerPositions(false);
-//        languageDisplay = new SparseLayers(gridWidth, bonusHeight - 1, cellWidth, cellHeight, display.font);
-        // SparseDisplay doesn't currently use the default background fields, but this isn't really a problem; we can
-        // set the background colors directly as floats with the SparseDisplay.backgrounds field, and it can be handy
-        // to hold onto the current color we want to fill that with in the defaultPackedBackground field.
-        // SparseLayers has fillBackground() and fillArea() methods for coloring all or part of the backgrounds.
-//        languageDisplay.defaultPackedBackground = FLOAT_LIGHTING; // happens to be the same color used for lighting
 
         //This uses the seeded RNG we made earlier to build a procedural dungeon using a method that takes rectangular
         //sections of pre-drawn dungeon and drops them into place in a tiling pattern. It makes good winding dungeons
@@ -337,12 +303,12 @@ public class BasicDemo extends ApplicationAdapter {
         // be used because there are walls to the east, west, and south of it, even when the player is to the north of
         // that cell and so has never seen the southern connecting wall, and would have no reason to know it is there.
         // By calling LineKit.pruneLines(), we adjust prunedDungeon to hold a variant on lineDungeon that removes any
-        // line segments that haven't ever been visible. This is called again whenever seen changes. 
+        // line segments that haven't ever been visible. This is called again whenever seen changes.
         prunedDungeon = ArrayTools.copy(lineDungeon);
-        // We call pruneLines with an optional parameter here, LineKit.lightAlt, which will allow prunedDungeon to use
-        // the half-line chars "╴╵╶╷". These chars aren't supported by all fonts, but they are by the one we use here.
+        // You can call pruneLines with an optional parameter here, LineKit.lightAlt, which will allow prunedDungeon to
+        // use the half-line chars "╴╵╶╷". These chars aren't supported by all fonts, including the one we use here.
         // The default is to use LineKit.light , which will replace '╴' and '╶' with '─' and '╷' and '╵' with '│'.
-        LineKit.pruneLines(lineDungeon, seen, LineKit.lightAlt, prunedDungeon);
+        LineKit.pruneLines(lineDungeon, seen, prunedDungeon);
 
         //This is used to allow clicks or taps to take the player to the desired area.
         toCursor = new ArrayList<>(200);
@@ -379,20 +345,6 @@ public class BasicDemo extends ApplicationAdapter {
 //        }
         //places the player as an '@' at his position in orange.
         pg = display.glyph('@', SColor.SAFETY_ORANGE, player.x, player.y);
-
-        // here we build up a List of IColoredString values formed by formatting the artOfWar text (this colors the
-        // whole thing dark gray and puts the name at the start in italic/oblique face) and wrapping it to fit within
-        // the width we want, filling up lang with the results.
-//        lang = new ArrayList<>(16);
-//        GDXMarkup.instance.colorString(artOfWar).wrap(gridWidth - 2, lang);
-//        // here we choose a random language from all the hand-made FakeLanguageGen text generators, and make a
-//        // NaturalLanguageCipher out of it. This Cipher takes words it finds in artOfWar and translates them to the
-//        // fictional language it selected.
-//        translator = new NaturalLanguageCipher(rng.getRandomElement(FakeLanguageGen.registered));
-//        // this is just like the call above except we work on the translated artOfWar text instead of the original.
-//        GDXMarkup.instance.colorString(translator.cipher(artOfWar)).wrap(gridWidth - 2, lang);
-//        // now we change the language again and tell the NaturalLanguageCipher, translator, what we chose.
-//        translator.initialize(rng.getRandomElement(FakeLanguageGen.registered), 0L);
 
         // this is a big one.
         // SquidInput can be constructed with a KeyHandler (which just processes specific keypresses), a SquidMouse
@@ -554,7 +506,6 @@ public class BasicDemo extends ApplicationAdapter {
         //Gdx.input.setInputProcessor(input);
         // and then add display, our one visual component, to the list of things that act in Stage.
         stage.addActor(display);
-//        languageStage.addActor(languageDisplay);
 
         screenPosition = new Vector2(cellWidth, cellHeight);
     }
@@ -579,7 +530,7 @@ public class BasicDemo extends ApplicationAdapter {
             blockage.fringe8way();
             // By calling LineKit.pruneLines(), we adjust prunedDungeon to hold a variant on lineDungeon that removes any
             // line segments that haven't ever been visible. This is called again whenever seen changes.
-            LineKit.pruneLines(lineDungeon, seen, LineKit.lightAlt, prunedDungeon);
+            LineKit.pruneLines(lineDungeon, seen, LineKit.light, prunedDungeon);
         }
         else
         {
@@ -595,7 +546,7 @@ public class BasicDemo extends ApplicationAdapter {
             ));
             // recolor() will change the color of a cell over time from what it is currently to a target color, which is
             // DB_BLOOD here from a DawnBringer palette. We give it a Runnable to run after the effect finishes, which
-            // permanently sets the color of the cell you bumped into to the color of your bloody nose. Without such a 
+            // permanently sets the color of the cell you bumped into to the color of your bloody nose. Without such a
             // Runnable, the cell would get drawn over with its normal wall color.
             display.recolor(0f, player.x + xmod, player.y + ymod, 0, SColor.DB_BLOOD.toFloatBits(), 0.4f, new Runnable() {
                 int x = player.x + xmod;
@@ -607,16 +558,6 @@ public class BasicDemo extends ApplicationAdapter {
             });
             //display.addAction(new PanelEffect.ExplosionEffect(display, 1f, floors, player, 6));
         }
-//        // removes the first line displayed of the Art of War text or its translation.
-//        lang.remove(0);
-//        // if the last line reduced the number of lines we can show to less than what we try to show, we fill in more
-//        // lines using a randomly selected fake language to translate the same Art of War text.
-//        while (lang.size() < bonusHeight - 1)
-//        {
-//            // refills lang with wrapped lines from the translated artOfWar text
-//            GDXMarkup.instance.colorString(translator.cipher(artOfWar)).wrap(gridWidth - 2, lang);
-//            translator.initialize(rng.getRandomElement(FakeLanguageGen.registered), 0L);
-//        }
     }
 
     /**
@@ -658,11 +599,6 @@ public class BasicDemo extends ApplicationAdapter {
             // use a brighter light to trace the path to the cursor, mixing the background color with mostly white.
             display.put(pt.x, pt.y, SColor.lightenFloat(bgColors[pt.x][pt.y], 0.85f));
         }
-//        languageDisplay.clear(0);
-//        languageDisplay.fillBackground(languageDisplay.defaultPackedBackground);
-//        for (int i = 0; i < 6; i++) {
-//            languageDisplay.put(1, i, lang.get(i));
-//        }
     }
     @Override
     public void render () {
@@ -708,19 +644,12 @@ public class BasicDemo extends ApplicationAdapter {
         else if(input.hasNext()) {
             input.next();
         }
-        //else
-        //    move(0,0);
-        // we need to do some work with viewports here so the language display (or game info messages in a real game)
-        // will display in the same place even though the map view will move around. We have the language stuff set up
-        // its viewport so it is in place and won't be altered by the map. Then we just tell the Stage for the language
-        // texts to draw.
-//        languageStage.getViewport().apply(false);
-//        languageStage.draw();
-        // certain classes that use scene2d.ui widgets need to be told to act() to process input.
+        // certain classes that use scene2d Actors need to be told to act() to process input.
         stage.act();
-        // we have the main stage set itself up after the language stage has already drawn.
+        // we have the main stage set itself up here.
         stage.getViewport().apply(false);
         // stage has its own batch and must be explicitly told to draw().
+        // this is the internal code of Stage.draw() mixed with code to set screenPosition.
         batch.setProjectionMatrix(stage.getCamera().combined);
         screenPosition.set(input.getMouse().getCellWidth() * 6, input.getMouse().getCellHeight());
         stage.screenToStageCoordinates(screenPosition);
@@ -739,8 +668,6 @@ public class BasicDemo extends ApplicationAdapter {
         float currentZoomX = (float)width / gridWidth;
         // total new screen height in pixels divided by total number of rows on the screen
         float currentZoomY = (float)height / (gridHeight + bonusHeight);
-        // message box should be given updated bounds since I don't think it will do this automatically
-//        languageDisplay.setBounds(0, 0, width, currentZoomY * bonusHeight);
         // SquidMouse turns screen positions to cell positions, and needs to be told that cell sizes have changed
         // a quirk of how the camera works requires the mouse to be offset by half a cell if the width or height is odd
         // (gridWidth & 1) is 1 if gridWidth is odd or 0 if it is even; it's good to know and faster than using % , plus
@@ -748,9 +675,6 @@ public class BasicDemo extends ApplicationAdapter {
         // x & 1 will always be 0 or 1).
         input.getMouse().reinitialize(currentZoomX, currentZoomY, gridWidth, gridHeight,
                 (gridWidth & 1) * (int)(currentZoomX * -0.5f), (gridHeight & 1) * (int) (currentZoomY * -0.5f));
-//        languageStage.getViewport().update(width, height, false);
-//        languageStage.getViewport().setScreenBounds(0, 0, width, (int)languageDisplay.getHeight());
         stage.getViewport().update(width, height, false);
-//        stage.getViewport().setScreenBounds(0, (int)languageDisplay.getHeight(), width, height - (int)languageDisplay.getHeight());
     }
 }

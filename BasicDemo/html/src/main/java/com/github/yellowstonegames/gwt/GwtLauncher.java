@@ -1,18 +1,15 @@
-package com.github.tommyettinger.demos.gwt;
+package com.github.yellowstonegames.gwt;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.github.tommyettinger.demos.BasicDemo;
-
-import static com.github.tommyettinger.demos.BasicDemo.*;
+import com.github.yellowstonegames.BasicDemo;
 
 /** Launches the GWT application. */
 public class GwtLauncher extends GwtApplication {
     @Override
     public GwtApplicationConfiguration getConfig() {
-        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(
-            gridWidth * cellWidth, gridHeight * cellHeight);
+        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(90 * 10, (25 + 7) * 20);
         return configuration;
     }
 

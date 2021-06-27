@@ -4,7 +4,7 @@ buildscript {
 		mavenCentral()
 		google()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-		jcenter()
+		maven { url 'https://plugins.gradle.org/m2/' }
 	}
 	dependencies {
 		classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
@@ -18,7 +18,7 @@ allprojects {
 
 configure(subprojects) {
 	apply plugin: 'java-library'
-	sourceCompatibility = 1.8
+	sourceCompatibility = 8.0
 	compileJava {
 		options.incremental = true
 	}
@@ -28,16 +28,13 @@ subprojects {
 	version = '0.0.1-SNAPSHOT'
 	ext.appName = 'BasicDemo'
 	repositories {
+		mavenLocal()
 		mavenCentral()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+		maven { url 'https://plugins.gradle.org/m2/' }
 		maven { url 'https://jitpack.io' }
-		jcenter()
 	}
 }
 
-// Clearing Eclipse project data in root folder:
-tasks.eclipse.doLast {
-	delete '.project'
-	delete '.classpath'
-	delete '.settings/'
-}
+eclipse.project.name = 'BasicDemo' + '-parent'
+
