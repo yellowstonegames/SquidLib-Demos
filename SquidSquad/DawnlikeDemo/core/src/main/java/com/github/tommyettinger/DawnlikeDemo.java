@@ -28,9 +28,12 @@ import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.Director;
 import com.github.yellowstonegames.text.Language;
 
+import com.github.yellowstonegames.core.DescriptiveColor;
+
 import java.util.Map;
 
 import static com.badlogic.gdx.Input.Keys.*;
+import static com.github.yellowstonegames.core.DescriptiveColor.*;
 
 public class DawnlikeDemo extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
@@ -126,9 +129,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private static final int
             INT_WHITE = -1,
             INT_BLACK = 255,
-            INT_BLOOD = DescriptiveColor.describe("dark dull red"),
-            INT_LIGHTING = DescriptiveColor.describe("lightest white yellow"),
-            INT_GRAY = DescriptiveColor.describe("darker gray");
+            INT_BLOOD = describe("dark dull red"),
+            INT_LIGHTING = describe("lighter dullest white yellow"),
+            INT_GRAY = describe("darker gray");
 
     @Override
     public void create () {
@@ -150,7 +153,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         font.setUseIntegerPositions(false);
         font.getData().setScale(1f/cellWidth, 1f/cellHeight);
         font.getData().markupEnabled = true;
-        bgColors = ArrayTools.fill(INT_BLACK, bigWidth, bigHeight);
+        bgColors = ArrayTools.fill(0x808080FF, bigWidth, bigHeight);
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);
 
@@ -545,7 +548,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     // position of this monster.
                     if (tmp.x == player.x && tmp.y == player.y) {
                         // not sure if this stays red for very long
-                        playerSprite.setPackedColor(DescriptiveColor.rgbaIntToFloat(INT_BLOOD));
+                        playerSprite.setPackedColor(rgbaIntToFloat(INT_BLOOD));
                         health--;
                         // make sure the monster is still actively stalking/chasing the player
                         monsters.put(pos, mon);
@@ -581,20 +584,20 @@ public class DawnlikeDemo extends ApplicationAdapter {
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
-        int rainbow = DescriptiveColor.toRGBA8888(
-                DescriptiveColor.maximizeSaturation(200,
+        int rainbow = toRGBA8888(
+                maximizeSaturation(200,
                         (int) (TrigTools.sin_(time * 0.5f) * 30f) + 128, (int) (TrigTools.cos_(time * 0.5f) * 30f) + 128, 255));
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
-                    batch.setPackedColor(DescriptiveColor.rgbaIntToFloat(toCursor.contains(Coord.get(i, j))
-                            ? DescriptiveColor.lerpColors(bgColors[i][j], rainbow, 0.95f)
-                            : DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f)));
+                    batch.setPackedColor(toCursor.contains(Coord.get(i, j))
+                            ? rgbaIntToFloat(lerpColors(bgColors[i][j], rainbow, 0.95f))
+                            : oklabIntToFloat(edit(fromRGBA8888(bgColors[i][j]), visible[i][j] * 0.7f + 0.25f, 0f, 0.018f, 0f, 0.4f, 1f, 1f, 1f)));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(seen.contains(i, j)) {
-                    batch.setPackedColor(DescriptiveColor.rgbaIntToFloat(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f)));
+                    batch.setPackedColor(rgbaIntToFloat(lerpColors(bgColors[i][j], INT_GRAY, 0.6f)));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
