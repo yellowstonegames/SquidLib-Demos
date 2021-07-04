@@ -28,8 +28,6 @@ import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.Director;
 import com.github.yellowstonegames.text.Language;
 
-import com.github.yellowstonegames.core.DescriptiveColor;
-
 import java.util.Map;
 
 import static com.badlogic.gdx.Input.Keys.*;
@@ -47,7 +45,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
 
     // Stores all images we use here efficiently, as well as the font image
     private TextureAtlas atlas;
-    // This maps chars, such as '#', to specific images, such as a pillar.
+    // This maps chars, such as '#', as keys to specific images, such as a pillar.
     private IntObjectMap<TextureAtlas.AtlasRegion> charMapping;
 
     private DungeonProcessor dungeonGen;
