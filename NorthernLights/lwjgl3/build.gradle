@@ -39,6 +39,9 @@ jar {
   exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
   dependencies {
     exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+    if(os.contains('win')){
+      exclude('windows/x86/**', 'linux/**', 'macos/**', '*.dylib', '*.so')
+    }
   }
   manifest {
     attributes 'Main-Class': project.mainClassName
