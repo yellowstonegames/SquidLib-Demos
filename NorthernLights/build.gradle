@@ -4,12 +4,12 @@ buildscript {
     mavenCentral()
     google()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    jcenter()
+    gradlePluginPortal()
   }
   dependencies {
-//    classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
     classpath "com.android.tools.build:gradle:$androidPluginVersion"
+    classpath 'com.guardsquare:proguard-gradle:7.1.0-beta5'
   }
 }
 
@@ -25,14 +25,14 @@ configure(subprojects - project(":android")) {
 }
 
 subprojects{
-  version = '0.0.1-SNAPSHOT'
+  version = '0.0.1'
   ext.appName = 'NorthernLights'
   repositories {
     mavenCentral()
     google()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
-    jcenter()
+    gradlePluginPortal()
   }
 }
 

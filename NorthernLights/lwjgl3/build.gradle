@@ -19,16 +19,17 @@ dependencies {
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
-import org.gradle.internal.os.OperatingSystem
+def os = System.properties['os.name'].toLowerCase()
 
 run {
   workingDir = rootProject.file('assets').path
   setIgnoreExitValue(true)
-  if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+  if (os.contains('mac')) {
     // Required to run LWJGL3 Java apps on MacOS
     jvmArgs += "-XstartOnFirstThread"
   }
 }
+
 jar {
   archiveFileName = "${appName}-Demo.jar"
   duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
@@ -69,21 +70,20 @@ runtime {
                '--no-man-pages',
                '--strip-native-commands',
                '--vm', 'server'])
-  modules.set(['java.base' ,
-               'java.desktop',
+  modules.set(['java.desktop',
                'jdk.unsupported'])
   distDir.set(file(buildDir))
   jpackage {
-    imageName = appName
+    imageName = 'NorthernLights'
     skipInstaller = true
     jpackageHome = javaHome.getOrElse("")
-    mainJar = jar.archiveFileName.get()
-    if (OperatingSystem.current() == OperatingSystem.WINDOWS) {
-      imageOptions = ["--icon", "../icons/icon.ico"]
-    } else if (OperatingSystem.current() == OperatingSystem.LINUX) {
-      imageOptions = ["--icon", "../icons/icon.png"]
-    } else if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
-      imageOptions = ["--icon", "../icons/icon.icns", " --java-options", "\"XstartOnFirstThread\""]
+    mainJar = "${appName}.jar"// jar.archiveFileName.get()
+    if (os.contains('win')) {
+      imageOptions = ["--icon", "../logo.ico"]
+    } else if (os.contains('nix' || os.contains('nux') || os.contains('bsd'))) {
+      imageOptions = ["--icon", "../logo.png"]
+    } else if (os.contains('mac')) {
+      imageOptions = ["--icon", "../logo.icns", " --java-options", "\"XstartOnFirstThread\""]
     }
   }
 }
