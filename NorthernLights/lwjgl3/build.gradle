@@ -30,7 +30,7 @@ run {
   }
 }
 
-jar {
+task jarWindows(type: Jar) {
   archiveFileName = "${appName}-Demo.jar"
   duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
   destinationDirectory = file("$project.buildDir/lib")
@@ -39,16 +39,18 @@ jar {
   exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
   dependencies {
     exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
-    if(os.contains('win')){
-      exclude('windows/x86/**', 'linux/**', 'macos/**', '*.dylib', '*.so')
-    }
+    exclude('windows/x86/**', 'linux/**', '*.so', 'macos/**', '*.dylib')
   }
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
+  doLast {
+    file(archiveFile).setExecutable(true, false)
+  }
+  with jar
 }
 
-task proguard(type: proguard.gradle.ProGuardTask) {
+task proguardWindows(type: proguard.gradle.ProGuardTask) {
   outputs.upToDateWhen { false }
   configuration 'proguard-rules.pro'
   //printmapping 'build/lib/out.map'
@@ -59,12 +61,102 @@ task proguard(type: proguard.gradle.ProGuardTask) {
     libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
   }
   injars "build/lib/${appName}-Demo.jar"
-  outjars "build/lib/${appName}.jar"
+  outjars "build/lib/${appName}-Windows.jar"
 }
 
-proguard.dependsOn jar
+proguardWindows.dependsOn jarWindows
 
-jpackageImage.dependsOn proguard
+proguardWindows.doLast {
+  file("build/jpackage/NorthernLights/app/${appName}-Demo.jar").delete()
+}
+
+task jarLinux(type: Jar) {
+  archiveFileName = "${appName}-Demo.jar"
+  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+  destinationDirectory = file("$project.buildDir/lib")
+  dependsOn configurations.compileClasspath
+  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+  dependencies {
+    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+    exclude('windows/**', 'macos/**', '*.dylib')
+  }
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+  doLast {
+    file(archiveFile).setExecutable(true, false)
+  }
+  with jar
+}
+
+task proguardLinux(type: proguard.gradle.ProGuardTask) {
+  outputs.upToDateWhen { false }
+  configuration 'proguard-rules.pro'
+  //printmapping 'build/lib/out.map'
+  if (System.getProperty('java.version').startsWith('1.')) {
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+  } else {
+//		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+  }
+  injars "build/lib/${appName}-Demo.jar"
+  outjars "build/lib/${appName}-Linux.jar"
+}
+
+proguardLinux.dependsOn jarLinux
+
+proguardLinux.doLast {
+  file("build/jpackage/NorthernLights/app/${appName}-Demo.jar").delete()
+}
+
+task jarMac(type: Jar) {
+  archiveFileName = "${appName}-Demo.jar"
+  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+  destinationDirectory = file("$project.buildDir/lib")
+  dependsOn configurations.runtimeClasspath
+  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+  dependencies {
+    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+    exclude('windows/**', 'linux/**', '*.so')
+  }
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+  doLast {
+    file(archiveFile).setExecutable(true, false)
+  }
+  with jar
+}
+
+task proguardMac(type: proguard.gradle.ProGuardTask) {
+  outputs.upToDateWhen { false }
+  configuration 'proguard-rules.pro'
+  //printmapping 'build/lib/out.map'
+  if (System.getProperty('java.version').startsWith('1.')) {
+    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+  } else {
+//		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+  }
+  injars "build/lib/${appName}-Demo.jar"
+  outjars "build/lib/${appName}-Mac.jar"
+}
+
+proguardMac.dependsOn jarMac
+
+proguardMac.doLast {
+  file("build/jpackage/NorthernLights/app/${appName}-Demo.jar").delete()
+}
+
+if (os.contains('win')) {
+  jpackageImage.dependsOn proguardWindows
+} else if (os.contains('nix' || os.contains('nux') || os.contains('bsd'))) {
+  jpackageImage.dependsOn proguardLinux
+} else if (os.contains('mac')) {
+  jpackageImage.dependsOn proguardMac
+}
 
 runtime {
   options.set(['--strip-debug',
@@ -80,17 +172,15 @@ runtime {
     imageName = 'NorthernLights'
     skipInstaller = true
     jpackageHome = javaHome.getOrElse("")
-    mainJar = "${appName}.jar"// jar.archiveFileName.get()
     if (os.contains('win')) {
+      mainJar = "${appName}-Windows.jar"
       imageOptions = ["--icon", "../logo.ico"]
     } else if (os.contains('nix' || os.contains('nux') || os.contains('bsd'))) {
+      mainJar = "${appName}-Linux.jar"
       imageOptions = ["--icon", "../logo.png"]
     } else if (os.contains('mac')) {
+      mainJar = "${appName}-Mac.jar"
       imageOptions = ["--icon", "../logo.icns", " --java-options", "\"XstartOnFirstThread\""]
     }
   }
-}
-
-jpackageImage.doLast {
-  file("build/jpackage/NorthernLights/app/${appName}-Demo.jar").delete()
 }
