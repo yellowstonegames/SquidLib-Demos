@@ -168,8 +168,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         rng = new GWTRNG(123456);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
-//        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
-        shader = new ShaderProgram(Gdx.files.internal("simple-scale.vert.txt"), Gdx.files.internal("simple-scale.frag.txt"));
+        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", shader.getLog());
             scalingShader = false;
@@ -431,7 +430,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     case B:
                         batch.setShader(scalingShader ? null : shader);
                         scalingShader = !scalingShader;
-                        if(scalingShader) System.out.println("Using scaling shader now.");
                         break;
                     case P:
                         DungeonUtility.debugPrint(decoDungeon);
@@ -663,12 +661,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
         if(scalingShader) {
             shader.bind(); // prevents an OpenGL error, though it runs without this line
             shader.setUniformf("TextureSize", 2048f, 1024f);
-            float targetRatio = mainViewport.getScreenWidth() / (float)mainViewport.getScreenWidth();
-            float sourceRatio = (gridHeight * cellHeight) / (float)(gridWidth * cellWidth);
-            float scale = (targetRatio < sourceRatio ? mainViewport.getScreenWidth() / (float)(gridWidth * cellWidth) : mainViewport.getScreenHeight() / (float)(gridHeight * cellHeight));
-
-            shader.setUniformf("Scale", scale, scale);
-            System.out.println(scale);
         }
         batch.begin();
         
