@@ -1,21 +1,18 @@
 package com.squidpony;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import squidpony.ArrayTools;
 import squidpony.FakeLanguageGen;
@@ -41,7 +38,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
     private long startTime;
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
-    private SpriteBatch batch;
+    private SpriteBatch batch, soloBatch;
+    private FrameBuffer buffer;
     private ShaderProgram shader;
     private boolean scalingShader = false;
     private Phase phase = Phase.WAIT;
@@ -102,8 +100,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private long lastDrawTime = 0;
     private Color bgColor;
     private BitmapFont font;
-    private Viewport mainViewport;
-    private Camera camera;
+    private Viewport mainViewport, basicViewport;
+    private Camera camera, basicCamera;
     
     private OrderedMap<Coord, AnimatedGlider> monsters;
     private DijkstraMap getToPlayer, playerToCursor;
@@ -168,21 +166,26 @@ public class DawnlikeDemo extends ApplicationAdapter {
         rng = new GWTRNG(123456);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
+        soloBatch = new SpriteBatch(32);
+        buffer = new FrameBuffer(Pixmap.Format.RGB888, cellWidth * gridWidth, cellHeight * gridHeight, false);
+
         shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", shader.getLog());
             scalingShader = false;
         }
-        else{
-            batch.setShader(shader);
-            scalingShader = true;
-        }
+//        else{
+//            batch.setShader(shader);
+//            scalingShader = true;
+//        }
         animationStart = TimeUtils.millis();
         
         mainViewport = new ScalingViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
         mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
         camera = mainViewport.getCamera();
         camera.update();
+        basicViewport = new ScreenViewport();
+        basicCamera = basicViewport.getCamera();
 
         atlas = new TextureAtlas("Dawnlike.atlas");
         font = new BitmapFont(Gdx.files.internal("font.fnt"), atlas.findRegion("font"));
@@ -647,15 +650,15 @@ public class DawnlikeDemo extends ApplicationAdapter {
     }
     @Override
     public void render () {
-        // standard clear the background routine for libGDX
-        Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, 1.0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        if(!scalingShader) {
+            buffer.begin();
+        }
+        ScreenUtils.clear(bgColor);
 
         // center the camera on the player's position
         camera.position.x = playerSprite.getX() * cellWidth;
         camera.position.y =  flipY(playerSprite.getY()) * cellHeight;
         camera.update();
-
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
         if(scalingShader) {
@@ -676,6 +679,13 @@ public class DawnlikeDemo extends ApplicationAdapter {
             font.draw(batch, lang, x, y, wide, Align.center, true);
             font.draw(batch, "[LIGHT_GRAY]q[WHITE] to quit.", x, y - 32, wide, Align.center, true);
             batch.end();
+            if(!scalingShader)
+            {
+                buffer.end();
+                soloBatch.begin();
+                soloBatch.draw(buffer.getColorBufferTexture(), 0, 0);
+                soloBatch.end();
+            }
             if(Gdx.input.isKeyPressed(Q))
                 Gdx.app.exit();
             return;
@@ -733,16 +743,30 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 }
             }
         }
-        pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight, 0);
+        pos.set(10,Gdx.graphics.getHeight() * 0xFp-4f, 0);
         mainViewport.unproject(pos);
         font.draw(batch, "Current Health: [RED]" + health + "[WHITE] at "
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
         batch.end();
-    }     
+        if(!scalingShader)
+        {
+            buffer.end();
+            ScreenUtils.clear(bgColor);
+            basicViewport.apply(true);
+            soloBatch.setProjectionMatrix(basicCamera.combined);
+            soloBatch.begin();
+            Texture tex = buffer.getColorBufferTexture();
+            tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            soloBatch.draw(tex, 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
+            soloBatch.end();
+        }
+    }
     @Override
 	public void resize(int width, int height) {
 		super.resize(width, height);
-        mainViewport.update(width, height, false);
+		if(scalingShader)
+		    mainViewport.update(width, height, false);
+		basicViewport.update(width, height, false);
 	}
 	
 	public float flipY(float y){
