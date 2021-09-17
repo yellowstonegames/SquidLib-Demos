@@ -73,8 +73,8 @@ task superDev(type: GwtSuperDev) {
         gwt.modules = gwt.devModules
     }
 }
-var outputPath = "build/dist/"
-//var outputPath = "../../docs/NorthernLights6/"
+//var outputPath = "build/dist/"
+var outputPath = "../../docs/thule/"
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
         file(outputPath).mkdirs()
