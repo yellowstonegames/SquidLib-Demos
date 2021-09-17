@@ -1,4 +1,5 @@
 apply plugin: 'application'
+java.targetCompatibility = JavaVersion.VERSION_1_8
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.tommyettinger.lwjgl3.Lwjgl3Launcher'
@@ -36,7 +37,6 @@ jar {
 	manifest {
 		attributes 'Main-Class': project.mainClassName
 	}
-// this last step may help on some OSes that need extra instruction to make runnable JARs.
 	doLast {
 		file(archiveFile).setExecutable(true, false)
 	}

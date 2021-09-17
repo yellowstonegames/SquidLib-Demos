@@ -22,10 +22,7 @@ vec3 swayRandomized(vec3 seed, vec3 value)
 // even though it should always return a vec3 with components between -1 and 1, we use it carefully.
 vec3 cosmic(vec3 c, vec3 con)
 {
-    con += swayRandomized(c, con.yzx);
-    con += swayRandomized(c + 1.0, con.zxy);
-    con += swayRandomized(c + 2.0, con.xyz);
-    return con * 0.25;
+    return (con + swayRandomized(c, con.yzx) + swayRandomized(c + 1.0, con.zxy) + swayRandomized(c + 2.0, con.xyz)) * 0.25;
 }
 
 void main()
@@ -34,15 +31,14 @@ void main()
     // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = gl_FragCoord.xy * 0.0625 + swayRandomized(COEFFS.zxy, (u_time * 0.1875) * COEFFS.yzx).xy * 32.0;
     // aTime, s, and c could be uniforms in some engines.
-    float aTime = u_time * 0.05;
+    float aTime = u_time * 0.0625;
     vec3 adj = vec3(-1.11, 1.41, 1.61);
     vec3 s = (swayRandomized(vec3(34.0, 76.0, 59.0), aTime + adj)) * 0.25;
     vec3 c = (swayRandomized(vec3(27.0, 67.0, 45.0), aTime - adj)) * 0.25;
     vec3 con = vec3(0.0004375, 0.0005625, 0.0008125) * aTime + c * uv.x + s * uv.y;
 
-    con = cosmic(COEFFS, con);
-    con = cosmic(COEFFS, con);
-    con = cosmic(COEFFS, con);
+    con = cosmic(COEFFS - 1.618, con);
+    con = cosmic(COEFFS + 1.618, con);
 
-    gl_FragColor = vec4(swayRandomized(COEFFS + 3.0, con * (3.14159265)) * 0.5 + 0.5,1.0);
+    gl_FragColor = vec4(swayRandomized(COEFFS + 3.0, con * 3.14159265) * 0.5 + 0.5, 1.0);
 }
