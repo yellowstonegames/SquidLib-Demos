@@ -28,18 +28,31 @@
 -dontwarn com.badlogic.gdx.jnigen.BuildTarget*
 -dontwarn com.badlogic.gdx.graphics.g2d.freetype.FreetypeBuild
 
--keep class com.badlogic.gdx.controllers.android.AndroidControllers
-
 -keepclassmembers class com.badlogic.gdx.backends.android.AndroidInput* {
    <init>(com.badlogic.gdx.Application, android.content.Context, java.lang.Object, com.badlogic.gdx.backends.android.AndroidApplicationConfiguration);
 }
 
--keepclassmembers class com.badlogic.gdx.physics.box2d.World {
-   boolean contactFilter(long, long);
-   void    beginContact(long);
-   void    endContact(long);
-   void    preSolve(long, long);
-   void    postSolve(long, long);
-   boolean reportFixture(long);
-   float   reportRayFixture(long, float, float, float, float, float);
+-keep public class !com.github.tommyettinger.Data { *; }
+-keep public class !com.github.tommyettinger.DawnlikeDemo { *; }
+
+-forceprocessing
+#-classobfuscationdictionary 'obfuscationClassNames.txt'
+-ignorewarnings
+-overloadaggressively
+-mergeinterfacesaggressively
+-repackageclasses ''
+-allowaccessmodification
+
+# FIELD ISSUE NPE
+-optimizations !field/propagation/value
+
+# DescriptiveColor fix
+-optimizations !code/simplification/string
+
+# LAMBDA FIX
+-keepclassmembernames class * {
+    private static synthetic *** lambda$*(...);
 }
+
+###### PROGUARD ANNOTATIONS END #####
+-optimizationpasses 5
