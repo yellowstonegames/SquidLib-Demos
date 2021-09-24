@@ -41,7 +41,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private SpriteBatch batch, soloBatch;
     private FrameBuffer buffer;
     private ShaderProgram shader;
-    private boolean scalingShader = false;
+    private boolean scalingShader = true;
     private Phase phase = Phase.WAIT;
     private long animationStart;
 
@@ -169,15 +169,16 @@ public class DawnlikeDemo extends ApplicationAdapter {
         soloBatch = new SpriteBatch(32);
         buffer = new FrameBuffer(Pixmap.Format.RGB888, cellWidth * gridWidth, cellHeight * gridHeight, false);
 
-        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
+//        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
+        shader = new ShaderProgram(Gdx.files.internal("madbrain-scaler.vert.txt"), Gdx.files.internal("madbrain-scaler.frag.txt"));
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", shader.getLog());
             scalingShader = false;
         }
-//        else{
-//            batch.setShader(shader);
-//            scalingShader = true;
-//        }
+        else{
+            soloBatch.setShader(shader);
+            scalingShader = true;
+        }
         animationStart = TimeUtils.millis();
         
         mainViewport = new ScalingViewport(Scaling.fill, gridWidth * cellWidth, gridHeight * cellHeight);
@@ -431,7 +432,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                         awaitedMoves.add(player);
                         break;
                     case B:
-                        batch.setShader(scalingShader ? null : shader);
+                        soloBatch.setShader(scalingShader ? null : shader);
                         scalingShader = !scalingShader;
                         break;
                     case P:
@@ -650,8 +651,10 @@ public class DawnlikeDemo extends ApplicationAdapter {
     }
     @Override
     public void render () {
-        if(!scalingShader) {
+        if(scalingShader) {
             buffer.begin();
+            shader.bind(); // prevents an OpenGL error, though it runs without this line
+            shader.setUniformf("TextureSize", Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight());
         }
         ScreenUtils.clear(bgColor);
 
@@ -661,10 +664,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
         camera.update();
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
-        if(scalingShader) {
-            shader.bind(); // prevents an OpenGL error, though it runs without this line
-            shader.setUniformf("TextureSize", 2048f, 1024f);
-        }
         batch.begin();
         
         // you done bad. you done real bad.
@@ -679,7 +678,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
             font.draw(batch, lang, x, y, wide, Align.center, true);
             font.draw(batch, "[LIGHT_GRAY]q[WHITE] to quit.", x, y - 32, wide, Align.center, true);
             batch.end();
-            if(!scalingShader)
+            if(scalingShader)
             {
                 buffer.end();
                 soloBatch.begin();
@@ -748,7 +747,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         font.draw(batch, "Current Health: [RED]" + health + "[WHITE] at "
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
         batch.end();
-        if(!scalingShader)
+        if(scalingShader)
         {
             buffer.end();
             ScreenUtils.clear(bgColor);
@@ -764,9 +763,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
     @Override
 	public void resize(int width, int height) {
 		super.resize(width, height);
-		if(scalingShader)
-		    mainViewport.update(width, height, false);
-		basicViewport.update(width, height, false);
+//		if(scalingShader)
+//		    mainViewport.update(width, height, false);
+        basicViewport.update(width, height, false);
 	}
 	
 	public float flipY(float y){
