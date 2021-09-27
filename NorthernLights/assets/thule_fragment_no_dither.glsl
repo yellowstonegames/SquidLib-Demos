@@ -34,7 +34,6 @@ vec3 cosmic(vec3 c, vec3 con)
 void main()
 {
     vec3 COEFFS = fract((u_seed + 23.4567) * vec3(0.8191725133961645, 0.6710436067037893, 0.5497004779019703)) + 0.5;
-    // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = gl_FragCoord.xy * 0.0625 + swayRandomized(COEFFS.zxy, (u_time * 0.1875) * COEFFS.yzx).xy * 32.0;
 
     vec3 con = vec3(0.0004375, 0.0005625, 0.0008125) * v_time + v_c * uv.x + v_s * uv.y;
