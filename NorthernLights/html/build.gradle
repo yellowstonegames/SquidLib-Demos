@@ -74,7 +74,7 @@ task superDev(type: GwtSuperDev) {
     }
 }
 //var outputPath = "build/dist/"
-var outputPath = "../../docs/elves/"
+var outputPath = "../../docs/melter/"
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
         file(outputPath).mkdirs()
