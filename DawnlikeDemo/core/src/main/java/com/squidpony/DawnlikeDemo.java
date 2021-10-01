@@ -41,6 +41,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private SpriteBatch batch, soloBatch;
     private FrameBuffer buffer;
     private ShaderProgram shader;
+    private Texture palette;
     private boolean scalingShader = true;
     private Phase phase = Phase.WAIT;
     private long animationStart;
@@ -151,6 +152,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     //-0x1.7e7e7ep125F; // same result as SColor.CW_GRAY_BLACK.toFloatBits()
     // the player's color as a float
 //    private float playerColor;
+
     @Override
     public void create () {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
@@ -170,7 +172,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
         buffer = new FrameBuffer(Pixmap.Format.RGB888, cellWidth * gridWidth, cellHeight * gridHeight, false);
 
 //        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
-        shader = new ShaderProgram(Gdx.files.internal("madbrain-scaler.vert.txt"), Gdx.files.internal("madbrain-scaler.frag.txt"));
+//        shader = new ShaderProgram(Gdx.files.internal("madbrain-scaler.vert.txt"), Gdx.files.internal("madbrain-scaler.frag.txt"));
+        shader = new ShaderProgram(Gdx.files.internal("quilez-scaler.vert.txt"), Gdx.files.internal("quilez-scaler.frag.txt"));
+        palette = new Texture("Betts-63-GLSL.png");
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", shader.getLog());
             scalingShader = false;
@@ -653,8 +657,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
     public void render () {
         if(scalingShader) {
             buffer.begin();
-            shader.bind(); // prevents an OpenGL error, though it runs without this line
-            shader.setUniformf("TextureSize", Gdx.graphics.getBackBufferWidth(), Gdx.graphics.getBackBufferHeight());
         }
         ScreenUtils.clear(bgColor);
 
@@ -750,12 +752,19 @@ public class DawnlikeDemo extends ApplicationAdapter {
         if(scalingShader)
         {
             buffer.end();
+            Texture t = atlas.getTextures().first();
+            shader.bind(); // prevents an OpenGL error, though it runs without this line
+            shader.setUniformf("TextureSize", t.getWidth(), t.getHeight());
             ScreenUtils.clear(bgColor);
             basicViewport.apply(true);
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE1);
+            palette.bind();
             soloBatch.setProjectionMatrix(basicCamera.combined);
             soloBatch.begin();
+            soloBatch.getShader().setUniformi("u_palette", 1);
+            Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
             Texture tex = buffer.getColorBufferTexture();
-            tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+            tex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
             soloBatch.draw(tex, 0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth(), -Gdx.graphics.getHeight());
             soloBatch.end();
         }
