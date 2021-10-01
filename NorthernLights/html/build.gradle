@@ -32,8 +32,12 @@ dependencies {
 
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0'
-    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0:sources'
+
+//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0'
+//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0:sources'
+
+    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd'
+    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd:sources'
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
@@ -124,7 +128,7 @@ tasks.draftCompileGwt.dependsOn(addSource)
 tasks.checkGwt.dependsOn(addSource)
 checkGwt.war = file("war")
 
-sourceCompatibility = 8.0
+sourceCompatibility = JavaVersion.VERSION_1_8
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"

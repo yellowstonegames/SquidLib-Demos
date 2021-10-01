@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.anim8.AnimatedGif;
 import com.github.tommyettinger.anim8.AnimatedPNG;
@@ -195,8 +196,7 @@ public class NorthernLights extends ApplicationAdapter {
 	@Override
     public void render() {
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        ScreenUtils.clear(0.2f, 0.2f, 0.2f, 1);
         final int tm = (int) TimeUtils.timeSinceMillis(startTime);
         final float rt = tm * RATE,
                 ftm = rt * 0x5p-13f;

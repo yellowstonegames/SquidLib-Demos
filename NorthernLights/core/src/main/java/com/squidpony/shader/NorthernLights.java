@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 /**
@@ -68,8 +69,7 @@ public class NorthernLights extends ApplicationAdapter {
 	}
 
 	@Override public void render () {
-		Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-		Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+		ScreenUtils.clear(0, 0, 0, 0);
 		if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && UIUtils.alt())
 		{
 			if(Gdx.graphics.isFullscreen())

@@ -11,7 +11,7 @@ apply plugin: 'application'
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.squidpony.demo.lwjgl3.Lwjgl3Launcher'
-sourceCompatibility = 8
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
   implementation project(':core')
