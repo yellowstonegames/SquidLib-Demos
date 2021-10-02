@@ -33,7 +33,8 @@ public class NorthernLights extends ApplicationAdapter {
 		pixel = new Texture(pixmap);
 		startTime = TimeUtils.millis();
 		ShaderProgram.pedantic = false;			
-		shader = new ShaderProgram(Gdx.files.internal("melter_vertex.glsl"), Gdx.files.internal("melter_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("multitude_vertex.glsl"), Gdx.files.internal("multitude_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("melter_vertex.glsl"), Gdx.files.internal("melter_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("elves_vertex.glsl"), Gdx.files.internal("elves_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("thule_vertex.glsl"), Gdx.files.internal("thule_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("warble_fragment_no_dither.glsl"));

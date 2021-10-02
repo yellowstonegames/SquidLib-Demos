@@ -33,11 +33,11 @@ dependencies {
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 
-//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0'
-//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0:sources'
+    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1'
+    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources'
 
-    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd'
-    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd:sources'
+//    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd'
+//    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd:sources'
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
@@ -77,8 +77,8 @@ task superDev(type: GwtSuperDev) {
         gwt.modules = gwt.devModules
     }
 }
-//var outputPath = "build/dist/"
-var outputPath = "../../docs/melter/"
+var outputPath = "build/dist/"
+//var outputPath = "../../docs/multitude/"
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
         file(outputPath).mkdirs()
