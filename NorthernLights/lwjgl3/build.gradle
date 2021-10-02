@@ -30,6 +30,25 @@ run {
   }
 }
 
+task jarAll(type: Jar) {
+  archiveFileName = "${appName}-Demo.jar"
+  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+  destinationDirectory = file("$project.buildDir/lib")
+  dependsOn configurations.runtimeClasspath
+  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+  dependencies {
+    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+  }
+  manifest {
+    attributes 'Main-Class': project.mainClassName
+  }
+  doLast {
+    file(archiveFile).setExecutable(true, false)
+  }
+  with jar
+}
+
 task jarWindows(type: Jar) {
   archiveFileName = "${appName}-Demo.jar"
   duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
@@ -39,7 +58,9 @@ task jarWindows(type: Jar) {
   exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
   dependencies {
     exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
-    exclude('windows/x86/**', 'linux/**', '*.so', 'macos/**', '*.dylib')
+    exclude(
+            //'windows/x86/**',
+            'linux/**', '*.so', 'macos/**', '*.dylib')
   }
   manifest {
     attributes 'Main-Class': project.mainClassName
