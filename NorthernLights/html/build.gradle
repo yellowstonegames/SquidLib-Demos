@@ -77,8 +77,8 @@ task superDev(type: GwtSuperDev) {
         gwt.modules = gwt.devModules
     }
 }
-var outputPath = "build/dist/"
-//var outputPath = "../../docs/multitude/"
+//var outputPath = "build/dist/"
+var outputPath = "../../docs/multitude/"
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
         file(outputPath).mkdirs()
