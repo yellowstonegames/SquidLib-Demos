@@ -71,7 +71,7 @@ COMPAT_VARYING vec4 t7;
 //const mat3 yuv = mat3(0.299, 0.587, 0.114, -0.169, -0.331, 0.499, 0.499, -0.418, -0.0813);
 
 const vec4 yuv0 = vec4(0.299, 0.587, 0.114, 0.0) * XBR_Y_WEIGHT;
-const vec4 delta = vec4(0.4, 0.4, 0.4, 0.4);
+const vec4 delta = vec4(0.4);
 
 vec4 df(vec4 A, vec4 B)
 {
@@ -247,16 +247,16 @@ void main()
 	vec4 final15 = vec4(nc15) * fx15;
 	vec4 final75 = vec4(nc75) * fx75;
 
-	vec4 maximo = max(max(max(final15, final75),max(final30, final60)), final45);
+	vec4 maximo = max(max(max(final15, final75),max(final30, final60)), final45) * (1.75 - E.a);
 
-	     if (nc.x) {pix1 = px.x ? F : H; blend1 = step(0.5, maximo.x);}
-	else if (nc.y) {pix1 = px.y ? B : F; blend1 = step(0.5, maximo.y);}
-	else if (nc.z) {pix1 = px.z ? D : B; blend1 = step(0.5, maximo.z);}
-	else if (nc.w) {pix1 = px.w ? H : D; blend1 = step(0.5, maximo.w);}
-	     if (nc.w) {pix2 = px.w ? H : D; blend2 = step(0.5, maximo.w);}
-	else if (nc.z) {pix2 = px.z ? D : B; blend2 = step(0.5, maximo.z);}
-	else if (nc.y) {pix2 = px.y ? B : F; blend2 = step(0.5, maximo.y);}
-	else if (nc.x) {pix2 = px.x ? F : H; blend2 = step(0.5, maximo.x);}
+	     if (nc.x) {pix1 = px.x ? F : H; blend1 = step(0.7, maximo.x);}
+	else if (nc.y) {pix1 = px.y ? B : F; blend1 = step(0.7, maximo.y);}
+	else if (nc.z) {pix1 = px.z ? D : B; blend1 = step(0.7, maximo.z);}
+	else if (nc.w) {pix1 = px.w ? H : D; blend1 = step(0.7, maximo.w);}
+	     if (nc.w) {pix2 = px.w ? H : D; blend2 = step(0.7, maximo.w);}
+	else if (nc.z) {pix2 = px.z ? D : B; blend2 = step(0.7, maximo.z);}
+	else if (nc.y) {pix2 = px.y ? B : F; blend2 = step(0.7, maximo.y);}
+	else if (nc.x) {pix2 = px.x ? F : H; blend2 = step(0.7, maximo.x);}
 
     res1 = mix(E, pix1, blend1);
     res2 = mix(E, pix2, blend2);
