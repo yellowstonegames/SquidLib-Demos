@@ -45,6 +45,7 @@ dependencies {
 	implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
 	implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
 	implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
+	implementation "com.github.tommyettinger:bluegrass:0.2.1:sources"
 
 }
 
@@ -136,6 +137,6 @@ tasks.checkGwt.dependsOn(addSource)
 checkGwt.war = file("war")
 
 sourceCompatibility = 8.0
-sourceSets.main.java.srcDirs = [ "src/main/java/" ]
+sourceSets.main.java.srcDirs = [ "src/main/java/", "src/main/resources/" ]
 
 eclipse.project.name = appName + "-html"
