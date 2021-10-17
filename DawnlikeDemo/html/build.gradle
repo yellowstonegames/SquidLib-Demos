@@ -1,10 +1,9 @@
 buildscript {
 	repositories {
 		mavenCentral()
-		maven { url 'https://jitpack.io' }
 	}
 	dependencies {
-		classpath "com.github.tommyettinger.gretty:gretty:3.0.4.5"
+		classpath "org.gretty:gretty:3.0.6"
 	}
 }
 apply plugin: "gwt"
