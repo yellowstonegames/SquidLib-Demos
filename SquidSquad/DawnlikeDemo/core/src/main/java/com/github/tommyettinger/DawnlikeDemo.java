@@ -49,7 +49,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private IntObjectMap<TextureAtlas.AtlasRegion> charMapping;
 
     private DungeonProcessor dungeonGen;
-    private char[][] decoDungeon, bareDungeon, lineDungeon;
+    private char[][] bareDungeon, lineDungeon, prunedDungeon;
     // these use packed RGBA8888 int colors, which avoid the overhead of creating new Color objects
     private int[][] bgColors;
     private Coord player;
@@ -174,6 +174,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         charMapping.put('┘', atlas.findRegion("lit brick wall left up"            ));
         charMapping.put('┐', atlas.findRegion("lit brick wall left down"            ));
 
+        charMapping.put(' ', atlas.findRegion("lit brick wall up down"            ));
+
         //// these would be needed if the map was flipped top-to-bottom, which has happened due to bugs before.
 //        charMapping.put('.', atlas.findRegion("day tile floor c"));
 //        charMapping.put(',', atlas.findRegion("brick clear pool center"      ));
@@ -205,11 +207,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
         dungeonGen.addDoors(10, true);
         dungeonGen.addGrass(DungeonProcessor.CAVE, 10);
-        //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
-        //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
-        decoDungeon = dungeonGen.generate();
-        //getBareDungeon provides the simplest representation of the generated dungeon -- '#' for walls, '.' for floors.
-        bareDungeon = dungeonGen.getBarePlaceGrid();
         //When we draw, we may want to use a nicer representation of walls. DungeonUtility has lots of useful methods
         //for modifying char[][] dungeon grids, and this one takes each '#' and replaces it with a box-drawing char.
         //The end result looks something like this, for a smaller 60x30 map:
@@ -246,10 +243,15 @@ public class DawnlikeDemo extends ApplicationAdapter {
         // └───────┘      └──┘    └──┘    └──┘     └───────┘ └──┘  └──┘
         //this is also good to compare against if the map looks incorrect, and you need an example of a correct map when
         //no parameters are given to generate().
-        lineDungeon = LineTools.hashesToLines(decoDungeon);
+        lineDungeon = LineTools.hashesToLines(dungeonGen.generate());
+        //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
+        //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
+        //getBareDungeon provides the simplest representation of the generated dungeon -- '#' for walls, '.' for floors.
+        bareDungeon = dungeonGen.getBarePlaceGrid();
 
-        resistance = FOV.generateSimpleResistances(decoDungeon);
+        resistance = FOV.generateSimpleResistances(lineDungeon);
         visible = new float[bigWidth][bigHeight];
+        prunedDungeon = ArrayTools.copy(lineDungeon);
 
         //Coord is the type we use as a general 2D point, usually in a dungeon.
         //Because we know dungeons won't be incredibly huge, Coord performs best for x and y values less than 256, but
@@ -310,6 +312,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         // out of sight, and no further) instead of all invisible cells when figuring out if something is currently
         // impossible to enter.
         blockage.fringe8way();
+        LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
         floors.remove(player);
         int numMonsters = 100;
         monsters = new ObjectObjectOrderedMap<>(numMonsters);
@@ -337,7 +340,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         //ones are clearly closer "as the crow flies." Alternatives are MANHATTAN, which means 4-way movement only, no
         //diagonals possible, and CHEBYSHEV, which allows 8 directions of movement at the same cost for all directions.
         playerToCursor = new DijkstraMap(bareDungeon, Measurement.EUCLIDEAN);
-        getToPlayer = new DijkstraMap(decoDungeon, Measurement.EUCLIDEAN);
+        getToPlayer = new DijkstraMap(bareDungeon, Measurement.EUCLIDEAN);
         //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
         // player from all walkable cells in the dungeon.
         playerToCursor.setGoal(player);
@@ -480,22 +483,24 @@ public class DawnlikeDemo extends ApplicationAdapter {
         if (newX >= 0 && newY >= 0 && newX < bigWidth && newY < bigHeight
                 && bareDungeon[newX][newY] != '#') {
             // '+' is a door.
-            if (lineDungeon[newX][newY] == '+') {
-                decoDungeon[newX][newY] = '/';
+            if (prunedDungeon[newX][newY] == '+') {
+                prunedDungeon[newX][newY] = '/';
                 lineDungeon[newX][newY] = '/';
                 // changes to the map mean the resistances for FOV need to be regenerated.
-                resistance = FOV.generateSimpleResistances(decoDungeon);
+                resistance = FOV.generateSimpleResistances(prunedDungeon);
                 // recalculate FOV, store it in fovmap for the render to use.
                 FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
                 seen.or(blockage.not());
                 blockage.fringe8way();
+                LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
             } else {
                 // recalculate FOV, store it in fovmap for the render to use.
                 FOV.reuseFOV(resistance, visible, newX, newY, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
                 seen.or(blockage.not());
                 blockage.fringe8way();
+                LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
                 playerSprite.location.setStart(player);
                 playerSprite.location.setEnd(player = Coord.get(newX, newY));
                 phase = Phase.PLAYER_ANIM;
@@ -591,14 +596,14 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     batch.setPackedColor(toCursor.contains(Coord.get(i, j))
                             ? rgbaIntToFloat(lerpColors(bgColors[i][j], rainbow, 0.95f))
                             : oklabIntToFloat(edit(fromRGBA8888(bgColors[i][j]), visible[i][j] * 0.7f + 0.25f, 0f, 0.018f, 0f, 0.4f, 1f, 1f, 1f)));
-                    if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
+                    if(prunedDungeon[i][j] == '/' || prunedDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
-                    batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
+                    batch.draw(charMapping.getOrDefault(prunedDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(seen.contains(i, j)) {
                     batch.setPackedColor(rgbaIntToFloat(lerpColors(bgColors[i][j], INT_GRAY, 0.6f)));
-                    if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
+                    if(prunedDungeon[i][j] == '/' || prunedDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
-                    batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
+                    batch.draw(charMapping.getOrDefault(prunedDungeon[i][j], solid), i, j, 1f, 1f);
                 }
             }
         }
@@ -707,12 +712,12 @@ public class DawnlikeDemo extends ApplicationAdapter {
     }
 
     private void debugPrintVisible(){
-        for (int y = lineDungeon[0].length - 1; y >= 0; y--) {
-            for (int x = 0; x < lineDungeon.length; x++) {
-                System.out.print(lineDungeon[x][y]);
+        for (int y = prunedDungeon[0].length - 1; y >= 0; y--) {
+            for (int x = 0; x < prunedDungeon.length; x++) {
+                System.out.print(prunedDungeon[x][y]);
             }
             System.out.print(' ');
-            for (int x = 0; x < lineDungeon.length; x++) {
+            for (int x = 0; x < prunedDungeon.length; x++) {
                 if(player.x == x && player.y == y)
                     System.out.print('@');
                 else
