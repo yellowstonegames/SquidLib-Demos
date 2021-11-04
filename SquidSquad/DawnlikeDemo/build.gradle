@@ -20,9 +20,16 @@ allprojects {
 
 configure(subprojects - project(':android')) {
 	apply plugin: 'java-library'
-	sourceCompatibility = 8.0
+	sourceCompatibility = 1.8
 	compileJava {
 		options.incremental = true
+	}
+}
+if(JavaVersion.current().isJava9Compatible()) {
+	allprojects {
+		tasks.withType(JavaCompile) {
+			options.release.set(8)
+		}
 	}
 }
 

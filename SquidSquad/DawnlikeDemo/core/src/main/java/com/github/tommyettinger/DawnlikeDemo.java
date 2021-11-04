@@ -103,7 +103,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private Director<Map.Entry<Coord, AnimatedGlidingSprite>> monsterDirector;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
-    private ObjectList<Coord> toCursor;
+    private ObjectList<Coord> toCursor = new ObjectList<>(100);
     private ObjectList<Coord> awaitedMoves;
     private ObjectList<Coord> nextMovePositions;
     private String lang;
@@ -327,7 +327,6 @@ public class DawnlikeDemo extends ApplicationAdapter {
         }
         monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
         //This is used to allow clicks or taps to take the player to the desired area.
-        toCursor = new ObjectList<>(200);
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
         awaitedMoves = new ObjectList<>(200);
 
@@ -454,7 +453,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     // already been fully analyzed by the DijkstraMap.partialScan() method at the start of the
                     // program, and re-calculated whenever the player moves, we only need to do a fraction of the
                     // work to find the best path with that info.
-                    toCursor = playerToCursor.findPathPreScanned(cursor);
+                    toCursor.clear();
+                    playerToCursor.findPathPreScanned(toCursor, cursor);
                     // findPathPreScanned includes the current cell (goal) by default, which is helpful when
                     // you're finding a path to a monster or loot, and want to bump into it, but here can be
                     // confusing because you would "move into yourself" as your first move without this.
@@ -577,11 +577,11 @@ public class DawnlikeDemo extends ApplicationAdapter {
      */
     public void putMap()
     {
-        final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
         //In many other situations, you would clear the drawn characters to prevent things that had been drawn in the
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
+        final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
         int rainbow = toRGBA8888(
                 maximizeSaturation(200,
                         (int) (TrigTools.sin_(time * 0.5f) * 30f) + 128, (int) (TrigTools.cos_(time * 0.5f) * 30f) + 128, 255));
