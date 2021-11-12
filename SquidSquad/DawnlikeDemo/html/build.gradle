@@ -45,7 +45,9 @@ dependencies {
 	implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
 	implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
 	implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
-	implementation "com.github.tommyettinger:bluegrass:0.2.1:sources"
+
+	implementation "com.github.yellowstonegames.SquidSquad:SquidOld:$squidSquadVersion:sources"
+	implementation 'com.github.tommyettinger:bluegrass:0.2.2:sources'
 
 }
 
@@ -86,7 +88,8 @@ task superDev(type: GwtSuperDev) {
 		gwt.modules = gwt.devModules
 	}
 }
-var outputPath = "../../../docs/squidsquad/dawnlike/"
+var outputPath = "build/dist/"
+//var outputPath = "../../../docs/squidsquad/dawnlike/"
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
 		file(outputPath).mkdirs()

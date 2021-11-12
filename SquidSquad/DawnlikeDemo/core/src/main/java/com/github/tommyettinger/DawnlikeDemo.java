@@ -22,6 +22,7 @@ import com.github.tommyettinger.ds.support.LaserRandom;
 import com.github.yellowstonegames.core.ArrayTools;
 import com.github.yellowstonegames.core.TrigTools;
 import com.github.yellowstonegames.grid.*;
+import com.github.yellowstonegames.old.v300.SilkRNG;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -41,7 +42,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private Phase phase = Phase.WAIT;
 
     // random number generator
-    private LaserRandom rng;
+    private SilkRNG rng;
 
     // Stores all images we use here efficiently, as well as the font image
     private TextureAtlas atlas;
@@ -134,10 +135,11 @@ public class DawnlikeDemo extends ApplicationAdapter {
     @Override
     public void create () {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
-        // Starting time for the game; other times are measured relative to this so they aren't huge numbers.
+        // Starting time for the game; other times are measured relative to this so that they aren't huge numbers.
         startTime = TimeUtils.millis();
-        // Gotta have a random number generator.
-        rng = new LaserRandom();
+        // We just need to have a random number generator.
+        // This is seeded the same every time.
+        rng = new SilkRNG(12345, 54321);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
 
@@ -202,7 +204,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         //TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS or TilesetType.CAVES_LIMIT_CONNECTIVITY to change the sections that
         //this will use, or just pass in a full 2D char array produced from some other generator, such as
         //SerpentMapGenerator, OrganicMapGenerator, or DenseRoomMapGenerator.
-        dungeonGen = new DungeonProcessor(bigWidth, bigHeight, rng);
+        dungeonGen = new DungeonProcessor(bigWidth, bigHeight, new LaserRandom(12345, 54321));
         //uncomment this next line to randomly add water to the dungeon in pools.
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
         dungeonGen.addDoors(10, true);

@@ -8,4 +8,6 @@ dependencies {
 	api "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion"
 	api "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion"
 
+	api "com.github.yellowstonegames.SquidSquad:SquidOld:$squidSquadVersion"
+
 }
