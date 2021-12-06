@@ -46,7 +46,6 @@ dependencies {
 	implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
 	implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
 
-	implementation "com.github.yellowstonegames.SquidSquad:SquidOld:$squidSquadVersion:sources"
 	implementation 'com.github.tommyettinger:bluegrass:0.2.2:sources'
 
 }

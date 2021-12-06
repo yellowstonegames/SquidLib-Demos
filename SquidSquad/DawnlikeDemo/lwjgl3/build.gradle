@@ -42,6 +42,10 @@ jar {
 	}
 }
 
+// Equivalent to the jar task; here for compatibility with gdx-setup.
+task dist(dependsOn: [jar]) {
+}
+
 task proguard(type: proguard.gradle.ProGuardTask) {
 	outputs.upToDateWhen { false }
 	configuration 'proguard-rules.pro'

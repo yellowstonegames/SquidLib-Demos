@@ -22,7 +22,6 @@ import com.github.tommyettinger.ds.support.LaserRandom;
 import com.github.yellowstonegames.core.ArrayTools;
 import com.github.yellowstonegames.core.TrigTools;
 import com.github.yellowstonegames.grid.*;
-import com.github.yellowstonegames.old.v300.SilkRNG;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -42,7 +41,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private Phase phase = Phase.WAIT;
 
     // random number generator
-    private SilkRNG rng;
+    private LaserRandom rng;
 
     // Stores all images we use here efficiently, as well as the font image
     private TextureAtlas atlas;
@@ -101,7 +100,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private ObjectObjectOrderedMap<Coord, AnimatedGlidingSprite> monsters;
     private AnimatedGlidingSprite playerSprite;
     private Director<AnimatedGlidingSprite> playerDirector;
-    private Director<Map.Entry<Coord, AnimatedGlidingSprite>> monsterDirector;
+    private Director<Coord> monsterDirector;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
     private ObjectList<Coord> toCursor = new ObjectList<>(100);
@@ -139,7 +138,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         startTime = TimeUtils.millis();
         // We just need to have a random number generator.
         // This is seeded the same every time.
-        rng = new SilkRNG(12345, 54321);
+        rng = new LaserRandom(12345, 54321);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
 
@@ -330,7 +329,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
             // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monsters.put(monPos, monster);
         }
-        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
+//        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
+        monsterDirector = new Director<Coord>((c)-> monsters.get(c).getLocation(), monsters.order(), 125);
         //This is used to allow clicks or taps to take the player to the desired area.
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
         awaitedMoves = new ObjectList<>(200);

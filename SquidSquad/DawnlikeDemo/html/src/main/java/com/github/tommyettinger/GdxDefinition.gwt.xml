@@ -9,7 +9,6 @@
 	<inherits name="squidpath" />
 	<inherits name="squidtext" />
 	<inherits name="squidsmooth" />
-	<inherits name="squidold" />
 	<inherits name="com.github.tommyettinger.DawnlikeDemo" />
 	<entry-point class="com.github.tommyettinger.gwt.GwtLauncher" />
 	<set-configuration-property name="gdx.assetpath" value="../assets" />
