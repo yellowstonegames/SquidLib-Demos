@@ -46,18 +46,18 @@ jar {
 task dist(dependsOn: [jar]) {
 }
 
-task proguard(type: proguard.gradle.ProGuardTask) {
-	outputs.upToDateWhen { false }
-	configuration 'proguard-rules.pro'
-	//printmapping 'build/lib/out.map'
-	if (System.getProperty('java.version').startsWith('1.')) {
-		libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-	} else {
-//		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-		libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-	}
-	injars "build/lib/${appName}-Large.jar"
-	outjars "build/lib/${appName}.jar"
-}
-
-proguard.dependsOn jar
+//task proguard(type: proguard.gradle.ProGuardTask) {
+//	outputs.upToDateWhen { false }
+//	configuration 'proguard-rules.pro'
+//	//printmapping 'build/lib/out.map'
+//	if (System.getProperty('java.version').startsWith('1.')) {
+//		libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+//	} else {
+////		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//		libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//	}
+//	injars "build/lib/${appName}-Large.jar"
+//	outjars "build/lib/${appName}.jar"
+//}
+//
+//proguard.dependsOn jar

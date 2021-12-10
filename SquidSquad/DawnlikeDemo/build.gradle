@@ -1,6 +1,5 @@
 buildscript {
 	repositories {
-		mavenLocal()
 		mavenCentral()
 		google()
 		gradlePluginPortal()
@@ -9,7 +8,7 @@ buildscript {
 	dependencies {
 		classpath "com.android.tools.build:gradle:$androidPluginVersion"
 		classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
-		classpath 'com.guardsquare:proguard-gradle:7.1.0-beta5'
+//		classpath 'com.guardsquare:proguard-gradle:7.1.0-beta5'
 	}
 }
 
@@ -37,7 +36,6 @@ subprojects {
 	version = '0.0.1'
 	ext.appName = 'DawnlikeDemo'
 	repositories {
-		mavenLocal()
 		mavenCentral()
 		gradlePluginPortal()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }

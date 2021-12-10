@@ -30,10 +30,10 @@ dependencies {
 	implementation project(':core')
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 
-//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-	implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0'
-	implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.0:sources'
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+//	implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1'
+//	implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources'
 //	implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3006b7d2d5'
 //	implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3006b7d2d5:sources'
 
