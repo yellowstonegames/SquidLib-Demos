@@ -81,10 +81,17 @@ task superDev(type: GwtSuperDev) {
 // This next line can be changed if you want to, for instance, always build into the
 // docs/ folder of a Git repo, which can be set to automatically publish on GitHub Pages.
 // This is relative to the html/ folder.
-var outputPath = "build/dist/"
+var outputPath = "../../docs/basic/"
 
 task dist(dependsOn: [clean, compileGwt]) {
-    doLast {
+	doLast {
+		// Uncomment the next line if you have changed outputPath and know that its contents
+		// should be replaced by a new dist build. Some large JS files are not cleaned up by
+		// default unless the outputPath is inside build/ (then the clean task removes them).
+		// Do not uncomment the next line if you changed outputPath to a folder that has
+		// non-generated files that you want to keep!
+		delete(file(outputPath))
+
 		file(outputPath).mkdirs()
 		copy {
 			from("build/gwt/out"){
@@ -98,7 +105,7 @@ task dist(dependsOn: [clean, compileGwt]) {
 				exclude 'refresh.png' // We don't need this button; this saves some bytes.
 			}
 			into outputPath
-			}
+		}
 		copy {
 			from("webapp") {
 				// These next two lines take the index.html page and remove the superdev refresh button.
@@ -107,7 +114,7 @@ task dist(dependsOn: [clean, compileGwt]) {
 				// This does not modify the original index.html, only the copy in the dist.
 			}
 			into outputPath
-			}
+		}
 		copy {
 			from "war"
 			into outputPath
@@ -118,7 +125,7 @@ task dist(dependsOn: [clean, compileGwt]) {
 task addSource {
 	doLast {
 		sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-		
+
 	}
 }
 
