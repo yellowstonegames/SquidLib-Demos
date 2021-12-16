@@ -25,11 +25,13 @@ import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
+import com.github.yellowstonegames.smooth.CoordGlider;
 import com.github.yellowstonegames.smooth.Director;
 import com.github.yellowstonegames.text.Language;
 
 import java.util.Map;
 
+import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.github.yellowstonegames.core.DescriptiveColor.*;
 
@@ -91,7 +93,6 @@ public class DawnSquad extends ApplicationAdapter {
     }
 
 
-    private InputProcessor input;
     private Color bgColor;
     private BitmapFont font;
     private Viewport mainViewport;
@@ -289,7 +290,7 @@ public class DawnSquad extends ApplicationAdapter {
         playerSprite = new AnimatedGlidingSprite(new Animation<>(DURATION,
                 atlas.findRegions(rng.randomElement(Data.possibleCharacters)), Animation.PlayMode.LOOP), player);
         playerSprite.setSize(1f, 1f);
-        playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 125);
+        playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
 //        playerColor = ColorTools.floatGetHSV(rng.nextFloat(), 1f, 1f, 1f);
 //        playerSprite.setPackedColor(playerColor);
 //        playerSprite.setPosition(player.x, player.y);
@@ -330,7 +331,7 @@ public class DawnSquad extends ApplicationAdapter {
             monsters.put(monPos, monster);
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
-        monsterDirector = new Director<Coord>((c)-> monsters.get(c).getLocation(), monsters.order(), 125);
+        monsterDirector = new Director<Coord>((c)-> monsters.get(c).getLocation(), monsters.order(), 150);
         //This is used to allow clicks or taps to take the player to the desired area.
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
         awaitedMoves = new ObjectList<>(200);
@@ -358,57 +359,26 @@ public class DawnSquad extends ApplicationAdapter {
         lang = '"' + Language.DEMONIC.sentence(rng, 4, 7,
                 new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"",  "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
 
-        input = new InputAdapter() {
+        //+1 is up on the screen
+        //-1 is down on the screen
+        // if the user clicks and mouseMoved hasn't already assigned a path to toCursor, then we call mouseMoved
+        // ourselves and copy toCursor over to awaitedMoves.
+        // causes the path to the mouse position to become highlighted (toCursor contains a list of Coords that
+        // receive highlighting). Uses DijkstraMap.findPathPreScanned() to find the path, which is rather fast.
+        // we also need to check if screenX or screenY is the same cell.
+        // This uses DijkstraMap.findPathPreScannned() to get a path as a List of Coord from the current
+        // player position to the position the user clicked on. The "PreScanned" part is an optimization
+        // that's special to DijkstraMap; because the part of the map that is viable to move into has
+        // already been fully analyzed by the DijkstraMap.partialScan() method at the start of the
+        // program, and re-calculated whenever the player moves, we only need to do a fraction of the
+        // work to find the best path with that info.
+        // findPathPreScanned includes the current cell (goal) by default, which is helpful when
+        // you're finding a path to a monster or loot, and want to bump into it, but here can be
+        // confusing because you would "move into yourself" as your first move without this.
+        InputProcessor input = new InputAdapter() {
             @Override
             public boolean keyUp(int keycode) {
                 switch (keycode) {
-                    case UP:
-                    case W:
-                    case NUMPAD_8:
-                        toCursor.clear();
-                        //+1 is up on the screen
-                        awaitedMoves.add(player.translate(0, 1));
-                        break;
-                    case DOWN:
-                    case S:
-                    case NUMPAD_2:
-                        toCursor.clear();
-                        //-1 is down on the screen
-                        awaitedMoves.add(player.translate(0, -1));
-                        break;
-                    case LEFT:
-                    case A:
-                    case NUMPAD_4:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(-1, 0));
-                        break;
-                    case RIGHT:
-                    case D:
-                    case NUMPAD_6:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(1, 0));
-                        break;
-                    case NUMPAD_1:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(-1, -1));
-                        break;
-                    case NUMPAD_3:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(1, -1));
-                        break;
-                    case NUMPAD_7:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(-1, 1));
-                        break;
-                    case NUMPAD_9:
-                        toCursor.clear();
-                        awaitedMoves.add(player.translate(1, 1));
-                        break;
-                    case PERIOD:
-                    case NUMPAD_5:
-                        toCursor.clear();
-                        awaitedMoves.add(player);
-                        break;
                     case P:
                         debugPrintVisible();
                         break;
@@ -442,7 +412,7 @@ public class DawnSquad extends ApplicationAdapter {
             // receive highlighting). Uses DijkstraMap.findPathPreScanned() to find the path, which is rather fast.
             @Override
             public boolean mouseMoved(int screenX, int screenY) {
-                if(!awaitedMoves.isEmpty())
+                if (!awaitedMoves.isEmpty())
                     return false;
                 pos.set(screenX, screenY);
                 mainViewport.unproject(pos);
@@ -476,10 +446,14 @@ public class DawnSquad extends ApplicationAdapter {
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
      * In a fully-fledged game, this would not be organized like this, but this is a one-file demo.
-     * @param newX
-     * @param newY
+     * @param next
      */
-    private void move(int newX, int newY) {
+    private void move(Coord next) {
+        CoordGlider cg = playerSprite.location;
+        // this prevents movements from restarting while a slide is already in progress.
+        if(cg.getChange() != 0f && cg.getChange() != 1f) return;
+
+        int newX = next.x, newY = next.y;
         if (health <= 0) return;
         playerSprite.setPackedColor(Color.WHITE_FLOAT_BITS);
         if (newX >= 0 && newY >= 0 && newX < bigWidth && newY < bigHeight
@@ -504,7 +478,7 @@ public class DawnSquad extends ApplicationAdapter {
                 blockage.fringe8way();
                 LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
                 playerSprite.location.setStart(player);
-                playerSprite.location.setEnd(player = Coord.get(newX, newY));
+                playerSprite.location.setEnd(player = next);
                 phase = Phase.PLAYER_ANIM;
                 playerDirector.play();
 
@@ -623,6 +597,39 @@ public class DawnSquad extends ApplicationAdapter {
         playerSprite.animate(time).draw(batch);
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
+    /**
+     * Supports WASD, vi-keys (hjklyubn), arrow keys, and numpad for movement, plus '.' or numpad 5 to stay still.
+     */
+    public void handleHeldKeys() {
+        float c = playerSprite.location.getChange();
+        if(c != 0f && c != 1f) return;
+        if(input.isKeyPressed(A)  || input.isKeyPressed(H) || input.isKeyPressed(LEFT) || input.isKeyPressed(NUMPAD_4))
+            move(Direction.LEFT);
+        else if(input.isKeyPressed(S)  || input.isKeyPressed(J) || input.isKeyPressed(DOWN) || input.isKeyPressed(NUMPAD_2))
+            move(Direction.DOWN);
+        else if(input.isKeyPressed(W)  || input.isKeyPressed(K) || input.isKeyPressed(UP) || input.isKeyPressed(NUMPAD_8))
+            move(Direction.UP);
+        else if(input.isKeyPressed(D)  || input.isKeyPressed(L) || input.isKeyPressed(RIGHT) || input.isKeyPressed(NUMPAD_6))
+            move(Direction.RIGHT);
+        else if(input.isKeyPressed(Y) || input.isKeyPressed(NUMPAD_7))
+            move(Direction.UP_LEFT);
+        else if(input.isKeyPressed(U) || input.isKeyPressed(NUMPAD_9))
+            move(Direction.UP_RIGHT);
+        else if(input.isKeyPressed(B) || input.isKeyPressed(NUMPAD_1))
+            move(Direction.DOWN_LEFT);
+        else if(input.isKeyPressed(N) || input.isKeyPressed(NUMPAD_3))
+            move(Direction.DOWN_RIGHT);
+        else if(input.isKeyPressed(PERIOD) || input.isKeyPressed(NUMPAD_5) || input.isKeyPressed(NUMPAD_DOT))
+            move(Direction.NONE);
+    }
+
+    private void move(Direction dir) {
+        toCursor.clear();
+        awaitedMoves.clear();
+        awaitedMoves.add(playerSprite.getLocation().getStart().translate(dir));
+    }
+
+
     @Override
     public void render () {
         // standard clear the background routine for libGDX
@@ -654,6 +661,7 @@ public class DawnSquad extends ApplicationAdapter {
             return;
         }
         playerDirector.step();
+        handleHeldKeys();
         monsterDirector.step();
 
         // need to display the map every frame, since we clear the screen to avoid artifacts.
@@ -665,7 +673,7 @@ public class DawnSquad extends ApplicationAdapter {
                     Coord m = awaitedMoves.remove(0);
                     if (!toCursor.isEmpty())
                         toCursor.remove(0);
-                    move(m.x, m.y);
+                    move(m);
                 }
             }
         }
@@ -674,7 +682,7 @@ public class DawnSquad extends ApplicationAdapter {
             Coord m = awaitedMoves.remove(0);
             if (!toCursor.isEmpty())
                 toCursor.remove(0);
-            move(m.x, m.y);
+            move(m);
         }
         else if(phase == Phase.PLAYER_ANIM) {
             if (!playerDirector.isPlaying() && !monsterDirector.isPlaying()) {
