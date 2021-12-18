@@ -4,10 +4,10 @@ buildscript {
 		mavenCentral()
 		google()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-		jcenter()
+		gradlePluginPortal()
 	}
 	dependencies {
-
+		classpath 'com.guardsquare:proguard-gradle:7.1.0-beta5'
 	}
 }
 
@@ -25,14 +25,14 @@ configure(subprojects) {
 }
 
 subprojects {
-	version = '0.0.1-SNAPSHOT'
+	version = '0.0.2'
 	ext.appName = 'KeyRemapper'
 	repositories {
 		mavenLocal()
 		mavenCentral()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 		maven { url 'https://jitpack.io' }
-		jcenter()
+		gradlePluginPortal()
 	}
 }
 

@@ -1,39 +1,105 @@
+buildscript {
+	repositories {
+		gradlePluginPortal()
+	}
+	dependencies {
+		classpath "org.beryx:badass-runtime-plugin:1.12.7"
+	}
+}
+apply plugin: 'org.beryx.runtime'
 apply plugin: 'application'
 
-sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+sourceSets.main.resources.srcDirs += [rootProject.file('assets').path]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
 sourceCompatibility = 8.0
 
 dependencies {
-	implementation project(':core')
-	implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion") {
-		exclude group: 'org.lwjgl', module: 'lwjgl-openal' //// only removes audio
-		exclude group: 'org.jcraft', module: 'jorbis' // removes audio
-	}
-	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation project(':core')
+    implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion") {
+        exclude group: 'org.lwjgl', module: 'lwjgl-openal' //// only removes audio
+        exclude group: 'org.jcraft', module: 'jorbis' // removes audio
+    }
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
 import org.gradle.internal.os.OperatingSystem
 
+def os = System.properties['os.name'].toLowerCase()
+
 run {
-	workingDir = rootProject.file('assets').path
-	setIgnoreExitValue(true)
-	
-	if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
-		// Required to run LWJGL3 Java apps on MacOS
-		jvmArgs += "-XstartOnFirstThread"
-	}
-}
-jar {
-	archiveName("KeyRemapTool.jar")
-	dependsOn configurations.runtimeClasspath
-	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
-	manifest {
-		attributes 'Main-Class': project.mainClassName
-	}
-	doLast {
-		file(archiveFile).setExecutable(true, false)
-	}
+    workingDir = rootProject.file('assets').path
+    setIgnoreExitValue(true)
+    if (os.contains('mac')) {
+        // Required to run LWJGL3 Java apps on MacOS
+        jvmArgs += "-XstartOnFirstThread"
+    }
 }
 
+jar {
+// sets the name of the .jar file this produces to the name of the game or app.
+    archiveName("KeyRemapTool-before.jar")
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    destinationDirectory = file("$project.buildDir/lib")
+    dependsOn configurations.runtimeClasspath
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+    dependencies {
+        exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+    }
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+task proguard(type: proguard.gradle.ProGuardTask) {
+    outputs.upToDateWhen { false }
+    configuration 'proguard-rules.pro'
+    //printmapping 'build/lib/out.map'
+    if (System.getProperty('java.version').startsWith('1.')) {
+        libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    } else {
+//		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    }
+    injars "build/lib/KeyRemapTool-before.jar"
+    outjars "build/lib/KeyRemapTool.jar"
+}
+
+proguard.dependsOn jar
+
+jpackageImage.dependsOn proguard
+
+runtime {
+    options.set(['--strip-debug',
+                 '--compress', '2',
+                 '--no-header-files',
+                 '--no-man-pages',
+                 '--strip-native-commands',
+                 '--vm', 'server'])
+    modules.set([
+            'jdk.unsupported'
+    ])
+    distDir.set(file(buildDir))
+    jpackage {
+        imageName = 'KeyRemapTool'
+        skipInstaller = true
+        jpackageHome = javaHome.getOrElse("")
+        mainJar = "KeyRemapTool.jar"// jar.archiveFileName.get()
+        if (os.contains('win')) {
+            imageOptions = ["--icon", "../logo.ico"]
+        } else if (os.contains('nix' || os.contains('nux') || os.contains('bsd'))) {
+            imageOptions = ["--icon", "../logo.png"]
+        } else if (os.contains('mac')) {
+            imageOptions = ["--icon", "../logo.icns", " --java-options", "\"XstartOnFirstThread\""]
+        }
+    }
+}
+
+jpackageImage.doLast {
+    file("build/jpackage/KeyRemapTool/app/KeyRemapTool-Before.jar").delete()
+}
+
+// Equivalent to the jar task; here for compatibility with gdx-setup.
+task dist(dependsOn: [jar]) {
+}
