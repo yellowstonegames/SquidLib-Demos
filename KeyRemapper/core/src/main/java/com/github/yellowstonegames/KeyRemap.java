@@ -1,9 +1,6 @@
 package com.github.yellowstonegames;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -531,6 +528,20 @@ public class KeyRemap extends ApplicationAdapter {
                         alted = !alted;
                     else if(screenX >= 128 && screenX < 144)
                         shifted = !shifted;
+                }
+                else if(button == Input.Buttons.RIGHT) {
+                    final int col = MathExtras.clamp(((screenX - 1)/54), 0, 2);
+                    final int prev = selectedIndex;
+                    selectedIndex = col * (gridHeight - 2) + screenY;
+                    if(selectedIndex < 0 || selectedIndex >= keyNameMap.size())
+                    {
+                        selectedIndex = prev;
+                        return false;
+                    }
+                    selectionPosition = Coord.get(col * 54, screenY);
+                    int code = encodeIndex(selectedIndex, alted, ctrled, shifted);
+                    mappingStore.mapping.remove(reverseMapping.remove(code, -1), -1);
+                    prefs.writeString(mappingStore.keyMappingToString(), false, "UTF-8");
                 }
                 return true;
             }
