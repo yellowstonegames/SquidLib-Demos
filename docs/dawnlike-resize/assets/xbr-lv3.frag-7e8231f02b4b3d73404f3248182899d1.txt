@@ -1,0 +1,278 @@
+/*
+   Hyllian's xBR-lv3 Shader
+   
+   Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   THE SOFTWARE.
+
+
+   Incorporates some of the ideas from SABR shader. Thanks to Joshua Street.
+*/
+
+#ifdef GL_ES
+#define LOWP lowp
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+#define COMPAT_PRECISION mediump
+#else
+#define COMPAT_PRECISION
+#define LOWP
+#endif
+
+#define COMPAT_VARYING varying
+#define FragColor gl_FragColor
+#define COMPAT_TEXTURE texture2D
+
+uniform COMPAT_PRECISION vec2 TextureSize;
+uniform sampler2D u_texture;
+#define Texture u_texture
+
+COMPAT_VARYING LOWP vec4 COL0;
+COMPAT_VARYING vec4 TEX0;
+COMPAT_VARYING vec4 t1;
+COMPAT_VARYING vec4 t2;
+COMPAT_VARYING vec4 t3;
+COMPAT_VARYING vec4 t4;
+COMPAT_VARYING vec4 t5;
+COMPAT_VARYING vec4 t6;
+COMPAT_VARYING vec4 t7;
+
+// compatibility #defines
+#define Source Texture
+#define vTexCoord TEX0.xy
+
+#define SourceSize vec4(TextureSize, 1.0 / TextureSize)
+
+#define XBR_Y_WEIGHT 48.0
+#define XBR_EQ_THRESHOLD 10.0
+#define XBR_EQ_THRESHOLD2 2.0
+#define XBR_LV2_COEFFICIENT 2.0
+
+//const mat4 yuv = mat4(0.299, 0.587, 0.114, 0.0, -0.169, -0.331, 0.499, 0.0, 0.499, -0.418, -0.0813, 0.0, 1.0, 1.0, 1.0, 1.0);
+//const mat3 yuv = mat3(0.299, 0.587, 0.114, -0.169, -0.331, 0.499, 0.499, -0.418, -0.0813);
+const mat3 rgbToIPT = mat3(0.189786, 0.669665 , 0.286498, 0.576951, -0.73741 , 0.655205, 0.233221, 0.0681367, -0.941748);
+const mat3 iptToRGB = mat3(0.999779, 1.00015, 0.999769, 1.07094, -0.377744, 0.0629496, 0.324891, 0.220439, -0.809638);
+const vec4 ipt0 = vec4(0.189786, 0.576951, 0.233221, 0.0);
+const vec4 delta = vec4(0.4, 0.4, 0.4, 0.4);
+
+vec4 df(vec4 A, vec4 B)
+{
+	return vec4(abs(A-B));
+}
+
+float c_df(vec4 c1, vec4 c2) {
+  vec3 df = abs(c1.rgb - c2.rgb);
+  return (df.r + df.g + df.b);
+}
+//// may use this later...
+//vec4 mixA(vec4 start, vec4 end, float amount) {
+//    return mix(start, end, min(1.0, amount * step(0.003, end.a) + 1.0 - (step(0.003, start.a))));
+//}
+
+mat4 transpose(mat4 val) {
+    mat4 result = val;
+    result[0][1] = val[1][0];
+    result[0][2] = val[2][0];
+    result[0][3] = val[3][0];
+    result[1][0] = val[0][1];
+    result[1][2] = val[2][1];
+    result[1][3] = val[3][1];
+    result[2][0] = val[0][2];
+    result[2][1] = val[1][2];
+    result[2][3] = val[3][2];
+    result[3][0] = val[0][3];
+    result[3][1] = val[1][3];
+    result[3][2] = val[2][3];
+    return result;
+}
+
+bvec4 eq(vec4 A, vec4 B)
+{
+	return lessThan(df(A, B), vec4(XBR_EQ_THRESHOLD));
+}
+
+bvec4 eq2(vec4 A, vec4 B)
+{
+	return lessThan(df(A, B), vec4(XBR_EQ_THRESHOLD2));
+}
+
+bvec4 and(bvec4 A, bvec4 B)
+{
+	return bvec4(A.x && B.x, A.y && B.y, A.z && B.z, A.w && B.w);
+}
+
+bvec4 or(bvec4 A, bvec4 B)
+{
+	return bvec4(A.x || B.x, A.y || B.y, A.z || B.z, A.w || B.w);
+}
+
+vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, vec4 h)
+{
+	return (df(a,b) + df(a,c) + df(d,e) + df(d,f) + 4.0*df(g,h));
+}
+
+void main()
+{
+	bvec4 edr, edr_left, edr_up, edr3_left, edr3_up, px; // px = pixel, edr = edge detection rule
+	bvec4 interp_restriction_lv1, interp_restriction_lv2_left, interp_restriction_lv2_up;
+	bvec4 interp_restriction_lv3_left, interp_restriction_lv3_up;
+	bvec4 nc, nc30, nc60, nc45, nc15, nc75; // new_color
+	vec4 fx, fx_left, fx_up, finalfx, fx3_left, fx3_up; // inequalities of straight lines.
+	vec4 res1, res2, pix1, pix2;
+	float blend1, blend2;
+
+    vec2 fp = fract(vTexCoord * SourceSize.xy);
+
+    vec4 A1 = COMPAT_TEXTURE(Texture, t1.xw).rgba;
+    vec4 B1 = COMPAT_TEXTURE(Texture, t1.yw).rgba;
+    vec4 C1 = COMPAT_TEXTURE(Texture, t1.zw).rgba;
+
+    vec4 A = COMPAT_TEXTURE(Texture, t2.xw).rgba;
+    vec4 B = COMPAT_TEXTURE(Texture, t2.yw).rgba;
+    vec4 C = COMPAT_TEXTURE(Texture, t2.zw).rgba;
+
+    vec4 D = COMPAT_TEXTURE(Texture, t3.xw).rgba;
+    vec4 E = COMPAT_TEXTURE(Texture, t3.yw).rgba;
+    vec4 F = COMPAT_TEXTURE(Texture, t3.zw).rgba;
+
+    vec4 G = COMPAT_TEXTURE(Texture, t4.xw).rgba;
+    vec4 H = COMPAT_TEXTURE(Texture, t4.yw).rgba;
+    vec4 I = COMPAT_TEXTURE(Texture, t4.zw).rgba;
+
+    vec4 G5 = COMPAT_TEXTURE(Texture, t5.xw).rgba;
+    vec4 H5 = COMPAT_TEXTURE(Texture, t5.yw).rgba;
+    vec4 I5 = COMPAT_TEXTURE(Texture, t5.zw).rgba;
+
+    vec4 A0 = COMPAT_TEXTURE(Texture, t6.xy).rgba;
+    vec4 D0 = COMPAT_TEXTURE(Texture, t6.xz).rgba;
+    vec4 G0 = COMPAT_TEXTURE(Texture, t6.xw).rgba;
+
+    vec4 C4 = COMPAT_TEXTURE(Texture, t7.xy).rgba;
+    vec4 F4 = COMPAT_TEXTURE(Texture, t7.xz).rgba;
+    vec4 I4 = COMPAT_TEXTURE(Texture, t7.xw).rgba;
+
+	vec4 b = transpose(mat4(B, D, H, F)) * (XBR_Y_WEIGHT * ipt0);
+	vec4 c = transpose(mat4(C, A, G, I)) * (XBR_Y_WEIGHT * ipt0);
+	vec4 e = transpose(mat4(E, E, E, E)) * (XBR_Y_WEIGHT * ipt0);
+	vec4 d = b.yzwx;
+	vec4 f = b.wxyz;
+	vec4 g = c.zwxy;
+	vec4 h = b.zwxy;
+	vec4 i = c.wxyz;
+
+	vec4 i4 = transpose(mat4(I4, C1, A0, G5)) * (XBR_Y_WEIGHT*ipt0);
+	vec4 i5 = transpose(mat4(I5, C4, A1, G0)) * (XBR_Y_WEIGHT*ipt0);
+	vec4 h5 = transpose(mat4(H5, F4, B1, D0)) * (XBR_Y_WEIGHT*ipt0);
+	vec4 f4 = h5.yzwx;
+
+	vec4 c1 = i4.yzwx;
+	vec4 g0 = i5.wxyz;
+	vec4 b1 = h5.zwxy;
+	vec4 d0 = h5.wxyz;
+
+	vec4 Ao = vec4( 1.0, -1.0, -1.0, 1.0 );
+	vec4 Bo = vec4( 1.0,  1.0, -1.0,-1.0 );
+	vec4 Co = vec4( 1.5,  0.5, -0.5, 0.5 );
+	vec4 Ax = vec4( 1.0, -1.0, -1.0, 1.0 );
+	vec4 Bx = vec4( 0.5,  2.0, -0.5,-2.0 );
+	vec4 Cx = vec4( 1.0,  1.0, -0.5, 0.0 );
+	vec4 Ay = vec4( 1.0, -1.0, -1.0, 1.0 );
+	vec4 By = vec4( 2.0,  0.5, -2.0,-0.5 );
+	vec4 Cy = vec4( 2.0,  0.0, -1.0, 0.5 );
+
+	vec4 Az = vec4( 6.0, -2.0, -6.0, 2.0 );
+	vec4 Bz = vec4( 2.0, 6.0, -2.0, -6.0 );
+	vec4 Cz = vec4( 5.0, 3.0, -3.0, -1.0 );
+	vec4 Aw = vec4( 2.0, -6.0, -2.0, 6.0 );
+	vec4 Bw = vec4( 6.0, 2.0, -6.0, -2.0 );
+	vec4 Cw = vec4( 5.0, -1.0, -3.0, 3.0 );
+
+	fx      = (Ao*fp.y+Bo*fp.x); 
+	fx_left = (Ax*fp.y+Bx*fp.x);
+	fx_up   = (Ay*fp.y+By*fp.x);
+	fx3_left= (Az*fp.y+Bz*fp.x);
+	fx3_up  = (Aw*fp.y+Bw*fp.x);
+
+    interp_restriction_lv1 = and(and(notEqual(e, f), notEqual(e, h)),
+	                             or(or(and(not(eq(f,b)), not(eq(f,c))),
+	                                   and(not(eq(h,d)), not(eq(h,g)))),
+	                                or(and(eq(e,i), or(and(not(eq(f,f4)), not(eq(f,i4))),
+	                                                   and(not(eq(h,h5)), not(eq(h,i5))))),
+	                                   or(eq(e,g), eq(e,c)))));
+
+    interp_restriction_lv2_left = and(notEqual(e, g), notEqual(d, g));
+	interp_restriction_lv2_up   = and(notEqual(e, c), notEqual(b, c));
+	interp_restriction_lv3_left = and(eq2(g,g0), not(eq2(d0,g0)));
+	interp_restriction_lv3_up   = and(eq2(c,c1), not(eq2(b1,c1)));
+
+	vec4 fx45 = smoothstep(Co - delta, Co + delta, fx);
+	vec4 fx30 = smoothstep(Cx - delta, Cx + delta, fx_left);
+	vec4 fx60 = smoothstep(Cy - delta, Cy + delta, fx_up);
+	vec4 fx15 = smoothstep(Cz - delta, Cz + delta, fx3_left);
+	vec4 fx75 = smoothstep(Cw - delta, Cw + delta, fx3_up);
+
+	edr = and(lessThan(weighted_distance( e, c, g, i, h5, f4, h, f), weighted_distance( h, d, i5, f, i4, b, e, i)), interp_restriction_lv1);
+	edr_left = and(lessThanEqual((XBR_LV2_COEFFICIENT*df(f,g)), df(h,c)), interp_restriction_lv2_left);
+	edr_up   = and(greaterThanEqual(df(f,g), (XBR_LV2_COEFFICIENT*df(h,c))), interp_restriction_lv2_up);
+	edr3_left = interp_restriction_lv3_left;
+	edr3_up = interp_restriction_lv3_up;
+
+	nc45 = and(edr, bvec4(fx45));
+	nc30 = and(edr, and(edr_left, bvec4(fx30)));
+	nc60 = and(edr, and(edr_up, bvec4(fx60)));
+	nc15 = and(and(edr, edr_left), and(edr3_left, bvec4(fx15)));
+	nc75 = and(and(edr, edr_up), and(edr3_up, bvec4(fx75)));
+
+    px = lessThanEqual(df(e, f), df(e, h));
+
+    nc = bvec4(nc75.x || nc15.x || nc30.x || nc60.x || nc45.x, nc75.y || nc15.y || nc30.y || nc60.y || nc45.y, nc75.z || nc15.z || nc30.z || nc60.z || nc45.z, nc75.w || nc15.w || nc30.w || nc60.w || nc45.w);
+
+	vec4 final45 = vec4(nc45) * fx45;
+	vec4 final30 = vec4(nc30) * fx30;
+	vec4 final60 = vec4(nc60) * fx60;
+	vec4 final15 = vec4(nc15) * fx15;
+	vec4 final75 = vec4(nc75) * fx75;
+
+	vec4 maximo = max(max(max(final15, final75),max(final30, final60)), final45);
+
+	     if (nc.x) {pix1 = px.x ? F : H; blend1 = maximo.x;}
+	else if (nc.y) {pix1 = px.y ? B : F; blend1 = maximo.y;}
+	else if (nc.z) {pix1 = px.z ? D : B; blend1 = maximo.z;}
+	else if (nc.w) {pix1 = px.w ? H : D; blend1 = maximo.w;}
+
+	     if (nc.w) {pix2 = px.w ? H : D; blend2 = maximo.w;}
+	else if (nc.z) {pix2 = px.z ? D : B; blend2 = maximo.z;}
+	else if (nc.y) {pix2 = px.y ? B : F; blend2 = maximo.y;}
+	else if (nc.x) {pix2 = px.x ? F : H; blend2 = maximo.x;}
+
+    res1 = mix(E, pix1, blend1);
+    res2 = mix(E, pix2, blend2);
+    vec4 res = mix(res1, res2, step(c_df(E, res1), c_df(E, res2)));
+    
+    //// normal colors
+    FragColor = res * COL0;
+    
+    //// high-contrast shader
+    //vec3 ipt = rgbToIPT * (res.rgb + COL0.rgb * 0.75 - 0.375);
+    //ipt.x *= ipt.x * 0.625;
+    //FragColor = clamp(vec4(iptToRGB * ipt, COL0.a * res.a), 0.0, 1.0);
+}

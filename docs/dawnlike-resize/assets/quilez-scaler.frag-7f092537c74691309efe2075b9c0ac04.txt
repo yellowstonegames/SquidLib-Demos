@@ -1,0 +1,66 @@
+#ifdef GL_ES
+#define LOWP lowp
+precision mediump float;
+#else
+#define LOWP
+#endif
+varying LOWP vec4 v_color;
+varying vec2 v_texCoords;
+uniform sampler2D u_texture;
+uniform vec2 TextureSize;
+uniform sampler2D u_palette;
+
+const float b_adj = 31.0 / 32.0;
+const float rb_adj = 32.0 / 1023.0;
+
+vec2 uv_aa_linear( vec2 uv, vec2 res, float width ) {
+    vec2 pixels = uv * res;
+
+    vec2 pixels_floor = floor(pixels + 0.5);
+    vec2 pixels_fract = clamp( (pixels - pixels_floor) / fwidth(pixels) / width, -0.5, 0.5);
+
+    return (pixels_floor + pixels_fract) / res;
+}
+
+vec2 quilez_position(vec2 uv, vec2 res) {
+    uv = uv*res;
+    vec2 seam = floor(uv+0.5);
+    uv = seam + clamp( (uv-seam)/fwidth(uv), -0.5, 0.5);
+    return uv/res;
+}
+
+vec2 uv_cstantos( vec2 uv, vec2 res ) {
+    vec2 pixels = uv * res;
+
+    // Updated to the final article
+    vec2 alpha = 0.7 * fwidth(pixels);
+    vec2 pixels_fract = fract(pixels);
+    vec2 pixels_diff = clamp( .5 / alpha * pixels_fract, 0., .5 ) +
+                       clamp( .5 / alpha * (pixels_fract - 1.) + .5, 0., .5 );
+    pixels = floor(pixels) + pixels_diff;
+    return pixels / res;
+}
+
+vec4 texture2D_special(sampler2D tex, vec2 uv)
+{
+    return texture2D(tex, quilez_position(uv, TextureSize * .75)); // .75 is experimental; try changing it
+//    return texture2D(tex, uv_cstantos(uv, TextureSize));
+//    return texture2D(tex, uv_aa_linear(uv, TextureSize, 1.5)); // 1.5 is experimental, and can be changed
+}
+
+void main()
+{
+// this section does not use a palette.
+   vec4 altColor = v_color + (texture2D(u_palette, vec2(0., 0.)) * 0.);
+   gl_FragColor = altColor * texture2D_special(u_texture, v_texCoords);
+
+// this section does. only one should be active.
+/*
+   vec4 tgt = v_color * texture2D_special(u_texture, v_texCoords);
+   vec4 used = texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g));
+   float adj = fract(52.9829189 * fract(dot(vec2(0.06711056, 0.00583715), gl_FragCoord.xy))) - 0.5;
+   tgt.rgb = clamp(tgt.rgb + (tgt.rgb - used.rgb) * adj, 0.0, 1.0);
+   gl_FragColor.rgb = texture2D(u_palette, vec2((tgt.b * b_adj + floor(tgt.r * 31.999)) * rb_adj, 1.0 - tgt.g)).rgb;
+   gl_FragColor.a = tgt.a;
+   */
+}

@@ -169,8 +169,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         soloBatch = new SpriteBatch(32);
         buffer = new FrameBuffer(Pixmap.Format.RGB888, cellWidth * gridWidth, cellHeight * gridHeight, false);
 
-//        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
-        shader = new ShaderProgram(Gdx.files.internal("xpal.vert.txt"), Gdx.files.internal("xpal.frag.txt"));
+        shader = new ShaderProgram(Gdx.files.internal("xbr-lv3.vert.txt"), Gdx.files.internal("xbr-lv3.frag.txt"));
+//        shader = new ShaderProgram(Gdx.files.internal("xpal.vert.txt"), Gdx.files.internal("xpal.frag.txt"));
         if (!shader.isCompiled()) {
             Gdx.app.error("Shader", shader.getLog());
             scalingShader = false;

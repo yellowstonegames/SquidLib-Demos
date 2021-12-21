@@ -11,9 +11,12 @@ import static com.squidpony.DawnlikeDemo.*;
 public class GwtLauncher extends GwtApplication {
     @Override
     public GwtApplicationConfiguration getConfig() {
-        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(gridWidth * cellWidth * 2, gridHeight * cellHeight * 2);
-        configuration.disableAudio = true;
-        return configuration;
+//        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(gridWidth * cellWidth * 2, gridHeight * cellHeight * 2);
+        GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(true);
+        cfg.padVertical = 160;
+        cfg.padHorizontal = 0;
+        cfg.disableAudio = true;
+        return cfg;
     }
 
     @Override
