@@ -14,7 +14,7 @@ public class GwtLauncher extends GwtApplication {
 //        GwtApplicationConfiguration configuration = new GwtApplicationConfiguration(gridWidth * cellWidth * 2, gridHeight * cellHeight * 2);
         GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(true);
         cfg.padVertical = 160;
-        cfg.padHorizontal = 0;
+        cfg.padHorizontal = 2;
         cfg.disableAudio = true;
         return cfg;
     }

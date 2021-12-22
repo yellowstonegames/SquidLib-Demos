@@ -75,34 +75,53 @@ task superDev(type: GwtSuperDev) {
 		gwt.modules = gwt.devModules
 	}
 }
+var outputPath = "build/dist/"
 task dist(dependsOn: [clean, compileGwt]) {
-    doLast {
-		file("build/dist").mkdirs()
+	doLast {
+		file(outputPath).mkdirs()
 		copy {
-			from "build/gwt/out"
-			into "build/dist"
+			from("build/gwt/out"){
+				exclude '**/*.symbolMap'
+			}
+			into outputPath
 		}
 		copy {
-			from "webapp"
-			into "build/dist"
+			from("webapp") {
+				exclude '**/*.html'
+				exclude '**/refresh.png'
 			}
+			into outputPath
+		}
+		copy {
+			from("webapp") {
+				include '**/*.html'
+				filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
+			}
+			into outputPath
+		}
 		copy {
 			from "war"
-			into "build/dist"
+			into outputPath
 		}
 	}
 }
 
+//helps avoid extra (large) cache.js files with gibberish names being stored by the dozen
+dist.doFirst {
+	delete fileTree(dir:outputPath+'html/', include: '**.cache.js')
+}
+
+
 task addSource {
 	doLast {
 		sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-		
 	}
 }
 
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 
+sourceCompatibility = 8
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"

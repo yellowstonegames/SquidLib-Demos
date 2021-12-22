@@ -12,7 +12,7 @@ t:madbrain-scaler.frag.txt:madbrain-scaler.frag-2affe293d8f11c2ee6288bfe030ee543
 t:madbrain-scaler.vert.txt:madbrain-scaler.vert-59aa8967ffb52b5b1e86ca12afaa9fd9.txt:340:text/plain:1
 t:quilez-scaler.frag.txt:quilez-scaler.frag-7f092537c74691309efe2075b9c0ac04.txt:2268:text/plain:1
 t:quilez-scaler.vert.txt:quilez-scaler.vert-527d2c238d70c2becc036536998de58d.txt:322:text/plain:1
-t:xbr-lv3.frag.txt:xbr-lv3.frag-7e8231f02b4b3d73404f3248182899d1.txt:10206:text/plain:1
+t:xbr-lv3.frag.txt:xbr-lv3.frag-0f991050439549529100e6ade1d46423.txt:10225:text/plain:1
 t:xbr-lv3.vert.txt:xbr-lv3.vert-3ad6cb8fecc766a69d938cae2f59fb49.txt:2637:text/plain:1
 t:xpal.frag.txt:xpal.frag-dd1797d307ca80897d0420e19a6ed66e.txt:9568:text/plain:1
 t:xpal.vert.txt:xpal.vert-50015dd551dd59641f7a4a072da72808.txt:2937:text/plain:1
