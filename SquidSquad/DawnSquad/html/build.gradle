@@ -31,6 +31,15 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+    implementation 'com.github.tommyettinger:jdkgdxds:0.2.3:sources'
+    implementation "com.github.tommyettinger:bluegrass:0.2.2:sources"
+    implementation "com.github.tommyettinger:regexodus:0.1.13:sources"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
 	implementation project(':core')
 
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
@@ -104,7 +113,7 @@ task dist(dependsOn: [clean, compileGwt]) {
                 exclude 'refresh.png' // We don't need this button; this saves some bytes.
             }
             into outputPath
-            }
+        }
         copy {
             from("webapp") {
                 // These next two lines take the index.html page and remove the superdev refresh button.
@@ -113,7 +122,7 @@ task dist(dependsOn: [clean, compileGwt]) {
                 // This does not modify the original index.html, only the copy in the dist.
             }
             into outputPath
-            }
+        }
         copy {
             from "war"
             into outputPath

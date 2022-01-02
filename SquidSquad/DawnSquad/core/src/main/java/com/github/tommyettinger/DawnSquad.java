@@ -83,9 +83,9 @@ public class DawnSquad extends ApplicationAdapter {
 //    /** In number of cells */
 //    public static final int bonusHeight = 0;
     /** The pixel width of a cell */
-    public static final int cellWidth = 16;
+    public static final int cellWidth = 32;
     /** The pixel height of a cell */
-    public static final int cellHeight = 16;
+    public static final int cellHeight = 32;
 
     private boolean onGrid(int screenX, int screenY)
     {
@@ -148,8 +148,9 @@ public class DawnSquad extends ApplicationAdapter {
         camera = mainViewport.getCamera();
         camera.update();
 
-        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
-        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
+        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike2.atlas"), Gdx.files.internal("dawnlike"));
+        font = new BitmapFont(Gdx.files.internal("dawnlike/font2.fnt"), atlas.findRegion("font"));
+//        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
         font.setUseIntegerPositions(false);
         font.getData().setScale(1f/cellWidth, 1f/cellHeight);
         font.getData().markupEnabled = true;
