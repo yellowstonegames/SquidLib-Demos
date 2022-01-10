@@ -184,6 +184,7 @@ public class DungeonDemo extends ApplicationAdapter {
                                 cursor = Coord.get(screenX, screenY);
                                 //This uses DijkstraMap.findPath to get a possibly long path from the current player position
                                 //to the position the user clicked on.
+                                DefaultResources.getGuiRandom().setState(cursor.hashCode());
                                 toCursor = playerToCursor.findPath(250, null, null, player, cursor);
                             }
                             awaitedMoves.clear();
@@ -208,6 +209,7 @@ public class DungeonDemo extends ApplicationAdapter {
                             return false;
                         }
                         cursor = Coord.get(screenX, screenY);
+                        DefaultResources.getGuiRandom().setState(cursor.hashCode());
                         toCursor = playerToCursor.findPath(250, null, null, player, cursor);
                         return false;
                     }
