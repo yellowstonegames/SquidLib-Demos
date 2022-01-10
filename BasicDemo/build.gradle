@@ -28,7 +28,6 @@ subprojects {
 	version = '0.0.1-SNAPSHOT'
 	ext.appName = 'BasicDemo'
 	repositories {
-		mavenLocal()
 		mavenCentral()
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 		maven { url 'https://plugins.gradle.org/m2/' }
