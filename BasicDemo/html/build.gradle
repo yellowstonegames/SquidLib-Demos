@@ -31,12 +31,12 @@ dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
   api "com.github.tommyettinger:gdx-backend-gwt:1.100.1"
   api "com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources"
-  api "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion:sources"
-  api "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
 //  api "com.squidpony:squidlib:$squidLibVersion:sources"
 //  api "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
-  api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
-  api "com.github.tommyettinger:anim8-gdx:$anim8Version:sources"
+	api "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion:sources"
+	api "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
+	api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
+	api "com.github.tommyettinger:anim8-gdx:$anim8Version:sources"
 
 }
 
