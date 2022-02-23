@@ -25,39 +25,47 @@ public class Distributor extends ApplicationAdapter {
     private FilterBatch batch;
     private SparseLayers layers;
     private Stage stage;
-    private int[] amounts = new int[512];
+    private final int[] amounts = new int[512];
     private MoonwalkRNG rng;
-    private KumaraswamyDistribution kd;
-    private long seed = 1L;
-    private long startTime;
+    private double a, b;
     private TextCellFactory font;
 
 
     @Override
     public void create() {
-        startTime = TimeUtils.millis();
         Coord.expandPoolTo(512, 512);
         font = new TextCellFactory().font(DefaultResources.getCozyFont());
         rng = new MoonwalkRNG(1234567890);
-        kd = new KumaraswamyDistribution(2.0, 5.0);
+        a = 2.0;
+        b = 5.0;
         batch = new FilterBatch();
         stage = new Stage(new StretchViewport(512, 540), batch);
         layers = new SparseLayers(512, 520, 1, 1, font);
         layers.setDefaultForeground(SColor.WHITE);
         stage.addActor(layers);
     }
+    public double nextExclusiveDouble (){
+        final long bits = rng.nextLong();
+        return NumberTools.longBitsToDouble(1022L - Long.numberOfTrailingZeros(bits) << 52 | bits >>> 12);
+    }
 
     public void update() {
         Arrays.fill(amounts, 0);
         ArrayTools.fill(layers.backgrounds, 0f);
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) kd.setA(kd.getA() + 0.5 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) kd.setA(kd.getA() - 0.5 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) kd.setB(kd.getB() + 0.5 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) kd.setB(kd.getB() - 0.5 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) a += 0.5 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) a += -0.5 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) b += 0.5 * Gdx.graphics.getDeltaTime();
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) b += -0.5 * Gdx.graphics.getDeltaTime();
+        if (a <= 0) a = 1e-9;
+        if (b <= 0) b = 1e-9;
         font.bmpFont.setColor(SColor.BLACK);
-        font.bmpFont.draw(batch, Stringf.format("Kumaraswamy with a=%1.3f, b=%1.3f", kd.getA(), kd.getB()), 100, 522);
+        double aa = 1.0 / a;
+        double bb = 1.0 / b;
+        font.bmpFont.draw(batch, Stringf.format("Kumaraswamy with a=%1.3f, b=%1.3f; mean=%1.3f", a, b,
+                (MathExtras.factorial(aa) * MathExtras.gamma(b) * b) / MathExtras.factorial(aa + b)), 100, 522);
+
         for (int i = 0; i < 0x40000; i++) {
-            amounts[Noise.fastFloor(kd.nextDouble(rng) * 512)]++;
+            amounts[Math.min(Noise.fastFloor((Math.pow(1.0 - Math.pow(nextExclusiveDouble(), bb), aa)) * 512), 511)]++;
         }
         for (int i = 0; i < 512; i++) {
             float color = (i & 63) == 0
