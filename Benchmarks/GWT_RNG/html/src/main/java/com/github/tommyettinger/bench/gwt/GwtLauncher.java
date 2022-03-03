@@ -9,6 +9,8 @@ import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.*;
 import squidpony.squidmath.*;
 
+import java.util.Random;
+
 
 /**
  * Benchmark for several different PRNG algorithms on GWT. Code mostly taken from
@@ -40,44 +42,50 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(new Label(" * the time it took in milliseconds to generate those 100,000 numbers,"));
         vp.add(new Label(" * the margin of error for the calculation, in ms as an offset from the time before it."));
 
-        addIntTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
-        addIntTest(vp, new Starfish32RNG(123456789, 987654321), "Starfish32RNG");
-        addIntTest(vp, new MoverCounter32RNG(123456789, 987654321), "MoverCounter32RNG");
-        addIntTest(vp, new JSF32RNG(123456789), "JSF32RNG");
-        addIntTest(vp, new Mover32RNG(1), "Mover32RNG");
-        addIntTest(vp, new XoshiroStarStar32RNG(123456789), "XoshiroStarStar32RNG");
-        addIntTest(vp, new XoshiroStarPhi32RNG(123456789), "XoshiroStarPhi32RNG");
-        addIntTest(vp, new XoshiroAra32RNG(123456789), "XoshiroAra32RNG");
-        addIntTest(vp, new LightRNG(123456L), "LightRNG");
-        addIntTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
-        addIntTest(vp, new GWTRNG(123456789, 987654321), "GWTRNG");
-        addIntTest(vp, new SilkRNG(123456789, 987654321), "SilkRNG");
-        addIntTest(vp, new RNG(new Starfish32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
-        addIntTest(vp, new RNG(new LightRNG(123456L)), "LightRNG wrapped in RNG");
-        addLongTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
-        addLongTest(vp, new Starfish32RNG(123456789, 987654321), "Starfish32RNG");
-        addLongTest(vp, new MoverCounter32RNG(123456789, 987654321), "MoverCounter32RNG");
-        addLongTest(vp, new JSF32RNG(123456789), "JSF32RNG");
-        addLongTest(vp, new Mover32RNG(1), "Mover32RNG");
-        addLongTest(vp, new XoshiroStarStar32RNG(123456789), "XoshiroStarStar32RNG");
-        addLongTest(vp, new XoshiroStarPhi32RNG(123456789), "XoshiroStarPhi32RNG");
-        addLongTest(vp, new XoshiroAra32RNG(123456789), "XoshiroAra32RNG");
-        addLongTest(vp, new LightRNG(123456L), "LightRNG");
-        addLongTest(vp, new RandomXS128(123456789L, 987654321L), "RandomXS128");
-        addLongTest(vp, new GWTRNG(123456789, 987654321), "GWTRNG");
-        addLongTest(vp, new SilkRNG(123456789, 987654321), "SilkRNG");
-        addLongTest(vp, new RNG(new Starfish32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
-        addLongTest(vp, new RNG(new LightRNG(123456L)), "LightRNG wrapped in RNG");
-        addBoundedIntTest(vp, new GWTRNG(123456789, 987654321), "GWTRNG");
-        addBoundedIntTest(vp, new SilkRNG(123456789, 987654321), "SilkRNG");
-        addBoundedIntTest(vp, new RNG(new Starfish32RNG(123456789, 987654321)), "Lathe32RNG wrapped in RNG");
-        addBoundedIntTest(vp, new RNG(new LightRNG(123456L)), "LightRNG wrapped in RNG");
+        addIntTest(vp, new RNG(new Lathe32RNG(123456789)), "Lathe32RNG");
+        addIntTest(vp, new RNG(new Starfish32RNG(123456789)), "Starfish32RNG");
+        addIntTest(vp, new RNG(new MoverCounter32RNG(123456789)), "MoverCounter32RNG");
+        addIntTest(vp, new RNG(new JSF32RNG(123456789)), "JSF32RNG");
+        addIntTest(vp, new RNG(new Mover32RNG(123456789)), "Mover32RNG");
+        addIntTest(vp, new RNG(new XoshiroStarStar32RNG(123456789)), "XoshiroStarStar32RNG");
+        addIntTest(vp, new RNG(new XoshiroStarPhi32RNG(123456789)), "XoshiroStarPhi32RNG");
+        addIntTest(vp, new RNG(new XoshiroAra32RNG(123456789)), "XoshiroAra32RNG");
+        addIntTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
+        addIntTest(vp, new RNG(new MizuchiRNG(123456789)), "MizuchiRNG");
+        addIntTest(vp, new RNG(new TangleRNG(123456789)), "TangleRNG");
+        addIntTest(vp, new RNG(new TricycleRNG(123456789)), "TricycleRNG");
+        addIntTest(vp, new RNG(new FourWheelRNG(123456789)), "FourWheelRNG");
+        addIntTest(vp, new RNG(new TrimRNG(123456789)), "TrimRNG");
+        addIntTest(vp, new GWTRNG(123456789), "GWTRNG");
+        addIntTest(vp, new SilkRNG(123456789), "SilkRNG");
+        addIntTest(vp, new RandomXS128(123456789), "RandomXS128");
+        addLongTest(vp, new RNG(new Lathe32RNG(123456789)), "Lathe32RNG");
+        addLongTest(vp, new RNG(new Starfish32RNG(123456789)), "Starfish32RNG");
+        addLongTest(vp, new RNG(new MoverCounter32RNG(123456789)), "MoverCounter32RNG");
+        addLongTest(vp, new RNG(new JSF32RNG(123456789)), "JSF32RNG");
+        addLongTest(vp, new RNG(new Mover32RNG(123456789)), "Mover32RNG");
+        addLongTest(vp, new RNG(new XoshiroStarStar32RNG(123456789)), "XoshiroStarStar32RNG");
+        addLongTest(vp, new RNG(new XoshiroStarPhi32RNG(123456789)), "XoshiroStarPhi32RNG");
+        addLongTest(vp, new RNG(new XoshiroAra32RNG(123456789)), "XoshiroAra32RNG");
+        addLongTest(vp, new GWTRNG(123456789), "GWTRNG");
+        addLongTest(vp, new SilkRNG(123456789), "SilkRNG");
+        addLongTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
+        addLongTest(vp, new RNG(new MizuchiRNG(123456789)), "MizuchiRNG");
+        addLongTest(vp, new RNG(new TangleRNG(123456789)), "TangleRNG");
+        addLongTest(vp, new RNG(new TricycleRNG(123456789)), "TricycleRNG");
+        addLongTest(vp, new RNG(new FourWheelRNG(123456789)), "FourWheelRNG");
+        addLongTest(vp, new RNG(new TrimRNG(123456789)), "TrimRNG");
+        addLongTest(vp, new RandomXS128(123456789), "RandomXS128");
+        addBoundedIntTest(vp, new GWTRNG(123456789), "GWTRNG");
+        addBoundedIntTest(vp, new SilkRNG(123456789), "SilkRNG");
+        addBoundedIntTest(vp, new RNG(new Starfish32RNG(123456789)), "Lathe32RNG");
+        addBoundedIntTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
 
-        vp.add(new Label("Note: Clicking multiple 'wrapped in RNG' buttons will slow down all such buttons."));
-        vp.add(new Label("This has something to do with multiple implementations of RandomnessSource being used,"));
-        vp.add(new Label(" and GWT has a hard time optimizing polymorphic code like this."));
-        vp.add(new Label("This may also affect GWTRNG, which does not use RandomnessSource in the same way."));
-        vp.add(new Label("It's probably best to stick to one RandomnessSource per app for this polymorphism reason."));
+//        vp.add(new Label("Note: Clicking multiple 'wrapped in RNG' buttons will slow down all such buttons."));
+//        vp.add(new Label("This has something to do with multiple implementations of RandomnessSource being used,"));
+//        vp.add(new Label(" and GWT has a hard time optimizing polymorphic code like this."));
+//        vp.add(new Label("This may also affect GWTRNG, which does not use RandomnessSource in the same way."));
+//        vp.add(new Label("It's probably best to stick to one RandomnessSource per app for this polymorphism reason."));
 
         //addIntTest(vp, new Light32RNG(2132132130, 2123456789), "Light32RNG");
         //addLongTest(vp, new Light32RNG(2132132130, 2123456789), "Light32RNG");
@@ -125,30 +133,7 @@ public class GwtLauncher extends GwtBareApp {
         
     }
 
-    private void addIntTest(final VerticalPanel vp, final Lathe32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    
-    private void addIntTest(final VerticalPanel vp, final LightRNG rs, final String name)
+    private void addIntTest(final VerticalPanel vp, final IRNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -171,7 +156,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
-    private void addIntTest(final VerticalPanel vp, final RandomXS128 rs, final String name)
+    private void addIntTest(final VerticalPanel vp, final Random rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
         final TextBox resultLabel = new TextBox();
@@ -184,75 +169,6 @@ public class GwtLauncher extends GwtBareApp {
                 runBenchButton.setEnabled(false);
 
                 String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final Lathe32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final LightRNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final RandomXS128 rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
 
                 resultLabel.setText(benchmarkResult);
                 runBenchButton.setEnabled(true);
@@ -270,7 +186,7 @@ public class GwtLauncher extends GwtBareApp {
     /** Run the benchmark the specified number of milliseconds and return
      *  the mean execution time and SEM in milliseconds.
      */
-    private String runIntBenchmark(Lathe32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runIntBenchmark(IRNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -288,25 +204,7 @@ public class GwtLauncher extends GwtBareApp {
     /** Run the benchmark the specified number of milliseconds and return
      *  the mean execution time and SEM in milliseconds.
      */
-    private String runIntBenchmark(LightRNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-    /** Run the benchmark the specified number of milliseconds and return
-     *  the mean execution time and SEM in milliseconds.
-     */
-    private String runIntBenchmark(RandomXS128 rs, long timeMinimum, int runsMinimum) {
+    private String runIntBenchmark(Random rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -325,7 +223,7 @@ public class GwtLauncher extends GwtBareApp {
     /** Run the benchmark the specified number of milliseconds and return
      *  the mean execution time and SEM in milliseconds.
      */
-    private String runLongBenchmark(Lathe32RNG rs, long timeMinimum, int runsMinimum) {
+    private String runLongBenchmark(IRNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -341,25 +239,10 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-    private String runLongBenchmark(LightRNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
     /** Run the benchmark the specified number of milliseconds and return
      *  the mean execution time and SEM in milliseconds.
      */
-    private String runLongBenchmark(RandomXS128 rs, long timeMinimum, int runsMinimum) {
+    private String runLongBenchmark(Random rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -399,22 +282,17 @@ public class GwtLauncher extends GwtBareApp {
         return Math.sqrt(sumSqs / (n * (n - 1)));
     }
     
-    private String reportInt(Lathe32RNG rs) {
+    private String reportInt(IRNG rs) {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
 
-    private String reportInt(LightRNG rs) {
+    private String reportInt(Random rs) {
         runIntBenchmark(rs, 100, 2); // warm up
         return runIntBenchmark(rs,2000, 5);
     }
 
-    private String reportInt(RandomXS128 rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(Lathe32RNG rs) {
+    private int runInt(IRNG rs) {
         int xor = 0;
         for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
@@ -422,14 +300,7 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private int runInt(LightRNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-    private int runInt(RandomXS128 rs) {
+    private int runInt(Random rs) {
         int xor = 0;
         for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
@@ -437,22 +308,17 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private String reportLong(Lathe32RNG rs) {
+    private String reportLong(IRNG rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
     }
 
-    private String reportLong(LightRNG rs) {
+    private String reportLong(Random rs) {
         runLongBenchmark(rs, 100, 2); // warm up
         return runLongBenchmark(rs,2000, 5);
     }
 
-    private String reportLong(RandomXS128 rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(Lathe32RNG rs) {
+    private int runLong(IRNG rs) {
         long xor = 0L;
         for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
@@ -460,23 +326,17 @@ public class GwtLauncher extends GwtBareApp {
         return (int) xor;
     }
 
-    private int runLong(LightRNG rs) {
+    private int runLong(Random rs) {
         long xor = 0L;
         for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
     }
-    private int runLong(RandomXS128 rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-    private void addIntTest(final VerticalPanel vp, final GWTRNG rs, final String name)
+
+    private void addBoundedIntTest(final VerticalPanel vp, final IRNG rs, final String name)
     {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
+        final PushButton runBenchButton = new PushButton(name + ".nextInt(100), " + rs.nextInt(100) + ", " + rs.nextInt(100) + ", " + rs.nextInt(100));
         final TextBox resultLabel = new TextBox();
         resultLabel.setReadOnly(false);
         resultLabel.setText("Not run yet");
@@ -486,7 +346,7 @@ public class GwtLauncher extends GwtBareApp {
                 resultLabel.setText("Running ...");
                 runBenchButton.setEnabled(false);
 
-                String benchmarkResult = reportInt(rs);
+                String benchmarkResult = reportIntBounded(rs);
 
                 resultLabel.setText(benchmarkResult);
                 runBenchButton.setEnabled(true);
@@ -497,29 +357,7 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
-    private void addLongTest(final VerticalPanel vp, final GWTRNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private void addBoundedIntTest(final VerticalPanel vp, final GWTRNG rs, final String name)
+    private void addBoundedIntTest(final VerticalPanel vp, final Random rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextInt(100), " + rs.nextInt(100) + ", " + rs.nextInt(100) + ", " + rs.nextInt(100));
         final TextBox resultLabel = new TextBox();
@@ -543,62 +381,7 @@ public class GwtLauncher extends GwtBareApp {
     }
 
 
-    private void addBoundedIntTest(final VerticalPanel vp, final SilkRNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(100), " + rs.nextInt(100) + ", " + rs.nextInt(100) + ", " + rs.nextInt(100));
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportIntBounded(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-
-    private String runIntBenchmark(GWTRNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(GWTRNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-    private String runBoundedIntBenchmark(GWTRNG rs, long timeMinimum, int runsMinimum) {
+    private String runBoundedIntBenchmark(IRNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -614,27 +397,12 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-
-    private String reportInt(GWTRNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(GWTRNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-
-    private String reportIntBounded(GWTRNG rs) {
+    private String reportIntBounded(IRNG rs) {
         runBoundedIntBenchmark(rs, 100, 2); // warm up
         return runBoundedIntBenchmark(rs, 2000, 5);
     }
 
-    private int runIntBounded(GWTRNG rs) {
+    private int runIntBounded(IRNG rs) {
         int xor = 0;
         for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt(100);
@@ -642,43 +410,12 @@ public class GwtLauncher extends GwtBareApp {
         return xor;
     }
 
-    private String reportLong(GWTRNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
+    private String reportIntBounded(Random rs) {
+        runBoundedIntBenchmark(rs, 100, 2); // warm up
+        return runBoundedIntBenchmark(rs, 2000, 5);
     }
 
-    private int runLong(GWTRNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-    private void addIntTest(final VerticalPanel vp, final SilkRNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final SilkRNG rs, final String name)
+    private void addLongTest(final VerticalPanel vp, final IRNG rs, final String name)
     {
         final PushButton runBenchButton = new PushButton(name + ".nextLong()");
         final TextBox resultLabel = new TextBox();
@@ -700,38 +437,31 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(runBenchButton);
         vp.add(resultLabel);
     }
-    private String runIntBenchmark(SilkRNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
 
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    private void addLongTest(final VerticalPanel vp, final Random rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportLong(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
     }
 
-    private String runLongBenchmark(SilkRNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-    private String runBoundedIntBenchmark(SilkRNG rs, long timeMinimum, int runsMinimum) {
+    private String runBoundedIntBenchmark(Random rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
         IntVLA samples = new IntVLA();
         long startTime, endTime, stopTime;
@@ -747,942 +477,11 @@ public class GwtLauncher extends GwtBareApp {
         return res + "; " + runs + " runs; " + meanAndSEM(samples);
     }
 
-
-
-    private String reportInt(SilkRNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(SilkRNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-    
-    private String reportIntBounded(SilkRNG rs) {
-        runBoundedIntBenchmark(rs, 100, 2); // warm up
-        return runBoundedIntBenchmark(rs, 2000, 5);
-    }
-
-    private int runIntBounded(SilkRNG rs) {
+    private int runIntBounded(Random rs) {
         int xor = 0;
         for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt(100);
         }
         return xor;
     }
-
-
-
-    private String reportLong(SilkRNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(SilkRNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-
-
-
-
-
-
-
-    private void addIntTest(final VerticalPanel vp, final Mover32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final Mover32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private String runIntBenchmark(Mover32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(Mover32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String reportInt(Mover32RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(Mover32RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-    private String reportLong(Mover32RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(Mover32RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-    private void addIntTest(final VerticalPanel vp, final JSF32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final JSF32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private String runIntBenchmark(JSF32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(JSF32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String reportInt(JSF32RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(JSF32RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-    private String reportLong(JSF32RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(JSF32RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-
-
-
-
-
-
-
-    private void addIntTest(final VerticalPanel vp, final XoshiroStarStar32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final XoshiroStarStar32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private String runIntBenchmark(XoshiroStarStar32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(XoshiroStarStar32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String reportInt(XoshiroStarStar32RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(XoshiroStarStar32RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-    private String reportLong(XoshiroStarStar32RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(XoshiroStarStar32RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-
-    private void addIntTest(final VerticalPanel vp, final XoshiroStarPhi32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final XoshiroStarPhi32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private String runIntBenchmark(XoshiroStarPhi32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(XoshiroStarPhi32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String reportInt(XoshiroStarPhi32RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(XoshiroStarPhi32RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-    private String reportLong(XoshiroStarPhi32RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(XoshiroStarPhi32RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-    private void addIntTest(final VerticalPanel vp, final MoverCounter32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final MoverCounter32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private String runIntBenchmark(MoverCounter32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(MoverCounter32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String reportInt(MoverCounter32RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(MoverCounter32RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-    private String reportLong(MoverCounter32RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(MoverCounter32RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-    private void addIntTest(final VerticalPanel vp, final XoshiroAra32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final XoshiroAra32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private String runIntBenchmark(XoshiroAra32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(XoshiroAra32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String reportInt(XoshiroAra32RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(XoshiroAra32RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-    private String reportLong(XoshiroAra32RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(XoshiroAra32RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-
-    private void addIntTest(final VerticalPanel vp, final Starfish32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final Starfish32RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private String runIntBenchmark(Starfish32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(Starfish32RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String reportInt(Starfish32RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(Starfish32RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-    private String reportLong(Starfish32RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(Starfish32RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-    private void addIntTest(final VerticalPanel vp, final RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(), " + rs.nextInt() + ", " + rs.nextInt() + ", " + rs.nextInt());
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportInt(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-    private void addLongTest(final VerticalPanel vp, final RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextLong()");
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportLong(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-    private void addBoundedIntTest(final VerticalPanel vp, final RNG rs, final String name)
-    {
-        final PushButton runBenchButton = new PushButton(name + ".nextInt(100), " + rs.nextInt(100) + ", " + rs.nextInt(100) + ", " + rs.nextInt(100));
-        final TextBox resultLabel = new TextBox();
-        resultLabel.setReadOnly(false);
-        resultLabel.setText("Not run yet");
-        resultLabel.setPixelSize(560, 22);
-        runBenchButton.addClickHandler(new ClickHandler() {
-            public void onClick(ClickEvent event) {
-                resultLabel.setText("Running ...");
-                runBenchButton.setEnabled(false);
-
-                String benchmarkResult = reportIntBounded(rs);
-
-                resultLabel.setText(benchmarkResult);
-                runBenchButton.setEnabled(true);
-            }
-        });
-        runBenchButton.setEnabled(true);
-        vp.add(runBenchButton);
-        vp.add(resultLabel);
-    }
-
-
-    private String runIntBenchmark(RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runInt(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-    private String runLongBenchmark(RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runLong(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-    private String runBoundedIntBenchmark(RNG rs, long timeMinimum, int runsMinimum) {
-        int runs = 0;
-        IntVLA samples = new IntVLA();
-        long startTime, endTime, stopTime;
-        stopTime = System.currentTimeMillis() + timeMinimum;
-        int res = 0;
-        do {
-            startTime = System.currentTimeMillis();
-            res ^= runIntBounded(rs);
-            endTime = System.currentTimeMillis();
-            samples.add((int) (endTime - startTime));
-        } while (++runs < runsMinimum || endTime < stopTime);
-
-        return res + "; " + runs + " runs; " + meanAndSEM(samples);
-    }
-
-
-    private String reportInt(RNG rs) {
-        runIntBenchmark(rs, 100, 2); // warm up
-        return runIntBenchmark(rs,2000, 5);
-    }
-
-    private int runInt(RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt();
-        }
-        return xor;
-    }
-
-
-    private String reportIntBounded(RNG rs) {
-        runBoundedIntBenchmark(rs, 100, 2); // warm up
-        return runBoundedIntBenchmark(rs, 2000, 5);
-    }
-
-    private int runIntBounded(RNG rs) {
-        int xor = 0;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextInt(100);
-        }
-        return xor;
-    }
-
-    private String reportLong(RNG rs) {
-        runLongBenchmark(rs, 100, 2); // warm up
-        return runLongBenchmark(rs,2000, 5);
-    }
-
-    private int runLong(RNG rs) {
-        long xor = 0L;
-        for (int i = 0; i < 100000; i++) {
-            xor ^= rs.nextLong();
-        }
-        return (int) xor;
-    }
-
-
 }
