@@ -1,5 +1,14 @@
-apply plugin: 'gwt'
-apply plugin: 'war'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.gretty:gretty:3.0.7"
+    }
+}
+apply plugin: "gwt"
+apply plugin: "war"
+apply plugin: "org.gretty"
 
 gwt {
     gwtVersion="2.8.2" // $gwtFrameworkVersion Should match the gwt version used for building the gwt backend
@@ -15,77 +24,120 @@ gwt {
     compiler.disableCastChecking = true
 }
 
+dependencies {
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+    implementation "com.github.tommyettinger:regexodus:$regExodusVersion"
+    implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
+    implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion"
+    implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
+}
+
+import org.akhikhl.gretty.AppBeforeIntegrationTestTask
 import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
 
-def HttpFileServer server = null
-def httpFilePort = 8080
-task startHttpServer () {
-    dependsOn draftCompileGwt
-    String output = project.buildDir.path + "/gwt/draftOut"
-    doLast {
+gretty.httpPort = 8080
+gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
+gretty.contextPath = "/"
+gretty.portPropertiesFileName = "TEMP_PORTS.properties"
+
+task startHttpServer (dependsOn: [draftCompileGwt]) {
+    doFirst {
         copy {
             from "webapp"
-            into output
+            into gretty.resourceBase
         }
         copy {
             from "war"
-            into output
+            into gretty.resourceBase
         }
-        server = new SimpleHttpFileServerFactory().start(new File(output), httpFilePort)
-        println "Server started in directory " + server.getContentRoot() + ", http://localhost:" + server.getPort()
     }
 }
-dependencies {
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-    compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-    compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-    compile "com.github.tommyettinger:regexodus:$regExodusVersion"
-    compile "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
-    compile "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
-    compile "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
+task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
+    // The next line allows ports to be reused instead of
+    // needing a process to be manually terminated.
+    file("build/TEMP_PORTS.properties").delete()
+    // Somewhat of a hack; uses Gretty's support for wrapping a task in
+    // a start and then stop of a Jetty server that serves files while
+    // also running the SuperDev code server.
+    integrationTestTask 'superDev'
+
+    interactive false
 }
 
 task superDev(type: GwtSuperDev) {
-    dependsOn startHttpServer
     doFirst {
         gwt.modules = gwt.devModules
     }
 }
+// This next line can be changed if you want to, for instance, always build into the
+// docs/ folder of a Git repo, which can be set to automatically publish on GitHub Pages.
+// This is relative to the html/ folder.
+var outputPath = "build/dist/"
 
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
-        file("build/dist").mkdirs()
+        // Uncomment the next line if you have changed outputPath and know that its contents
+        // should be replaced by a new dist build. Some large JS files are not cleaned up by
+        // default unless the outputPath is inside build/ (then the clean task removes them).
+        // Do not uncomment the next line if you changed outputPath to a folder that has
+        // non-generated files that you want to keep!
+        //delete(file(outputPath))
+
+        file(outputPath).mkdirs()
         copy {
-            from "build/gwt/out"
-            into "build/dist"
+            from("build/gwt/out"){
+                exclude '**/*.symbolMap' // Not used by a dist, and these can be large.
+            }
+            into outputPath
         }
         copy {
-            from "webapp"
-            into "build/dist"
+            from("webapp") {
+                exclude 'index.html' // We edit this HTML file later.
+                exclude 'refresh.png' // We don't need this button; this saves some bytes.
+            }
+            into outputPath
+        }
+        copy {
+            from("webapp") {
+                // These next two lines take the index.html page and remove the superdev refresh button.
+                include 'index.html'
+                filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
+                // This does not modify the original index.html, only the copy in the dist.
+            }
+            into outputPath
         }
         copy {
             from "war"
-            into "build/dist"
+            into outputPath
         }
     }
 }
-
 
 task addSource {
     doLast {
         sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+
     }
+}
+
+task distZip(type: Zip, dependsOn: dist){
+    //// This uses the output of the dist task, which removes the superdev buttons from index.html .
+    from(outputPath)
+    archiveBaseName.set("${appName}-dist")
+    //// The result will be in html/build/ with a name containing "-dist".
+    destinationDir(file("build"))
 }
 
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
+tasks.checkGwt.dependsOn(addSource)
+checkGwt.war = file("war")
 
-sourceCompatibility = 1.7
+// You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
+sourceCompatibility = JavaVersion.VERSION_1_8
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
-sourceSets.main.java.exclude("emu")
 
-
-eclipse.project {
-    name = appName + "-gwt"
-}
+eclipse.project.name = appName + "-html"

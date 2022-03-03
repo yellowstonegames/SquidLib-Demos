@@ -2,12 +2,12 @@ buildscript {
   repositories {
     mavenLocal()
     mavenCentral()
+    gradlePluginPortal()
+    google()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    jcenter()
   }
   dependencies {
-    classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-    classpath 'org.wisepersist:gwt-gradle-plugin:1.0.13'
+    classpath 'org.wisepersist:gwt-gradle-plugin:1.1.16'
   }
 }
 
@@ -18,7 +18,7 @@ allprojects {
 
 configure(subprojects) {
   apply plugin: 'java'
-  sourceCompatibility = 1.7
+  sourceCompatibility = 1.8
 }
 
 subprojects {
@@ -26,16 +26,7 @@ subprojects {
   ext.appName = 'BenchmarksGWT'
   repositories {
     mavenCentral()
-    mavenLocal()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
-    jcenter()
   }
-}
-
-// Clearing Eclipse project data in root folder:
-tasks.eclipse.doLast {
-  delete '.project'
-  delete '.classpath'
-  delete '.settings/'
 }

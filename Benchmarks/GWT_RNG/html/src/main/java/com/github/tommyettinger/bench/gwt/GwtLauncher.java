@@ -22,7 +22,7 @@ public class GwtLauncher extends GwtBareApp {
 
     @Override
     public GwtApplicationConfiguration getConfig() {
-        return new GwtApplicationConfiguration(600, 650);
+        return new GwtApplicationConfiguration(600, 0);
     }
 
 
@@ -36,8 +36,8 @@ public class GwtLauncher extends GwtBareApp {
         vp.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 
         vp.add(new Label("Click any button and wait a few seconds to see:"));
-        vp.add(new Label(" * the RNG's calculated result, which requires 10,000 numbers to be generated,"));
-        vp.add(new Label(" * the time it took in milliseconds to generate those 10,000 numbers,"));
+        vp.add(new Label(" * the RNG's calculated result, which requires 100,000 numbers to be generated,"));
+        vp.add(new Label(" * the time it took in milliseconds to generate those 100,000 numbers,"));
         vp.add(new Label(" * the margin of error for the calculation, in ms as an offset from the time before it."));
 
         addIntTest(vp, new Lathe32RNG(123456789, 987654321), "Lathe32RNG");
@@ -416,7 +416,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(Lathe32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -424,14 +424,14 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(LightRNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
     }
     private int runInt(RandomXS128 rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -454,7 +454,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(Lathe32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -462,14 +462,14 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(LightRNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
     }
     private int runLong(RandomXS128 rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -622,7 +622,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(GWTRNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -636,7 +636,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runIntBounded(GWTRNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt(100);
         }
         return xor;
@@ -649,7 +649,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(GWTRNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -756,7 +756,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(SilkRNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -769,7 +769,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runIntBounded(SilkRNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt(100);
         }
         return xor;
@@ -784,7 +784,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(SilkRNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -881,7 +881,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(Mover32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -894,7 +894,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(Mover32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -984,7 +984,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(JSF32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -997,7 +997,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(JSF32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -1094,7 +1094,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(XoshiroStarStar32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -1107,7 +1107,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(XoshiroStarStar32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -1198,7 +1198,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(XoshiroStarPhi32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -1211,7 +1211,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(XoshiroStarPhi32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -1301,7 +1301,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(MoverCounter32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -1314,7 +1314,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(MoverCounter32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -1404,7 +1404,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(XoshiroAra32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -1417,7 +1417,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(XoshiroAra32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -1508,7 +1508,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(Starfish32RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -1521,7 +1521,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(Starfish32RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
@@ -1651,7 +1651,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runInt(RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt();
         }
         return xor;
@@ -1665,7 +1665,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runIntBounded(RNG rs) {
         int xor = 0;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt(100);
         }
         return xor;
@@ -1678,7 +1678,7 @@ public class GwtLauncher extends GwtBareApp {
 
     private int runLong(RNG rs) {
         long xor = 0L;
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextLong();
         }
         return (int) xor;
