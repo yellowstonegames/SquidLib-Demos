@@ -50,6 +50,7 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new RNG(new XoshiroStarStar32RNG(123456789)), "XoshiroStarStar32RNG");
         addIntTest(vp, new RNG(new XoshiroStarPhi32RNG(123456789)), "XoshiroStarPhi32RNG");
         addIntTest(vp, new RNG(new XoshiroAra32RNG(123456789)), "XoshiroAra32RNG");
+        addIntTest(vp, new RNG(new Rumble32RNG(123456789)), "Rumble32RNG");
         addIntTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
         addIntTest(vp, new RNG(new MizuchiRNG(123456789)), "MizuchiRNG");
         addIntTest(vp, new RNG(new TangleRNG(123456789)), "TangleRNG");
@@ -67,6 +68,7 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new RNG(new XoshiroStarStar32RNG(123456789)), "XoshiroStarStar32RNG");
         addLongTest(vp, new RNG(new XoshiroStarPhi32RNG(123456789)), "XoshiroStarPhi32RNG");
         addLongTest(vp, new RNG(new XoshiroAra32RNG(123456789)), "XoshiroAra32RNG");
+        addLongTest(vp, new RNG(new Rumble32RNG(123456789)), "Rumble32RNG");
         addLongTest(vp, new GWTRNG(123456789), "GWTRNG");
         addLongTest(vp, new SilkRNG(123456789), "SilkRNG");
         addLongTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
