@@ -65,13 +65,13 @@ public final class XoRo32RNG implements StatefulRandomness, Serializable {
     }
     
     @Override
-    public final int next(int bits) {
+    public int next(int bits) {
         final int s0 = stateA;
         int s1 = stateB;
         final int result = (s0 + s1) >>> (32 - bits);
         s1 ^= s0;
-        stateA = (s0 << 13 | s0 >>> 19) ^ s1 ^ (s1 << 9); // a, b
-        stateB = (s1 << 26 | s1 >>> 6); // c
+        stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
+        stateB = (s1 << 13 | s1 >>> 19);
         return result;
         //return (result ^ result >>> 17) * 0xE5CB3 | 0;
     }
@@ -80,32 +80,30 @@ public final class XoRo32RNG implements StatefulRandomness, Serializable {
      * Can return any int, positive or negative, of any size permissible in a 32-bit signed integer.
      * @return any int, all 32 bits are random
      */
-    public final int nextInt() {
+    public int nextInt() {
         final int s0 = stateA;
         int s1 = stateB;
         final int result = s0 + s1 | 0;
         s1 ^= s0;
-        stateA = (s0 << 13 | s0 >>> 19) ^ s1 ^ (s1 << 9); // a, b
-        stateB = (s1 << 26 | s1 >>> 6); // c
+        stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
+        stateB = (s1 << 13 | s1 >>> 19);
         return result;
         //return (result ^ result >>> 17) * 0xE5CB3 | 0;
     }
 
     @Override
-    public final long nextLong() {
+    public long nextLong() {
         int s0 = stateA;
         int s1 = stateB;
         final long high = s0 + s1 | 0;
         s1 ^= s0;
-        s0 = (s0 << 13 | s0 >>> 19) ^ s1 ^ (s1 << 9); // a, b
-        s1 = (s1 << 26 | s1 >>> 6); // c
-        final long result = high << 32 ^ (s0 + s1);
-        //final long result = (high ^ high >>> 17) << 32 ^ (s0 + s1);
+        s0 = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9);
+        s1 = (s1 << 13 | s1 >>> 19);
+        final long result = high << 32 ^ (s0 + s1 & 0xFFFFFFFFL);
         s1 ^= s0;
-        stateA = (s0 << 13 | s0 >>> 19) ^ s1 ^ (s1 << 9); // a, b
-        stateB = (s1 << 26 | s1 >>> 6); // c
+        stateA = (s0 << 26 | s0 >>> 6) ^ s1 ^ (s1 << 9); // a, b
+        stateB = (s1 << 13 | s1 >>> 19); // c
         return result;
-        //return (result ^ result >>> 17) * 0xE5CB3L;
     }
 
     /**
@@ -125,14 +123,14 @@ public final class XoRo32RNG implements StatefulRandomness, Serializable {
      * @param seed the int to use to assign this generator's state
      */
     public void setSeed(final int seed) {
-        int z = seed + 0xC74EAD55 | 0, a = seed ^ z;
+        int z = seed + 0xC74EAD55, a = seed ^ z;
         a ^= a >>> 14;
-        z = (z ^ z >>> 10) * 0xA5CB3 | 0;
+        z = (z ^ z >>> 10) * 0xA5CB3;
         a ^= a >>> 15;
         stateA = (z ^ z >>> 20) + (a ^= a << 13) | 0;
-        z = seed + 0x8E9D5AAA | 0;
+        z = seed + 0x8E9D5AAA;
         a ^= a >>> 14;
-        z = (z ^ z >>> 10) * 0xA5CB3 | 0;
+        z = (z ^ z >>> 10) * 0xA5CB3;
         a ^= a >>> 15;
         stateB = (z ^ z >>> 20) + (a ^ a << 13) | 0;
     }
