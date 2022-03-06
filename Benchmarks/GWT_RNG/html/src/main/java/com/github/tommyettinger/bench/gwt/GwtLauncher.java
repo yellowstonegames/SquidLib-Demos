@@ -56,7 +56,10 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new RNG(new TangleRNG(123456789)), "TangleRNG");
         addIntTest(vp, new RNG(new TricycleRNG(123456789)), "TricycleRNG");
         addIntTest(vp, new RNG(new FourWheelRNG(123456789)), "FourWheelRNG");
+        addIntTest(vp, new RNG(new StrangerRNG(123456789)), "StrangerRNG");
         addIntTest(vp, new RNG(new TrimRNG(123456789)), "TrimRNG");
+        addIntTest(vp, new RNG(new Trim2RNG(123456789)), "Trim2RNG");
+        addIntTest(vp, new RNG(new XoshiroStarStar64RNG(123456789)), "XoshiroStarStar64RNG");
         addIntTest(vp, new GWTRNG(123456789), "GWTRNG");
         addIntTest(vp, new SilkRNG(123456789), "SilkRNG");
         addIntTest(vp, new RandomXS128(123456789), "RandomXS128");
@@ -76,7 +79,10 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new RNG(new TangleRNG(123456789)), "TangleRNG");
         addLongTest(vp, new RNG(new TricycleRNG(123456789)), "TricycleRNG");
         addLongTest(vp, new RNG(new FourWheelRNG(123456789)), "FourWheelRNG");
+        addLongTest(vp, new RNG(new StrangerRNG(123456789)), "StrangerRNG");
         addLongTest(vp, new RNG(new TrimRNG(123456789)), "TrimRNG");
+        addLongTest(vp, new RNG(new Trim2RNG(123456789)), "Trim2RNG");
+        addLongTest(vp, new RNG(new XoshiroStarStar64RNG(123456789)), "XoshiroStarStar64RNG");
         addLongTest(vp, new RandomXS128(123456789), "RandomXS128");
         addBoundedIntTest(vp, new GWTRNG(123456789), "GWTRNG");
         addBoundedIntTest(vp, new SilkRNG(123456789), "SilkRNG");
