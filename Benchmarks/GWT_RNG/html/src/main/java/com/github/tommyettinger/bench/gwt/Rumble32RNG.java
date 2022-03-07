@@ -53,19 +53,12 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
         final int fc = stateC;
         final int fd = stateD;
         stateA = fb ^ fc;
-        stateA = (stateA << 19 | stateA >>> 13);
+        stateA = (stateA << 26 | stateA >>> 6);
         stateB = fc ^ fd;
-        stateB = (stateB << 24 | stateB >>> 8);
+        stateB = (stateB << 11 | stateB >>> 21);
         stateC = fa ^ fb + fc;
-        stateD = fd + 0x30ECB8CB | 0;
+        stateD = fd + 0xADB5B165 | 0;
         return fc >>> (32 - bits);
-//        stateD = stateD + 0x30ECB8CB | 0;
-//        final int xor = stateC ^ stateD;
-//        stateB = (xor << 24 | xor >>> 8);
-//        final int sum = stateB + stateC;
-//        stateA = (sum << 19 | sum >>> 13);
-//        stateC = stateA ^ sum;
-//        return stateC >>> (32 - bits);
     }
 
     /**
@@ -78,11 +71,11 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
         final int fc = stateC;
         final int fd = stateD;
         final int x = fb ^ fc;
-        stateA = (x << 19 | x >>> 13);
+        stateA = (x << 26 | x >>> 6);
         final int y = fc ^ fd;
-        stateB = (y << 24 | y >>> 8);
+        stateB = (y << 11 | y >>> 21);
         stateC = fa ^ fb + fc;
-        stateD = fd + 0x30ECB8CB | 0;
+        stateD = fd + 0xADB5B165 | 0;
         return fc;
     }
 
@@ -92,15 +85,15 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
         final int fb = stateB;
         final int fc = stateC;
         final int fd = stateD;
-        int ga = fb ^ fc; ga = (ga << 19 | ga >>> 13);
-        int gb = fc ^ fd; gb = (gb << 24 | gb >>>  8);
+        int ga = fb ^ fc; ga = (ga << 26 | ga >>>  6);
+        int gb = fc ^ fd; gb = (gb << 11 | gb >>> 21);
         final int gc = fa ^ fb + fc;
-        final int gd = fd + 0x30ECB8CB | 0;
+        final int gd = fd + 0xADB5B165 | 0;
         final long high = fc;
-        stateA = gb ^ gc; stateA = (stateA << 19 | stateA >>> 13);
-        stateB = gc ^ gd; stateB = (stateB << 24 | stateB >>>  8);
+        stateA = gb ^ gc; stateA = (stateA << 26 | stateA >>>  6);
+        stateB = gc ^ gd; stateB = (stateB << 11 | stateB >>> 21);
         stateC = ga ^ gb + gc;
-        stateD = gd + 0x30ECB8CB | 0;
+        stateD = gd + 0xADB5B165 | 0;
         return high << 32 ^ gc;
     }
 
