@@ -11,7 +11,7 @@ apply plugin: "war"
 apply plugin: "org.gretty"
 
 gwt {
-    gwtVersion="2.8.2" // $gwtFrameworkVersion Should match the gwt version used for building the gwt backend
+    gwtVersion="$gwtFrameworkVersion" // Should match the gwt version used for building the gwt backend
     maxHeapSize="1G" // Default 256m is not enough for gwt compiler. GWT is HUNGRY
     minHeapSize="1G"
 
@@ -27,8 +27,10 @@ gwt {
 dependencies {
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+    implementation "com.github.tommyettinger:gdx-backend-gwt:1.100.1"
+    implementation "com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources"
+//    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+//    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion"
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
     implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion"
