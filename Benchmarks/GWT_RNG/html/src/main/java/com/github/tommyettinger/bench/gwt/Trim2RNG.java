@@ -196,7 +196,7 @@ public class Trim2RNG implements RandomnessSource, Serializable {
         final long fb = stateB;
         final long fc = stateC;
         final long fd = stateD;
-        final long bc = fb + fc, cd = fc ^ fd;
+        final long bc = fb ^ fc, cd = fc ^ fd;
         stateA = (bc << 57 | bc >>> 7);
         stateB = (cd << 11 | cd >>> 53);
         stateC = fa + fb;
@@ -223,7 +223,7 @@ public class Trim2RNG implements RandomnessSource, Serializable {
         final long fb = stateB;
         final long fc = stateC;
         final long fd = stateD;
-        final long bc = fb + fc, cd = fc ^ fd;
+        final long bc = fb ^ fc, cd = fc ^ fd;
         stateA = (bc << 57 | bc >>> 7);
         stateB = (cd << 11 | cd >>> 53);
         stateC = fa + fb;
