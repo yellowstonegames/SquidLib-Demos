@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.ds.ObjectObjectOrderedMap;
+import com.github.tommyettinger.ds.support.ChopRandom;
 import com.github.tommyettinger.ds.support.LaserRandom;
 import com.github.yellowstonegames.core.ArrayTools;
 import com.github.yellowstonegames.core.TrigTools;
@@ -43,7 +45,7 @@ public class DawnSquad extends ApplicationAdapter {
     private Phase phase = Phase.WAIT;
 
     // random number generator
-    private LaserRandom rng;
+    private ChopRandom rng;
 
     // Stores all images we use here efficiently, as well as the font image
     private TextureAtlas atlas;
@@ -139,7 +141,7 @@ public class DawnSquad extends ApplicationAdapter {
         startTime = TimeUtils.millis();
         // We just need to have a random number generator.
         // This is seeded the same every time.
-        rng = new LaserRandom(12345, 54321);
+        rng = new ChopRandom(12345, 54321, 98765, 56789);
         //Some classes in SquidLib need access to a batch to render certain things, so it's a good idea to have one.
         batch = new SpriteBatch();
 
@@ -553,6 +555,30 @@ public class DawnSquad extends ApplicationAdapter {
         monsterDirector.play();
     }
 
+    /**
+     * Converts the four HSLA components, each in the 0.0 to 1.0 range, to a packed float in RGBA format.
+     * @param h hue, from 0.0 to 1.0
+     * @param s saturation, from 0.0 to 1.0
+     * @param l lightness, from 0.0 to 1.0
+     * @param a alpha, from 0.0 to 1.0
+     * @return an RGBA-format packed float
+     */
+    public static int hsl2rgb(final float h, final float s, final float l, final float a){
+        float x = Math.min(Math.max(Math.abs(h * 6f - 3f) - 1f, 0f), 1f);
+        float y = h + (2f / 3f);
+        float z = h + (1f / 3f);
+        y -= (int)y;
+        z -= (int)z;
+        y = Math.min(Math.max(Math.abs(y * 6f - 3f) - 1f, 0f), 1f);
+        z = Math.min(Math.max(Math.abs(z * 6f - 3f) - 1f, 0f), 1f);
+        float v = (l + s * Math.min(l, 1f - l));
+        float d = 2f * (1f - l / (v + 1e-10f));
+        v *= 255f;
+        return (int)(v * MathUtils.lerp(1f, x, d)) << 24 |
+                (int)(v * MathUtils.lerp(1f, y, d)) << 16 |
+                (int)(v * MathUtils.lerp(1f, z, d)) << 8 |
+                ((int)(a * 255) & 254);
+    }
 
     /**
      * Draws the map, applies any highlighting for the path to the cursor, and then draws the player.
@@ -564,14 +590,14 @@ public class DawnSquad extends ApplicationAdapter {
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
-        int rainbow = toRGBA8888(
-                maximizeSaturation(200,
-                        (int) (TrigTools.sin_(time * 0.5f) * 30f) + 128, (int) (TrigTools.cos_(time * 0.5f) * 30f) + 128, 255));
+        int rainbow = //hsl2rgb(time - MathUtils.floorPositive(time), 0.9f, 0.6f, 1f);
+                toRGBA8888(
+                oklabByHCL(time - MathUtils.floorPositive(time), 0.1f, 0.7f, 1f));
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
                     batch.setPackedColor(toCursor.contains(Coord.get(i, j))
-                            ? rgbaIntToFloat(lerpColors(bgColors[i][j], rainbow, 0.95f))
+                            ? rgbaIntToFloat(lerpColors(bgColors[i][j], rainbow, 0.9f))
                             : oklabIntToFloat(edit(fromRGBA8888(bgColors[i][j]), visible[i][j] * 0.7f + 0.25f, 0f, 0.018f, 0f, 0.4f, 1f, 1f, 1f)));
                     if(prunedDungeon[i][j] == '/' || prunedDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
