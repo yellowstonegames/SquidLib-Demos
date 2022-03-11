@@ -2,13 +2,12 @@ package com.github.tommyettinger.bench.gwt;
 
 import squidpony.StringKit;
 import squidpony.squidmath.RandomnessSource;
-import squidpony.squidmath.StatefulRandomness;
 
 import java.io.Serializable;
 
 /**
  */
-public final class Rumble32RNG implements RandomnessSource, Serializable {
+public final class Chop32RNG implements RandomnessSource, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -17,7 +16,7 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
     /**
      * Creates a new generator seeded using four calls to Math.random().
      */
-    public Rumble32RNG() {
+    public Chop32RNG() {
         this((int)((Math.random() * 2.0 - 1.0) * 0x80000000), (int)((Math.random() * 2.0 - 1.0) * 0x80000000),
                 (int)((Math.random() * 2.0 - 1.0) * 0x80000000), (int)((Math.random() * 2.0 - 1.0) * 0x80000000));
     }
@@ -26,7 +25,7 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
      * this has.
      * @param seed a long that won't be used exactly, but will affect both components of state
      */
-    public Rumble32RNG(final int seed) {
+    public Chop32RNG(final int seed) {
         setSeed(seed);
     }
     /**
@@ -35,7 +34,7 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
      * @param stateA the number to use as the first part of the state; this will be 1 instead if both seeds are 0
      * @param stateB the number to use as the second part of the state
      */
-    public Rumble32RNG(final int stateA, final int stateB, final int stateC, final int stateD) {
+    public Chop32RNG(final int stateA, final int stateB, final int stateC, final int stateD) {
         setState(stateA, stateB, stateC, stateD);
     }
     
@@ -78,16 +77,15 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
         final int fb = stateB;
         final int fc = stateC;
         final int fd = stateD;
-        int ga = fb ^ fc; ga = (ga << 26 | ga >>>  6);
-        int gb = fc ^ fd; gb = (gb << 11 | gb >>> 21);
-        final int gc = fa ^ fb + fc;
-        final int gd = fd + 0xADB5B165 | 0;
-        final long high = fc;
-        stateA = gb ^ gc; stateA = (stateA << 26 | stateA >>>  6);
-        stateB = gc ^ gd; stateB = (stateB << 11 | stateB >>> 21);
-        stateC = ga ^ gb + gc;
-        stateD = gd + 0xADB5B165 | 0;
-        return high << 32 ^ gc;
+        final int x = fb ^ fc;
+        final int y = fc ^ fd;
+        final int hi = fb + fd;
+        final int lo = fa + fc;
+        stateA = (x << 26 | x >>> 6);
+        stateB = (y << 11 | y >>> 21);
+        stateC = fa ^ fb + fc;
+        stateD = fd + 0xADB5B165 | 0;
+        return (long) hi << 32 ^ lo;
     }
 
     /**
@@ -98,8 +96,8 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
      * @return a copy of this RandomnessSource
      */
     @Override
-    public Rumble32RNG copy() {
-        return new Rumble32RNG(stateA, stateB, stateC, stateD);
+    public Chop32RNG copy() {
+        return new Chop32RNG(stateA, stateB, stateC, stateD);
     }
     
     /**
@@ -161,7 +159,7 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
     }
     @Override
     public String toString() {
-        return "Rumble32RNG with stateA 0x" + StringKit.hex(stateA) +
+        return "Chop32RNG with stateA 0x" + StringKit.hex(stateA) +
                 "L, stateB 0x" + StringKit.hex(stateB) +
                 "L, stateC 0x" + StringKit.hex(stateC) +
                 "L and stateD 0x" + StringKit.hex(stateD) + 'L';
@@ -172,10 +170,10 @@ public final class Rumble32RNG implements RandomnessSource, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Rumble32RNG rumble32RNG = (Rumble32RNG) o;
+        Chop32RNG chop32RNG = (Chop32RNG) o;
 
-        return stateA == rumble32RNG.stateA && stateB == rumble32RNG.stateB
-                && stateC == rumble32RNG.stateC && stateD == rumble32RNG.stateD;
+        return stateA == chop32RNG.stateA && stateB == chop32RNG.stateB
+                && stateC == chop32RNG.stateC && stateD == chop32RNG.stateD;
     }
 
     @Override
