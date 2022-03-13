@@ -34,10 +34,11 @@ public class NorthernLights extends ApplicationAdapter {
 		pixel = new Texture(pixmap);
 		startTime = TimeUtils.millis();
 		ShaderProgram.pedantic = false;
-		shader = new ShaderProgram(Gdx.files.internal("multitude_vertex.glsl"), Gdx.files.internal("multitude_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("multitude_vertex.glsl"), Gdx.files.internal("multitude_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("melter_vertex.glsl"), Gdx.files.internal("melter_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("elves_vertex.glsl"), Gdx.files.internal("elves_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("thule_vertex.glsl"), Gdx.files.internal("thule_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("thule_vertex.glsl"), Gdx.files.internal("grule_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("warble_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
@@ -54,6 +55,7 @@ public class NorthernLights extends ApplicationAdapter {
 		long state = TimeUtils.nanoTime() + startTime;//-1L;//-987654321234567890L;//-1234567890L;
 		// Sarong's DiverRNG.randomize()
 		seed = ((((state = (state ^ (state << 41 | state >>> 23) ^ (state << 17 | state >>> 47) ^ 0xD1B54A32D192ED03L) * 0xAEF17502108EF2D9L) ^ state >>> 43 ^ state >>> 31 ^ state >>> 23) * 0xDB4F0B9175AE2165L) >>> 42) * 0x1.5bf0a8p-16f;
+		// changes the start time (in milliseconds) by up to 65535 ms, based on state (which uses nanoseconds).
 		startTime -= (state ^ state >>> 11) & 0xFFFFL;
 		//startTime -= 0x1000000;
 		width = Gdx.graphics.getWidth();
