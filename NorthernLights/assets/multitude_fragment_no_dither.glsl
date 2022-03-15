@@ -60,14 +60,14 @@ vec3 cosmic(vec3 c, vec3 con)
 
 void main()
 {
-    vec2 uv = (gl_FragCoord.xy * 0.3125) + swayRandomized((v_time * 0.2) * v_coeffs.yzx, vec3(gl_FragCoord.yxy * 0.002 + v_time * 0.01)).xy * 42.0;
+    vec2 uv = (gl_FragCoord.xy * 0.3125) + swayRandomized((v_time * 0.19) * v_coeffs.yzx - gl_FragCoord.xyx * 0.005, vec3(gl_FragCoord.yxy * 0.002 + v_time * 0.01)).xy * 42.0;
 
     vec3 adj = vec3(-1.11, 1.41, 1.61);
     vec3 con = vec3(0.0004375, 0.0005625, 0.0008125) * v_time + v_c * uv.x + v_s * uv.y;
 
     con = cosmic(v_coeffs, con);
 //    con = cosmic(v_coeffs + 1.618, con);
-    con = cosmic(0.123 - v_coeffs, con);
+    con = cosmic(0.123 - v_coeffs, con.yzx);
 
     gl_FragColor = vec4(sin(con * 3.1416) * 0.5 + 0.5, 1.0);
 //    gl_FragColor = vec4(pow(sin(con * 3.1416) * 0.175 + 0.2, vec3(2.0)), 1.0);

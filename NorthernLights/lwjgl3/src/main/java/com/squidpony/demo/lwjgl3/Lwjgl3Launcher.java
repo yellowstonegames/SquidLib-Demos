@@ -18,8 +18,10 @@ public class Lwjgl3Launcher {
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("NorthernLights");
-//        configuration.setWindowedMode(960, 640);
-        configuration.setWindowedMode(300, 300);
+        configuration.setWindowedMode(480, 480);
+//        configuration.setWindowedMode(300, 300);
+//        configuration.setWindowedMode(1920, 1080);
+//        configuration.setDecorated(false);
         configuration.useVsync(true);
         configuration.setForegroundFPS(240);
         configuration.setIdleFPS(30);
