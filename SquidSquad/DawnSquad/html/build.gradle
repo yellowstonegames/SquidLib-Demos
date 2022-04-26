@@ -31,7 +31,7 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-    implementation 'com.github.tommyettinger:jdkgdxds:0.2.3:sources'
+    implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:bluegrass:0.2.2:sources"
     implementation "com.github.tommyettinger:regexodus:0.1.13:sources"
     implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"

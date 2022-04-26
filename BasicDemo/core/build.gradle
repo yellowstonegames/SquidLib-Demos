@@ -5,6 +5,7 @@ dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   //api "com.squidpony:squidlib:$squidLibVersion"
   //api "com.squidpony:squidlib-util:$squidLibUtilVersion"
+
   api "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion"
   api "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion"
   api "com.github.tommyettinger:regexodus:$regExodusVersion"

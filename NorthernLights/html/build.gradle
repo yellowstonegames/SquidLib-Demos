@@ -30,12 +30,11 @@ dependencies {
     implementation project(':core')
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 
-//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 
-    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1'
-    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources'
-
+//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1'
+//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources'
 //    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd'
 //    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd:sources'
 }
@@ -61,12 +60,7 @@ task startHttpServer (dependsOn: [draftCompileGwt]) {
     }
 }
 task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
-    // The next line allows ports to be reused instead of
-    // needing a process to be manually terminated.
     file("build/TEMP_PORTS.properties").delete()
-    // Somewhat of a hack; uses Gretty's support for wrapping a task in
-    // a start and then stop of a Jetty server that serves files while
-    // also running the SuperDev code server.
     integrationTestTask 'superDev'
 
     interactive false
@@ -77,8 +71,8 @@ task superDev(type: GwtSuperDev) {
         gwt.modules = gwt.devModules
     }
 }
-//var outputPath = "build/dist/"
-var outputPath = "../../docs/grule/"
+var outputPath = "build/dist/"
+//var outputPath = "../../docs/grule/"
 task dist(dependsOn: [clean, compileGwt]) {
     doLast {
         file(outputPath).mkdirs()
@@ -116,7 +110,6 @@ task addSource {
 }
 
 task distZip(type: Zip, dependsOn: dist){
-    //// This uses the output of the dist task, which removes the superdev buttons from index.html .
     from(outputPath)
     archiveBaseName.set("${appName}-dist")
     //// The result will be in html/build/ with a name containing "-dist".

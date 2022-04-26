@@ -11,6 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.ArrayTools;
 import squidpony.squidai.DijkstraMap;
+import squidpony.squidai.graph.DefaultGraph;
+import squidpony.squidai.graph.Heuristic;
 import squidpony.squidgrid.Direction;
 import squidpony.squidgrid.FOV;
 import squidpony.squidgrid.Measurement;
@@ -113,6 +115,7 @@ public class BasicDemo extends ApplicationAdapter {
     private Color bgColor;
     private Stage stage;
     private DijkstraMap playerToCursor;
+    private DefaultGraph graph;
     private Coord cursor, player;
     private ArrayList<Coord> toCursor;
     private List<Coord> awaitedMoves;
@@ -323,11 +326,11 @@ public class BasicDemo extends ApplicationAdapter {
         //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
         // player from all walkable cells in the dungeon.
         playerToCursor.setGoal(player);
-        playerToCursor.setGoal(player);
         // DijkstraMap.partialScan only finds the distance to get to a cell if that distance is less than some limit,
         // which is 13 here. It also won't try to find distances through an impassable cell, which here is the blockage
         // GreasedRegion that contains the cells just past the edge of the player's FOV area.
         playerToCursor.partialScan(null, 13, blockage, false);
+        graph = new DefaultGraph(bareDungeon, true);
 
         //The next three lines set the background color for anything we don't draw on, but also create 2D arrays of the
         //same size as decoDungeon that store the colors for the foregrounds and backgrounds of each cell as packed
@@ -447,13 +450,17 @@ public class BasicDemo extends ApplicationAdapter {
                                 // that's special to DijkstraMap; because the whole map has already been fully analyzed by the
                                 // DijkstraMap.scan() method at the start of the program, and re-calculated whenever the player
                                 // moves, we only need to do a fraction of the work to find the best path with that info.
-                                toCursor.clear();
-                                playerToCursor.findPathPreScanned(toCursor, cursor);
+//                                toCursor.clear();
+//                                playerToCursor.findPathPreScanned(toCursor, cursor);
+                                if(graph.contains(cursor) && currentlySeen.contains(cursor))
+                                    graph.findShortestPath(cursor, player, toCursor, Heuristic.EUCLIDEAN);
+                                else
+                                    return false;
                                 //findPathPreScanned includes the current cell (goal) by default, which is helpful when
                                 // you're finding a path to a monster or loot, and want to bump into it, but here can be
                                 // confusing because you would "move into yourself" as your first move without this.
                                 if(!toCursor.isEmpty())
-                                    toCursor.remove(0);
+                                    toCursor.remove(toCursor.size() - 1);
                             }
                             awaitedMoves.addAll(toCursor);
                         }
@@ -490,13 +497,17 @@ public class BasicDemo extends ApplicationAdapter {
                         // DijkstraMap.scan() method at the start of the program, and re-calculated whenever the player
                         // moves, we only need to do a fraction of the work to find the best path with that info.
 
-                        toCursor.clear();
-                        playerToCursor.findPathPreScanned(toCursor, cursor);
+//                        toCursor.clear();
+//                        playerToCursor.findPathPreScanned(toCursor, cursor);
+                        if(graph.contains(cursor) && currentlySeen.contains(cursor))
+                            graph.findShortestPath(cursor, player, toCursor, Heuristic.EUCLIDEAN);
+                        else
+                            return false;
                         //findPathPreScanned includes the current cell (goal) by default, which is helpful when
                         // you're finding a path to a monster or loot, and want to bump into it, but here can be
                         // confusing because you would "move into yourself" as your first move without this.
                         if(!toCursor.isEmpty())
-                            toCursor.remove(0);
+                            toCursor.remove(toCursor.size() - 1);
                         return false;
                     }
                 }));
@@ -615,9 +626,9 @@ public class BasicDemo extends ApplicationAdapter {
         {
             // this doesn't check for input, but instead processes and removes Coords from awaitedMoves.
             if (!display.hasActiveAnimations()) {
-                Coord m = awaitedMoves.remove(0);
+                Coord m = awaitedMoves.remove(awaitedMoves.size() - 1);
                 if(!toCursor.isEmpty())
-                    toCursor.remove(0);
+                    toCursor.remove(toCursor.size() - 1);
                 move(m.x - player.x, m.y - player.y);
                 // this only happens if we just removed the last Coord from awaitedMoves, and it's only then that we need to
                 // re-calculate the distances from all cells to the player. We don't need to calculate this information on
@@ -657,7 +668,7 @@ public class BasicDemo extends ApplicationAdapter {
         stage.getRoot().draw(batch, 1);
         display.font.draw(batch, Gdx.graphics.getFramesPerSecond() + " FPS", screenPosition.x, screenPosition.y);
         batch.end();
-        Gdx.graphics.setTitle("SparseLayers Demo running at FPS: " + Gdx.graphics.getFramesPerSecond());
+        Gdx.graphics.setTitle("Basic Demo running at FPS: " + Gdx.graphics.getFramesPerSecond());
     }
 
     @Override
