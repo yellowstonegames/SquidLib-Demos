@@ -31,6 +31,8 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+    implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
+    implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:bluegrass:$bluegrassVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"

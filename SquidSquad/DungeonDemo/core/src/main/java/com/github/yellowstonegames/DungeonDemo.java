@@ -48,8 +48,8 @@ public class DungeonDemo extends ApplicationAdapter {
     private Coord cursor = Coord.get(-1, -1);
     private final Vector2 pos = new Vector2();
 
-    public static final int GRID_WIDTH = 100;
-    public static final int GRID_HEIGHT = 32;
+    public static final int GRID_WIDTH = 60;
+    public static final int GRID_HEIGHT = 40;
 
     private static final int DEEP_OKLAB = describeOklab("dark dull cobalt");
     private static final int SHALLOW_OKLAB = describeOklab("dull denim");
@@ -70,8 +70,8 @@ public class DungeonDemo extends ApplicationAdapter {
 //        font = KnownFonts.getIosevka().scale(0.75f, 0.75f);
 //        font = KnownFonts.getIosevkaSlab().scale(0.75f, 0.75f);
 //        font = KnownFonts.getDejaVuSansMono().scale(0.75f, 0.75f);
-        Font font = KnownFonts.getCozette().useIntegerPositions(false);
-//        Font font = KnownFonts.getAStarry();
+//        Font font = KnownFonts.getCozette().useIntegerPositions(false);
+        Font font = KnownFonts.getCascadiaMono().fitCell(16, 16, false);
         gm = new GlyphMap(font, GRID_WIDTH, GRID_HEIGHT);
         GlidingGlyph playerGlyph = new GlidingGlyph('@', describe("red orange"), Coord.get(1, 1));
         playerGlyph.getLocation().setCompleteRunner(() -> {

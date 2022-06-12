@@ -1,7 +1,7 @@
 d:assets:assets:0:application/unknown:1
-t:Cozette-License.txt:Cozette-License-8568e9b7b733077137305aa76a9192ab.txt:1086:text/plain:1
-t:Cozette.fnt:Cozette-5ffc5dac60d165740e2225cf9ac5b38c.fnt:150367:application/unknown:1
-i:Cozette.png:Cozette-d29f61193c0256a712609f789e255c84.png:13899:image/png:1
+t:Cascadia-License.txt:Cascadia-License-96450eac9bbceaa25e8bac3dea54bf51.txt:4486:text/plain:1
+t:CascadiaMono-msdf.fnt:CascadiaMono-msdf-24fa03a8ab84d71e18d160d32457514f.fnt:136690:application/unknown:1
+i:CascadiaMono-msdf.png:CascadiaMono-msdf-b7e037c153335106ef4fe1797abc7ef9.png:967138:image/png:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:particles.fragment-b90524761fdf09b0a836056d590c30b8.glsl:820:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:particles.vertex-f25b8b2fae10b9bfa09bfdd484923148.glsl:2886:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl:default.fragment-e1c018bd48044c8b67c7bbc53145e540.glsl:5874:application/unknown:1

@@ -30,7 +30,7 @@ public class Lwjgl3Launcher {
 		configuration.setTitle("SquidSquad Dungeon Demo");
 		// these are constants in the main game class; they should match your
 		// initial viewport size in pixels before it gets resized to fullscreen.
-        configuration.setWindowedMode(GRID_WIDTH * 7, GRID_HEIGHT * 13);
+        configuration.setWindowedMode(GRID_WIDTH * 16, GRID_HEIGHT * 16);
         configuration.disableAudio(true);
 		return configuration;
 	}
