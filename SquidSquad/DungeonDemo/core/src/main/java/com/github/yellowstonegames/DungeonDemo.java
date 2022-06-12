@@ -11,11 +11,11 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.ds.ObjectList;
-import com.github.tommyettinger.ds.support.EnhancedRandom;
-import com.github.tommyettinger.ds.support.FourWheelRandom;
+import com.github.tommyettinger.random.EnhancedRandom;
+import com.github.tommyettinger.random.FourWheelRandom;
 import com.github.tommyettinger.textra.Font;
-import com.github.yellowstonegames.core.ArrayTools;
-import com.github.yellowstonegames.core.TrigTools;
+import com.github.tommyettinger.digital.ArrayTools;
+import com.github.tommyettinger.digital.TrigTools;
 import com.github.yellowstonegames.glyph.GlidingGlyph;
 import com.github.yellowstonegames.glyph.GlyphMap;
 import com.github.yellowstonegames.glyph.KnownFonts;
@@ -29,7 +29,7 @@ import com.github.yellowstonegames.smooth.VectorSequenceGlider;
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.github.yellowstonegames.core.DescriptiveColor.*;
-import static com.github.yellowstonegames.core.MathTools.swayRandomized;
+import static com.github.tommyettinger.random.LineWobble.wobble;
 
 public class DungeonDemo extends ApplicationAdapter {
 
@@ -70,7 +70,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        font = KnownFonts.getIosevka().scale(0.75f, 0.75f);
 //        font = KnownFonts.getIosevkaSlab().scale(0.75f, 0.75f);
 //        font = KnownFonts.getDejaVuSansMono().scale(0.75f, 0.75f);
-        Font font = KnownFonts.getCozette();
+        Font font = KnownFonts.getCozette().useIntegerPositions(false);
 //        Font font = KnownFonts.getAStarry();
         gm = new GlyphMap(font, GRID_WIDTH, GRID_HEIGHT);
         GlidingGlyph playerGlyph = new GlidingGlyph('@', describe("red orange"), Coord.get(1, 1));
@@ -206,8 +206,8 @@ public class DungeonDemo extends ApplicationAdapter {
         float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
         int rainbow = toRGBA8888(
                 limitToGamut(100,
-                        (int) (TrigTools.sin_(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cos_(modifiedTime * 0.2f) * 40f) + 128, 255));
-        FOV.reuseFOV(res, light, player.x, player.y, swayRandomized(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
+                        (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
+        FOV.reuseFOV(res, light, player.x, player.y, wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
         for (int y = 0; y < GRID_HEIGHT; y++) {
             for (int x = 0; x < GRID_WIDTH; x++) {
                 if (inView.contains(x, y)) {
