@@ -44,7 +44,7 @@ public class Distributor extends ApplicationAdapter {
         renderer = new ImmediateModeRenderer20(512 * 520, false, true, 0);
         backgrounds = new float[512][520];
     }
-    public double nextExclusiveDouble (){
+    public final double nextExclusiveDouble (){
         final long bits = rng.nextLong();
         return NumberTools.longBitsToDouble(1022L - Long.numberOfTrailingZeros(bits) << 52 | bits >>> 12);
     }
