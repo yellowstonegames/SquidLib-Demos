@@ -3,14 +3,9 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import squidpony.ArrayTools;
 import squidpony.squidgrid.gui.gdx.*;
@@ -26,7 +21,7 @@ public class Distributor extends ApplicationAdapter {
     private SparseLayers layers;
     private Stage stage;
     private final int[] amounts = new int[512];
-    private MoonwalkRNG rng;
+    private GWTRNG rng;
     private double a, b;
     private TextCellFactory font;
 
@@ -35,7 +30,7 @@ public class Distributor extends ApplicationAdapter {
     public void create() {
         Coord.expandPoolTo(512, 512);
         font = new TextCellFactory().font(DefaultResources.getCozyFont());
-        rng = new MoonwalkRNG(1234567890);
+        rng = new GWTRNG(1234567890);
         a = 2.0;
         b = 5.0;
         batch = new FilterBatch();
