@@ -33,9 +33,8 @@ subprojects {
   version = '0.0.1-SNAPSHOT'
   ext.appName = 'TsarStart'
   repositories {
-    maven { url 'https://jitpack.io' }
-    mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     google()
     gradlePluginPortal()
