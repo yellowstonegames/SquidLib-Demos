@@ -22,7 +22,7 @@
     <version>0.2.0</version>
 
     <properties>
-        <kotlin.version>1.0.1-2</kotlin.version>
+        <kotlin.version>1.6.0</kotlin.version>
         <jtransc.version>0.2.0</jtransc.version>
         <gdx.version>1.9.2</gdx.version>
     </properties>
