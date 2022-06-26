@@ -50,6 +50,7 @@ public class GwtLauncher extends GwtBareApp {
         addIntTest(vp, new RNG(new XoshiroStarStar32RNG(123456789)), "XoshiroStarStar32RNG");
         addIntTest(vp, new RNG(new XoshiroStarPhi32RNG(123456789)), "XoshiroStarPhi32RNG");
         addIntTest(vp, new RNG(new XoshiroAra32RNG(123456789)), "XoshiroAra32RNG");
+        addIntTest(vp, new RNG(new XoshiroPlusPlus32RNG(123456789)), "XoshiroPlusPlus32RNG");
         addIntTest(vp, new RNG(new Rumble32RNG(123456789)), "Rumble32RNG");
         addIntTest(vp, new RNG(new Chop32RNG(123456789)), "Chop32RNG");
         addIntTest(vp, new RNG(new Tyche32RNG(123456789)), "Tyche32RNG");
@@ -74,6 +75,7 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new RNG(new XoshiroStarStar32RNG(123456789)), "XoshiroStarStar32RNG");
         addLongTest(vp, new RNG(new XoshiroStarPhi32RNG(123456789)), "XoshiroStarPhi32RNG");
         addLongTest(vp, new RNG(new XoshiroAra32RNG(123456789)), "XoshiroAra32RNG");
+        addLongTest(vp, new RNG(new XoshiroPlusPlus32RNG(123456789)), "XoshiroPlusPlus32RNG");
         addLongTest(vp, new RNG(new Rumble32RNG(123456789)), "Rumble32RNG");
         addLongTest(vp, new RNG(new Chop32RNG(123456789)), "Chop32RNG");
         addLongTest(vp, new RNG(new Tyche32RNG(123456789)), "Tyche32RNG");
@@ -92,8 +94,9 @@ public class GwtLauncher extends GwtBareApp {
         addLongTest(vp, new RandomXS128(123456789), "RandomXS128");
         addBoundedIntTest(vp, new GWTRNG(123456789), "GWTRNG");
         addBoundedIntTest(vp, new SilkRNG(123456789), "SilkRNG");
-        addBoundedIntTest(vp, new RNG(new Starfish32RNG(123456789)), "Lathe32RNG");
+        addBoundedIntTest(vp, new RNG(new Starfish32RNG(123456789)), "Starfish32RNG");
         addBoundedIntTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
+        addBoundedIntTest(vp, new RNG(new XoshiroPlusPlus32RNG(123456789)), "XoshiroPlusPlus32RNG");
 
 //        vp.add(new Label("Note: Clicking multiple 'wrapped in RNG' buttons will slow down all such buttons."));
 //        vp.add(new Label("This has something to do with multiple implementations of RandomnessSource being used,"));
@@ -286,7 +289,7 @@ public class GwtLauncher extends GwtBareApp {
     private static double standardErrorOfTheMean(IntVLA samples,
                                                  double mean) {
         final int sz = samples.size;
-        double n = (double) sz;
+        double n = sz;
         double sumSqs = 0f;
         double t;
         for (int i = 0; i < sz; i++) {

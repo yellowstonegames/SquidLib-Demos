@@ -21,7 +21,7 @@ public final class Chop32RNG implements RandomnessSource, Serializable {
                 (int)((Math.random() * 2.0 - 1.0) * 0x80000000), (int)((Math.random() * 2.0 - 1.0) * 0x80000000));
     }
     /**
-     * Constructs this Rumble32RNG by dispersing the bits of seed using {@link #setSeed(int)} across the two parts of state
+     * Constructs this Chop32RNG by dispersing the bits of seed using {@link #setSeed(int)} across the two parts of state
      * this has.
      * @param seed a long that won't be used exactly, but will affect both components of state
      */
@@ -29,7 +29,7 @@ public final class Chop32RNG implements RandomnessSource, Serializable {
         setSeed(seed);
     }
     /**
-     * Constructs this Rumble32RNG by calling {@link #setState(int, int, int, int)} on the arguments as given; see that method for
+     * Constructs this Chop32RNG by calling {@link #setState(int, int, int, int)} on the arguments as given; see that method for
      * the specific details (stateA and stateB are kept as-is unless they are both 0).
      * @param stateA the number to use as the first part of the state; this will be 1 instead if both seeds are 0
      * @param stateB the number to use as the second part of the state
@@ -77,15 +77,19 @@ public final class Chop32RNG implements RandomnessSource, Serializable {
         final int fb = stateB;
         final int fc = stateC;
         final int fd = stateD;
-        final int x = fb ^ fc;
-        final int y = fc ^ fd;
-        final int hi = fb + fd;
-        final int lo = fa + fc;
-        stateA = (x << 26 | x >>> 6);
-        stateB = (y << 11 | y >>> 21);
-        stateC = fa ^ fb + fc;
-        stateD = fd + 0xADB5B165 | 0;
-        return (long) hi << 32 ^ lo;
+        int ga = fb ^ fc;
+        ga = (ga << 26 | ga >>> 6);
+        int gb = fc ^ fd;
+        gb = (gb << 11 | gb >>> 21);
+        final int gc = fa ^ fb + fc;
+        final int gd = fd + 0xADB5B165;
+        int sa = gb ^ gc;
+        stateA = (sa << 26 | sa >>> 6);
+        int sb = gc ^ gd;
+        stateB = (sb << 11 | sb >>> 21);
+        stateC = ga ^ gb + gc;
+        stateD = gd + 0xADB5B165;
+        return (long)fc << 32 ^ gc;
     }
 
     /**
@@ -145,7 +149,7 @@ public final class Chop32RNG implements RandomnessSource, Serializable {
     }
 
     /**
-     * Sets the current internal state of this Rumble32RNG with two ints, where stateA can be any int except 0, and stateB
+     * Sets the current internal state of this Chop32RNG with two ints, where stateA can be any int except 0, and stateB
      * can be any int.
      * @param stateA any int except 0 (0 will be treated as 1 instead)
      * @param stateB any int
