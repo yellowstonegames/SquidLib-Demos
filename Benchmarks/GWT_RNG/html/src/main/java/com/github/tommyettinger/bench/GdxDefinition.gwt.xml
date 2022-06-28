@@ -9,6 +9,8 @@
     <inherits name="com.google.gwt.typedarrays.TypedArrays"/>
     <inherits name="regexodus" />
     <inherits name="squidlib-util" />
+    <inherits name="digital" />
+    <inherits name="juniper" />
     <entry-point class="com.github.tommyettinger.bench.gwt.GwtLauncher" />
     <set-configuration-property name="gdx.assetpath" value="../assets" />
     <set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>

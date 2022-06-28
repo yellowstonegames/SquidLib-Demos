@@ -35,6 +35,11 @@ dependencies {
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
     implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion"
     implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
+    implementation "com.github.tommyettinger:digital:0.0.3"
+    implementation "com.github.tommyettinger:digital:0.0.3:sources"
+    implementation "com.github.tommyettinger:juniper:ce87ca8913"
+    implementation "com.github.tommyettinger:juniper:ce87ca8913:sources"
+
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
