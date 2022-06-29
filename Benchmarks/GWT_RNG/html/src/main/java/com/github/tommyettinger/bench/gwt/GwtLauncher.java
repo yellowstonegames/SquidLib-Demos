@@ -119,8 +119,10 @@ public class GwtLauncher extends GwtBareApp {
         addBoundedIntTest(vp, new SilkRNG(123456789), "SilkRNG");
         addBoundedIntTest(vp, new RNG(new Starfish32RNG(123456789)), "Starfish32RNG");
         addBoundedIntTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
+        addBoundedIntTest(vp, new RNG(new Chop32RNG(123456789)), "Chop32RNG");
         addBoundedIntTest(vp, new RNG(new XoshiroPlusPlus32RNG(123456789)), "XoshiroPlusPlus32RNG");
         addBoundedIntTest(vp, new DistinctRandom(123456789), "DistinctRandom");
+        addBoundedIntTest(vp, new ChopRandom(123456789), "ChopRandom");
         addBoundedIntTest(vp, new Xoshiro128PlusPlusRandom(123456789), "Xoshiro128PlusPlusRandom");
 
 //        vp.add(new Label("Note: Clicking multiple 'wrapped in RNG' buttons will slow down all such buttons."));
