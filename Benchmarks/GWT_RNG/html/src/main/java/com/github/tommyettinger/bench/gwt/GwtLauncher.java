@@ -121,7 +121,9 @@ public class GwtLauncher extends GwtBareApp {
         addBoundedIntTest(vp, new RNG(new LightRNG(123456789)), "LightRNG");
         addBoundedIntTest(vp, new RNG(new Chop32RNG(123456789)), "Chop32RNG");
         addBoundedIntTest(vp, new RNG(new XoshiroPlusPlus32RNG(123456789)), "XoshiroPlusPlus32RNG");
+        addBoundedIntTest(vp, new RNG(new ChopRandomness(123456789)), "ChopRandomness");
         addBoundedIntTest(vp, new DistinctRandom(123456789), "DistinctRandom");
+        addBoundedIntTest(vp, new ChopRNGPure(123456789), "ChopRNGPure");
         addBoundedIntTest(vp, new ChopRandom(123456789), "ChopRandom");
         addBoundedIntTest(vp, new Xoshiro128PlusPlusRandom(123456789), "Xoshiro128PlusPlusRandom");
 
