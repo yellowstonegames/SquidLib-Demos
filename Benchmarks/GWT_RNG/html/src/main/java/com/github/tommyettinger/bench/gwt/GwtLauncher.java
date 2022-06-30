@@ -125,6 +125,7 @@ public class GwtLauncher extends GwtBareApp {
         addBoundedIntTest(vp, new DistinctRandom(123456789), "DistinctRandom");
         addBoundedIntTest(vp, new ChopRNGPure(123456789), "ChopRNGPure");
         addBoundedIntTest(vp, new ChopRandom(123456789), "ChopRandom");
+        addBoundedIntTestDirect(vp, new ChopRandom(123456789), "ChopRandom Direct");
         addBoundedIntTest(vp, new Xoshiro128PlusPlusRandom(123456789), "Xoshiro128PlusPlusRandom");
 
 //        vp.add(new Label("Note: Clicking multiple 'wrapped in RNG' buttons will slow down all such buttons."));
@@ -426,6 +427,29 @@ public class GwtLauncher extends GwtBareApp {
         vp.add(resultLabel);
     }
 
+    private void addBoundedIntTestDirect(final VerticalPanel vp, final ChopRandom rs, final String name)
+    {
+        final PushButton runBenchButton = new PushButton(name + ".nextInt(100), " + rs.nextInt(100) + ", " + rs.nextInt(100) + ", " + rs.nextInt(100));
+        final TextBox resultLabel = new TextBox();
+        resultLabel.setReadOnly(false);
+        resultLabel.setText("Not run yet");
+        resultLabel.setPixelSize(560, 22);
+        runBenchButton.addClickHandler(new ClickHandler() {
+            public void onClick(ClickEvent event) {
+                resultLabel.setText("Running ...");
+                runBenchButton.setEnabled(false);
+
+                String benchmarkResult = reportIntBounded(rs);
+
+                resultLabel.setText(benchmarkResult);
+                runBenchButton.setEnabled(true);
+            }
+        });
+        runBenchButton.setEnabled(true);
+        vp.add(runBenchButton);
+        vp.add(resultLabel);
+    }
+
 
     private String runBoundedIntBenchmark(IRNG rs, long timeMinimum, int runsMinimum) {
         int runs = 0;
@@ -457,6 +481,11 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private String reportIntBounded(Random rs) {
+        runBoundedIntBenchmark(rs, 100, 2); // warm up
+        return runBoundedIntBenchmark(rs, 2000, 5);
+    }
+
+    private String reportIntBounded(ChopRandom rs) {
         runBoundedIntBenchmark(rs, 100, 2); // warm up
         return runBoundedIntBenchmark(rs, 2000, 5);
     }
@@ -524,6 +553,29 @@ public class GwtLauncher extends GwtBareApp {
     }
 
     private int runIntBounded(Random rs) {
+        int xor = 0;
+        for (int i = 0; i < 100000; i++) {
+            xor ^= rs.nextInt(100);
+        }
+        return xor;
+    }
+    private String runBoundedIntBenchmark(ChopRandom rs, long timeMinimum, int runsMinimum) {
+        int runs = 0;
+        IntVLA samples = new IntVLA();
+        long startTime, endTime, stopTime;
+        stopTime = System.currentTimeMillis() + timeMinimum;
+        int res = 0;
+        do {
+            startTime = System.currentTimeMillis();
+            res ^= runIntBounded(rs);
+            endTime = System.currentTimeMillis();
+            samples.add((int) (endTime - startTime));
+        } while (++runs < runsMinimum || endTime < stopTime);
+
+        return res + "; " + runs + " runs; " + meanAndSEM(samples);
+    }
+
+    private int runIntBounded(ChopRandom rs) {
         int xor = 0;
         for (int i = 0; i < 100000; i++) {
             xor ^= rs.nextInt(100);
