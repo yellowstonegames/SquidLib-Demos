@@ -1,10 +1,10 @@
+
 buildscript {
 	repositories {
 		mavenCentral()
-		maven { url 'https://jitpack.io' }
 	}
 	dependencies {
-		classpath "com.github.tommyettinger.gretty:gretty:3.0.4.5"
+		classpath "org.gretty:gretty:3.0.7"
 	}
 }
 apply plugin: "gwt"
@@ -31,12 +31,13 @@ dependencies {
 	api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	api "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 	api "com.github.tommyettinger:formic:$formicVersion:sources"
+//	api "com.squidpony:squidlib:$squidLibVersion:sources"
+//	api "com.squidpony:squidlib-util:$squidLibUtilVersion:sources"
 	api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion:sources"
 	api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion:sources"
-	api "com.github.tommyettinger:anim8-gdx:0.2.9:sources"
+	api "com.github.tommyettinger:anim8-gdx:0.3.7:sources"
 	api "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 }
-
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
 import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
@@ -75,20 +76,46 @@ task superDev(type: GwtSuperDev) {
 		gwt.modules = gwt.devModules
 	}
 }
+// This next line can be changed if you want to, for instance, always build into the
+// docs/ folder of a Git repo, which can be set to automatically publish on GitHub Pages.
+// This is relative to the html/ folder.
+var outputPath = "build/dist/"
+
 task dist(dependsOn: [clean, compileGwt]) {
 	doLast {
-		file("build/dist").mkdirs()
+		// Uncomment the next line if you have changed outputPath and know that its contents
+		// should be replaced by a new dist build. Some large JS files are not cleaned up by
+		// default unless the outputPath is inside build/ (then the clean task removes them).
+		// Do not uncomment the next line if you changed outputPath to a folder that has
+		// non-generated files that you want to keep!
+		//delete(file(outputPath))
+
+		file(outputPath).mkdirs()
 		copy {
-			from "build/gwt/out"
-			into "build/dist"
+			from("build/gwt/out"){
+				exclude '**/*.symbolMap' // Not used by a dist, and these can be large.
+			}
+			into outputPath
 		}
 		copy {
-			from "webapp"
-			into "build/dist"
+			from("webapp") {
+				exclude 'index.html' // We edit this HTML file later.
+				exclude 'refresh.png' // We don't need this button; this saves some bytes.
+			}
+			into outputPath
+		}
+		copy {
+			from("webapp") {
+				// These next two lines take the index.html page and remove the superdev refresh button.
+				include 'index.html'
+				filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
+				// This does not modify the original index.html, only the copy in the dist.
+			}
+			into outputPath
 		}
 		copy {
 			from "war"
-			into "build/dist"
+			into outputPath
 		}
 	}
 }
@@ -96,15 +123,24 @@ task dist(dependsOn: [clean, compileGwt]) {
 task addSource {
 	doLast {
 		sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+
 	}
 }
 
-tasks.checkGwt.dependsOn(addSource)
-checkGwt.war = file("war")
+task distZip(type: Zip, dependsOn: dist){
+	//// This uses the output of the dist task, which removes the superdev buttons from index.html .
+	from(outputPath)
+	archiveBaseName.set("${appName}-dist")
+	//// The result will be in html/build/ with a name containing "-dist".
+	destinationDir(file("build"))
+}
+
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
+tasks.checkGwt.dependsOn(addSource)
 
-sourceCompatibility = 8.0
+// You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
+sourceCompatibility = JavaVersion.VERSION_1_8
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"
