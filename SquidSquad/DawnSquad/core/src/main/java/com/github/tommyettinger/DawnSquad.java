@@ -33,6 +33,7 @@ import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.CoordGlider;
 import com.github.yellowstonegames.smooth.Director;
+import com.github.yellowstonegames.smooth.VectorSequenceGlider;
 import com.github.yellowstonegames.text.Language;
 
 import static com.badlogic.gdx.Gdx.input;
@@ -102,7 +103,7 @@ public class DawnSquad extends ApplicationAdapter {
     private ObjectObjectOrderedMap<Coord, AnimatedGlidingSprite> monsters;
     private AnimatedGlidingSprite playerSprite;
     private Director<AnimatedGlidingSprite> playerDirector;
-    private Director<Coord> monsterDirector;
+    private Director<Coord> monsterDirector, directorSmall;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
     private final ObjectList<Coord> toCursor = new ObjectList<>(100);
@@ -335,7 +336,8 @@ public class DawnSquad extends ApplicationAdapter {
             monsters.put(monPos, monster);
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
-        monsterDirector = new Director<Coord>((c)-> monsters.get(c).getLocation(), monsters.order(), 150);
+        monsterDirector = new Director<>(c -> monsters.get(c).getLocation(), monsters.order(), 150);
+        directorSmall = new Director<>(c -> monsters.get(c).getSmallMotion(), monsters.order(), 300L);
         //This is used to allow clicks or taps to take the player to the desired area.
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
         //DijkstraMap is the pathfinding swiss-army knife we use here to find a path to the latest cursor position.
@@ -517,6 +519,7 @@ public class DawnSquad extends ApplicationAdapter {
         {
             Coord pos = monsters.keyAt(0);
             AnimatedGlidingSprite mon = monsters.removeAt(0);
+            if(mon == null) continue;
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (visible[pos.x][pos.y] > 0.1) {
                 getToPlayer.clearGoals();
@@ -532,6 +535,14 @@ public class DawnSquad extends ApplicationAdapter {
                         health--;
                         // make sure the monster is still actively stalking/chasing the player
                         monsters.put(pos, mon);
+                        VectorSequenceGlider small = VectorSequenceGlider.BUMPS.getOrDefault(pos.toGoTo(player), null);
+                        if(small != null) {
+                            small = small.copy();
+                            small.setCompleteRunner(() -> mon.setSmallMotion(null));
+                        }
+                        mon.setSmallMotion(small);
+                        directorSmall.play();
+
                     }
                     // otherwise store the new position in newMons.
                     else {
@@ -688,11 +699,12 @@ public class DawnSquad extends ApplicationAdapter {
         playerDirector.step();
         handleHeldKeys();
         monsterDirector.step();
+        directorSmall.step();
 
         // need to display the map every frame, since we clear the screen to avoid artifacts.
         putMap();
         if(phase == Phase.MONSTER_ANIM) {
-            if (!monsterDirector.isPlaying()) {
+            if (!monsterDirector.isPlaying() && !directorSmall.isPlaying()) {
                 phase = Phase.WAIT;
                 if (!awaitedMoves.isEmpty()) {
                     Coord m = awaitedMoves.remove(0);
@@ -710,7 +722,7 @@ public class DawnSquad extends ApplicationAdapter {
             move(m);
         }
         else if(phase == Phase.PLAYER_ANIM) {
-            if (!playerDirector.isPlaying() && !monsterDirector.isPlaying()) {
+            if (!playerDirector.isPlaying() && !monsterDirector.isPlaying() && !directorSmall.isPlaying()) {
                 phase = Phase.MONSTER_ANIM;
                 postMove();
                 // this only happens if we just removed the last Coord from awaitedMoves, and it's only then that we need to
