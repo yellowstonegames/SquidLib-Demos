@@ -49,18 +49,15 @@ public class DawnSquad extends ApplicationAdapter {
     // random number generator
     private ChopRandom rng;
 
-    // Stores all images we use here efficiently, as well as the font image
-    private TextureAtlas atlas;
     // This maps chars, such as '#', as keys to specific images, such as a pillar.
     private IntObjectMap<TextureAtlas.AtlasRegion> charMapping;
 
-    private DungeonProcessor dungeonGen;
     private char[][] bareDungeon, lineDungeon, prunedDungeon;
     // these use packed RGBA8888 int colors, which avoid the overhead of creating new Color objects
     private int[][] bgColors;
     private Coord player;
     private final int fovRange = 8;
-    private Vector2 pos = new Vector2();
+    private final Vector2 pos = new Vector2();
 
     //Here, gridHeight refers to the total number of rows to be displayed on the screen.
     //We're displaying 32 rows of dungeon, then 1 more row of player stats, like current health.
@@ -108,26 +105,17 @@ public class DawnSquad extends ApplicationAdapter {
     private Director<Coord> monsterDirector;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
-    private ObjectList<Coord> toCursor = new ObjectList<>(100);
-    private ObjectList<Coord> awaitedMoves;
-    private ObjectList<Coord> nextMovePositions;
+    private final ObjectList<Coord> toCursor = new ObjectList<>(100);
+    private final ObjectList<Coord> awaitedMoves = new ObjectList<>(200);
+    private final ObjectList<Coord> nextMovePositions = new ObjectList<>(200);
     private String lang;
     private float[][] resistance;
     private float[][] visible;
     private TextureAtlas.AtlasRegion solid;
     private int health = 9;
 
-    // GreasedRegion is a hard-to-explain class, but it's an incredibly useful one for map generation and many other
-    // tasks; it stores a region of "on" cells where everything not in that region is considered "off," and can be used
-    // as a Collection of Coord points. However, it's more than that! Because of how it is implemented, it can perform
-    // bulk operations on as many as 64 points at a time, and can efficiently do things like expanding the "on" area to
-    // cover adjacent cells that were "off", retracting the "on" area away from "off" cells to shrink it, getting the
-    // surface ("on" cells that are adjacent to "off" cells) or fringe ("off" cells that are adjacent to "on" cells),
-    // and generally useful things like picking a random point from all "on" cells.
-    // Here, we use a GreasedRegion to store all floors that the player can walk on, a small rim of cells just beyond
-    // the player's vision that blocks pathfinding to areas we can't see a path to, and we also store all cells that we
-    // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
-    private Region floors, blockage, seen;
+    private Region blockage;
+    private Region seen;
 
     private static final int
             INT_WHITE = -1,
@@ -152,7 +140,8 @@ public class DawnSquad extends ApplicationAdapter {
         camera = mainViewport.getCamera();
         camera.update();
 
-        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike2.atlas"), Gdx.files.internal("dawnlike"));
+        // Stores all images we use here efficiently, as well as the font image
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike2.atlas"), Gdx.files.internal("dawnlike"));
         font = new BitmapFont(Gdx.files.internal("dawnlike/font2.fnt"), atlas.findRegion("font"));
 //        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
         font.setUseIntegerPositions(false);
@@ -209,7 +198,7 @@ public class DawnSquad extends ApplicationAdapter {
         //TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS or TilesetType.CAVES_LIMIT_CONNECTIVITY to change the sections that
         //this will use, or just pass in a full 2D char array produced from some other generator, such as
         //SerpentMapGenerator, OrganicMapGenerator, or DenseRoomMapGenerator.
-        dungeonGen = new DungeonProcessor(bigWidth, bigHeight, new LaserRandom(12345, 54321));
+        DungeonProcessor dungeonGen = new DungeonProcessor(bigWidth, bigHeight, new LaserRandom(12345, 54321));
         //uncomment this next line to randomly add water to the dungeon in pools.
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
         dungeonGen.addDoors(10, true);
@@ -285,7 +274,17 @@ public class DawnSquad extends ApplicationAdapter {
         // being especially fast. Both of them can be seen as storing regions of points in 2D space as "on" and "off."
 
         // Here we fill a GreasedRegion so it stores the cells that contain a floor, the '.' char, as "on."
-        floors = new Region(bareDungeon, '.');
+        // GreasedRegion is a hard-to-explain class, but it's an incredibly useful one for map generation and many other
+        // tasks; it stores a region of "on" cells where everything not in that region is considered "off," and can be used
+        // as a Collection of Coord points. However, it's more than that! Because of how it is implemented, it can perform
+        // bulk operations on as many as 64 points at a time, and can efficiently do things like expanding the "on" area to
+        // cover adjacent cells that were "off", retracting the "on" area away from "off" cells to shrink it, getting the
+        // surface ("on" cells that are adjacent to "off" cells) or fringe ("off" cells that are adjacent to "on" cells),
+        // and generally useful things like picking a random point from all "on" cells.
+        // Here, we use a GreasedRegion to store all floors that the player can walk on, a small rim of cells just beyond
+        // the player's vision that blocks pathfinding to areas we can't see a path to, and we also store all cells that we
+        // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
+        Region floors = new Region(bareDungeon, '.');
         //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
         //creatures, and possibly a subclass for the player. The singleRandom() method on GreasedRegion finds one Coord
         //in that region that is "on," or -1,-1 if there are no such cells. It takes an RNG object as a parameter, and
@@ -339,9 +338,6 @@ public class DawnSquad extends ApplicationAdapter {
         monsterDirector = new Director<Coord>((c)-> monsters.get(c).getLocation(), monsters.order(), 150);
         //This is used to allow clicks or taps to take the player to the desired area.
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
-        awaitedMoves = new ObjectList<>(200);
-
-        nextMovePositions = new ObjectList<>(200);
         //DijkstraMap is the pathfinding swiss-army knife we use here to find a path to the latest cursor position.
         //DijkstraMap.Measurement is an enum that determines the possibility or preference to enter diagonals. Here, the
         //Measurement used is EUCLIDEAN, which allows 8 directions, but will prefer orthogonal moves unless diagonal
