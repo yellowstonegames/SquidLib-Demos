@@ -31,10 +31,8 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-	implementation "com.github.tommyettinger:anim8-gdx:$anim8Version:sources"
 	implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 	implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidlibUtilVersion:sources"
-	implementation "com.github.yellowstonegames.SquidLib:squidlib:$squidlibVersion:sources"
 	implementation 'com.github.tommyettinger:formic:0.1.4:sources'
 	implementation project(':core')
 
@@ -137,7 +135,6 @@ task distZip(type: Zip, dependsOn: dist){
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 tasks.checkGwt.dependsOn(addSource)
-checkGwt.war = file("war")
 
 // You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
 sourceCompatibility = JavaVersion.VERSION_1_8

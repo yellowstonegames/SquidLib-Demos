@@ -225,6 +225,6 @@ public final class ChopRandomness implements RandomnessSource {
     }
 
     public String toString() {
-        return "ChopRandom{" + "stateA=" + (stateA) + ", stateB=" + (stateB) + ", stateC=" + (stateC) + ", stateD=" + (stateD) + "}";
+        return "ChopRandomness{" + "stateA=" + (stateA) + ", stateB=" + (stateB) + ", stateC=" + (stateC) + ", stateD=" + (stateD) + "}";
     }
 }
