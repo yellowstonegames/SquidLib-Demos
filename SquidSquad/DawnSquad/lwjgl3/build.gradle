@@ -43,6 +43,22 @@ jar {
 	}
 }
 
+task proguard(type: ProGuardTask) {
+	outputs.upToDateWhen { false }
+	configuration 'proguard-rules.pro'
+	//printmapping 'build/lib/out.map'
+	if (System.getProperty('java.version').startsWith('1.')) {
+		libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+	} else {
+		libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+	}
+	injars (file("build/libs/${appName}-${version}.jar"))
+
+	outjars "build/libs/${appName}.jar"
+}
+
+proguard.dependsOn jar
+
 // Equivalent to the jar task; here for compatibility with gdx-setup.
 task dist(dependsOn: [jar]) {
 }
