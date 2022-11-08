@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -123,6 +124,12 @@ public class DawnSquad extends ApplicationAdapter {
     /**
      * Just the parts of create() that can be called again if the game is reloaded.
      */
+    public void restart() {
+        restart(TimeUtils.millis() ^ System.identityHashCode(this));
+    }
+    /**
+     * Just the parts of create() that can be called again if the game is reloaded.
+     */
     public void restart(long seed) {
         health = 9;
         phase = Phase.WAIT;
@@ -143,13 +150,15 @@ public class DawnSquad extends ApplicationAdapter {
         //TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS or TilesetType.CAVES_LIMIT_CONNECTIVITY to change the sections that
         //this will use, or just pass in a full 2D char array produced from some other generator, such as
         //SerpentMapGenerator, OrganicMapGenerator, or DenseRoomMapGenerator.
-        DungeonProcessor dungeonGen = new DungeonProcessor(bigWidth, bigHeight, new LaserRandom(12345, 54321));
+        DungeonProcessor dungeonGen = new DungeonProcessor(bigWidth, bigHeight, rng);
         //this next line randomly adds water to the dungeon in pools.
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
         //this next line makes 10% of valid door positions into complete doors.
         dungeonGen.addDoors(10, true);
         //this next line randomly adds water to the cave parts of the dungeon in patches.
-        dungeonGen.addGrass(DungeonProcessor.CAVE, 10);
+        dungeonGen.addGrass(DungeonProcessor.ALL, 10);
+        //some boulders make the map a little more tactically interesting, and show how the FOV works.
+        dungeonGen.addBoulders(DungeonProcessor.ALL, 5);
         //When we draw, we may want to use a nicer representation of walls. DungeonUtility has lots of useful methods
         //for modifying char[][] dungeon grids, and this one takes each '#' and replaces it with a box-drawing char.
         //The end result looks something like this, for a smaller 60x30 map:
@@ -186,7 +195,7 @@ public class DawnSquad extends ApplicationAdapter {
         // └───────┘      └──┘    └──┘    └──┘     └───────┘ └──┘  └──┘
         //this is also good to compare against if the map looks incorrect, and you need an example of a correct map when
         //no parameters are given to generate().
-        lineDungeon = LineTools.hashesToLines(dungeonGen.generate());
+        lineDungeon = LineTools.hashesToLines(dungeonGen.generate(), true);
         //decoDungeon is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
         //water to the dungeon. In that case, decoDungeon will have different contents than bareDungeon, next.)
         //getBareDungeon provides the simplest representation of the generated dungeon -- '#' for walls, '.' for floors.
@@ -291,7 +300,7 @@ public class DawnSquad extends ApplicationAdapter {
     @Override
     public void create () {
 
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        Gdx.app.setLogLevel(Application.LOG_ERROR);
 
         // We need access to a batch to render most things.
         batch = new SpriteBatch();
@@ -341,7 +350,7 @@ public class DawnSquad extends ApplicationAdapter {
 
         bgColor = Color.BLACK;
 
-        restart(0xB0BAFE77L);
+        restart(0);
 
         //+1 is up on the screen
         //-1 is down on the screen
@@ -621,8 +630,7 @@ public class DawnSquad extends ApplicationAdapter {
     @Override
     public void render () {
         // standard clear the background routine for libGDX
-        Gdx.gl.glClearColor(bgColor.r, bgColor.g, bgColor.b, 1.0f);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        ScreenUtils.clear(bgColor);
 
         // center the camera on the player's position
         camera.position.x = playerSprite.getX();
