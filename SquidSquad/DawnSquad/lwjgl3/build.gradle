@@ -1,9 +1,12 @@
+import proguard.gradle.ProGuardTask
+
 apply plugin: 'application'
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
 sourceCompatibility = 1.8
+java.targetCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
@@ -24,22 +27,17 @@ run {
 }
 
 jar {
-// sets the name of the .jar file this produces to the name of the game or app.
-	archiveBaseName.set(appName)
-// the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
+	archiveFileName.set("${appName}-${version}.jar")
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	dependsOn configurations.runtimeClasspath
-	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-// these "exclude" lines remove some unnecessary duplicate files in the output JAR.
+	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 	exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
 	dependencies {
 		exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
 	}
-// setting the manifest makes the JAR runnable.
 	manifest {
 		attributes 'Main-Class': project.mainClassName
 	}
-// this last step may help on some OSes that need extra instruction to make runnable JARs.
 	doLast {
 		file(archiveFile).setExecutable(true, false)
 	}
