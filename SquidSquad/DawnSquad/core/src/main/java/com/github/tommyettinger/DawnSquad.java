@@ -91,7 +91,6 @@ public class DawnSquad extends ApplicationAdapter {
     private Camera camera;
 
     private CoordObjectOrderedMap<AnimatedGlidingSprite> monsters;
-    private CoordSet monSet;
     private AnimatedGlidingSprite playerSprite;
     private Director<AnimatedGlidingSprite> playerDirector;
     private Director<Coord> monsterDirector, directorSmall;
@@ -253,7 +252,6 @@ public class DawnSquad extends ApplicationAdapter {
         floors.remove(player);
         int numMonsters = 100;
         monsters = new CoordObjectOrderedMap<>(numMonsters);
-        monSet = new CoordSet(numMonsters);
         for (int i = 0; i < numMonsters; i++) {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
@@ -496,19 +494,26 @@ public class DawnSquad extends ApplicationAdapter {
         seen.or(blockage.not());
         blockage.fringe8way();
         // handle monster turns
-        monSet.clear();
-        monSet.addAll(monsters.keySet());
         for(int ci = 0; ci < monCount; ci++)
         {
             Coord pos = monsters.keyAt(ci);
             AnimatedGlidingSprite mon = monsters.getAt(ci);
             if(mon == null) continue;
-            monSet.remove(pos);
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (visible[pos.x][pos.y] > 0.1) {
+                // the player's position is set as a goal by findPath(), later.
                 getToPlayer.clearGoals();
+                // clear the buffer, we fill it next
                 nextMovePositions.clear();
-                getToPlayer.findPath(nextMovePositions, 1, 7, monSet, null, pos, playerArray);
+                // this gets the path from pos (the monster's starting position) to the player, and stores it in
+                // nextMovePositions. it only stores one cell of movement, but it looks ahead up to 7 cells.
+                // The keySet() from monsters is interesting here. it contains the current monster, but DijkstraMap
+                // ignores the starting cell's blocking-or-not status, so that isn't an issue. the keyset is cached in
+                // the CoordObjectOrderedMap, so it doesn't constantly allocate new sets (don't do this with a HashMap).
+                // again to reduce allocations, the target position (and there could be more than one in many games) is
+                // stored in a one-element array that gets modified, instead of using a new varargs every time (which
+                // silently creates an array each time it is called).
+                getToPlayer.findPath(nextMovePositions, 1, 7, monsters.keySet(), null, pos, playerArray);
                 if (nextMovePositions.notEmpty()) {
                     Coord tmp = nextMovePositions.get(0);
                     // if we would move into the player, instead damage the player and animate a bump motion.
@@ -533,8 +538,6 @@ public class DawnSquad extends ApplicationAdapter {
                     }
                 }
             }
-            monSet.add(pos);
-
         }
         monsterDirector.play();
     }
@@ -549,9 +552,8 @@ public class DawnSquad extends ApplicationAdapter {
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
-        int rainbow = //hsl2rgb(time - MathUtils.floorPositive(time), 0.9f, 0.6f, 1f);
-                toRGBA8888(
-                oklabByHCL(time - MathUtils.floorPositive(time), 0.1f, 0.7f, 1f));
+        int rainbow = //hsl2rgb(time - (int)time, 0.9f, 0.6f, 1f);
+                toRGBA8888(oklabByHCL(time - (int)time, 0.1f, 0.7f, 1f));
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
