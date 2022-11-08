@@ -21,13 +21,7 @@ import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.ds.ObjectObjectOrderedMap;
 import com.github.tommyettinger.random.ChopRandom;
 import com.github.tommyettinger.random.LaserRandom;
-import com.github.yellowstonegames.grid.Coord;
-import com.github.yellowstonegames.grid.Direction;
-import com.github.yellowstonegames.grid.FOV;
-import com.github.yellowstonegames.grid.LineTools;
-import com.github.yellowstonegames.grid.Measurement;
-import com.github.yellowstonegames.grid.Radius;
-import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -57,6 +51,7 @@ public class DawnSquad extends ApplicationAdapter {
     // these use packed RGBA8888 int colors, which avoid the overhead of creating new Color objects
     private int[][] bgColors;
     private Coord player;
+    private Coord[] playerArray = {player};
     private final int fovRange = 8;
     private final Vector2 pos = new Vector2();
 
@@ -95,7 +90,8 @@ public class DawnSquad extends ApplicationAdapter {
     private Viewport mainViewport;
     private Camera camera;
 
-    private ObjectObjectOrderedMap<Coord, AnimatedGlidingSprite> monsters;
+    private CoordObjectOrderedMap<AnimatedGlidingSprite> monsters;
+    private CoordSet monSet;
     private AnimatedGlidingSprite playerSprite;
     private Director<AnimatedGlidingSprite> playerDirector;
     private Director<Coord> monsterDirector, directorSmall;
@@ -256,7 +252,8 @@ public class DawnSquad extends ApplicationAdapter {
         LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
         floors.remove(player);
         int numMonsters = 100;
-        monsters = new ObjectObjectOrderedMap<>(numMonsters);
+        monsters = new CoordObjectOrderedMap<>(numMonsters);
+        monSet = new CoordSet(numMonsters);
         for (int i = 0; i < numMonsters; i++) {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
@@ -266,7 +263,6 @@ public class DawnSquad extends ApplicationAdapter {
                             atlas.findRegions(enemy), Animation.PlayMode.LOOP), monPos);
             monster.setSize(1f, 1f);
 //            monster.setPackedColor(ColorTools.floatGetHSV(rng.nextFloat(), 0.75f, 0.8f, 0f));
-            // new Color().fromHsv(rng.nextFloat(), 0.75f, 0.8f));
             monsters.put(monPos, monster);
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
@@ -338,26 +334,6 @@ public class DawnSquad extends ApplicationAdapter {
         charMapping.put('┐', atlas.findRegion("lit brick wall left down"            ));
 
         charMapping.put(' ', atlas.findRegion("lit brick wall up down"            ));
-
-        //// these would be needed if the map was flipped top-to-bottom, which has happened due to bugs before.
-//        charMapping.put('.', atlas.findRegion("day tile floor c"));
-//        charMapping.put(',', atlas.findRegion("brick clear pool center"      ));
-//        charMapping.put('~', atlas.findRegion("brick murky pool center"      ));
-//        charMapping.put('"', atlas.findRegion("dusk grass floor c"      ));
-//        charMapping.put('#', atlas.findRegion("lit brick wall center"     ));
-//        charMapping.put('+', atlas.findRegion("closed wooden door front")); //front
-//        charMapping.put('/', atlas.findRegion("open wooden door side"  )); //side
-//        charMapping.put('└', atlas.findRegion("lit brick wall right down"            ));
-//        charMapping.put('┌', atlas.findRegion("lit brick wall right up"            ));
-//        charMapping.put('┬', atlas.findRegion("lit brick wall left right up"           ));
-//        charMapping.put('┴', atlas.findRegion("lit brick wall left right down"           ));
-//        charMapping.put('─', atlas.findRegion("lit brick wall left right"            ));
-//        charMapping.put('│', atlas.findRegion("lit brick wall up down"            ));
-//        charMapping.put('├', atlas.findRegion("lit brick wall right up down"           ));
-//        charMapping.put('┼', atlas.findRegion("lit brick wall left right up down"          ));
-//        charMapping.put('┤', atlas.findRegion("lit brick wall left up down"           ));
-//        charMapping.put('┐', atlas.findRegion("lit brick wall left up"            ));
-//        charMapping.put('┘', atlas.findRegion("lit brick wall left down"            ));
 
         //Coord is the type we use as a general 2D point, usually in a dungeon.
         //Because we know dungeons won't be incredibly huge, Coord performs best for x and y values less than 256, but
@@ -511,10 +487,8 @@ public class DawnSquad extends ApplicationAdapter {
     private void postMove()
     {
         phase = Phase.MONSTER_ANIM;
-        Coord[] playerArray = {player};
-        // in some cases you can use keySet() to get a Set of keys, but that makes a read-only view, and we want
-        // a copy of the key set that we can edit (so monsters don't move into each others' spaces)
-//        OrderedSet<Coord> monplaces = monsters.keysAsOrderedSet();
+        // updates our mutable player array in-place, because a Coord like player is immutable.
+        playerArray[0] = player;
         int monCount = monsters.size();
         // recalculate FOV, store it in fovmap for the render to use.
         FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
@@ -522,26 +496,25 @@ public class DawnSquad extends ApplicationAdapter {
         seen.or(blockage.not());
         blockage.fringe8way();
         // handle monster turns
+        monSet.clear();
+        monSet.addAll(monsters.keySet());
         for(int ci = 0; ci < monCount; ci++)
         {
-            Coord pos = monsters.keyAt(0);
-            AnimatedGlidingSprite mon = monsters.removeAt(0);
+            Coord pos = monsters.keyAt(ci);
+            AnimatedGlidingSprite mon = monsters.getAt(ci);
             if(mon == null) continue;
+            monSet.remove(pos);
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (visible[pos.x][pos.y] > 0.1) {
                 getToPlayer.clearGoals();
                 nextMovePositions.clear();
-                getToPlayer.findPath(nextMovePositions, 1, 7, monsters.keySet(), null, pos, playerArray);
+                getToPlayer.findPath(nextMovePositions, 1, 7, monSet, null, pos, playerArray);
                 if (nextMovePositions.notEmpty()) {
                     Coord tmp = nextMovePositions.get(0);
-                    // if we would move into the player, instead damage the player and give newMons the current
-                    // position of this monster.
+                    // if we would move into the player, instead damage the player and animate a bump motion.
                     if (tmp.x == player.x && tmp.y == player.y) {
-                        // not sure if this stays red for very long
                         playerSprite.setPackedColor(rgbaIntToFloat(INT_BLOOD));
                         health--;
-                        // make sure the monster is still actively stalking/chasing the player
-                        monsters.put(pos, mon);
                         VectorSequenceGlider small = VectorSequenceGlider.BUMPS.getOrDefault(pos.toGoTo(player), null);
                         if(small != null) {
                             small = small.copy();
@@ -551,49 +524,19 @@ public class DawnSquad extends ApplicationAdapter {
                         directorSmall.play();
 
                     }
-                    // otherwise store the new position in newMons.
+                    // otherwise, make the monster start moving from its current position to its next one.
                     else {
-                        // alter is a method on OrderedMap and OrderedSet that changes a key in-place
                         mon.location.setStart(pos);
                         mon.location.setEnd(tmp);
-                        //display.slide(mon, pos.x, pos.y, tmp.x, tmp.y, 0.125f, null);
-                        monsters.put(tmp, mon);
+                        // this changes the key from pos to tmp without affecting its value.
+                        monsters.alter(pos, tmp);
                     }
-                } else {
-                    monsters.put(pos, mon);
                 }
             }
-            else
-            {
-                monsters.put(pos, mon);
-            }
+            monSet.add(pos);
+
         }
         monsterDirector.play();
-    }
-
-    /**
-     * Converts the four HSLA components, each in the 0.0 to 1.0 range, to a packed float in RGBA format.
-     * @param h hue, from 0.0 to 1.0
-     * @param s saturation, from 0.0 to 1.0
-     * @param l lightness, from 0.0 to 1.0
-     * @param a alpha, from 0.0 to 1.0
-     * @return an RGBA-format packed float
-     */
-    public static int hsl2rgb(final float h, final float s, final float l, final float a){
-        float x = Math.min(Math.max(Math.abs(h * 6f - 3f) - 1f, 0f), 1f);
-        float y = h + (2f / 3f);
-        float z = h + (1f / 3f);
-        y -= (int)y;
-        z -= (int)z;
-        y = Math.min(Math.max(Math.abs(y * 6f - 3f) - 1f, 0f), 1f);
-        z = Math.min(Math.max(Math.abs(z * 6f - 3f) - 1f, 0f), 1f);
-        float v = (l + s * Math.min(l, 1f - l));
-        float d = 2f * (1f - l / (v + 1e-10f));
-        v *= 255f;
-        return (int)(v * MathUtils.lerp(1f, x, d)) << 24 |
-                (int)(v * MathUtils.lerp(1f, y, d)) << 16 |
-                (int)(v * MathUtils.lerp(1f, z, d)) << 8 |
-                ((int)(a * 255) & 254);
     }
 
     /**
