@@ -23,14 +23,14 @@ public class Lwjgl3Launcher {
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setResizable(true);
-        configuration.useVsync(true);
-        configuration.setForegroundFPS(120); // upper bound in case vsync fails
+        configuration.useVsync(false);
+//        configuration.setForegroundFPS(120); // upper bound in case vsync fails
         configuration.setWindowListener(new Lwjgl3WindowAdapter() {
             @Override
             public void created(Lwjgl3Window window) {
                 super.created(window);
                 mainWindow = window;
-                mainWindow.maximizeWindow();
+//                mainWindow.maximizeWindow();
             }
 
 //            @Override
@@ -80,12 +80,12 @@ public class Lwjgl3Launcher {
 
         //// useful to know if something's wrong in a shader.
         //// you should remove the next line for a release.
-        configuration.enableGLDebugOutput(true, System.out);
+//        configuration.enableGLDebugOutput(true, System.out);
         ShaderProgram.prependVertexCode = "#version 110\n";
         ShaderProgram.prependFragmentCode = "#version 110\n";
         // these are constants in the main game class; they should match your
         // initial viewport size in pixels before it gets resized to fullscreen.
-        configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+        configuration.setWindowedMode(gridWidth * cellWidth * 2, gridHeight * cellHeight * 2);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
         return configuration;
     }
