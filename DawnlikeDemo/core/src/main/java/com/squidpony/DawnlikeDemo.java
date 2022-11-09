@@ -647,7 +647,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
             }
         }
         batch.draw(playerSprite.animate(time), playerSprite.getX() * cellWidth, flipY(playerSprite.getY()) * cellHeight);
-        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
+//        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     @Override
     public void render () {

@@ -592,7 +592,10 @@ public class DawnSquad extends ApplicationAdapter {
             }
         }
         playerSprite.animate(time).draw(batch);
-        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
+
+        // for some reason, this takes an unusually high amount of time.
+        // when framerate is uncapped, commenting this out can provide more than a 25% boost to FPS.
+//        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
     /**
      * Supports WASD, vi-keys (hjklyubn), arrow keys, and numpad for movement, plus '.' or numpad 5 to stay still.
