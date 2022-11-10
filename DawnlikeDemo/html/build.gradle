@@ -3,7 +3,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "org.gretty:gretty:3.0.7"
+		classpath "org.gretty:gretty:3.0.9"
 	}
 }
 apply plugin: "gwt"
@@ -28,9 +28,9 @@ gwt {
 
 dependencies {
 	implementation project(':core')
-	implementation "com.badlogicgames.gdx:gdx:1.10.0:sources"
-  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.10.0"
-  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.10.0:sources"
+	implementation "com.badlogicgames.gdx:gdx:1.11.0:sources"
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.11.0"
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:1.11.0:sources"
 //	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0"
 //	implementation "com.github.tommyettinger:gdx-backend-gwt:1.912.0:sources"
 	implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion:sources"

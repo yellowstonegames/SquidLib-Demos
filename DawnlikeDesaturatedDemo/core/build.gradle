@@ -3,5 +3,5 @@ eclipse.project.name = appName + '-core'
 
 dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
-  api "com.github.SquidPony.SquidLib:squidlib-util:$squidLibUtilVersion"
+  api "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion"
 }

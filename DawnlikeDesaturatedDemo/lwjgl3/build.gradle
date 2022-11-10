@@ -11,21 +11,31 @@ dependencies {
   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
-import org.gradle.internal.os.OperatingSystem
+def os = System.properties['os.name'].toLowerCase()
 
 run {
 	workingDir = rootProject.file('assets').path
 	setIgnoreExitValue(true)
-	
-	if (OperatingSystem.current() == OperatingSystem.MAC_OS) {
+
+	if (os.contains('mac')) {
 		// Required to run LWJGL3 Java apps on MacOS
 		jvmArgs += "-XstartOnFirstThread"
 	}
 }
+
 jar {
-	archiveFileName = "${appName}-${archiveVersion}.jar"
-	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } } 
+	archiveFileName.set("${appName}-${version}.jar")
+	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+	dependsOn configurations.runtimeClasspath
+	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+	exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
+	dependencies {
+		exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+	}
 	manifest {
 		attributes 'Main-Class': project.mainClassName
+	}
+	doLast {
+		file(archiveFile).setExecutable(true, false)
 	}
 }
