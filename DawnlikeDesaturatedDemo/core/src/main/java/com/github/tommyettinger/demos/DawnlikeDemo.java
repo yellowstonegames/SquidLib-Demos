@@ -61,6 +61,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     // these use packed float colors, which avoid the overhead of creating new Color objects
     private float[][] colors, bgColors;
     private Coord player;
+    private Coord[] playerArray = new Coord[1];
     private final int fovRange = 8;
     private Vector3 pos = new Vector3();
 
@@ -79,7 +80,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     /** In number of cells */
     public static final int gridWidth = 48;
     /** In number of cells */
-    public static final int gridHeight = 32;
+    public static final int gridHeight = 24;
 
     /** In number of cells */
     public static final int bigWidth = gridWidth * 2;
@@ -89,9 +90,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
 //    /** In number of cells */
 //    public static final int bonusHeight = 0;
     /** The pixel width of a cell */
-    public static final int cellWidth = 16;
+    public static final int cellWidth = 32;
     /** The pixel height of a cell */
-    public static final int cellHeight = 16;
+    public static final int cellHeight = 32;
     
     private boolean onGrid(int screenX, int screenY)
     {
@@ -196,8 +197,8 @@ public class DawnlikeDemo extends ApplicationAdapter {
         camera = mainViewport.getCamera();
         camera.update();
 
-        atlas = new TextureAtlas("Dawnlike.atlas");
-        font = new BitmapFont(Gdx.files.internal("font.fnt"), atlas.findRegion("font"));
+        atlas = new TextureAtlas("Dawnlike2.atlas");
+        font = new BitmapFont(Gdx.files.internal("font2.fnt"), atlas.findRegion("font"));
         font.setUseIntegerPositions(false);
         font.getData().markupEnabled = true;
         bgColors = ArrayTools.fill(FLOAT_BLACK, bigWidth, bigHeight);
@@ -1091,7 +1092,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 pos.set(screenX, screenY, 0f);
                 mainViewport.unproject(pos);
-                if (onGrid(MathUtils.floor(pos.x) >> 4, MathUtils.floor(pos.y) >> 4)) {
+                if (onGrid(MathUtils.floor(pos.x) >> 5, MathUtils.floor(pos.y) >> 5)) {
                     mouseMoved(screenX, screenY);
                     awaitedMoves.addAll(toCursor);
                     return true;
@@ -1112,7 +1113,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     return false;
                 pos.set(screenX, screenY, 0f);
                 mainViewport.unproject(pos);
-                if (onGrid(screenX = MathUtils.floor(pos.x) >> 4, screenY = MathUtils.floor(pos.y) >> 4)) {
+                if (onGrid(screenX = MathUtils.floor(pos.x) >> 5, screenY = MathUtils.floor(pos.y) >> 5)) {
                     // we also need to check if screenX or screenY is the same cell.
                     if (cursor.x == screenX && cursor.y == screenY) {
                         return false;
@@ -1191,7 +1192,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
     private void postMove()
     {
         phase = Phase.MONSTER_ANIM;
-        Coord[] playerArray = {player};
+        playerArray[0] = player;
         // in some cases you can use keySet() to get a Set of keys, but that makes a read-only view, and we want
         // a copy of the key set that we can edit (so monsters don't move into each others' spaces)
 //        OrderedSet<Coord> monplaces = monsters.keysAsOrderedSet();
