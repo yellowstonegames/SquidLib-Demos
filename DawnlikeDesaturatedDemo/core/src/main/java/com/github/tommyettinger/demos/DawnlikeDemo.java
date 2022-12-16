@@ -1204,7 +1204,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         seen.or(blockage.not());
         blockage.fringe8way();
         // handle monster turns
-        ArrayList<Coord> nextMovePositions;
+        ArrayList<Coord> nextMovePositions = new ArrayList<>(8);
         for(int ci = 0; ci < monCount; ci++)
         {
             Coord pos = monsters.firstKey();
@@ -1212,8 +1212,9 @@ public class DawnlikeDemo extends ApplicationAdapter {
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (visible[pos.x][pos.y] > 0.1) {
                 getToPlayer.clearGoals();
-                nextMovePositions = getToPlayer.findPath(1, 7, monsters.keySet(), null, pos, playerArray);
-                if (nextMovePositions != null && !nextMovePositions.isEmpty()) {
+                nextMovePositions.clear();
+                getToPlayer.findPath(nextMovePositions, 1, 7, monsters.keySet(), null, pos, playerArray);
+                if (!nextMovePositions.isEmpty()) {
                     Coord tmp = nextMovePositions.get(0);
                     // if we would move into the player, instead damage the player and give newMons the current
                     // position of this monster.

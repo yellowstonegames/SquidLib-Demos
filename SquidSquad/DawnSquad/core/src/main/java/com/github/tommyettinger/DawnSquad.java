@@ -19,14 +19,7 @@ import com.github.tommyettinger.digital.ArrayTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.ChopRandom;
-import com.github.yellowstonegames.grid.Coord;
-import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
-import com.github.yellowstonegames.grid.Direction;
-import com.github.yellowstonegames.grid.FOV;
-import com.github.yellowstonegames.grid.LineTools;
-import com.github.yellowstonegames.grid.Measurement;
-import com.github.yellowstonegames.grid.Radius;
-import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -34,8 +27,6 @@ import com.github.yellowstonegames.smooth.CoordGlider;
 import com.github.yellowstonegames.smooth.Director;
 import com.github.yellowstonegames.smooth.VectorSequenceGlider;
 import com.github.yellowstonegames.text.Language;
-
-import java.util.Map;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
@@ -587,7 +578,6 @@ public class DawnSquad extends ApplicationAdapter {
             }
         }
         batch.setPackedColor(Color.WHITE_FLOAT_BITS);
-
         // I tried some other approaches here, but this is the fastest by quite a lot.
 
         AnimatedGlidingSprite monster;

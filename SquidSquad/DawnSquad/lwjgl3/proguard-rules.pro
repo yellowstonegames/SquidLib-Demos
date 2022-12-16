@@ -4,6 +4,8 @@
 
 -keepclasseswithmembers public class * { public static void main(java.lang.String[]); }
 
+-keep public class org.lwjgl.system.** { *; }
+
 -keepclasseswithmembernames class * { native <methods>; }
 
 -keepclassmembers enum * {
@@ -19,8 +21,6 @@
          java.lang.Object writeReplace();
          java.lang.Object readResolve();
      }
-
--keep public class !com.badlogic.gdx.tools.etc1.** { *; }
 
 -forceprocessing
 #-classobfuscationdictionary 'obfuscationClassNames.txt'
