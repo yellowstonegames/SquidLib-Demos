@@ -1,6 +1,6 @@
-import proguard.gradle.ProGuardTask
-
 apply plugin: 'application'
+
+import proguard.gradle.ProGuardTask
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'

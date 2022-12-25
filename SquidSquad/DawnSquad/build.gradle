@@ -8,7 +8,7 @@ buildscript {
 	dependencies {
 		classpath "com.android.tools.build:gradle:$androidPluginVersion"
 		classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
-		classpath 'com.guardsquare:proguard-gradle:7.3.0-beta2'
+		classpath 'com.guardsquare:proguard-gradle:7.3.0'
 	}
 }
 

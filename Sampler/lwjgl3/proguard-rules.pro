@@ -4,6 +4,11 @@
 
 -keepclasseswithmembers public class * { public static void main(java.lang.String[]); }
 
+-keep public class org.lwjgl.system.** { *; }
+-keep public class com.badlogic.gdx.graphics.g2d.** { *; }
+-keep public class com.badlogic.gdx.graphics.Color { *; }
+-keep public class com.badlogic.gdx.scenes.scene2d.** { *; }
+
 -keepclasseswithmembernames class * { native <methods>; }
 
 -keepclassmembers enum * {
@@ -11,12 +16,14 @@
     public static ** valueOf(java.lang.String);
 }
 
--keep public class com.squidpony.samples.lwjgl3.Lwjgl3Launcher {
-    public static void main(java.lang.String[]);
-}
-
--keep public class !com.squidpony.samples.* { *; }
--keep public class !com.squidpony.samples.lwjgl3.* { *; }
+-keepclassmembers class * implements java.io.Serializable {
+         static final long serialVersionUID;
+         static final java.io.ObjectStreamField[] serialPersistentFields;
+         private void writeObject(java.io.ObjectOutputStream);
+         private void readObject(java.io.ObjectInputStream);
+         java.lang.Object writeReplace();
+         java.lang.Object readResolve();
+     }
 
 -forceprocessing
 #-classobfuscationdictionary 'obfuscationClassNames.txt'
