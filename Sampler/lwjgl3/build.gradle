@@ -17,6 +17,7 @@ dependencies {
     exclude group: 'org.jcraft', module: 'jorbis' // removes audio
     exclude group: 'com.badlogicgames.jlayer', module: 'jlayer'
   }
+  api "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "com.github.SquidPony.SquidLib:squidlib:$squidLibVersion"

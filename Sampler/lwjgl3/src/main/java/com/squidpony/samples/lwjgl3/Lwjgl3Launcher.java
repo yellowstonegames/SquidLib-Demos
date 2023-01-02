@@ -18,6 +18,8 @@ public class Lwjgl3Launcher {
     private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("Sampler");
+        // If ANGLE is not available, this falls back to GL ES 2.0
+        configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 3, 2);
         configuration.setWindowedMode(400, 500);
         configuration.useVsync(true);
         configuration.setForegroundFPS(240);
