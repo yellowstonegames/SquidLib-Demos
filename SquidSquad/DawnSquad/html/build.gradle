@@ -34,7 +34,7 @@ dependencies {
     implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
     implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
-    implementation "com.github.tommyettinger:funderby:0.0.1:sources"
+    implementation "com.github.tommyettinger:funderby:0.0.2:sources"
     implementation "com.github.tommyettinger:regexodus:0.1.13:sources"
     implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
@@ -47,13 +47,12 @@ dependencies {
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
 //// If you do, follow the steps at https://github.com/tommyettinger/gdx-backends#gwt-290-support
 //// and you can use GWT 2.10.0, which gives you access to Java 11 language features.
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.100.1"
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources"
-    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion"
-    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion:sources"
+	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0"
+	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1100.0:sources"
+    implementation "com.google.jsinterop:jsinterop-annotations:2.0.0:sources"
 
-    implementation 'com.google.jsinterop:jsinterop-annotations:2.0.0:sources'
-
+//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
+//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask

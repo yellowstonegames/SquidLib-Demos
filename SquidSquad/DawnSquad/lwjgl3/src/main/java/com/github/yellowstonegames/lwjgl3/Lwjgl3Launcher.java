@@ -22,6 +22,7 @@ public class Lwjgl3Launcher {
 
 	private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
 		Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
+		configuration.disableAudio(true);
 		configuration.setResizable(true);
 		configuration.useVsync(false);
 		//// Limits FPS to the refresh rate of the currently active monitor.

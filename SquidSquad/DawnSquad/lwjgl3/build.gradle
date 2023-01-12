@@ -14,6 +14,8 @@ dependencies {
 		exclude group: 'org.jcraft', module: 'jorbis' // removes audio
 		exclude group: 'com.badlogicgames.jlayer', module: 'jlayer'
 	}
+//	implementation "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
+
 	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 	implementation project(':core')
 }
