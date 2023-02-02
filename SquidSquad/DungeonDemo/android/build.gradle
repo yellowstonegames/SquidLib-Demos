@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 
 android {
-	compileSdkVersion 30
+	compileSdk 33
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -32,7 +32,7 @@ android {
 	defaultConfig {
 		applicationId 'com.github.yellowstonegames'
 		minSdkVersion 19
-		targetSdkVersion 30
+		targetSdkVersion 33
 		versionCode 1
 		versionName "1.0"
 		multiDexEnabled true
@@ -45,7 +45,7 @@ android {
 	
 	buildTypes {
 		release {
-			minifyEnabled false
+			minifyEnabled true
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 		}
 	}

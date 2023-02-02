@@ -1,12 +1,12 @@
 package com.github.yellowstonegames.gwt;
 
-import static com.github.yellowstonegames.DungeonDemo.GRID_WIDTH;
-import static com.github.yellowstonegames.DungeonDemo.GRID_HEIGHT;
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.github.yellowstonegames.DungeonDemo;
+
+import static com.github.yellowstonegames.DungeonDemo.*;
+import static com.github.yellowstonegames.DungeonDemo.CELL_HEIGHT;
 
 /** Launches the GWT application. */
 public class GwtLauncher extends GwtApplication {
@@ -19,7 +19,7 @@ public class GwtLauncher extends GwtApplication {
 //			return cfg;
 			// If you want a fixed size application, comment out the above resizable section,
 			// and uncomment below:
-			GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(GRID_WIDTH * 16, GRID_HEIGHT * 16);
+			GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(GRID_WIDTH * CELL_WIDTH, GRID_HEIGHT * CELL_HEIGHT);
 			return cfg;
 		}
 

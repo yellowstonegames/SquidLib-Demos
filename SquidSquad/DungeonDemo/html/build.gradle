@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.gretty:gretty:3.0.7"
+        classpath "org.gretty:gretty:3.1.0"
     }
 }
 apply plugin: "gwt"
@@ -34,7 +34,6 @@ dependencies {
     implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
     implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
-    implementation "com.github.tommyettinger:bluegrass:$bluegrassVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
     implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
     implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
@@ -151,7 +150,6 @@ task distZip(type: Zip, dependsOn: dist){
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 tasks.checkGwt.dependsOn(addSource)
-checkGwt.war = file("war")
 
 // You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
 sourceCompatibility = JavaVersion.VERSION_1_8
