@@ -40,7 +40,7 @@ dependencies {
     implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.SquidSquad:SquidGlyph:$squidSquadVersion:sources"
 	implementation project(':core')
 

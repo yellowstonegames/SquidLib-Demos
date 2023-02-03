@@ -6,21 +6,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.github.tommyettinger.digital.ArrayTools;
+import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.EnhancedRandom;
-import com.github.tommyettinger.random.FourWheelRandom;
 import com.github.tommyettinger.random.LineWobble;
 import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.tommyettinger.textra.Font;
-import com.github.tommyettinger.digital.ArrayTools;
-import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.textra.KnownFonts;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
@@ -28,14 +25,14 @@ import com.github.yellowstonegames.glyph.MoreActions;
 import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
-import com.github.yellowstonegames.smooth.CoordGlider;
-import com.github.yellowstonegames.smooth.Director;
-import com.github.yellowstonegames.smooth.VectorSequenceGlider;
+import com.github.yellowstonegames.text.Language;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
 import static com.github.yellowstonegames.core.DescriptiveColor.*;
-import static com.github.tommyettinger.random.LineWobble.wobble;
 
 public class DungeonDemo extends ApplicationAdapter {
     private Stage stage;
@@ -89,7 +86,15 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
         gg = new GlyphGrid(font, GRID_WIDTH, GRID_HEIGHT, true);
         //use Ă to test glyph height
-        playerGlyph = new GlyphActor('@', "[red orange]", gg.getFont());
+        String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
+        Matcher matcher = Pattern.compile("([aeiou])").matcher(name);
+        StringBuffer buffer = new StringBuffer(64);
+        if(matcher.find())
+            matcher.appendReplacement(buffer, "@").appendTail(buffer);
+        else
+            buffer.append('@');
+
+        playerGlyph = new GlyphActor(buffer.charAt(buffer.length()-1), "[red orange]", gg.getFont());
         gg.addActor(playerGlyph);
         post = () -> {
             seen.or(inView.refill(FOV.reuseFOV(res, light,

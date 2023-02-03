@@ -9,6 +9,6 @@ dependencies {
     implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion"
     implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion"
     implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion"
+    implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion"
     implementation "com.github.yellowstonegames.SquidSquad:SquidGlyph:$squidSquadVersion"
 }
