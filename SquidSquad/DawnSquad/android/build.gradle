@@ -1,8 +1,9 @@
 apply plugin: 'com.android.application'
 
+//android.packagingOptions.exclude "**.gwt.xml"
 
 android {
-	compileSdkVersion 33
+	compileSdk 33
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -28,7 +29,10 @@ android {
 		exclude 'META-INF/DEPENDENCIES.txt'
 		exclude 'META-INF/DEPENDENCIES'
 		exclude 'META-INF/dependencies.txt'
+
+		exclude '**/*.gwt.xml'
 	}
+
 	defaultConfig {
 		applicationId 'com.github.yellowstonegames'
 		minSdkVersion 19

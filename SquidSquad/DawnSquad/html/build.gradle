@@ -35,13 +35,13 @@ dependencies {
     implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:funderby:0.0.2:sources"
-    implementation "com.github.tommyettinger:regexodus:0.1.13:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidSmooth:$squidSquadVersion:sources"
+    implementation "com.github.tommyettinger:regexodus:0.1.15:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion:sources"
 	implementation project(':core')
 
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
