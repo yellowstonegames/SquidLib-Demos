@@ -83,6 +83,19 @@ public class Main extends ApplicationAdapter {
         font.draw(batch, "62-bit overflow:  0x" + Base.BASE16.unsigned((0x7FFFFFFE+o) * 0x7FFFFFFF), 300, n -= lh);
         font.draw(batch, "63-bit overflow:  0x" + Base.BASE16.unsigned((0x7FFFFFFE+o) * 0x80000000), 300, n -= lh);
         font.draw(batch, "64-bit overflow:  0x" + Base.BASE16.unsigned((0x7FFFFFFF+o) * 0x80000000), 300, n -= lh);
+        h = Gdx.graphics.getHeight();
+        n = h - lh;
+        byte i8 = 0;
+        i8 += (0xFFFE+o) * 0x1000;
+        char u16 = 0;
+        u16 += (0xFFFE+o) * 0x1000;
+        short i16 = 0;
+        i16 += (0xFFFE+o) * 0x1000;
+
+        font.draw(batch, "byte:  "+i8 +" 0x" + Base.BASE16.unsigned(i8 ), 450, n -= lh);
+        font.draw(batch, "char:  "+(int)u16+" 0x" + Base.BASE16.unsigned(u16), 450, n -= lh);
+        font.draw(batch, "short: "+i16+" 0x" + Base.BASE16.unsigned(i16), 450, n -= lh);
+
 
         batch.end();
     }
