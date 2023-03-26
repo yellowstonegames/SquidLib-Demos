@@ -36,12 +36,21 @@ dependencies {
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
     implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.SquidSquad:SquidGlyph:$squidSquadVersion:sources"
+
+    implementation "com.squidpony:SquidCore:$squidSquadVersion:sources"
+    implementation "com.squidpony:SquidGrid:$squidSquadVersion:sources"
+    implementation "com.squidpony:SquidPlace:$squidSquadVersion:sources"
+    implementation "com.squidpony:SquidPath:$squidSquadVersion:sources"
+    implementation "com.squidpony:SquidText:$squidSquadVersion:sources"
+    implementation "com.squidpony:SquidGlyph:$squidSquadVersion:sources"
+
+    //implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
+    //implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
+    //implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
+    //implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
+    //implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
+    //implementation "com.github.yellowstonegames.SquidSquad:SquidGlyph:$squidSquadVersion:sources"
+
 	implementation project(':core')
 
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
