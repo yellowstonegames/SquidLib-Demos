@@ -23,8 +23,6 @@ dependencies {
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
 
-import org.gradle.internal.os.OperatingSystem
-
 def os = System.properties['os.name'].toLowerCase()
 
 run {

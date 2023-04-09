@@ -3,8 +3,8 @@ eclipse.project.name = appName + '-core'
 
 dependencies {
 	api "com.badlogicgames.gdx:gdx:$gdxVersion"
-	api "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibUtilVersion"
+	implementation "com.github.yellowstonegames.SquidLib:squidlib-util:$squidLibVersion"
 	api "com.github.tommyettinger:regexodus:$regExodusVersion"
-	api "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion"
+	implementation "com.github.yellowstonegames.SquidLib:squidlib:$squidLibVersion"
 	api "com.github.tommyettinger:anim8-gdx:$anim8Version"
 }

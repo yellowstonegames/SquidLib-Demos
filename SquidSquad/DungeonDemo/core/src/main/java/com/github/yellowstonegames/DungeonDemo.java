@@ -25,6 +25,7 @@ import com.github.yellowstonegames.glyph.MoreActions;
 import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
+import com.github.yellowstonegames.place.DungeonTools;
 import com.github.yellowstonegames.text.Language;
 
 import java.util.regex.Matcher;
