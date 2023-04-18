@@ -7,4 +7,11 @@ dependencies {
 	api "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion"
 	api "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion"
 	api "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion"
+
+	api 'com.github.lyze237:gdx-UnBox2D:897974035c'
+	api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+	api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+	// and in html/build.gradle
+	// implementation 'com.github.lyze237:gdx-UnBox2D:897974035c:sources'
+
 }

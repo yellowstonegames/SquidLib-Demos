@@ -9,6 +9,8 @@
 	<inherits name="com.github.yellowstonegames.squidpath" />
 	<inherits name="com.github.yellowstonegames.squidtext" />
 	<inherits name="com.github.yellowstonegames.squidsmooth" />
+	<inherits name="dev.lyze.gdxUnBox2d" />
+
 	<inherits name="com.github.tommyettinger.DawnSquad" />
 	<entry-point class="com.github.yellowstonegames.gwt.GwtLauncher" />
 	<set-configuration-property name="gdx.assetpath" value="../assets" />
