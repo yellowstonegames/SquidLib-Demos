@@ -8,7 +8,6 @@ import static com.github.tommyettinger.DawnSquad.gridWidth;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.github.tommyettinger.CoolGame;
 import com.github.tommyettinger.DawnSquad;
 
 /** Launches the desktop (LWJGL3) application. */
@@ -18,7 +17,7 @@ public class Lwjgl3Launcher {
 	}
 
 	private static Lwjgl3Application createApplication() {
-		return new Lwjgl3Application(new CoolGame(), getDefaultConfiguration());
+		return new Lwjgl3Application(new DawnSquad(), getDefaultConfiguration());
 	}
 
 	private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {

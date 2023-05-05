@@ -49,7 +49,7 @@ public class DawnSquad extends ApplicationAdapter {
     // these use packed RGBA8888 int colors, which avoid the overhead of creating new Color objects
     private int[][] bgColors;
     private Coord player;
-    private Coord[] playerArray = {player};
+    private final Coord[] playerArray = new Coord[1];
     private final int fovRange = 8;
     private final Vector2 pos = new Vector2();
 
@@ -606,6 +606,8 @@ public class DawnSquad extends ApplicationAdapter {
 //                entry.getValue().animate(time).draw(batch);
 //        }
 
+//        playerSprite.setOrigin(0.5f, 0.5f);
+//        playerSprite.setRotation(TimeUtils.timeSinceMillis(startTime) * 0.05f);
         playerSprite.animate(time).draw(batch);
 
         // for some reason, this takes an unusually high amount of time.
@@ -647,6 +649,9 @@ public class DawnSquad extends ApplicationAdapter {
 
     @Override
     public void render () {
+        if(input.isKeyJustPressed(R))
+            restart(lang.hashCode());
+
         // standard clear the background routine for libGDX
         ScreenUtils.clear(bgColor);
 
@@ -673,8 +678,6 @@ public class DawnSquad extends ApplicationAdapter {
             batch.end();
             if(Gdx.input.isKeyJustPressed(Q))
                 Gdx.app.exit();
-            else if(input.isKeyJustPressed(R))
-                restart(lang.hashCode());
             return;
         }
         playerDirector.step();

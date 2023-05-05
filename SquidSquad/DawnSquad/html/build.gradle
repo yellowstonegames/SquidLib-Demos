@@ -42,7 +42,6 @@ dependencies {
     implementation "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion:sources"
-    implementation 'com.github.lyze237:gdx-UnBox2D:897974035c:sources'
 	implementation project(':core')
 
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
