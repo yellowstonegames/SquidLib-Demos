@@ -56,7 +56,7 @@ jar {
 /**
  * Change libraryjars to match your system, or use java.home if possible!
  */
-task proguard(type: ProGuardTask) {
+tasks.register('proguard', ProGuardTask) {
   outputs.upToDateWhen { false }
   configuration 'proguard-rules.pro'
 //  printmapping 'build/libs/out.map'
@@ -65,7 +65,7 @@ task proguard(type: ProGuardTask) {
   } else {
     libraryjars "C:/d/jvm/jdk19-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
   }
-  injars (file("build/libs/${appName}.jar"))
+  injars(file("build/libs/${appName}.jar"))
 
   outjars "build/libs/${appName}-${version}.jar"
 }
@@ -73,5 +73,6 @@ task proguard(type: ProGuardTask) {
 proguard.dependsOn jar
 
 // Equivalent to the jar task; here for compatibility with gdx-setup.
-task dist(dependsOn: [jar]) {
+tasks.register('dist') {
+  dependsOn['jar']
 }
