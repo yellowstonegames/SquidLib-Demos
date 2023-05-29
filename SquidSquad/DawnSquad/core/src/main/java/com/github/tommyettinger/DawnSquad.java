@@ -308,11 +308,11 @@ public class DawnSquad extends ApplicationAdapter {
         camera.update();
 
         // Stores all images we use here efficiently, as well as the font image
-        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike2.atlas"), Gdx.files.internal("dawnlike"));
-        font = new BitmapFont(Gdx.files.internal("dawnlike/font2.fnt"), atlas.findRegion("font"));
+        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
+        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
 //        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
         font.setUseIntegerPositions(false);
-        font.getData().setScale(1f/cellWidth, 1f/cellHeight);
+        font.getData().setScale(2f/cellWidth, 2f/cellHeight);
         font.getData().markupEnabled = true;
         bgColors = ArrayTools.fill(0x808080FF, bigWidth, bigHeight);
         solid = atlas.findRegion("pixel");
@@ -756,7 +756,5 @@ public class DawnSquad extends ApplicationAdapter {
             }
             System.out.println();
         }
-
     }
-
 }

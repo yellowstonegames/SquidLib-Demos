@@ -3,15 +3,8 @@ eclipse.project.name = appName + '-core'
 
 dependencies {
 	api "com.badlogicgames.gdx:gdx:$gdxVersion"
-	api "com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion"
-
-	api 'com.github.lyze237:gdx-UnBox2D:897974035c'
-	api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-	api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-	// and in html/build.gradle
-	// implementation 'com.github.lyze237:gdx-UnBox2D:897974035c:sources'
-
+	api "com.squidpony:SquidPlace:$squidSquadVersion"
+	api "com.squidpony:SquidPath:$squidSquadVersion"
+	api "com.squidpony:SquidText:$squidSquadVersion"
+	api "com.squidpony:SquidSmooth:$squidSquadVersion"
 }
