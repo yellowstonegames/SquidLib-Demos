@@ -5,19 +5,24 @@ import proguard.gradle.ProGuardTask
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
-sourceCompatibility = 1.8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = 11
+java.targetCompatibility = JavaVersion.VERSION_11
 
 dependencies {
-	implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion") {
-		exclude group: 'org.lwjgl', module: 'lwjgl-openal' //// only removes audio
-		exclude group: 'org.jcraft', module: 'jorbis' // removes audio
-		exclude group: 'com.badlogicgames.jlayer', module: 'jlayer'
-	}
-//	implementation "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
+//	implementation("com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion") {
+//		exclude group: 'org.lwjgl', module: 'lwjgl-openal' //// only removes audio
+//		exclude group: 'org.jcraft', module: 'jorbis' // removes audio
+//		exclude group: 'com.badlogicgames.jlayer', module: 'jlayer'
+//	}
+	implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+	implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
+
+	compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
 
 	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 	implementation project(':core')
+
+//	implementation "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
 }
 
 def os = System.properties['os.name'].toLowerCase()

@@ -7,4 +7,6 @@ dependencies {
 	api "com.squidpony:SquidPath:$squidSquadVersion"
 	api "com.squidpony:SquidText:$squidSquadVersion"
 	api "com.squidpony:SquidSmooth:$squidSquadVersion"
+	api "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
+
 }

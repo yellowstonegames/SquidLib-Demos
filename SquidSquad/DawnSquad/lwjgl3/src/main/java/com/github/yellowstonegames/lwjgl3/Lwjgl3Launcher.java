@@ -14,6 +14,11 @@ import com.github.tommyettinger.DawnSquad;
 public class Lwjgl3Launcher {
 	public static void main(String[] args) {
 		if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
+
+		// Graal stuff
+		org.lwjgl.system.Library.initialize();
+		org.lwjgl.system.ThreadLocalUtil.setupEnvData();
+
 		createApplication();
 	}
 
@@ -25,9 +30,9 @@ public class Lwjgl3Launcher {
 		Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
 		configuration.disableAudio(true);
 		configuration.setResizable(true);
-		configuration.useVsync(false);
+		configuration.useVsync(true);
 		//// Limits FPS to the refresh rate of the currently active monitor.
-//		configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
+		configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
 		//// If you remove the above line and set Vsync to false, you may get unlimited FPS, which can be
 		//// useful for testing performance, but can also be very stressful to some hardware.
 		//// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.

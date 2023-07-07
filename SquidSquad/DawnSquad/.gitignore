@@ -65,6 +65,11 @@ nb-configuration.xml
 ## OS Specific
 .DS_Store
 
+## Graal development
+/graal-native/
+!/graal-native/*.json
+!/graal-native/*.bat
+
 ## Miscellaneous
 *~
 *.*#
