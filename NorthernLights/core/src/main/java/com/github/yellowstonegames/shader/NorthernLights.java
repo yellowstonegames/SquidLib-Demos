@@ -36,7 +36,7 @@ public class NorthernLights extends ApplicationAdapter {
 		pixmap.drawPixel(0, 0, 0xFFFFFFFF);
 		pixel = new Texture(pixmap);
 		startTime = TimeUtils.millis();
-		ShaderProgram.pedantic = false;
+		ShaderProgram.pedantic = true;
 //		shader = new ShaderProgram(Gdx.files.internal("multitude_vertex.glsl"), Gdx.files.internal("multitude_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("melter_vertex.glsl"), Gdx.files.internal("melter_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("elves_vertex.glsl"), Gdx.files.internal("elves_fragment_no_dither.glsl"));
@@ -65,7 +65,6 @@ public class NorthernLights extends ApplicationAdapter {
 		seed = 123;
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
-		
 //		renderAPNG();
 //		renderGif();
 	}
@@ -98,6 +97,7 @@ public class NorthernLights extends ApplicationAdapter {
 		batch.begin();
 		shader.setUniformf("u_seed", seed);
 		shader.setUniformf("u_time", ftm);
+		shader.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 //		if(false) { // used to capture only the first frame, at the specified size

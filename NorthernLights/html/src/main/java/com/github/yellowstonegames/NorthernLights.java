@@ -80,6 +80,7 @@ public class NorthernLights extends ApplicationAdapter {
 		Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 		shader.setUniformf("u_seed", seed);
 		shader.setUniformf("u_time", ftm);
+		shader.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
 	}
