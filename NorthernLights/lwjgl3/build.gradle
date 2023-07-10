@@ -3,20 +3,29 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath "org.beryx:badass-runtime-plugin:1.12.4" // plugin dependencies
+// using jpackage only works if the JDK version is 14 or higher.
+// your JAVA_HOME environment variable may also need to be a JDK with version 14 or higher.
+    if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
+      classpath "org.beryx:badass-runtime-plugin:1.13.0"
+    }
   }
 }
-apply plugin: 'org.beryx.runtime'
-apply plugin: 'application'
+if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
+  apply plugin: 'org.beryx.runtime'
+}
+else {
+  apply plugin: 'application'
+}
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-mainClassName = 'com.squidpony.demo.lwjgl3.Lwjgl3Launcher'
-sourceCompatibility = JavaVersion.VERSION_1_8
+mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
+eclipse.project.name = appName + '-lwjgl3'
+sourceCompatibility = 11
 
 dependencies {
-  implementation project(':core')
   implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  implementation project(':core')
 }
 
 def os = System.properties['os.name'].toLowerCase()
@@ -24,184 +33,71 @@ def os = System.properties['os.name'].toLowerCase()
 run {
   workingDir = rootProject.file('assets').path
   setIgnoreExitValue(true)
+
   if (os.contains('mac')) {
-    // Required to run LWJGL3 Java apps on MacOS
+    // Required to run LWJGL3 Java apps on macOS
     jvmArgs += "-XstartOnFirstThread"
   }
 }
 
-task jarAll(type: Jar) {
-  archiveFileName = "${appName}-Demo.jar"
-  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+jar {
+// sets the name of the .jar file this produces to the name of the game or app.
+  archiveBaseName.set(appName)
+// using 'lib' instead of the default 'libs' appears to be needed by jpackageimage.
   destinationDirectory = file("$project.buildDir/lib")
+// the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
+  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
   dependsOn configurations.runtimeClasspath
   from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+// these "exclude" lines remove some unnecessary duplicate files in the output JAR.
   exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
   dependencies {
     exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
   }
+// setting the manifest makes the JAR runnable.
   manifest {
     attributes 'Main-Class': project.mainClassName
   }
+// this last step may help on some OSes that need extra instruction to make runnable JARs.
   doLast {
     file(archiveFile).setExecutable(true, false)
   }
-  with jar
 }
 
-task jarWindows(type: Jar) {
-  archiveFileName = "${appName}-Demo.jar"
-  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-  destinationDirectory = file("$project.buildDir/lib")
-  dependsOn configurations.runtimeClasspath
-  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
-  dependencies {
-    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
-    exclude(
-            //'windows/x86/**',
-            'linux/**', '*.so', 'macos/**', '*.dylib')
-  }
-  manifest {
-    attributes 'Main-Class': project.mainClassName
-  }
-  doLast {
-    file(archiveFile).setExecutable(true, false)
-  }
-  with jar
-}
-
-task proguardWindows(type: proguard.gradle.ProGuardTask) {
-  outputs.upToDateWhen { false }
-  configuration 'proguard-rules.pro'
-  //printmapping 'build/lib/out.map'
-  if (System.getProperty('java.version').startsWith('1.')) {
-    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-  } else {
-//		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-    libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-  }
-  injars "build/lib/${appName}-Demo.jar"
-  outjars "build/lib/${appName}-Windows.jar"
-}
-
-proguardWindows.dependsOn jarWindows
-
-proguardWindows.doLast {
-  file("build/jpackage/NorthernLights/app/${appName}-Demo.jar").delete()
-}
-
-task jarLinux(type: Jar) {
-  archiveFileName = "${appName}-Demo.jar"
-  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-  destinationDirectory = file("$project.buildDir/lib")
-  dependsOn configurations.compileClasspath
-  from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
-  dependencies {
-    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
-    exclude('windows/**', 'macos/**', '*.dylib')
-  }
-  manifest {
-    attributes 'Main-Class': project.mainClassName
-  }
-  doLast {
-    file(archiveFile).setExecutable(true, false)
-  }
-  with jar
-}
-
-task proguardLinux(type: proguard.gradle.ProGuardTask) {
-  outputs.upToDateWhen { false }
-  configuration 'proguard-rules.pro'
-  //printmapping 'build/lib/out.map'
-  if (System.getProperty('java.version').startsWith('1.')) {
-    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-  } else {
-//		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-    libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-  }
-  injars "build/lib/${appName}-Demo.jar"
-  outjars "build/lib/${appName}-Linux.jar"
-}
-
-proguardLinux.dependsOn jarLinux
-
-proguardLinux.doLast {
-  file("build/jpackage/NorthernLights/app/${appName}-Demo.jar").delete()
-}
-
-task jarMac(type: Jar) {
-  archiveFileName = "${appName}-Demo.jar"
-  duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-  destinationDirectory = file("$project.buildDir/lib")
-  dependsOn configurations.runtimeClasspath
-  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
-  dependencies {
-    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
-    exclude('windows/**', 'linux/**', '*.so')
-  }
-  manifest {
-    attributes 'Main-Class': project.mainClassName
-  }
-  doLast {
-    file(archiveFile).setExecutable(true, false)
-  }
-  with jar
-}
-
-task proguardMac(type: proguard.gradle.ProGuardTask) {
-  outputs.upToDateWhen { false }
-  configuration 'proguard-rules.pro'
-  //printmapping 'build/lib/out.map'
-  if (System.getProperty('java.version').startsWith('1.')) {
-    libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-  } else {
-//		libraryjars "C:/d/jvm/jdk16-hotspot/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-    libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-  }
-  injars "build/lib/${appName}-Demo.jar"
-  outjars "build/lib/${appName}-Mac.jar"
-}
-
-proguardMac.dependsOn jarMac
-
-proguardMac.doLast {
-  file("build/jpackage/NorthernLights/app/${appName}-Demo.jar").delete()
-}
-
-if (os.contains('win')) {
-  jpackageImage.dependsOn proguardWindows
-} else if (os.contains('nix' || os.contains('nux') || os.contains('bsd'))) {
-  jpackageImage.dependsOn proguardLinux
-} else if (os.contains('mac')) {
-  jpackageImage.dependsOn proguardMac
-}
-
-runtime {
-  options.set(['--strip-debug',
-               '--compress', '2',
-               '--no-header-files',
-               '--no-man-pages',
-               '--strip-native-commands',
-               '--vm', 'server'])
-  modules.set(['java.desktop',
-               'jdk.unsupported'])
-  distDir.set(file(buildDir))
-  jpackage {
-    imageName = 'NorthernLights'
-    skipInstaller = true
-    jpackageHome = javaHome.getOrElse("")
-    if (os.contains('win')) {
-      mainJar = "${appName}-Windows.jar"
-      imageOptions = ["--icon", "../logo.ico"]
-    } else if (os.contains('nix' || os.contains('nux') || os.contains('bsd'))) {
-      mainJar = "${appName}-Linux.jar"
-      imageOptions = ["--icon", "../logo.png"]
-    } else if (os.contains('mac')) {
-      mainJar = "${appName}-Mac.jar"
-      imageOptions = ["--icon", "../logo.icns", " --java-options", "\"XstartOnFirstThread\""]
+if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
+  tasks.jpackageImage.doNotTrackState("This task both reads from and writes to the build folder.")
+  runtime {
+    options.set(['--strip-debug',
+           '--compress', '2',
+           '--no-header-files',
+           '--no-man-pages',
+           '--strip-native-commands',
+           '--vm', 'server'])
+// you could very easily need more modules than this one.
+// use the lwjgl3:suggestModules task to see which modules may be needed.
+    modules.set([
+        'jdk.unsupported'
+    ])
+    distDir.set(file(buildDir))
+    jpackage {
+      imageName = appName
+// you can set this to false if you want to build an installer, or keep it as true to build just an app.
+      skipInstaller = true
+// this may need to be set to a different path if your JAVA_HOME points to a low JDK version.
+      jpackageHome = javaHome.getOrElse("")
+      mainJar = jar.archiveFileName.get()
+      if (os.contains('win')) {
+        imageOptions = ["--icon", "icons/logo.ico"]
+      } else if (os.contains('nix') || os.contains('nux') || os.contains('bsd')) {
+        imageOptions = ["--icon", "icons/logo.png"]
+      } else if (os.contains('mac')) {
+        imageOptions = ["--icon", "icons/logo.icns", "--java-options", "\"-XstartOnFirstThread\""]
+      }
     }
   }
+}
+
+// Equivalent to the jar task; here for compatibility with gdx-setup.
+tasks.register('dist') {
+  dependsOn['jar']
 }

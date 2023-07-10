@@ -1,7 +1,8 @@
-apply plugin: "com.android.application"
+apply plugin: 'com.android.application'
+
 
 android {
-  compileSdkVersion 30
+  compileSdk 33
   sourceSets {
     main {
       manifest.srcFile 'AndroidManifest.xml'
@@ -27,20 +28,31 @@ android {
     exclude 'META-INF/DEPENDENCIES.txt'
     exclude 'META-INF/DEPENDENCIES'
     exclude 'META-INF/dependencies.txt'
+    // These are only used by GWT, and not Android.
+    exclude '**/*.gwt.xml'
   }
   defaultConfig {
-    applicationId 'com.squidpony.demo'
+    applicationId 'com.github.yellowstonegames'
     minSdkVersion 19
-    targetSdkVersion 30
+    targetSdkVersion 33
     versionCode 1
     versionName "1.0"
+    multiDexEnabled true
   }
+  namespace "com.github.yellowstonegames"
+  compileOptions {
+    sourceCompatibility "11"
+    targetCompatibility "11"
+    coreLibraryDesugaringEnabled true
+  }
+  
   buildTypes {
     release {
-      minifyEnabled false
+      minifyEnabled true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
 }
 
 repositories {
@@ -51,11 +63,12 @@ repositories {
 configurations { natives }
 
 dependencies {
-  api project(':core')
-  api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+  implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+  implementation project(':core')
 
-  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+  natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
   natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
 
@@ -64,34 +77,34 @@ dependencies {
 // Called every time gradle gets executed, takes the native dependencies of
 // the natives configuration, and extracts them to the proper libs/ folders
 // so they get packed with the APK.
-task copyAndroidNatives() {
-  file("libs/armeabi-v7a/").mkdirs()
-  file("libs/arm64-v8a/").mkdirs()
-  file("libs/x86_64/").mkdirs()
-  file("libs/x86/").mkdirs()
+tasks.register('copyAndroidNatives') {
+  doFirst {
+    file("libs/armeabi-v7a/").mkdirs()
+    file("libs/arm64-v8a/").mkdirs()
+    file("libs/x86_64/").mkdirs()
+    file("libs/x86/").mkdirs()
 
-  configurations.natives.files.each { jar ->
-    def outputDir = null
-    if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-    if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-    if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-    if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-    if(outputDir != null) {
-      copy {
-        from zipTree(jar)
-        into outputDir
-        include "*.so"
+    configurations.getByName("natives").copy().files.each { jar ->
+      def outputDir = null
+      if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+      if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
+      if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+      if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+      if(outputDir != null) {
+        copy {
+          from zipTree(jar)
+          into outputDir
+          include "*.so"
+        }
       }
     }
   }
 }
-tasks.whenTaskAdded { packageTask ->
-  if (packageTask.name.contains("package")) {
-    packageTask.dependsOn 'copyAndroidNatives'
-  }
+tasks.matching { it.name.contains("merge") && it.name.contains("JniLibFolders") }.configureEach { packageTask ->
+  packageTask.dependsOn 'copyAndroidNatives'
 }
 
-task run(type: Exec) {
+tasks.register('run', Exec) {
   def path
   def localProperties = project.file("../local.properties")
   if (localProperties.exists()) {
@@ -103,14 +116,14 @@ task run(type: Exec) {
     if (sdkDir) {
       path = sdkDir
     } else {
-      path = "$System.env.ANDROID_HOME"
+      path = "$System.env.ANDROID_SDK_ROOT"
     }
   } else {
-    path = "$System.env.ANDROID_HOME"
+    path = "$System.env.ANDROID_SDK_ROOT"
   }
 
   def adb = path + "/platform-tools/adb"
-  commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.squidpony.demo/com.squidpony.demo.AndroidLauncher'
+  commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.github.yellowstonegames/com.github.yellowstonegames.android.AndroidLauncher'
 }
 
 eclipse.project.name = appName + "-android"

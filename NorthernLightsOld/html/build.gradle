@@ -1,0 +1,127 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.gretty:gretty:3.0.6"
+    }
+}
+apply plugin: "gwt"
+apply plugin: "war"
+apply plugin: "org.gretty"
+
+gwt {
+    gwtVersion = "$gwtFrameworkVersion" // Should match the version used for building the GWT backend. See gradle.properties.
+    maxHeapSize = '1G' // Default 256m is not enough for the GWT compiler. GWT is HUNGRY.
+    minHeapSize = '1G'
+
+    src = files(file('src/main/java')) // Needs to be in front of "modules" below.
+    modules 'com.squidpony.demo.GdxDefinition'
+    devModules 'com.squidpony.demo.GdxDefinitionSuperdev'
+    project.webAppDirName = 'webapp'
+
+    compiler.strict = true
+    compiler.disableCastChecking = true
+    //// The next line can be useful to uncomment if you want output that hasn't been obfuscated.
+//	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
+}
+
+dependencies {
+    implementation project(':core')
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+
+//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1'
+//    implementation 'com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources'
+//    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd'
+//    implementation 'com.github.tommyettinger.gdx-backends:gdx-backend-gwt:3d9c87f7cd:sources'
+}
+
+import org.akhikhl.gretty.AppBeforeIntegrationTestTask
+import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
+
+gretty.httpPort = 8080
+gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
+gretty.contextPath = "/"
+gretty.portPropertiesFileName = "TEMP_PORTS.properties"
+
+task startHttpServer (dependsOn: [draftCompileGwt]) {
+    doFirst {
+        copy {
+            from "webapp"
+            into gretty.resourceBase
+        }
+        copy {
+            from "war"
+            into gretty.resourceBase
+        }
+    }
+}
+task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
+    file("build/TEMP_PORTS.properties").delete()
+    integrationTestTask 'superDev'
+
+    interactive false
+}
+
+task superDev(type: GwtSuperDev) {
+    doFirst {
+        gwt.modules = gwt.devModules
+    }
+}
+var outputPath = "build/dist/"
+//var outputPath = "../../docs/grule/"
+task dist(dependsOn: [clean, compileGwt]) {
+    doLast {
+        file(outputPath).mkdirs()
+        copy {
+            from("build/gwt/out"){
+                exclude '**/*.symbolMap'
+            }
+            into outputPath
+        }
+        copy {
+            from("webapp") {
+                exclude 'index.html'
+                exclude '**/refresh.png'
+            }
+            into outputPath
+        }
+        copy {
+            from("webapp") {
+                include 'index.html'
+                filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
+            }
+            into outputPath
+        }
+        copy {
+            from "war"
+            into outputPath
+        }
+    }
+}
+
+task addSource {
+    doLast {
+        sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
+    }
+}
+
+task distZip(type: Zip, dependsOn: dist){
+    from(outputPath)
+    archiveBaseName.set("${appName}-dist")
+    //// The result will be in html/build/ with a name containing "-dist".
+    destinationDir(file("build"))
+}
+
+tasks.compileGwt.dependsOn(addSource)
+tasks.draftCompileGwt.dependsOn(addSource)
+tasks.checkGwt.dependsOn(addSource)
+checkGwt.war = file("war")
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+sourceSets.main.java.srcDirs = [ "src/main/java/" ]
+
+eclipse.project.name = appName + "-html"

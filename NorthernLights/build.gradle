@@ -1,15 +1,17 @@
 buildscript {
   repositories {
-    mavenLocal()
     mavenCentral()
+    maven { url 'https://s01.oss.sonatype.org' }
+    mavenLocal()
     google()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     gradlePluginPortal()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
   }
   dependencies {
-    classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
     classpath "com.android.tools.build:gradle:$androidPluginVersion"
-    classpath 'com.guardsquare:proguard-gradle:7.1.0-beta5'
+    classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
+
   }
 }
 
@@ -18,27 +20,27 @@ allprojects {
   apply plugin: 'idea'
 }
 
-configure(subprojects - project(":android")) {
-//configure(subprojects) {
+configure(subprojects - project(':android')) {
   apply plugin: 'java-library'
-  sourceCompatibility = JavaVersion.VERSION_1_8
-}
-
-subprojects{
-  version = '0.0.1'
-  ext.appName = 'NorthernLights'
-  repositories {
-    mavenCentral()
-    google()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://jitpack.io' }
-    gradlePluginPortal()
+  sourceCompatibility = 11
+  compileJava {
+    options.incremental = true
   }
 }
 
-// Clearing Eclipse project data in root folder:
-tasks.eclipse.doLast {
-  delete '.project'
-  delete '.classpath'
-  delete '.settings/'
+subprojects {
+  version = '1.0.0'
+  ext.appName = 'NorthernLights'
+  repositories {
+    mavenCentral()
+    maven { url 'https://s01.oss.sonatype.org' }
+    // You may want to remove the following line if you have errors downloading dependencies.
+    mavenLocal()
+    gradlePluginPortal()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://jitpack.io' }
+  }
 }
+
+eclipse.project.name = 'NorthernLights' + '-parent'
