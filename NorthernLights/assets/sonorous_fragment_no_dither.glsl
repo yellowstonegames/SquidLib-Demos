@@ -65,6 +65,15 @@ float ridged(float seed, vec4 x) {
   float f = foam(seed, x);
   return 1. - abs(1. - 2. * f);
 }
+// Credit to Andrey-Postelzhuk,
+// https://forum.unity.com/threads/hue-saturation-brightness-contrast-shader.260649/
+vec3 rodriguesHue(vec3 rgb, float hue)
+{
+    vec3 k = vec3(0.57735);
+    float c = cos(hue);
+    //Rodrigues' rotation formula
+    return rgb * c + cross(k, rgb) * sin(hue) + k * dot(k, rgb) * (1.0 - c);
+}
 
 void main() {
   vec2 center = v_texCoords.xy - 0.5;
@@ -75,8 +84,10 @@ void main() {
   len = (len * 12. - c) * (1.0 / (256.0));
   vec2 pos = vec2(theta, len);
   vec4 i = vec4(sin(pos) * shrunk, cos(pos) * shrunk) * 16.;
-  gl_FragColor.r = foam(4.3 + u_seed, i);//
-  gl_FragColor.g = foam(61.6 + u_seed, i);//i.ywxz);
-  gl_FragColor.b = foam(257.9 + u_seed, i);//i.zxwy);
+  gl_FragColor.r = ridged(4.3 + u_seed, i);
+  gl_FragColor.gb = vec2(0.0);
+  gl_FragColor.rgb = rodriguesHue(gl_FragColor.rgb, c * 0.4);
+//  gl_FragColor.g = foam(61.6 + u_seed, i);//i.ywxz);
+//  gl_FragColor.b = foam(257.9 + u_seed, i);//i.zxwy);
   gl_FragColor.a = v_color.a;
 }
