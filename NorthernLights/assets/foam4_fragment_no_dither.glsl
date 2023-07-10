@@ -56,18 +56,18 @@ float foam(float seed, vec4 x) {
                   dot(x,     vec4(-0.25, -0.3227486121839514, -0.45643546458763834, -0.7905694150420948)));
 
     float a = noise(seed, p.xyzw);
-    float b = noise(seed + 42.1, vec4(x.x, p.yzw) + a * H4.x);
-    float c = noise(seed + 84.2, vec4(x.x, p.xzw) + b * H4.y);
-    float d = noise(seed + 126.3, vec4(x.x, p.xyw) + c * H4.z);
-    float e = noise(seed + 168.4, vec4(x.x, p.xyz) + d * H4.w);
+    float b = noise(seed + 23.1, vec4(x.x, p.yzw) + a * H4.x);
+    float c = noise(seed + 46.2, vec4(x.x, p.xzw) + b * H4.y);
+    float d = noise(seed + 69.3, vec4(x.x, p.xyw) + c * H4.z);
+    float e = noise(seed + 92.4, vec4(x.x, p.xyz) + d * H4.w);
     return smoothstep(0.0, 1.0, smoothstep(0.0, 1.0, (a + b + c + d + e) * 0.2));
 }
 
 void main() {
   vec2 pos = gl_FragCoord.xy * 0.03125 + u_time * 0.625;
   vec4 i = vec4(sin(pos), cos(pos));
-  gl_FragColor.r = foam(4.0 + u_seed, i);
-  gl_FragColor.g = foam(61.0 + u_seed, i);
-  gl_FragColor.b = foam(257.0 + u_seed, i);
+  gl_FragColor.r = foam(4.3 + u_seed, i);//
+  gl_FragColor.g = foam(61.6 + u_seed, i);//i.ywxz);
+  gl_FragColor.b = foam(257.9 + u_seed, i);//i.zxwy);
   gl_FragColor.a = v_color.a;
 }

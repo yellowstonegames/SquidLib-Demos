@@ -2,11 +2,13 @@ package com.github.yellowstonegames;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
@@ -66,6 +68,11 @@ public class NorthernLights extends ApplicationAdapter {
 
 	@Override public void render () {
 		ScreenUtils.clear(0f, 0f, 0f, 0f);
+		if(Gdx.input.isKeyJustPressed(Input.Keys.S)){ // seed
+			seed += UIUtils.shift() ? 1 : -1;
+		} else if(Gdx.input.isKeyJustPressed(Input.Keys.R)){ // reset
+			startTime = TimeUtils.millis();
+		}
 //		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * 0x1p-10f;
 		batch.begin();

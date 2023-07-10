@@ -85,6 +85,12 @@ public class NorthernLights extends ApplicationAdapter {
 			{
 				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 			}
+		} else if(Gdx.input.isKeyJustPressed(Input.Keys.S)){ // seed
+			seed += UIUtils.shift() ? 1 : -1;
+		} else if(Gdx.input.isKeyJustPressed(Input.Keys.R)){ // reset
+			startTime = TimeUtils.millis();
+		} else if(Gdx.input.isKeyJustPressed(Input.Keys.Q) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){ // quit
+			Gdx.app.exit();
 		}
 		Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
 		final float ftm = TimeUtils.timeSinceMillis(startTime) * (0x1p-10f);
@@ -93,12 +99,12 @@ public class NorthernLights extends ApplicationAdapter {
 		shader.setUniformf("u_time", ftm);
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
-		if(false) { // used to capture only the first frame, at the specified size
-			Pixmap pm = Pixmap.createFromFrameBuffer(0, 0, width, height);
-			PixmapIO.writePNG(Gdx.files.local("multi_" + TimeUtils.millis() + ".png"), pm, 9, false);
-			Gdx.app.exit();
-			System.exit(0);
-		}
+//		if(false) { // used to capture only the first frame, at the specified size
+//			Pixmap pm = Pixmap.createFromFrameBuffer(0, 0, width, height);
+//			PixmapIO.writePNG(Gdx.files.local("multi_" + TimeUtils.millis() + ".png"), pm, 9, false);
+//			Gdx.app.exit();
+//			System.exit(0);
+//		}
 	}
 
 	public void renderAPNG () {
