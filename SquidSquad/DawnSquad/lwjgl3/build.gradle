@@ -1,6 +1,6 @@
 apply plugin: 'application'
 
-import proguard.gradle.ProGuardTask
+//import proguard.gradle.ProGuardTask
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
@@ -31,14 +31,15 @@ run {
 	workingDir = rootProject.file('assets').path
 	setIgnoreExitValue(true)
 
-	if (os.contains('mac')) {
-		// Required to run LWJGL3 Java apps on MacOS
-		jvmArgs += "-XstartOnFirstThread"
-	}
+//	if (os.contains('mac')) {
+//		// Required to run LWJGL3 Java apps on MacOS
+//		jvmArgs += "-XstartOnFirstThread"
+//	}
 }
 
 jar {
-	archiveFileName.set("${appName}-${version}.jar")
+	archiveFileName.set("${appName}.jar")
+//	archiveFileName.set("${appName}-${archiveVersion}.jar")
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	dependsOn configurations.runtimeClasspath
 	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -54,21 +55,21 @@ jar {
 	}
 }
 
-task proguard(type: ProGuardTask) {
-	outputs.upToDateWhen { false }
-	configuration 'proguard-rules.pro'
-	//printmapping 'build/lib/out.map'
-	if (System.getProperty('java.version').startsWith('1.')) {
-		libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-	} else {
-		libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-	}
-	injars (file("build/libs/${appName}-${version}.jar"))
-
-	outjars "build/libs/${appName}.jar"
-}
-
-proguard.dependsOn jar
+//task proguard(type: ProGuardTask) {
+//	outputs.upToDateWhen { false }
+//	configuration 'proguard-rules.pro'
+//	//printmapping 'build/lib/out.map'
+//	if (System.getProperty('java.version').startsWith('1.')) {
+//		libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+//	} else {
+//		libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//	}
+//	injars (file("build/libs/${appName}-${version}.jar"))
+//
+//	outjars "build/libs/${appName}.jar"
+//}
+//
+//proguard.dependsOn jar
 
 // Equivalent to the jar task; here for compatibility with gdx-setup.
 task dist(dependsOn: [jar]) {

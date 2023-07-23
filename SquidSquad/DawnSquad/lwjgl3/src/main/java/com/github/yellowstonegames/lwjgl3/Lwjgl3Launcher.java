@@ -13,8 +13,8 @@ import com.github.tommyettinger.DawnSquad;
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
 	public static void main(String[] args) {
-		if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
-
+		// Needed for macOS support, but also Windows with non-ASCII usernames.
+		if (StartupHelper.startNewJvmIfRequired()) return;
 		// Graal stuff
 		org.lwjgl.system.Library.initialize();
 		org.lwjgl.system.ThreadLocalUtil.setupEnvData();
