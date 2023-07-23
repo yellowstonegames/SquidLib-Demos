@@ -42,7 +42,7 @@ jar {
 //	archiveFileName.set("${appName}-${archiveVersion}.jar")
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	dependsOn configurations.runtimeClasspath
-	from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 	exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
 	dependencies {
 		exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
