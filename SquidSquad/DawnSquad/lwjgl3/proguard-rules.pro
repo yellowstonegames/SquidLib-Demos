@@ -1,10 +1,12 @@
-# proguard github example stuff for application
+# proguard github example for application
 # https://github.com/Guardsquare/proguard/blob/master/examples/gradle/applications.gradle
 -keepattributes '*Annotation*'
 
 -keepclasseswithmembers public class * { public static void main(java.lang.String[]); }
 
 -keep public class org.lwjgl.system.** { *; }
+# You will need the next line if you use scene2d for UI or gameplay
+#-keep public class com.badlogic.gdx.scenes.scene2d.** { *; }
 
 -keepclasseswithmembernames class * { native <methods>; }
 

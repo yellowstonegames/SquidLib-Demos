@@ -75,9 +75,9 @@ public class DawnSquad extends ApplicationAdapter {
     public static final int bigHeight = gridHeight * 2;
 
     /** The pixel width of a cell */
-    public static final int cellWidth = 16;
+    public static final int cellWidth = 32;
     /** The pixel height of a cell */
-    public static final int cellHeight = 16;
+    public static final int cellHeight = 32;
 
     private boolean onGrid(int screenX, int screenY)
     {
