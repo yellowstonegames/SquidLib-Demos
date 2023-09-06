@@ -358,18 +358,6 @@ public class DawnSquad extends ApplicationAdapter {
 
         bgColor = Color.BLACK;
 
-        ObjectList<String> pcs = new ObjectList<>(Data.possibleCharacters);
-        for(String pc : pcs) {
-            System.out.println(pc);
-        }
-        StringBuilder sb = new StringBuilder(100);
-        for(String pc : pcs){
-            sb.append(pc);
-        }
-        System.out.println(sb);
-        if(!"ordinary humanfighterrangerbanditvalkyrieslayerwizardmonkpriestaidesamuraicollectorbrutenomadtouristconvictmanknightyeomanthiefchampionexterminatorarchmagesenseibishophealerninjaarchaeologistbarbariancavemansightseerdesperadoordinary womanpriestesscavewoman".equals(sb.toString())){
-            throw new IllegalArgumentException("No no no no, NO! No.");
-        }
         restart(0);
 
         //+1 is up on the screen

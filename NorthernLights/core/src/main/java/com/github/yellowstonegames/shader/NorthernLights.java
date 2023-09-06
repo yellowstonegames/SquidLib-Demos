@@ -1,18 +1,16 @@
 package com.github.yellowstonegames.shader;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.utils.UIUtils;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.tommyettinger.anim8.AnimatedPNG;
 
 /**
  * Credit for the shader adaptation goes to angelickite , a very helpful user on the libGDX Discord.
@@ -29,7 +27,7 @@ public class NorthernLights extends ApplicationAdapter {
 	private int width, height;
 
 	@Override public void create () {
-		//Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		Gdx.app.setLogLevel(Application.LOG_ERROR);
 		batch = new SpriteBatch();
 		
 		Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
@@ -43,9 +41,9 @@ public class NorthernLights extends ApplicationAdapter {
 //		shader = new ShaderProgram(Gdx.files.internal("thule_vertex.glsl"), Gdx.files.internal("thule_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("thule_vertex.glsl"), Gdx.files.internal("grule_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("warble_fragment_no_dither.glsl"));
-		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("sonorous_fragment_no_dither.glsl"));
+//		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("sonorous_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam4_fragment_no_dither.glsl"));
-//		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
+		shader = new ShaderProgram(Gdx.files.internal("foam_vertex.glsl"), Gdx.files.internal("foam_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("scrambler_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("northern_fragment_no_dither.glsl"));
 //		shader = new ShaderProgram(Gdx.files.internal("northern_vertex.glsl"), Gdx.files.internal("cuatro_fragment_no_dither.glsl"));
@@ -76,11 +74,11 @@ public class NorthernLights extends ApplicationAdapter {
 	}
 
 	@Override public void render () {
-		ScreenUtils.clear(0, 0, 0, 0);
+		ScreenUtils.clear(0f, 0f, 0f, 0f);
 		if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER) && UIUtils.alt())
 		{
 			if(Gdx.graphics.isFullscreen())
-				Gdx.graphics.setWindowedMode(480, 320);
+				Gdx.graphics.setWindowedMode(480, 480);
 			else 
 			{
 				Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
@@ -100,34 +98,29 @@ public class NorthernLights extends ApplicationAdapter {
 		shader.setUniformf("u_resolution", Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		batch.draw(pixel, 0, 0, width, height);
 		batch.end();
-//		if(false) { // used to capture only the first frame, at the specified size
-//			Pixmap pm = Pixmap.createFromFrameBuffer(0, 0, width, height);
-//			PixmapIO.writePNG(Gdx.files.local("multi_" + TimeUtils.millis() + ".png"), pm, 9, false);
-//			Gdx.app.exit();
-//			System.exit(0);
+	}
+//
+//	public void renderAPNG () {
+//		Array<Pixmap> pixmaps = new Array<>(180);
+//		for (int i = 1; i <= 240; i++) {
+//			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
+//			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
+//			batch.begin();
+//			shader.setUniformf("u_seed", seed);
+//			shader.setUniformf("u_time", i * 0.125f);
+//			batch.draw(pixel, 0, 0, width, height);
+//			batch.end();
+//			pixmaps.add(Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 //		}
-	}
+//		AnimatedPNG apng = new AnimatedPNG();
+//		apng.setCompression(7);
+//		apng.setFlipY(false);
+//		apng.write(Gdx.files.local("build/Multitude_"+startTime+".png"), pixmaps, 30);
+//		for(Pixmap pm : pixmaps)
+//			pm.dispose();
+//		apng.dispose();
+//	}
 
-	public void renderAPNG () {
-		Array<Pixmap> pixmaps = new Array<>(180);
-		for (int i = 1; i <= 240; i++) {
-			Gdx.gl.glClearColor(0f, 0f, 0f, 0f);
-			Gdx.gl.glClear(Gdx.gl.GL_COLOR_BUFFER_BIT);
-			batch.begin();
-			shader.setUniformf("u_seed", seed);
-			shader.setUniformf("u_time", i * 0.125f);
-			batch.draw(pixel, 0, 0, width, height);
-			batch.end();
-			pixmaps.add(Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-		}
-		AnimatedPNG apng = new AnimatedPNG();
-		apng.setCompression(7);
-		apng.setFlipY(false);
-		apng.write(Gdx.files.local("build/Multitude_"+startTime+".png"), pixmaps, 30);
-		for(Pixmap pm : pixmaps)
-			pm.dispose();
-		apng.dispose();
-	}
 //	public void renderGif() {
 //		Array<Pixmap> pixmaps = new Array<>(80);
 //		for (int i = 1; i <= 160; i++) {

@@ -25,6 +25,7 @@ uniform sampler2D u_texture;
 
 uniform float u_seed;
 uniform float u_time;
+uniform vec2 u_resolution;
 
 float hash(float seed, float p) {
     return fract(fract((p - seed) * PHI + seed) * (PHI - p) - seed);
@@ -160,7 +161,8 @@ float foam(float seed, vec3 x) {
 //}
 
 void main() {
-  vec3 i = vec3(gl_FragCoord.xy * 0.03125 + 3.0, u_time * 0.625);
+  if(texture2D(u_texture, v_texCoords).a <= 0.) discard;
+  vec3 i = vec3((gl_FragCoord.xy - u_resolution * 0.5) * 0.03125 + 3.0, u_time * 0.625);
   gl_FragColor.r = foam(4.0 + u_seed, i);
   gl_FragColor.g = foam(61.0 + u_seed, i);
   gl_FragColor.b = foam(257.0 + u_seed, i);
