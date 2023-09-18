@@ -48,6 +48,11 @@ dependencies {
     implementation "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion:sources"
+
+
+    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
+    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
+
 	implementation project(':core')
 
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
