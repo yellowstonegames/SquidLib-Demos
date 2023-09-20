@@ -74,8 +74,7 @@ gretty.resourceBase = project.projectDir.path + "/build/gwt/draftOut"
 gretty.contextPath = "/"
 gretty.portPropertiesFileName = "TEMP_PORTS.properties"
 
-tasks.register('startHttpServer') {
-    dependsOn['draftCompileGwt']
+task startHttpServer (dependsOn: [draftCompileGwt]) {
     doFirst {
         copy {
             from "webapp"
@@ -87,11 +86,6 @@ tasks.register('startHttpServer') {
         }
     }
 }
-
-// The beforeRun task can't use the same tasks.register() syntax because of how it
-// uses Gretty to both run a GWT app and serve its HTML files.
-
-//noinspection ConfigurationAvoidance
 task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
     // The next line allows ports to be reused instead of
     // needing a process to be manually terminated.
@@ -104,8 +98,7 @@ task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
     interactive false
 }
 
-tasks.register('superDev', GwtSuperDev) {
-    dependsOn(['addSource'])
+task superDev(type: GwtSuperDev) {
     doFirst {
         gwt.modules = gwt.devModules
     }
@@ -115,8 +108,7 @@ tasks.register('superDev', GwtSuperDev) {
 // This is relative to the html/ folder.
 var outputPath = "build/dist/"
 
-tasks.register('dist') {
-    dependsOn(['clean', 'compileGwt'])
+task dist(dependsOn: [clean, compileGwt]) {
     doLast {
         // Uncomment the next line if you have changed outputPath and know that its contents
         // should be replaced by a new dist build. Some large JS files are not cleaned up by
@@ -127,7 +119,7 @@ tasks.register('dist') {
 
         file(outputPath).mkdirs()
         copy {
-            from("build/gwt/out") {
+            from("build/gwt/out"){
                 exclude '**/*.symbolMap' // Not used by a dist, and these can be large.
             }
             into outputPath
@@ -155,15 +147,14 @@ tasks.register('dist') {
     }
 }
 
-tasks.register('addSource') {
+task addSource {
     doLast {
         sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-
+        
     }
 }
 
-tasks.register('distZip', Zip) {
-    dependsOn dist
+task distZip(type: Zip, dependsOn: dist){
     //// This uses the output of the dist task, which removes the superdev buttons from index.html .
     from(outputPath)
     archiveBaseName.set("${appName}-dist")
@@ -171,9 +162,9 @@ tasks.register('distZip', Zip) {
     destinationDirectory = file("build")
 }
 
-tasks.compileGwt.dependsOn('addSource')
-tasks.draftCompileGwt.dependsOn('addSource')
-tasks.checkGwt.dependsOn('addSource')
+tasks.compileGwt.dependsOn(addSource)
+tasks.draftCompileGwt.dependsOn(addSource)
+tasks.checkGwt.dependsOn(addSource)
 
 // You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
 sourceCompatibility = JavaVersion.VERSION_11
