@@ -4,7 +4,7 @@
 	<source path="" />
 	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
 
-<!--	<inherits name="com.badlogic.gdx.graphics.g2d.freetype.freetype-gwt" />-->
+	<inherits name="com.badlogic.gdx.graphics.g2d.freetype.freetype-gwt" />
 	<inherits name="com.github.yellowstonegames.squidcore" />
 	<inherits name="com.github.yellowstonegames.squidgrid" />
 	<inherits name="com.github.yellowstonegames.squidplace" />

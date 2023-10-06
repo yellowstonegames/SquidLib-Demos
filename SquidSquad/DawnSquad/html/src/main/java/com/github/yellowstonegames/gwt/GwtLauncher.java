@@ -28,8 +28,8 @@ public class GwtLauncher extends GwtApplication {
 		return new DawnSquad();
 	}
 
-//	@Override
-//	public void onModuleLoad() {
-//		com.badlogic.gdx.graphics.g2d.freetype.gwt.FreetypeInjector.inject(super::onModuleLoad);
-//	}
+	@Override
+	public void onModuleLoad() {
+		com.badlogic.gdx.graphics.g2d.freetype.gwt.FreetypeInjector.inject(super::onModuleLoad);
+	}
 }
