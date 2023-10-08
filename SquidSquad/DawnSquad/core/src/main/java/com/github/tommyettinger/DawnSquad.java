@@ -98,6 +98,7 @@ public class DawnSquad extends ApplicationAdapter {
     private String lang;
     private float[][] resistance;
     private float[][] visible;
+    private float[][] oldVisible;
     private TextureAtlas.AtlasRegion solid;
     private int health = 9;
 
@@ -204,6 +205,8 @@ public class DawnSquad extends ApplicationAdapter {
 
         resistance = FOV.generateSimpleResistances(lineDungeon);
         visible = new float[bigWidth][bigHeight];
+        oldVisible = new float[bigWidth][bigHeight];
+        
         prunedDungeon = ArrayTools.copy(lineDungeon);
         // here, we need to get a random floor cell to place the player upon, without the possibility of putting him
         // inside a wall. There are a few ways to do this in SquidSquad. The most straightforward way is to randomly
@@ -240,6 +243,7 @@ public class DawnSquad extends ApplicationAdapter {
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
         // Uses shadowcasting FOV and reuses the visible array without creating new arrays constantly.
         FOV.reuseFOV(resistance, visible, player.x, player.y, 9f, Radius.CIRCLE);
+        ArrayTools.set(visible, oldVisible);
         // 0.0 is the upper bound (inclusive), so any Coord in visible that is more well-lit than 0.0 will _not_ be in
         // the blockage Collection, but anything 0.0 or less will be in it. This lets us use blockage to prevent access
         // to cells we can't see from the start of the move.
@@ -470,7 +474,8 @@ public class DawnSquad extends ApplicationAdapter {
                 // changes to the map mean the resistances for FOV need to be regenerated.
                 resistance = FOV.generateSimpleResistances(prunedDungeon);
                 // recalculate FOV, store it in fovmap for the render to use.
-                justHidden.refill(visible, 0f).not();
+                ArrayTools.set(visible, oldVisible);
+                justHidden.refill(oldVisible, 0f).not();
                 FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
                 justSeen.remake(seen);
@@ -481,7 +486,8 @@ public class DawnSquad extends ApplicationAdapter {
                 LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
             } else {
                 // recalculate FOV, store it in fovmap for the render to use.
-                justHidden.refill(visible, 0f).not();
+                ArrayTools.set(visible, oldVisible);
+                justHidden.refill(oldVisible, 0f).not();
                 FOV.reuseFOV(resistance, visible, newX, newY, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
                 justSeen.remake(seen);
@@ -518,7 +524,8 @@ public class DawnSquad extends ApplicationAdapter {
         playerArray[0] = player;
         int monCount = monsters.size();
         // recalculate FOV, store it in fovmap for the render to use.
-        justHidden.refill(visible, 0f).not();
+        ArrayTools.set(visible, oldVisible);
+        justHidden.refill(oldVisible, 0f).not();
         FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
         blockage.refill(visible, 0f);
         justSeen.remake(seen);
@@ -611,11 +618,9 @@ public class DawnSquad extends ApplicationAdapter {
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(justHidden.contains(i, j)) {
-//                    int color = DescriptiveColor.fade(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change);
-                    int color = DescriptiveColor.lerpColors(DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f),
-                            DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change);
-//                    System.out.printf("%d,%d: %08X, frame change %.6f, player change %.6f\n", i, j, DescriptiveColor.toRGBA8888(color), change, playerSprite.location.getChange());
-                    batch.setPackedColor(DescriptiveColor.oklabIntToFloat(color));
+                    batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
+                            DescriptiveColor.lerpColors(DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, oldVisible[i][j] * 0.7f + 0.15f),
+                            DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change)));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
