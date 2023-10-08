@@ -111,7 +111,7 @@ public class DawnSquad extends ApplicationAdapter {
     // Here, we use a GreasedRegion to store all floors that the player can walk on, a small rim of cells just beyond
     // the player's vision that blocks pathfinding to areas we can't see a path to, and we also store all cells that we
     // have seen in the past in a GreasedRegion (in most roguelikes, there would be one of these per dungeon floor).
-    private Region floors, blockage, seen;
+    private Region floors, blockage, seen, justSeen, justHidden;
 
     private static final int
             INT_WHITE = DescriptiveColor.WHITE,
@@ -150,7 +150,7 @@ public class DawnSquad extends ApplicationAdapter {
         //TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS or TilesetType.CAVES_LIMIT_CONNECTIVITY to change the sections that
         //this will use, or just pass in a full 2D char array produced from some other generator, such as
         //SerpentMapGenerator, OrganicMapGenerator, or DenseRoomMapGenerator.
-        DungeonProcessor dungeonGen = new DungeonProcessor(bigWidth, bigHeight, rng);
+        dungeonGen = new DungeonProcessor(bigWidth, bigHeight, rng);
         //this next line randomly adds water to the dungeon in pools.
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
         //this next line makes 10% of valid door positions into complete doors.
@@ -226,7 +226,7 @@ public class DawnSquad extends ApplicationAdapter {
         // store all floors that the player can walk on, a small rim of cells just beyond the player's vision that
         // blocks pathfinding to areas we can't see a path to, and we also store all cells that we have seen in the past
         // in a Region (in most roguelikes, there would be one of these per dungeon floor).
-        Region floors = new Region(bareDungeon, '.');
+        floors = floors == null ? new Region(bareDungeon, '.') : floors.refill(bareDungeon, '.');
         //player is, here, just a Coord that stores his position. In a real game, you would probably have a class for
         //creatures, and possibly a subclass for the player. The singleRandom() method on Region finds one Coord
         //in that region that is "on," or -1,-1 if there are no such cells. It takes an RNG object as a parameter, and
@@ -242,13 +242,15 @@ public class DawnSquad extends ApplicationAdapter {
         // 0.0 is the upper bound (inclusive), so any Coord in visible that is more well-lit than 0.0 will _not_ be in
         // the blockage Collection, but anything 0.0 or less will be in it. This lets us use blockage to prevent access
         // to cells we can't see from the start of the move.
-        blockage = new Region(visible, 0f);
+        blockage = blockage == null ? new Region(visible, 0f) : blockage.refill(visible, 0f);
         // Here we mark the initially seen cells as anything that wasn't included in the unseen "blocked" region.
         // We invert the copy's contents to prepare for a later step, which makes blockage contain only the cells that
         // are above 0.0, then copy it to save this step as the seen cells. We will modify seen later independently of
         // the blocked cells, so a copy is correct here. Most methods on Region objects will modify the
         // Region they are called on, which can greatly help efficiency on long chains of operations.
-        seen = blockage.not().copy();
+        seen = seen == null ? blockage.not().copy() : seen.remake(blockage.not());
+        justSeen = justSeen == null ? seen.copy() : justSeen.remake(seen);
+        justHidden = justHidden == null ? new Region(bigWidth, bigHeight) : justHidden.resizeAndEmpty(bigWidth, bigHeight);
         // Here is one of those methods on a Region; fringe8way takes a Region (here, the set of cells
         // that are visible to the player), and modifies it to contain only cells that were not in the last step, but
         // were adjacent to a cell that was present in the last step. This can be visualized as taking the area just
@@ -468,14 +470,22 @@ public class DawnSquad extends ApplicationAdapter {
                 // recalculate FOV, store it in fovmap for the render to use.
                 FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
+                justSeen.remake(seen);
+                justHidden.remake(seen);
                 seen.or(blockage.not());
+                justSeen.notAnd(seen);
+                justHidden.andNot(seen);
                 blockage.fringe8way();
                 LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
             } else {
                 // recalculate FOV, store it in fovmap for the render to use.
                 FOV.reuseFOV(resistance, visible, newX, newY, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
+                justSeen.remake(seen);
+                justHidden.remake(seen);
                 seen.or(blockage.not());
+                justSeen.notAnd(seen);
+                justHidden.andNot(seen);
                 blockage.fringe8way();
                 LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
                 playerSprite.location.setStart(player);
@@ -508,7 +518,11 @@ public class DawnSquad extends ApplicationAdapter {
         // recalculate FOV, store it in fovmap for the render to use.
         FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
         blockage.refill(visible, 0f);
+        justSeen.remake(seen);
+        justHidden.remake(seen);
         seen.or(blockage.not());
+        justSeen.notAnd(seen);
+        justHidden.andNot(seen);
         blockage.fringe8way();
         // handle monster turns
         for(int ci = 0; ci < monCount; ci++)
@@ -570,14 +584,31 @@ public class DawnSquad extends ApplicationAdapter {
         //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
+
+        float change = playerSprite.smallMotion.getChange();
+
         int rainbow = DescriptiveColor.maximizeSaturation(160,
                 (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.0) {
-                    batch.setPackedColor(DescriptiveColor.oklabIntToFloat(toCursor.contains(Coord.get(i, j))
-                            ? DescriptiveColor.lerpColors(bgColors[i][j], rainbow, 0.95f)
-                            : DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f)));
+                    if(justSeen.contains(i, j)){
+                        batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
+                                DescriptiveColor.fade(
+                                toCursor.contains(Coord.get(i, j))
+                                ? DescriptiveColor.lerpColors(bgColors[i][j], rainbow, 0.95f)
+                                : DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f), 1f - change)));
+                    }
+                    else {
+                        batch.setPackedColor(DescriptiveColor.oklabIntToFloat(toCursor.contains(Coord.get(i, j))
+                                ? DescriptiveColor.lerpColors(bgColors[i][j], rainbow, 0.95f)
+                                : DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f)));
+                    }
+                    if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
+                        batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
+                    batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
+                } else if(justHidden.contains(i, j)) {
+                    batch.setPackedColor(DescriptiveColor.oklabIntToFloat(DescriptiveColor.fade(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change)));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);

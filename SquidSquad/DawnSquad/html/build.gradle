@@ -31,17 +31,20 @@ dependencies {
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+
     implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
     implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:funderby:0.1.1:sources"
     implementation "com.github.tommyettinger:regexodus:0.1.15:sources"
+
 //    implementation "com.squidpony:SquidCore:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidGrid:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidPlace:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidPath:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidText:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidSmooth:$squidSquadVersion:sources"
+
     implementation "com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion:sources"
@@ -49,6 +52,25 @@ dependencies {
     implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion:sources"
 
+    //// These don't work currently; they still can't find many classes from dependencies (and themselves).
+//    gwt ("com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion") {
+//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
+//    }
+//    gwt ("com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion") {
+//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
+//    }
+//    gwt ("com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion") {
+//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
+//    }
+//    gwt ("com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion") {
+//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
+//    }
+//    gwt ("com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion" ){
+//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
+//    }
+//    gwt ("com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion") {
+//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
+//    }
 
     implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
     implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
@@ -62,7 +84,7 @@ dependencies {
 //// gwtVersion = "2.10.0"
 	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1200.1"
 	implementation "com.github.tommyettinger:gdx-backend-gwt:1.1200.1:sources"
-    implementation "com.google.jsinterop:jsinterop-annotations:2.0.0:sources"
+    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
 //// These lines would use GWT 2.8.2. You would need to set gwtVersion to "2.8.2" instead.
 //    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
