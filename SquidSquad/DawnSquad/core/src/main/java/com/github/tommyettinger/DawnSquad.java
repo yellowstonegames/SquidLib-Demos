@@ -587,7 +587,8 @@ public class DawnSquad extends ApplicationAdapter {
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
 
-        float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 0.006f, 0f), 1f);
+//        float change = Math.min(Math.max(playerSprite.location.getChange(), 0f), 1f);
+        float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 0.004f, 0f), 1f);
 
         int rainbow = DescriptiveColor.maximizeSaturation(160,
                 (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
@@ -610,8 +611,10 @@ public class DawnSquad extends ApplicationAdapter {
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(justHidden.contains(i, j)) {
-                    int color = DescriptiveColor.fade(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change);
-                    System.out.printf("%d,%d: %08X, %.6f\n", i, j, DescriptiveColor.toRGBA8888(color), change);
+//                    int color = DescriptiveColor.fade(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change);
+                    int color = DescriptiveColor.lerpColors(DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f),
+                            DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change);
+//                    System.out.printf("%d,%d: %08X, frame change %.6f, player change %.6f\n", i, j, DescriptiveColor.toRGBA8888(color), change, playerSprite.location.getChange());
                     batch.setPackedColor(DescriptiveColor.oklabIntToFloat(color));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
