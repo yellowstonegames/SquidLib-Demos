@@ -587,7 +587,7 @@ public class DawnSquad extends ApplicationAdapter {
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
 
-        float change = Math.min(TimeUtils.timeSinceMillis(lastMove) * 0.001f, 1f);
+        float change = Math.min(TimeUtils.timeSinceMillis(lastMove) * 0.006f, 1f);
 
         int rainbow = DescriptiveColor.maximizeSaturation(160,
                 (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
