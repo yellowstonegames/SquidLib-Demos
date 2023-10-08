@@ -37,7 +37,7 @@ import static com.badlogic.gdx.Input.Keys.*;
 
 public class DawnSquad extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
-    private long startTime;
+    private long startTime, lastMove;
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
     private SpriteBatch batch;
     private Phase phase = Phase.WAIT;
@@ -138,6 +138,7 @@ public class DawnSquad extends ApplicationAdapter {
         nextMovePositions.clear();
         // Starting time for the game; other times are measured relative to this so that they aren't huge numbers.
         startTime = TimeUtils.millis();
+        lastMove = startTime;
         // We just need to have a random number generator.
         // This is seeded the same every time.
         rng.setSeed(seed);
@@ -452,6 +453,7 @@ public class DawnSquad extends ApplicationAdapter {
      * @param next
      */
     private void move(Coord next) {
+        lastMove = TimeUtils.millis();
         CoordGlider cg = playerSprite.location;
         // this prevents movements from restarting while a slide is already in progress.
         if(cg.getChange() != 0f && cg.getChange() != 1f) return;
@@ -585,7 +587,7 @@ public class DawnSquad extends ApplicationAdapter {
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
 
-        float change = playerSprite.smallMotion.getChange();
+        float change = Math.min(TimeUtils.timeSinceMillis(lastMove) * 0.001f, 1f);
 
         int rainbow = DescriptiveColor.maximizeSaturation(160,
                 (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
