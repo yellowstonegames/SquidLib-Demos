@@ -52,7 +52,7 @@ public class DawnSquad extends ApplicationAdapter {
 
     private DungeonProcessor dungeonGen;
     private char[][] bareDungeon, lineDungeon, prunedDungeon;
-    // these use packed RGBA8888 int colors, which avoid the overhead of creating new Color objects
+    // these use packed Oklab int colors, which avoid the overhead of creating new Color objects
     private int[][] bgColors;
     private Coord player;
     private final Coord[] playerArray = new Coord[1];
@@ -328,7 +328,7 @@ public class DawnSquad extends ApplicationAdapter {
         font.setUseIntegerPositions(false);
         font.getData().setScale(2f/cellWidth, 2f/cellHeight);
         font.getData().markupEnabled = true;
-        bgColors = ArrayTools.fill(0x808080FF, bigWidth, bigHeight);
+        bgColors = ArrayTools.fill(0xFF848350, bigWidth, bigHeight);
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);
 
@@ -470,24 +470,24 @@ public class DawnSquad extends ApplicationAdapter {
                 // changes to the map mean the resistances for FOV need to be regenerated.
                 resistance = FOV.generateSimpleResistances(prunedDungeon);
                 // recalculate FOV, store it in fovmap for the render to use.
+                justHidden.refill(visible, 0f).not();
                 FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
                 justSeen.remake(seen);
-                justHidden.remake(seen);
                 seen.or(blockage.not());
                 justSeen.notAnd(seen);
-                justHidden.andNot(seen);
+                justHidden.andNot(blockage);
                 blockage.fringe8way();
                 LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
             } else {
                 // recalculate FOV, store it in fovmap for the render to use.
+                justHidden.refill(visible, 0f).not();
                 FOV.reuseFOV(resistance, visible, newX, newY, fovRange, Radius.CIRCLE);
                 blockage.refill(visible, 0f);
                 justSeen.remake(seen);
-                justHidden.remake(seen);
                 seen.or(blockage.not());
                 justSeen.notAnd(seen);
-                justHidden.andNot(seen);
+                justHidden.andNot(blockage);
                 blockage.fringe8way();
                 LineTools.pruneLines(lineDungeon, seen, prunedDungeon);
                 playerSprite.location.setStart(player);
@@ -518,13 +518,13 @@ public class DawnSquad extends ApplicationAdapter {
         playerArray[0] = player;
         int monCount = monsters.size();
         // recalculate FOV, store it in fovmap for the render to use.
+        justHidden.refill(visible, 0f).not();
         FOV.reuseFOV(resistance, visible, player.x, player.y, fovRange, Radius.CIRCLE);
         blockage.refill(visible, 0f);
         justSeen.remake(seen);
-        justHidden.remake(seen);
         seen.or(blockage.not());
         justSeen.notAnd(seen);
-        justHidden.andNot(seen);
+        justHidden.andNot(blockage);
         blockage.fringe8way();
         // handle monster turns
         for(int ci = 0; ci < monCount; ci++)
@@ -587,13 +587,13 @@ public class DawnSquad extends ApplicationAdapter {
         //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
         //display.clear();
 
-        float change = Math.min(TimeUtils.timeSinceMillis(lastMove) * 0.006f, 1f);
+        float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 0.006f, 0f), 1f);
 
         int rainbow = DescriptiveColor.maximizeSaturation(160,
                 (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
         for (int i = 0; i < bigWidth; i++) {
             for (int j = 0; j < bigHeight; j++) {
-                if(visible[i][j] > 0.0) {
+                if(visible[i][j] > 0.01) {
                     if(justSeen.contains(i, j)){
                         batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
                                 DescriptiveColor.fade(
@@ -610,7 +610,9 @@ public class DawnSquad extends ApplicationAdapter {
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(justHidden.contains(i, j)) {
-                    batch.setPackedColor(DescriptiveColor.oklabIntToFloat(DescriptiveColor.fade(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change)));
+                    int color = DescriptiveColor.fade(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change);
+                    System.out.printf("%d,%d: %08X, %.6f\n", i, j, DescriptiveColor.toRGBA8888(color), change);
+                    batch.setPackedColor(DescriptiveColor.oklabIntToFloat(color));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
@@ -705,8 +707,6 @@ public class DawnSquad extends ApplicationAdapter {
         playerDirector.step();
         monsterDirector.step();
 
-        // need to display the map every frame, since we clear the screen to avoid artifacts.
-        putMap();
         if(phase == Phase.MONSTER_ANIM) {
             if (!monsterDirector.isPlaying()) {
                 phase = Phase.WAIT;
@@ -750,6 +750,7 @@ public class DawnSquad extends ApplicationAdapter {
                 }
             }
         }
+        putMap();
         pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight);
         mainViewport.unproject(pos);
         font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
