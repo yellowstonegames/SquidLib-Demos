@@ -638,9 +638,13 @@ public class DawnSquad extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if (visible[i][j] > 0.0) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
-                        monster.animate(time).draw(batch);
+                        if(justSeen.contains(i, j)) monster.animate(time).draw(batch, change);
+                        else monster.animate(time).draw(batch);
                     }
                 }
+                else if(justHidden.contains(i, j) && (monster = monsters.get(Coord.get(i, j))) != null)
+                    monster.animate(time).draw(batch, 1f - change);
+
             }
         }
         playerSprite.animate(time).draw(batch);
