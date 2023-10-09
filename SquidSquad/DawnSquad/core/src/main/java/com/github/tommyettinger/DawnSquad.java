@@ -20,7 +20,6 @@ import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.ds.ObjectList;
-import com.github.tommyettinger.ds.ObjectObjectOrderedMap;
 import com.github.tommyettinger.random.ChopRandom;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.grid.*;
@@ -42,7 +41,7 @@ public class DawnSquad extends ApplicationAdapter {
     private SpriteBatch batch;
     private Phase phase = Phase.WAIT;
 
-    // random number generator
+    // random number generator; this one is more efficient on GWT, but less-so on desktop.
     private ChopRandom rng;
 
     // Stores all images we use here efficiently, as well as the font image
@@ -80,13 +79,12 @@ public class DawnSquad extends ApplicationAdapter {
         return screenX >= 0 && screenX < bigWidth && screenY >= 0 && screenY < bigHeight;
     }
 
-
     private Color bgColor;
     private BitmapFont font;
     private Viewport mainViewport;
     private Camera camera;
 
-    private ObjectObjectOrderedMap<Coord, AnimatedGlidingSprite> monsters;
+    private CoordObjectOrderedMap<AnimatedGlidingSprite> monsters;
     private AnimatedGlidingSprite playerSprite;
     private Director<AnimatedGlidingSprite> playerDirector;
     private Director<Coord> monsterDirector, directorSmall;
@@ -115,9 +113,7 @@ public class DawnSquad extends ApplicationAdapter {
     private Region floors, blockage, seen, justSeen, justHidden;
 
     private static final int
-            INT_WHITE = DescriptiveColor.WHITE,
-            INT_BLACK = DescriptiveColor.BLACK,
-            INT_BLOOD = DescriptiveColor.describeOklab("dark dull red"),
+            INT_BLOOD = DescriptiveColor.describeOklab("deepest red"),
             INT_LIGHTING = DescriptiveColor.describeOklab("lightest white yellow"),
             INT_GRAY = DescriptiveColor.describeOklab("darker gray");
 
@@ -332,7 +328,9 @@ public class DawnSquad extends ApplicationAdapter {
         font.setUseIntegerPositions(false);
         font.getData().setScale(2f/cellWidth, 2f/cellHeight);
         font.getData().markupEnabled = true;
-        bgColors = ArrayTools.fill(0xFF848350, bigWidth, bigHeight);
+        // 0xFF848350 is fully opaque, slightly-yellow-brown, and about 30% lightness.
+        // It affects the default color each cell has, and changes when there is a blood stain.
+        bgColors = ArrayTools.fill(0xFF828150, bigWidth, bigHeight);
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);
 
@@ -606,20 +604,20 @@ public class DawnSquad extends ApplicationAdapter {
                         batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
                                 DescriptiveColor.fade(
                                 toCursor.contains(Coord.get(i, j))
-                                ? DescriptiveColor.lerpColors(bgColors[i][j], rainbow, 0.95f)
-                                : DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f), 1f - change)));
+                                ? rainbow
+                                : addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, visible[i][j] * 0.7f + 0.15f)), 1f - change)));
                     }
                     else {
                         batch.setPackedColor(DescriptiveColor.oklabIntToFloat(toCursor.contains(Coord.get(i, j))
-                                ? DescriptiveColor.lerpColors(bgColors[i][j], rainbow, 0.95f)
-                                : DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, visible[i][j] * 0.7f + 0.15f)));
+                                ? rainbow
+                                : addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, visible[i][j] * 0.7f + 0.15f))));
                     }
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(justHidden.contains(i, j)) {
                     batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
-                            DescriptiveColor.lerpColors(DescriptiveColor.lerpColors(bgColors[i][j], INT_LIGHTING, oldVisible[i][j] * 0.7f + 0.15f),
+                            DescriptiveColor.lerpColors(addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, oldVisible[i][j] * 0.7f + 0.15f)),
                             DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change)));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
@@ -649,6 +647,25 @@ public class DawnSquad extends ApplicationAdapter {
         }
         playerSprite.animate(time).draw(batch);
 //        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
+    }
+
+    /**
+     * Mixes the packed int color start and the packed in color end additively. The colors (start and end)
+     * should be packed Oklab ints. This is a good way to reduce allocations of temporary Colors. You will
+     * probably want to convert the color for rendering with {@link DescriptiveColor#toRGBA8888(int)}.
+     *
+     * @param start      the starting color as a packed int
+     * @param end      the end/target color as a packed int
+     * @return a packed Oklab int that represents a color between start and end
+     */
+    public static int addColors(final int start, final int end) {
+        final int
+                sL = (start & 0xFF), sA = (start >>> 8) & 0xFF, sB = (start >>> 16) & 0xFF, sAlpha = start >>> 24 & 0xFF,
+                eL = (end & 0xFF), eA = (end >>> 8) & 0xFF, eB = (end >>> 16) & 0xFF, eAlpha = end >>> 24 & 0xFF;
+        return (Math.min(Math.max(sL + eL - 0x80, 0), 255)
+                | (Math.min(Math.max(sA + eA - 0x7F, 0), 255) << 8)
+                | (Math.min(Math.max(sB + eB - 0x7F, 0), 255) << 16)
+                | (Math.min(Math.max(sAlpha + eAlpha - 0x7F, 0), 255) << 24));
     }
 
     /**
