@@ -385,6 +385,11 @@ public class DawnSquad extends ApplicationAdapter {
             @Override
             public boolean keyUp(int keycode) {
                 switch (keycode) {
+                    case F:
+                        // this probably isn't needed currently, since the FPS is shown on-screen.
+                        // it could be useful in the future.
+                        System.out.println(Gdx.graphics.getFramesPerSecond());
+                        break;
                     case P:
                         debugPrintVisible();
                         break;
@@ -587,13 +592,8 @@ public class DawnSquad extends ApplicationAdapter {
     public void putMap()
     {
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
-        //In many other situations, you would clear the drawn characters to prevent things that had been drawn in the
-        //past from affecting the current frame. This isn't a problem here, but would probably be an issue if we had
-        //monsters running in and out of our vision. If artifacts from previous frames show up, uncomment the next line.
-        //display.clear();
 
-//        float change = Math.min(Math.max(playerSprite.location.getChange(), 0f), 1f);
-        float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 0.004f, 0f), 1f);
+        final float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 0.004f, 0f), 1f);
 
         int rainbow = DescriptiveColor.maximizeSaturation(160,
                 (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
@@ -601,28 +601,31 @@ public class DawnSquad extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if(visible[i][j] > 0.01) {
                     if(justSeen.contains(i, j)){
+                        // if a cell just became visible in the last frame, we fade it in over a short animation.
                         batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
                                 DescriptiveColor.fade(
                                 toCursor.contains(Coord.get(i, j))
                                 ? rainbow
-                                : addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, visible[i][j] * 0.7f + 0.15f)), 1f - change)));
+                                : DescriptiveColor.addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, visible[i][j] * 0.7f + 0.15f)), 1f - change)));
                     }
                     else {
                         batch.setPackedColor(DescriptiveColor.oklabIntToFloat(toCursor.contains(Coord.get(i, j))
                                 ? rainbow
-                                : addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, visible[i][j] * 0.7f + 0.15f))));
+                                : DescriptiveColor.addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, visible[i][j] * 0.7f + 0.15f))));
                     }
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(justHidden.contains(i, j)) {
+                    // if a cell was visible in the previous frame but isn't now, we fade it out to the seen color.
                     batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
-                            DescriptiveColor.lerpColors(addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, oldVisible[i][j] * 0.7f + 0.15f)),
+                            DescriptiveColor.lerpColors(DescriptiveColor.addColors(bgColors[i][j], DescriptiveColor.lerpColors(INT_GRAY, INT_LIGHTING, oldVisible[i][j] * 0.7f + 0.15f)),
                             DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f), change)));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(lineDungeon[i][j], solid), i, j, 1f, 1f);
                 } else if(seen.contains(i, j)) {
+                    // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
                     batch.setPackedColor(DescriptiveColor.oklabIntToFloat(DescriptiveColor.lerpColors(bgColors[i][j], INT_GRAY, 0.6f)));
                     if(lineDungeon[i][j] == '/' || lineDungeon[i][j] == '+') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), i, j, 1f, 1f);
@@ -636,36 +639,20 @@ public class DawnSquad extends ApplicationAdapter {
             for (int j = 0; j < bigHeight; j++) {
                 if (visible[i][j] > 0.0) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
-                        if(justSeen.contains(i, j)) monster.animate(time).draw(batch, change);
+                        // like with scenery, monsters fade in when just seen in the last frame.
+                        if(justSeen.contains(i, j))
+                            monster.animate(time).draw(batch, change);
                         else monster.animate(time).draw(batch);
                     }
                 }
-                else if(justHidden.contains(i, j) && (monster = monsters.get(Coord.get(i, j))) != null)
+                else if(justHidden.contains(i, j) && (monster = monsters.get(Coord.get(i, j))) != null) {
+                    // and just like with scenery, monsters that just stopped being visible fade out (though to transparent here).
                     monster.animate(time).draw(batch, 1f - change);
-
+                }
             }
         }
         playerSprite.animate(time).draw(batch);
 //        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
-    }
-
-    /**
-     * Mixes the packed int color start and the packed in color end additively. The colors (start and end)
-     * should be packed Oklab ints. This is a good way to reduce allocations of temporary Colors. You will
-     * probably want to convert the color for rendering with {@link DescriptiveColor#toRGBA8888(int)}.
-     *
-     * @param start      the starting color as a packed int
-     * @param end      the end/target color as a packed int
-     * @return a packed Oklab int that represents a color between start and end
-     */
-    public static int addColors(final int start, final int end) {
-        final int
-                sL = (start & 0xFF), sA = (start >>> 8) & 0xFF, sB = (start >>> 16) & 0xFF, sAlpha = start >>> 24 & 0xFF,
-                eL = (end & 0xFF), eA = (end >>> 8) & 0xFF, eB = (end >>> 16) & 0xFF, eAlpha = end >>> 24 & 0xFF;
-        return (Math.min(Math.max(sL + eL - 0x80, 0), 255)
-                | (Math.min(Math.max(sA + eA - 0x7F, 0), 255) << 8)
-                | (Math.min(Math.max(sB + eB - 0x7F, 0), 255) << 16)
-                | (Math.min(Math.max(sAlpha + eAlpha - 0x7F, 0), 255) << 24));
     }
 
     /**
