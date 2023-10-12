@@ -2,8 +2,8 @@ package com.github.yellowstonegames.lwjgl3;
 
 import static com.github.tommyettinger.DawnSquad.cellHeight;
 import static com.github.tommyettinger.DawnSquad.cellWidth;
-import static com.github.tommyettinger.DawnSquad.gridHeight;
-import static com.github.tommyettinger.DawnSquad.gridWidth;
+import static com.github.tommyettinger.DawnSquad.shownHeight;
+import static com.github.tommyettinger.DawnSquad.shownWidth;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -36,6 +36,9 @@ public class Lwjgl3Launcher {
 		//// If you remove the above line and set Vsync to false, you may get unlimited FPS, which can be
 		//// useful for testing performance, but can also be very stressful to some hardware.
 		//// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
+		//// That would use the following two settings:
+//		configuration.useVsync(false);
+//		configuration.setForegroundFPS(0);
 
 		configuration.setTitle("SquidSquad Dawnlike Demo");
 		//// useful to know if something's wrong in a shader.
@@ -45,7 +48,7 @@ public class Lwjgl3Launcher {
 		ShaderProgram.prependFragmentCode = "#version 110\n";
 		// these are constants in the main game class; they should match your
 		// initial viewport size in pixels before it gets resized to fullscreen.
-		configuration.setWindowedMode(gridWidth * cellWidth, gridHeight * cellHeight);
+		configuration.setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
 		return configuration;
 	}
 }

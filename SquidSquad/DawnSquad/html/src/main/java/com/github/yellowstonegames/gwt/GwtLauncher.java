@@ -18,7 +18,7 @@ public class GwtLauncher extends GwtApplication {
 //			return cfg;
 		// If you want a fixed size application, comment out the above resizable section,
 		// and uncomment below:
-		GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(gridWidth * cellWidth, gridHeight * cellHeight);
+		GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(shownWidth * cellWidth, shownHeight * cellHeight);
 		cfg.disableAudio = true;
 		return cfg;
 	}

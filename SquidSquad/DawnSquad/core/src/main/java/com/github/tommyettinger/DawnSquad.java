@@ -49,25 +49,24 @@ public class DawnSquad extends ApplicationAdapter {
     // This maps chars, such as '#', to specific images, such as a pillar.
     private IntObjectMap<TextureAtlas.AtlasRegion> charMapping;
 
-    private DungeonProcessor dungeonGen;
     private char[][] bareDungeon, lineDungeon, prunedDungeon;
     // these use packed Oklab int colors, which avoid the overhead of creating new Color objects
     private int[][] bgColors;
     private Coord player;
     private final Coord[] playerArray = new Coord[1];
 
-    private final int fovRange = 8;
+    private int fovRange = 8;
     private final Vector2 pos = new Vector2();
 
     /** In number of cells */
-    public static final int gridWidth = 32;
+    public static final int shownWidth = 32;
     /** In number of cells */
-    public static final int gridHeight = 24;
+    public static final int shownHeight = 24;
 
     /** In number of cells */
-    public static final int bigWidth = gridWidth * 2;
+    public static final int dungeonWidth = shownWidth * 2;
     /** In number of cells */
-    public static final int bigHeight = gridHeight * 2;
+    public static final int dungeonHeight = shownHeight * 2;
 
     /** The pixel width of a cell */
     public static final int cellWidth = 32;
@@ -76,7 +75,7 @@ public class DawnSquad extends ApplicationAdapter {
 
     private boolean onGrid(int screenX, int screenY)
     {
-        return screenX >= 0 && screenX < bigWidth && screenY >= 0 && screenY < bigHeight;
+        return screenX >= 0 && screenX < dungeonWidth && screenY >= 0 && screenY < dungeonHeight;
     }
 
     private Color bgColor;
@@ -148,7 +147,7 @@ public class DawnSquad extends ApplicationAdapter {
         //TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS or TilesetType.CAVES_LIMIT_CONNECTIVITY to change the sections that
         //this will use, or just pass in a full 2D char array produced from some other generator, such as
         //SerpentMapGenerator, OrganicMapGenerator, or DenseRoomMapGenerator.
-        dungeonGen = new DungeonProcessor(bigWidth, bigHeight, rng);
+        DungeonProcessor dungeonGen = new DungeonProcessor(dungeonWidth, dungeonHeight, rng);
         //this next line randomly adds water to the dungeon in pools.
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
         //this next line makes 10% of valid door positions into complete doors.
@@ -200,8 +199,8 @@ public class DawnSquad extends ApplicationAdapter {
         bareDungeon = dungeonGen.getBarePlaceGrid();
 
         resistance = FOV.generateSimpleResistances(lineDungeon);
-        visible = new float[bigWidth][bigHeight];
-        oldVisible = new float[bigWidth][bigHeight];
+        visible = new float[dungeonWidth][dungeonHeight];
+        oldVisible = new float[dungeonWidth][dungeonHeight];
         
         prunedDungeon = ArrayTools.copy(lineDungeon);
         // here, we need to get a random floor cell to place the player upon, without the possibility of putting him
@@ -251,7 +250,7 @@ public class DawnSquad extends ApplicationAdapter {
         // Region they are called on, which can greatly help efficiency on long chains of operations.
         seen = seen == null ? blockage.not().copy() : seen.remake(blockage.not());
         justSeen = justSeen == null ? seen.copy() : justSeen.remake(seen);
-        justHidden = justHidden == null ? new Region(bigWidth, bigHeight) : justHidden.resizeAndEmpty(bigWidth, bigHeight);
+        justHidden = justHidden == null ? new Region(dungeonWidth, dungeonHeight) : justHidden.resizeAndEmpty(dungeonWidth, dungeonHeight);
         // Here is one of those methods on a Region; fringe8way takes a Region (here, the set of cells
         // that are visible to the player), and modifies it to contain only cells that were not in the last step, but
         // were adjacent to a cell that was present in the last step. This can be visualized as taking the area just
@@ -309,8 +308,8 @@ public class DawnSquad extends ApplicationAdapter {
 
         rng = new ChopRandom(123, -456, 789, 987654321);
 
-        mainViewport = new ScalingViewport(Scaling.fill, gridWidth, gridHeight);
-        mainViewport.setScreenBounds(0, 0, gridWidth * cellWidth, gridHeight * cellHeight);
+        mainViewport = new ScalingViewport(Scaling.fill, shownWidth, shownHeight);
+        mainViewport.setScreenBounds(0, 0, shownWidth * cellWidth, shownHeight * cellHeight);
         camera = mainViewport.getCamera();
         camera.update();
 
@@ -330,7 +329,7 @@ public class DawnSquad extends ApplicationAdapter {
         font.getData().markupEnabled = true;
         // 0xFF848350 is fully opaque, slightly-yellow-brown, and about 30% lightness.
         // It affects the default color each cell has, and changes when there is a blood stain.
-        bgColors = ArrayTools.fill(0xFF828150, bigWidth, bigHeight);
+        bgColors = ArrayTools.fill(0xFF828150, dungeonWidth, dungeonHeight);
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);
 
@@ -457,7 +456,7 @@ public class DawnSquad extends ApplicationAdapter {
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
      * In a fully-fledged game, this would not be organized like this, but this is a one-file demo.
-     * @param next
+     * @param next where to move
      */
     private void move(Coord next) {
         lastMove = TimeUtils.millis();
@@ -468,7 +467,7 @@ public class DawnSquad extends ApplicationAdapter {
         int newX = next.x, newY = next.y;
         if (health <= 0) return;
         playerSprite.setPackedColor(Color.WHITE_FLOAT_BITS);
-        if (newX >= 0 && newY >= 0 && newX < bigWidth && newY < bigHeight
+        if (newX >= 0 && newY >= 0 && newX < dungeonWidth && newY < dungeonHeight
                 && bareDungeon[newX][newY] != '#') {
             // '+' is a door.
             if (prunedDungeon[newX][newY] == '+') {
@@ -559,6 +558,7 @@ public class DawnSquad extends ApplicationAdapter {
                 getToPlayer.findPath(nextMovePositions, 1, 7, monsters.keySet(), null, pos, playerArray);
                 if (nextMovePositions.notEmpty()) {
                     Coord tmp = nextMovePositions.get(0);
+                    if(tmp == null) continue;
                     // if we would move into the player, instead damage the player and animate a bump motion.
                     if (tmp.x == player.x && tmp.y == player.y) {
                         playerSprite.setPackedColor(DescriptiveColor.oklabIntToFloat(INT_BLOOD));
@@ -597,8 +597,8 @@ public class DawnSquad extends ApplicationAdapter {
 
         int rainbow = DescriptiveColor.maximizeSaturation(160,
                 (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
-        for (int i = 0; i < bigWidth; i++) {
-            for (int j = 0; j < bigHeight; j++) {
+        for (int i = 0; i < dungeonWidth; i++) {
+            for (int j = 0; j < dungeonHeight; j++) {
                 if(visible[i][j] > 0.01) {
                     if(justSeen.contains(i, j)){
                         // if a cell just became visible in the last frame, we fade it in over a short animation.
@@ -635,8 +635,8 @@ public class DawnSquad extends ApplicationAdapter {
         }
         batch.setPackedColor(Color.WHITE_FLOAT_BITS);
         AnimatedGlidingSprite monster;
-        for (int i = 0; i < bigWidth; i++) {
-            for (int j = 0; j < bigHeight; j++) {
+        for (int i = 0; i < dungeonWidth; i++) {
+            for (int j = 0; j < dungeonHeight; j++) {
                 if (visible[i][j] > 0.0) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
                         // like with scenery, monsters fade in when just seen in the last frame.
@@ -698,6 +698,7 @@ public class DawnSquad extends ApplicationAdapter {
         camera.position.x = playerSprite.getX();
         camera.position.y =  playerSprite.getY();
         camera.update();
+
 
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
@@ -765,6 +766,9 @@ public class DawnSquad extends ApplicationAdapter {
                     playerToCursor.partialScan(13, blockage);
                 }
             }
+        }
+        else {
+            handleHeldKeys();
         }
         putMap();
         pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight);
