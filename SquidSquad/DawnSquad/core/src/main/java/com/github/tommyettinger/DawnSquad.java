@@ -45,6 +45,8 @@ public class DawnSquad extends ApplicationAdapter {
     // random number generator; this one is more efficient on GWT, but less-so on desktop.
     private ChopRandom rng;
 
+    public long seed = 0L;
+
     // Stores all images we use here efficiently, as well as the font image
     private TextureAtlas atlas;
     // This maps chars, such as '#', to specific images, such as a pillar.
@@ -117,6 +119,13 @@ public class DawnSquad extends ApplicationAdapter {
             INT_LIGHTING = DescriptiveColor.describeOklab("lightest white yellow"),
             INT_GRAY = DescriptiveColor.describeOklab("darker gray");
 
+    public DawnSquad() {
+
+    }
+
+    public DawnSquad(long seed) {
+        this.seed = seed;
+    }
 
     /**
      * Just the parts of create() that can be called again if the game is reloaded.
@@ -332,6 +341,7 @@ public class DawnSquad extends ApplicationAdapter {
         // It affects the default color each cell has, and changes when there is a blood stain.
         bgColors = ArrayTools.fill(0xFF828150, dungeonWidth, dungeonHeight);
 
+        /*
         Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
         Pixmap pAtlas = new Pixmap(Gdx.files.classpath("dawnlike/Dawnlike.png"));
         String[] cursorNames = {"broadsword", "dwarvish spear", "javelin", "vulgar polearm", "pole cleaver", "quarterstaff"};
@@ -339,7 +349,8 @@ public class DawnSquad extends ApplicationAdapter {
         pCursor.drawPixmap(pAtlas, pointer.getRegionX(), pointer.getRegionY(), 16, 16, 0, 0, cellWidth, cellHeight);
         Gdx.graphics.setCursor(Gdx.graphics.newCursor(pCursor, 1, 1));
         pAtlas.dispose();
-        pCursor.dispose();
+        pCursor.dispose()
+        */
 
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);
@@ -373,7 +384,7 @@ public class DawnSquad extends ApplicationAdapter {
 
         bgColor = Color.BLACK;
 
-        restart(0);
+        restart(seed);
 
         //+1 is up on the screen
         //-1 is down on the screen
@@ -471,12 +482,12 @@ public class DawnSquad extends ApplicationAdapter {
      */
     private void move(Coord next) {
         lastMove = TimeUtils.millis();
+        if (health <= 0) return;
         CoordGlider cg = playerSprite.location;
         // this prevents movements from restarting while a slide is already in progress.
         if(cg.getChange() != 0f && cg.getChange() != 1f) return;
 
         int newX = next.x, newY = next.y;
-        if (health <= 0) return;
         playerSprite.setPackedColor(Color.WHITE_FLOAT_BITS);
         if (newX >= 0 && newY >= 0 && newX < dungeonWidth && newY < dungeonHeight
                 && bareDungeon[newX][newY] != '#') {
@@ -547,8 +558,7 @@ public class DawnSquad extends ApplicationAdapter {
         justHidden.andNot(blockage);
         blockage.fringe8way();
         // handle monster turns
-        for(int ci = 0; ci < monCount; ci++)
-        {
+        for(int ci = 0; ci < monCount; ci++) {
             Coord pos = monsters.keyAt(ci);
             AnimatedGlidingSprite mon = monsters.getAt(ci);
             if(mon == null) continue;
@@ -611,7 +621,7 @@ public class DawnSquad extends ApplicationAdapter {
         for (int i = 0; i < dungeonWidth; i++) {
             for (int j = 0; j < dungeonHeight; j++) {
                 if(visible[i][j] > 0.01) {
-                    if(justSeen.contains(i, j)){
+                    if(justSeen.contains(i, j)) {
                         // if a cell just became visible in the last frame, we fade it in over a short animation.
                         batch.setPackedColor(DescriptiveColor.oklabIntToFloat(
                                 DescriptiveColor.fade(

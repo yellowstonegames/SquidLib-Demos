@@ -23,10 +23,6 @@ public class Lwjgl3Launcher {
 	}
 
 	private static Lwjgl3Application createApplication() {
-		return new Lwjgl3Application(new DawnSquad(), getDefaultConfiguration());
-	}
-
-	private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
 		Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
 		configuration.disableAudio(true);
 		configuration.setResizable(true);
@@ -49,6 +45,11 @@ public class Lwjgl3Launcher {
 		// these are constants in the main game class; they should match your
 		// initial viewport size in pixels before it gets resized to fullscreen.
 		configuration.setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
-		return configuration;
+
+		String env = System.getenv("seed");
+		long seed;
+		if(env == null) seed = System.currentTimeMillis();
+		else seed = Long.parseLong(env);
+		return new Lwjgl3Application(new DawnSquad(seed), configuration);
 	}
 }

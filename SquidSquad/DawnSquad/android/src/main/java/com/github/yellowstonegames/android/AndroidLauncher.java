@@ -12,6 +12,6 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
-		initialize(new DawnSquad(), configuration);
+		initialize(new DawnSquad(System.currentTimeMillis()), configuration);
 	}
 }

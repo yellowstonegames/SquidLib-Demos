@@ -25,7 +25,7 @@ public class GwtLauncher extends GwtApplication {
 
 	@Override
 	public ApplicationListener createApplicationListener() {
-		return new DawnSquad();
+		return new DawnSquad(System.currentTimeMillis());
 	}
 
 //	@Override
