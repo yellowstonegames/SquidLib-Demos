@@ -3,6 +3,7 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -330,6 +331,16 @@ public class DawnSquad extends ApplicationAdapter {
         // 0xFF848350 is fully opaque, slightly-yellow-brown, and about 30% lightness.
         // It affects the default color each cell has, and changes when there is a blood stain.
         bgColors = ArrayTools.fill(0xFF828150, dungeonWidth, dungeonHeight);
+
+        Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
+        Pixmap pAtlas = new Pixmap(Gdx.files.classpath("dawnlike/Dawnlike.png"));
+        String[] cursorNames = {"broadsword", "dwarvish spear", "javelin", "vulgar polearm", "pole cleaver", "quarterstaff"};
+        TextureAtlas.AtlasRegion pointer = atlas.findRegion(cursorNames[(int) (TimeUtils.millis() & 0xFFFFF) % cursorNames.length]);
+        pCursor.drawPixmap(pAtlas, pointer.getRegionX(), pointer.getRegionY(), 16, 16, 0, 0, cellWidth, cellHeight);
+        Gdx.graphics.setCursor(Gdx.graphics.newCursor(pCursor, 1, 1));
+        pAtlas.dispose();
+        pCursor.dispose();
+
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);
 
