@@ -40,7 +40,13 @@ import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.ChopRandom;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
-import com.github.yellowstonegames.grid.*;
+import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
+import com.github.yellowstonegames.grid.Direction;
+import com.github.yellowstonegames.grid.LineTools;
+import com.github.yellowstonegames.grid.Measurement;
+import com.github.yellowstonegames.grid.Radiance;
+import com.github.yellowstonegames.grid.Region;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -256,7 +262,8 @@ public class SunriseSquad extends ApplicationAdapter {
         playerSprite.setSize(1f, 1f);
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
         vision.restart(linePlaceMap, player, 8);
-        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0.3f, 0f));
+        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0f, 0f));
+//        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0.3f, 0f));
         floors.remove(player);
         int numMonsters = 100;
         monsters = new CoordObjectOrderedMap<>(numMonsters);
@@ -270,7 +277,8 @@ public class SunriseSquad extends ApplicationAdapter {
             monster.setSize(1f, 1f);
             monsters.put(monPos, monster);
             vision.lighting.addLight(monPos, new Radiance(rng.nextFloat(3f) + 2f,
-                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0.5f, 0f));
+                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0f, 0f));
+//                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0.5f, 0f));
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
         monsterDirector = new Director<>(c -> monsters.get(c).getLocation(), monsters.order(), 150);
@@ -571,8 +579,9 @@ public class SunriseSquad extends ApplicationAdapter {
      */
     public void putMap()
     {
-        float change = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4f, 0f), 1000f);
-        vision.update(change);
+        double dc = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4.0, 0.0), 1000.0);
+        vision.update(dc);
+        float change = (float) dc;
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
 //        final float sun = 1f - ((time * 0.1f) - (int)(time * 0.1f)),
 //                blueYellow = TrigTools.sinTurns(sun),
