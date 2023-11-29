@@ -1,14 +1,11 @@
 package com.github.yellowstonegames.lwjgl3;
 
-import static com.github.tommyettinger.DawnSquad.cellHeight;
-import static com.github.tommyettinger.DawnSquad.cellWidth;
-import static com.github.tommyettinger.DawnSquad.shownHeight;
-import static com.github.tommyettinger.DawnSquad.shownWidth;
-
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.github.tommyettinger.DawnSquad;
+import com.github.tommyettinger.SunriseSquad;
+
+import static com.github.tommyettinger.SunriseSquad.*;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -50,6 +47,6 @@ public class Lwjgl3Launcher {
 		long seed;
 		if(env == null) seed = System.currentTimeMillis();
 		else seed = Long.parseLong(env);
-		return new Lwjgl3Application(new DawnSquad(seed), configuration);
+		return new Lwjgl3Application(new SunriseSquad(seed), configuration);
 	}
 }

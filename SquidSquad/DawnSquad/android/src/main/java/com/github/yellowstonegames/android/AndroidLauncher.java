@@ -1,10 +1,9 @@
 package com.github.yellowstonegames.android;
 
 import android.os.Bundle;
-
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.github.tommyettinger.DawnSquad;
+import com.github.tommyettinger.SunriseSquad;
 
 /** Launches the Android application. */
 public class AndroidLauncher extends AndroidApplication {
@@ -12,6 +11,6 @@ public class AndroidLauncher extends AndroidApplication {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplicationConfiguration configuration = new AndroidApplicationConfiguration();
-		initialize(new DawnSquad(System.currentTimeMillis()), configuration);
+		initialize(new SunriseSquad(System.currentTimeMillis()), configuration);
 	}
 }

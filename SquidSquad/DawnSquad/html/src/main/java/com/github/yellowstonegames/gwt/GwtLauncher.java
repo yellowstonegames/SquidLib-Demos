@@ -3,9 +3,9 @@ package com.github.yellowstonegames.gwt;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.github.tommyettinger.DawnSquad;
+import com.github.tommyettinger.SunriseSquad;
 
-import static com.github.tommyettinger.DawnSquad.*;
+import static com.github.tommyettinger.SunriseSquad.*;
 
 /** Launches the GWT application. */
 public class GwtLauncher extends GwtApplication {
@@ -25,7 +25,7 @@ public class GwtLauncher extends GwtApplication {
 
 	@Override
 	public ApplicationListener createApplicationListener() {
-		return new DawnSquad(System.currentTimeMillis());
+		return new SunriseSquad(System.currentTimeMillis());
 	}
 
 //	@Override
