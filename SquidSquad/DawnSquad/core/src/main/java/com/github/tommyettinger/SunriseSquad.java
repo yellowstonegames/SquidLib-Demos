@@ -19,12 +19,10 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -40,13 +38,7 @@ import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.ChopRandom;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
-import com.github.yellowstonegames.grid.Coord;
-import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
-import com.github.yellowstonegames.grid.Direction;
-import com.github.yellowstonegames.grid.LineTools;
-import com.github.yellowstonegames.grid.Measurement;
-import com.github.yellowstonegames.grid.Radiance;
-import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -61,7 +53,9 @@ import static com.badlogic.gdx.Input.Keys.*;
 public class SunriseSquad extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
     private long startTime, lastMove;
+
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
+
     private SpriteBatch batch;
     private Phase phase = Phase.WAIT;
 
@@ -98,23 +92,34 @@ public class SunriseSquad extends ApplicationAdapter {
 
     private final Vector2 pos = new Vector2();
 
-    /** In number of cells */
+    /**
+     * In number of cells
+     */
     public static final int shownWidth = 32;
-    /** In number of cells */
+    /**
+     * In number of cells
+     */
     public static final int shownHeight = 24;
 
-    /** In number of cells */
+    /**
+     * In number of cells
+     */
     public static final int placeWidth = shownWidth * 2;
-    /** In number of cells */
+    /**
+     * In number of cells
+     */
     public static final int placeHeight = shownHeight * 2;
 
-    /** The pixel width of a cell */
+    /**
+     * The pixel width of a cell
+     */
     public static final int cellWidth = 32;
-    /** The pixel height of a cell */
+    /**
+     * The pixel height of a cell
+     */
     public static final int cellHeight = 32;
 
-    private boolean onGrid(int screenX, int screenY)
-    {
+    private boolean onGrid(int screenX, int screenY) {
         return screenX >= 0 && screenX < placeWidth && screenY >= 0 && screenY < placeHeight;
     }
 
@@ -144,15 +149,18 @@ public class SunriseSquad extends ApplicationAdapter {
     public SunriseSquad() {
         this(1L);
     }
+
     public SunriseSquad(long seed) {
         this.seed = seed;
     }
+
     /**
      * Just the parts of create() that can be called again if the game is reloaded.
      */
     public void restart() {
         restart(TimeUtils.millis() ^ System.identityHashCode(this));
     }
+
     /**
      * Just the parts of create() that can be called again if the game is reloaded.
      */
@@ -262,8 +270,8 @@ public class SunriseSquad extends ApplicationAdapter {
         playerSprite.setSize(1f, 1f);
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
         vision.restart(linePlaceMap, player, 8);
-        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0f, 0f));
-//        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0.3f, 0f));
+//        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0f, 0f));
+        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0.3f, 0f));
         floors.remove(player);
         int numMonsters = 100;
         monsters = new CoordObjectOrderedMap<>(numMonsters);
@@ -277,8 +285,8 @@ public class SunriseSquad extends ApplicationAdapter {
             monster.setSize(1f, 1f);
             monsters.put(monPos, monster);
             vision.lighting.addLight(monPos, new Radiance(rng.nextFloat(3f) + 2f,
-                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0f, 0f));
-//                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0.5f, 0f));
+//                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0f, 0f));
+                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0.5f, 0f));
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
         monsterDirector = new Director<>(c -> monsters.get(c).getLocation(), monsters.order(), 150);
@@ -301,14 +309,14 @@ public class SunriseSquad extends ApplicationAdapter {
         playerToCursor.partialScan(13, vision.blockage);
 
         lang = '"' + Language.DEMONIC.sentence(rng, 4, 7,
-                new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"",  "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
+                new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"", "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
 
     }
 
     @Override
-    public void create () {
+    public void create() {
 
-        Gdx.app.setLogLevel(Application.LOG_ERROR);
+        Gdx.app.setLogLevel(Application.LOG_INFO);
         // We need access to a batch to render most things.
         batch = new SpriteBatch();
 
@@ -331,7 +339,7 @@ public class SunriseSquad extends ApplicationAdapter {
         font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
 //        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
         font.setUseIntegerPositions(false);
-        font.getData().setScale(2f/cellWidth, 2f/cellHeight);
+        font.getData().setScale(2f / cellWidth, 2f / cellHeight);
         font.getData().markupEnabled = true;
         // 0xFF848350 is fully opaque, slightly-yellow-brown, and about 30% lightness.
         // It affects the default color each cell has before lighting affects it.
@@ -350,25 +358,25 @@ public class SunriseSquad extends ApplicationAdapter {
         charMapping = new IntObjectMap<>(64);
 
         charMapping.put('.', atlas.findRegion("day tile floor c"));
-        charMapping.put(',', atlas.findRegion("brick clear pool center"      ));
-        charMapping.put('~', atlas.findRegion("brick murky pool center"      ));
-        charMapping.put('"', atlas.findRegion("dusk grass floor c"      ));
-        charMapping.put('#', atlas.findRegion("lit brick wall center"     ));
+        charMapping.put(',', atlas.findRegion("brick clear pool center"));
+        charMapping.put('~', atlas.findRegion("brick murky pool center"));
+        charMapping.put('"', atlas.findRegion("dusk grass floor c"));
+        charMapping.put('#', atlas.findRegion("lit brick wall center"));
         charMapping.put('+', atlas.findRegion("closed wooden door front")); //front
-        charMapping.put('/', atlas.findRegion("open wooden door side"  )); //side
-        charMapping.put('┌', atlas.findRegion("lit brick wall right down"            ));
-        charMapping.put('└', atlas.findRegion("lit brick wall right up"            ));
-        charMapping.put('┴', atlas.findRegion("lit brick wall left right up"           ));
-        charMapping.put('┬', atlas.findRegion("lit brick wall left right down"           ));
-        charMapping.put('─', atlas.findRegion("lit brick wall left right"            ));
-        charMapping.put('│', atlas.findRegion("lit brick wall up down"            ));
-        charMapping.put('├', atlas.findRegion("lit brick wall right up down"           ));
-        charMapping.put('┼', atlas.findRegion("lit brick wall left right up down"          ));
-        charMapping.put('┤', atlas.findRegion("lit brick wall left up down"           ));
-        charMapping.put('┘', atlas.findRegion("lit brick wall left up"            ));
-        charMapping.put('┐', atlas.findRegion("lit brick wall left down"            ));
+        charMapping.put('/', atlas.findRegion("open wooden door side")); //side
+        charMapping.put('┌', atlas.findRegion("lit brick wall right down"));
+        charMapping.put('└', atlas.findRegion("lit brick wall right up"));
+        charMapping.put('┴', atlas.findRegion("lit brick wall left right up"));
+        charMapping.put('┬', atlas.findRegion("lit brick wall left right down"));
+        charMapping.put('─', atlas.findRegion("lit brick wall left right"));
+        charMapping.put('│', atlas.findRegion("lit brick wall up down"));
+        charMapping.put('├', atlas.findRegion("lit brick wall right up down"));
+        charMapping.put('┼', atlas.findRegion("lit brick wall left right up down"));
+        charMapping.put('┤', atlas.findRegion("lit brick wall left up down"));
+        charMapping.put('┘', atlas.findRegion("lit brick wall left up"));
+        charMapping.put('┐', atlas.findRegion("lit brick wall left down"));
 
-        charMapping.put(' ', atlas.findRegion("lit brick wall up down"            ));
+        charMapping.put(' ', atlas.findRegion("lit brick wall up down"));
         charMapping.put('1', atlas.findRegion("red liquid drizzle"));
         charMapping.put('2', atlas.findRegion("red liquid spatter"));
         charMapping.put('s', atlas.findRegion("little shine", 1));
@@ -472,6 +480,7 @@ public class SunriseSquad extends ApplicationAdapter {
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
      * In a fully-fledged game, this would not be organized like this, but this is a one-file demo.
+     *
      * @param next where to move
      */
     private void move(Coord next) {
@@ -479,7 +488,7 @@ public class SunriseSquad extends ApplicationAdapter {
         if (health <= 0) return;
         CoordGlider cg = playerSprite.location;
         // this prevents movements from restarting while a slide is already in progress.
-        if(cg.getChange() != 0f && cg.getChange() != 1f) return;
+        if (cg.getChange() != 0f && cg.getChange() != 1f) return;
 
         int newX = next.x, newY = next.y;
         playerSprite.setPackedColor(Color.WHITE_FLOAT_BITS);
@@ -490,15 +499,14 @@ public class SunriseSquad extends ApplicationAdapter {
                 vision.editSingle(next, '/');
             } else {
                 // if a monster was at the position we moved into, and so was successfully removed...
-                if(monsters.containsKey(next))
-                {
+                if (monsters.containsKey(next)) {
                     monsters.remove(next);
                     // remove any light present at the now-dead enemy's location
                     vision.lighting.removeLight(next);
                     for (int x = -1; x <= 1; x++) {
                         for (int y = -1; y <= 1; y++) {
-                            if(vision.prunedPlaceMap[newX+x][newY+y] == '.' && rng.nextBoolean())
-                                vision.prunedPlaceMap[newX+x][newY+y] = rng.next(2) != 0 ? '1' : '2';
+                            if (vision.prunedPlaceMap[newX + x][newY + y] == '.' && rng.nextBoolean())
+                                vision.prunedPlaceMap[newX + x][newY + y] = rng.next(2) != 0 ? '1' : '2';
                         }
                     }
                 }
@@ -516,18 +524,17 @@ public class SunriseSquad extends ApplicationAdapter {
         }
     }
 
-    private void afterChange()
-    {
+    private void afterChange() {
         phase = Phase.MONSTER_ANIM;
         // updates our mutable player array in-place, because a Coord like player is immutable.
         playerArray[0] = player;
         int monCount = monsters.size();
         // handle monster turns
         float[][] lightLevels = vision.lighting.fovResult;
-        for(int ci = 0; ci < monCount; ci++) {
+        for (int ci = 0; ci < monCount; ci++) {
             Coord pos = monsters.keyAt(ci);
             AnimatedGlidingSprite mon = monsters.getAt(ci);
-            if(mon == null) continue;
+            if (mon == null) continue;
             // monster values are used to store their aggression, 1 for actively stalking the player, 0 for not.
             if (lightLevels[pos.x][pos.y] > 0.01) {
                 // the player's position is set as a goal by findPath(), later.
@@ -545,13 +552,13 @@ public class SunriseSquad extends ApplicationAdapter {
                 getToPlayer.findPath(nextMovePositions, 1, 7, monsters.keySet(), null, pos, playerArray);
                 if (nextMovePositions.notEmpty()) {
                     Coord tmp = nextMovePositions.get(0);
-                    if(tmp == null) continue;
+                    if (tmp == null) continue;
                     // if we would move into the player, instead damage the player and animate a bump motion.
                     if (tmp.x == player.x && tmp.y == player.y) {
                         playerSprite.setPackedColor(DescriptiveColor.oklabIntToFloat(INT_BLOOD));
                         health--;
                         VectorSequenceGlider small = VectorSequenceGlider.BUMPS.getOrDefault(pos.toGoTo(player), null);
-                        if(small != null) {
+                        if (small != null) {
                             small = small.copy();
                             small.setCompleteRunner(() -> mon.setSmallMotion(null));
                         }
@@ -577,11 +584,9 @@ public class SunriseSquad extends ApplicationAdapter {
     /**
      * Draws the map, applies any highlighting for the path to the cursor, and then draws the player.
      */
-    public void putMap()
-    {
-        double dc = Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4.0, 0.0), 1000.0);
-        vision.update(dc);
-        float change = (float) dc;
+    public void putMap() {
+        float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4.0, 0.0), 1000.0);
+        vision.update(change);
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
 //        final float sun = 1f - ((time * 0.1f) - (int)(time * 0.1f)),
 //                blueYellow = TrigTools.sinTurns(sun),
@@ -593,7 +598,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
         for (int i = 0; i < toCursor.size(); i++) {
             Coord curr = toCursor.get(i);
-            if(vision.inView.contains(curr))
+            if (vision.inView.contains(curr))
                 vision.backgroundColors[curr.x][curr.y] = rainbow;
         }
 
@@ -602,10 +607,10 @@ public class SunriseSquad extends ApplicationAdapter {
         for (int x = 0; x < placeWidth; x++) {
             for (int y = 0; y < placeHeight; y++) {
                 char glyph = vision.prunedPlaceMap[x][y];
-                if(vision.seen.contains(x, y)) {
+                if (vision.seen.contains(x, y)) {
                     // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
                     batch.setPackedColor(DescriptiveColor.oklabIntToFloat(vision.backgroundColors[x][y]));
-                    if(glyph == '/' || glyph == '+' || glyph == '1' || glyph == '2') // doors expect a floor drawn beneath them
+                    if (glyph == '/' || glyph == '+' || glyph == '1' || glyph == '2') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), x, y, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(glyph, solid), x, y, 1f, 1f);
                     // visual debugging; show all cells w
@@ -623,8 +628,7 @@ public class SunriseSquad extends ApplicationAdapter {
                         monster.setPackedColor(DescriptiveColor.oklabIntToFloat(vision.getForegroundColor(i, j, change)));
                         monster.draw(batch);
                     }
-                }
-                else if(vision.justHidden.contains(i, j) && (monster = monsters.get(Coord.get(i, j))) != null) {
+                } else if (vision.justHidden.contains(i, j) && (monster = monsters.get(Coord.get(i, j))) != null) {
                     monster = monster.animate(time);
                     monster.setPackedColor(DescriptiveColor.oklabIntToFloat(vision.getForegroundColor(i, j, change)));
                     monster.draw(batch);
@@ -641,24 +645,24 @@ public class SunriseSquad extends ApplicationAdapter {
      */
     public void handleHeldKeys() {
         float c = playerSprite.location.getChange();
-        if(c != 0f && c != 1f) return;
-        if(input.isKeyPressed(A)  || input.isKeyPressed(H) || input.isKeyPressed(LEFT) || input.isKeyPressed(NUMPAD_4))
+        if (c != 0f && c != 1f) return;
+        if (input.isKeyPressed(A) || input.isKeyPressed(H) || input.isKeyPressed(LEFT) || input.isKeyPressed(NUMPAD_4))
             move(Direction.LEFT);
-        else if(input.isKeyPressed(S)  || input.isKeyPressed(J) || input.isKeyPressed(DOWN) || input.isKeyPressed(NUMPAD_2))
+        else if (input.isKeyPressed(S) || input.isKeyPressed(J) || input.isKeyPressed(DOWN) || input.isKeyPressed(NUMPAD_2))
             move(Direction.DOWN);
-        else if(input.isKeyPressed(W)  || input.isKeyPressed(K) || input.isKeyPressed(UP) || input.isKeyPressed(NUMPAD_8))
+        else if (input.isKeyPressed(W) || input.isKeyPressed(K) || input.isKeyPressed(UP) || input.isKeyPressed(NUMPAD_8))
             move(Direction.UP);
-        else if(input.isKeyPressed(D)  || input.isKeyPressed(L) || input.isKeyPressed(RIGHT) || input.isKeyPressed(NUMPAD_6))
+        else if (input.isKeyPressed(D) || input.isKeyPressed(L) || input.isKeyPressed(RIGHT) || input.isKeyPressed(NUMPAD_6))
             move(Direction.RIGHT);
-        else if(input.isKeyPressed(Y) || input.isKeyPressed(NUMPAD_7))
+        else if (input.isKeyPressed(Y) || input.isKeyPressed(NUMPAD_7))
             move(Direction.UP_LEFT);
-        else if(input.isKeyPressed(U) || input.isKeyPressed(NUMPAD_9))
+        else if (input.isKeyPressed(U) || input.isKeyPressed(NUMPAD_9))
             move(Direction.UP_RIGHT);
-        else if(input.isKeyPressed(B) || input.isKeyPressed(NUMPAD_1))
+        else if (input.isKeyPressed(B) || input.isKeyPressed(NUMPAD_1))
             move(Direction.DOWN_LEFT);
-        else if(input.isKeyPressed(N) || input.isKeyPressed(NUMPAD_3))
+        else if (input.isKeyPressed(N) || input.isKeyPressed(NUMPAD_3))
             move(Direction.DOWN_RIGHT);
-        else if(input.isKeyPressed(PERIOD) || input.isKeyPressed(NUMPAD_5) || input.isKeyPressed(NUMPAD_DOT))
+        else if (input.isKeyPressed(PERIOD) || input.isKeyPressed(NUMPAD_5) || input.isKeyPressed(NUMPAD_DOT))
             move(Direction.NONE);
     }
 
@@ -669,15 +673,15 @@ public class SunriseSquad extends ApplicationAdapter {
     }
 
     @Override
-    public void render () {
-        if(input.isKeyJustPressed(R))
+    public void render() {
+        if (input.isKeyJustPressed(R))
             restart(lang.hashCode());
 
         // standard clear the background routine for libGDX
         ScreenUtils.clear(bgColor);
         // center the camera on the player's position
         camera.position.x = playerSprite.getX();
-        camera.position.y =  playerSprite.getY();
+        camera.position.y = playerSprite.getY();
         camera.update();
 
 
@@ -698,7 +702,7 @@ public class SunriseSquad extends ApplicationAdapter {
             font.draw(batch, "[GRAY]q to quit.", x, y - 2, wide, Align.center, true);
             font.draw(batch, "[YELLOW]r to restart.", x, y - 4, wide, Align.center, true);
             batch.end();
-            if(input.isKeyPressed(Q))
+            if (input.isKeyPressed(Q))
                 Gdx.app.exit();
             return;
         }
@@ -706,7 +710,7 @@ public class SunriseSquad extends ApplicationAdapter {
         monsterDirector.step();
         directorSmall.step();
 
-        if(phase == Phase.MONSTER_ANIM) {
+        if (phase == Phase.MONSTER_ANIM) {
             if (!monsterDirector.isPlaying()) {
                 phase = Phase.WAIT;
                 if (!awaitedMoves.isEmpty()) {
@@ -716,15 +720,12 @@ public class SunriseSquad extends ApplicationAdapter {
                     move(m);
                 }
             }
-        }
-        else if(phase == Phase.WAIT && !awaitedMoves.isEmpty())
-        {
+        } else if (phase == Phase.WAIT && !awaitedMoves.isEmpty()) {
             Coord m = awaitedMoves.removeFirst();
             if (!toCursor.isEmpty())
                 toCursor.removeFirst();
             move(m);
-        }
-        else if(phase == Phase.PLAYER_ANIM) {
+        } else if (phase == Phase.PLAYER_ANIM) {
             if (!playerDirector.isPlaying() && !monsterDirector.isPlaying()) {
                 phase = Phase.MONSTER_ANIM;
                 afterChange();
@@ -748,8 +749,7 @@ public class SunriseSquad extends ApplicationAdapter {
                     playerToCursor.partialScan(13, vision.blockage);
                 }
             }
-        }
-        else {
+        } else {
             handleHeldKeys();
         }
         putMap();
@@ -759,6 +759,7 @@ public class SunriseSquad extends ApplicationAdapter {
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
         batch.end();
     }
+
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
