@@ -2,6 +2,7 @@ package com.github.yellowstonegames.lwjgl3;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.github.tommyettinger.DaybreakDemo;
 
@@ -24,6 +25,7 @@ public class Lwjgl3Launcher {
 		configuration.disableAudio(true);
 		configuration.setResizable(true);
 		configuration.useVsync(true);
+		configuration.setInitialBackgroundColor(new Color(0f, 0f, 0f, 1f)); // Color.BLACK gets edited to use Oklab.
 		//// Limits FPS to the refresh rate of the currently active monitor.
 		configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
 		//// If you remove the above line and set Vsync to false, you may get unlimited FPS, which can be

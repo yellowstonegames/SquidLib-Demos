@@ -19,9 +19,9 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -31,7 +31,6 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.github.tommyettinger.digital.BitConversion;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -49,6 +48,8 @@ import com.github.yellowstonegames.text.Language;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
+import static com.github.tommyettinger.digital.BitConversion.intBitsToFloat;
+import static com.github.yellowstonegames.core.DescriptiveColor.*;
 
 public class DaybreakDemo extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
@@ -156,7 +157,11 @@ public class DaybreakDemo extends ApplicationAdapter {
 
     public DaybreakDemo(long seed) {
         this.seed = seed;
-        DescriptiveColor.
+        for(Color c : Colors.getColors().values()) {
+            final int f = DescriptiveColor.fromRGBA(c.r, c.g, c.b, c.a);
+            c.set(channelL(f) * 0.5f, channelA(f), channelB(f), c.a);
+        }
+
     }
 
     /**
@@ -291,7 +296,7 @@ public class DaybreakDemo extends ApplicationAdapter {
             monsters.put(monPos, monster);
             vision.lighting.addLight(monPos, new Radiance(rng.nextFloat(3f) + 2f,
 //                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0f, 0f));
-                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0.5f, 0f));
+                    FullPalette.COLOR_WHEEL_PALETTE_MID[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0.5f, 0f));
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
         monsterDirector = new Director<>(c -> monsters.get(c).getLocation(), monsters.order(), 150);
@@ -557,7 +562,7 @@ public class DaybreakDemo extends ApplicationAdapter {
                     if (tmp == null) continue;
                     // if we would move into the player, instead damage the player and animate a bump motion.
                     if (tmp.x == player.x && tmp.y == player.y) {
-                        playerSprite.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & OKLAB_BLOOD));
+                        playerSprite.setPackedColor(intBitsToFloat(0xFEFFFFFF & OKLAB_BLOOD));
                         health--;
                         VectorSequenceGlider small = VectorSequenceGlider.BUMPS.getOrDefault(pos.toGoTo(player), null);
                         if (small != null) {
@@ -611,7 +616,7 @@ public class DaybreakDemo extends ApplicationAdapter {
                 char glyph = vision.prunedPlaceMap[x][y];
                 if (vision.seen.contains(x, y)) {
                     // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
-                    batch.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & vision.backgroundColors[x][y]));
+                    batch.setPackedColor(intBitsToFloat(0xFEFFFFFF & vision.backgroundColors[x][y]));
                     if (glyph == '/' || glyph == '+' || glyph == '1' || glyph == '2') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), x, y, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(glyph, solid), x, y, 1f, 1f);
@@ -627,12 +632,12 @@ public class DaybreakDemo extends ApplicationAdapter {
                 if (lightLevels[i][j] > 0.01) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
                         monster = monster.animate(time);
-                        monster.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(i, j, change)));
+                        monster.setPackedColor(intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(i, j, change)));
                         monster.draw(batch);
                     }
                 } else if (vision.justHidden.contains(i, j) && (monster = monsters.get(Coord.get(i, j))) != null) {
                     monster = monster.animate(time);
-                    monster.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(i, j, change)));
+                    monster.setPackedColor(intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(i, j, change)));
                     monster.draw(batch);
                 }
             }
@@ -680,7 +685,7 @@ public class DaybreakDemo extends ApplicationAdapter {
             restart(lang.hashCode());
 
         // standard clear the background routine for libGDX
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        ScreenUtils.clear(0f, 0f, 0f, 0f);
         // center the camera on the player's position
         camera.position.x = playerSprite.getX();
         camera.position.y = playerSprite.getY();
