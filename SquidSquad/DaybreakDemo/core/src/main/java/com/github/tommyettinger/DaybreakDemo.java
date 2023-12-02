@@ -31,6 +31,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tommyettinger.digital.BitConversion;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -41,7 +42,6 @@ import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
-import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.CoordGlider;
 import com.github.yellowstonegames.smooth.Director;
 import com.github.yellowstonegames.smooth.VectorSequenceGlider;
@@ -56,7 +56,7 @@ public class DaybreakDemo extends ApplicationAdapter {
 
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
 
-    private SpriteBatch batch;
+    private SunBatch batch;
     private Phase phase = Phase.WAIT;
 
     // random number generator; this one is more efficient on GWT, but less-so on desktop.
@@ -156,6 +156,7 @@ public class DaybreakDemo extends ApplicationAdapter {
 
     public DaybreakDemo(long seed) {
         this.seed = seed;
+        DescriptiveColor.
     }
 
     /**
@@ -322,7 +323,7 @@ public class DaybreakDemo extends ApplicationAdapter {
 
         Gdx.app.setLogLevel(Application.LOG_INFO);
         // We need access to a batch to render most things.
-        batch = new SpriteBatch();
+        batch = new SunBatch();
 
         rng = new ChopRandom(seed);
 
@@ -492,7 +493,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         if (cg.getChange() != 0f && cg.getChange() != 1f) return;
 
         int newX = next.x, newY = next.y;
-        playerSprite.setPackedColor(Color.WHITE_FLOAT_BITS);
+        playerSprite.setPackedColor(SunBatch.NEUTRAL);
         if (newX >= 0 && newY >= 0 && newX < placeWidth && newY < placeHeight
                 && barePlaceMap[newX][newY] != '#') {
             // '+' is a door.
@@ -556,7 +557,7 @@ public class DaybreakDemo extends ApplicationAdapter {
                     if (tmp == null) continue;
                     // if we would move into the player, instead damage the player and animate a bump motion.
                     if (tmp.x == player.x && tmp.y == player.y) {
-                        playerSprite.setPackedColor(DescriptiveColor.oklabIntToFloat(OKLAB_BLOOD));
+                        playerSprite.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & OKLAB_BLOOD));
                         health--;
                         VectorSequenceGlider small = VectorSequenceGlider.BUMPS.getOrDefault(pos.toGoTo(player), null);
                         if (small != null) {
@@ -610,7 +611,7 @@ public class DaybreakDemo extends ApplicationAdapter {
                 char glyph = vision.prunedPlaceMap[x][y];
                 if (vision.seen.contains(x, y)) {
                     // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
-                    batch.setPackedColor(DescriptiveColor.oklabIntToFloat(vision.backgroundColors[x][y]));
+                    batch.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & vision.backgroundColors[x][y]));
                     if (glyph == '/' || glyph == '+' || glyph == '1' || glyph == '2') // doors expect a floor drawn beneath them
                         batch.draw(charMapping.getOrDefault('.', solid), x, y, 1f, 1f);
                     batch.draw(charMapping.getOrDefault(glyph, solid), x, y, 1f, 1f);
@@ -626,17 +627,17 @@ public class DaybreakDemo extends ApplicationAdapter {
                 if (lightLevels[i][j] > 0.01) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
                         monster = monster.animate(time);
-                        monster.setPackedColor(DescriptiveColor.oklabIntToFloat(vision.getForegroundColor(i, j, change)));
+                        monster.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(i, j, change)));
                         monster.draw(batch);
                     }
                 } else if (vision.justHidden.contains(i, j) && (monster = monsters.get(Coord.get(i, j))) != null) {
                     monster = monster.animate(time);
-                    monster.setPackedColor(DescriptiveColor.oklabIntToFloat(vision.getForegroundColor(i, j, change)));
+                    monster.setPackedColor(BitConversion.intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(i, j, change)));
                     monster.draw(batch);
                 }
             }
         }
-        batch.setPackedColor(Color.WHITE_FLOAT_BITS);
+        batch.setPackedColor(SunBatch.NEUTRAL);
         playerSprite.animate(time).draw(batch);
 //        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
