@@ -58,7 +58,7 @@ public class DawnSquad extends ApplicationAdapter {
     private Coord player;
     private final Coord[] playerArray = new Coord[1];
 
-    private int fovRange = 8;
+    private final int fovRange = 8;
     private final Vector2 pos = new Vector2();
 
     /** In number of cells */
@@ -81,7 +81,6 @@ public class DawnSquad extends ApplicationAdapter {
         return screenX >= 0 && screenX < dungeonWidth && screenY >= 0 && screenY < dungeonHeight;
     }
 
-    private Color bgColor;
     private BitmapFont font;
     private Viewport mainViewport;
     private Camera camera;
@@ -381,8 +380,6 @@ public class DawnSquad extends ApplicationAdapter {
         // by default it can also handle some negative x and y values (-3 is the lowest it can efficiently store). You
         // can call Coord.expandPool() or Coord.expandPoolTo() if you need larger maps to be just as fast.
         cursor = Coord.get(-1, -1);
-
-        bgColor = Color.BLACK;
 
         restart(seed);
 
@@ -714,7 +711,7 @@ public class DawnSquad extends ApplicationAdapter {
             restart(lang.hashCode());
 
         // standard clear the background routine for libGDX
-        ScreenUtils.clear(bgColor);
+        ScreenUtils.clear(0f, 0f, 0f, 1f);
         // center the camera on the player's position
         camera.position.x = playerSprite.getX();
         camera.position.y =  playerSprite.getY();

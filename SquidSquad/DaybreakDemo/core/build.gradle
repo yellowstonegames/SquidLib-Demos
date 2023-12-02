@@ -1,0 +1,19 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+dependencies {
+//	api "com.badlogicgames.gdx:gdx:$gdxVersion"
+//	api "com.squidpony:SquidPlace:$squidSquadVersion"
+//	api "com.squidpony:SquidPath:$squidSquadVersion"
+//	api "com.squidpony:SquidText:$squidSquadVersion"
+//	api "com.squidpony:SquidSmooth:$squidSquadVersion"
+	implementation "com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion"
+	implementation "com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion"
+	implementation "com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion"
+	implementation "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion"
+	implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion"
+	implementation "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion"
+	
+	implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
+
+}

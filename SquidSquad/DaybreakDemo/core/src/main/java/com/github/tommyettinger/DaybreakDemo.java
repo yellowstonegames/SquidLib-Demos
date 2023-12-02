@@ -50,7 +50,7 @@ import com.github.yellowstonegames.text.Language;
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
 
-public class SunriseSquad extends ApplicationAdapter {
+public class DaybreakDemo extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
     private long startTime, lastMove;
 
@@ -150,11 +150,11 @@ public class SunriseSquad extends ApplicationAdapter {
      */
     private static final int OKLAB_MEMORY = 0xFF848350;
 
-    public SunriseSquad() {
+    public DaybreakDemo() {
         this(1L);
     }
 
-    public SunriseSquad(long seed) {
+    public DaybreakDemo(long seed) {
         this.seed = seed;
     }
 

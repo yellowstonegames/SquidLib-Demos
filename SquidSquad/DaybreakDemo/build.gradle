@@ -1,0 +1,39 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		google()
+		gradlePluginPortal()
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+	}
+	dependencies {
+		classpath "com.android.tools.build:gradle:$androidPluginVersion"
+		classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
+		classpath 'com.guardsquare:proguard-gradle:7.3.2'
+	}
+}
+
+allprojects {
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+}
+
+configure(subprojects - project(':android')) {
+	apply plugin: 'java-library'
+	sourceCompatibility = 11
+	compileJava {
+		options.incremental = true
+	}
+}
+
+subprojects {
+	version = '0.0.1'
+	ext.appName = 'DaybreakDemo'
+	repositories {
+		mavenCentral()
+		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+		maven { url 'https://jitpack.io' }
+		maven { url 'https://s01.oss.sonatype.org' }
+	}
+}
+
+eclipse.project.name = 'DaybreakDemo' + '-parent'
