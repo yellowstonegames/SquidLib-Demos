@@ -365,7 +365,6 @@ public class DaybreakDemo extends ApplicationAdapter {
 
         solid = atlas.findRegion("pixel");
         charMapping = new IntObjectMap<>(64);
-
         charMapping.put('.', atlas.findRegion("day tile floor c"));
         charMapping.put(',', atlas.findRegion("brick clear pool center"));
         charMapping.put('~', atlas.findRegion("brick murky pool center"));
@@ -642,7 +641,9 @@ public class DaybreakDemo extends ApplicationAdapter {
                 }
             }
         }
-        batch.setPackedColor(SunBatch.NEUTRAL);
+//        batch.setPackedColor(intBitsToFloat(0xFEFFFFFF));
+//        playerSprite.setPackedColor(intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(player.x, player.y, change)));
+//        batch.setPackedColor(SunBatch.NEUTRAL);
         playerSprite.animate(time).draw(batch);
 //        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }

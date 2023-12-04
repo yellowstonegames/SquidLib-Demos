@@ -69,6 +69,7 @@ nb-configuration.xml
 /graal-native/
 !/graal-native/*.json
 !/graal-native/*.bat
+**/resource-config.json
 
 ## Miscellaneous
 *~

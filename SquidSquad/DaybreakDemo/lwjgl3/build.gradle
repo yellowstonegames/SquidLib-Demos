@@ -7,10 +7,13 @@ buildscript {
 // using jpackage only works if the JDK version is 14 or higher.
 // your JAVA_HOME environment variable may also need to be a JDK with version 14 or higher.
 		classpath "org.beryx:badass-runtime-plugin:1.13.0"
+		if(enableGraalNative == 'true') {
+			classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28"
+		}
+
 	}
 }
 apply plugin: 'org.beryx.runtime'
-
 
 import proguard.gradle.ProGuardTask
 
@@ -27,34 +30,27 @@ dependencies {
 //		exclude group: 'com.badlogicgames.jlayer', module: 'jlayer'
 //	}
 	implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
-	implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
-
-	compileOnly "org.graalvm.nativeimage:svm:$graalvmVersion"
-
 	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 	implementation project(':core')
 
 //	implementation "com.badlogicgames.gdx:gdx-lwjgl3-angle:$gdxVersion"
 }
 
+def jarName = "${appName}-${version}.jar"
 def os = System.properties['os.name'].toLowerCase()
 
 run {
 	workingDir = rootProject.file('assets').path
 	setIgnoreExitValue(true)
-
-//	if (os.contains('mac')) {
-//		// Required to run LWJGL3 Java apps on MacOS
-//		jvmArgs += "-XstartOnFirstThread"
-//	}
 }
 
 jar {
-	var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
+	def buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
+
 // sets the name of the .jar file this produces to the name of the game or app.
-	archiveFileName.set(appName + ".jar")
+	archiveFileName.set(jarName)
 // using 'lib' instead of the default 'libs' appears to be needed by jpackageimage.
-	destinationDirectory = file("${buildDirectory}/lib")
+	destinationDirectory = file("$buildDirectory/lib")
 // the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
 	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 	dependsOn configurations.runtimeClasspath
@@ -73,6 +69,24 @@ jar {
 		file(archiveFile).setExecutable(true, false)
 	}
 }
+
+tasks.register('proguard', ProGuardTask) {
+	outputs.upToDateWhen { false }
+	configuration 'proguard-rules.pro'
+	//printmapping 'build/lib/out.map'
+	var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
+
+	if (System.getProperty('java.version').startsWith('1.')) {
+		libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+	} else {
+		libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+	}
+	injars(file("$buildDirectory/lib/${jarName}"))
+
+	outjars "$buildDirectory/lib/${appName}.jar"
+}
+
+proguard.dependsOn jar
 
 tasks.jpackageImage.doNotTrackState("This task reads and writes to the build folder.")
 runtime {
@@ -94,36 +108,22 @@ runtime {
 		skipInstaller = true
 // this may need to be set to a different path if your JAVA_HOME points to a low JDK version.
 		jpackageHome = javaHome.getOrElse("")
-		mainJar = jar.archiveFileName.get()
+		mainJar = jarName
 		if (os.contains('win')) {
-			imageOptions = ["--icon", "icons/logo.ico"]
+			imageOptions = ["--icon", "../assets/images/icons/logo.ico"]
 		} else if (os.contains('nix') || os.contains('nux') || os.contains('bsd')) {
-			imageOptions = ["--icon", "icons/logo.png"]
+			imageOptions = ["--icon", "../assets/images/icons/logo.png"]
 		} else if (os.contains('mac')) {
-			imageOptions = ["--icon", "icons/logo.icns", "--java-options", "\"-XstartOnFirstThread\""]
+			imageOptions = ["--icon", "../assets/images/icons/logo.icns", "--java-options", "\"-XstartOnFirstThread\""]
 		}
 	}
 }
 
-tasks.register('proguard', ProGuardTask) {
-	outputs.upToDateWhen { false }
-	configuration 'proguard-rules.pro'
-	//printmapping 'build/lib/out.map'
-	var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
-
-	if (System.getProperty('java.version').startsWith('1.')) {
-		libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-	} else {
-		libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-	}
-	injars(file("$buildDirectory/libs/${appName}-${version}.jar"))
-
-	outjars "$buildDirectory/libs/${appName}.jar"
-}
-
-proguard.dependsOn jar
-
 // Equivalent to the jar task; here for compatibility with gdx-setup.
 tasks.register('dist') {
 	dependsOn['jar']
+}
+
+if(enableGraalNative == 'true') {
+	apply from: file("nativeimage.gradle")
 }
