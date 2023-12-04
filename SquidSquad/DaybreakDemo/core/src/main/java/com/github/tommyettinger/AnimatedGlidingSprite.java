@@ -16,6 +16,7 @@
 
 package com.github.tommyettinger;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.github.yellowstonegames.grid.Coord;
@@ -24,20 +25,22 @@ import com.github.yellowstonegames.smooth.VectorSequenceGlider;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static com.badlogic.gdx.graphics.g2d.SpriteBatch.*;
+
 /**
- * Extends {@link Sprite}, but uses an {@link Animation} of {@link TextureRegion} for its visuals and a
+ * Extends {@link ParentSprite}, but uses an {@link Animation} of {@link TextureRegion} for its visuals and a
  * {@link CoordGlider} to store its position. The {@link CoordGlider} is publicly available as {@link #location} or with
  * {@link #getLocation()}, which should be used to determine or change where this started its move, where it is going,
  * and how far it has gone between the two. You Must Call {@link #animate(float)} with an increasing float parameter
  * when you want the animation to be playing; otherwise it will stay on the first frame (or a later frame if you stop
  * calling animate() at some other point). You can use the {@link VectorSequenceGlider} {@link #smallMotion} to move
- * this Sprite at a finer resolution than between Coords for start and end points.
+ * this AnimatedGlidingSprite at a finer resolution than between Coords for start and end points.
  * <br>
  * You probably want to use Textures with a width and height of 1 world unit in
  * your Animation, and {@link #setSize(float, float)} on this to {@code 1, 1}; this avoids the need to convert between
  * Coord units in the CoordGlider and some other unit in the world.
  */
-public class AnimatedGlidingSprite extends Sprite {
+public class AnimatedGlidingSprite extends ParentSprite {
     public Animation<? extends TextureRegion> animation;
     @NonNull
     public CoordGlider location;
@@ -127,5 +130,48 @@ public class AnimatedGlidingSprite extends Sprite {
     public void setSmallMotion(@Nullable VectorSequenceGlider smallMotion) {
         if(smallMotion == null) this.smallMotion = ownEmptyMotion;
         else this.smallMotion = smallMotion;
+    }
+
+
+    /** Sets the color used to tint this sprite. Default is {@link Color#WHITE}. */
+    public void setColor (Color tint) {
+        float color = tint.toFloatBits();
+        float[] vertices = this.vertices;
+        vertices[C1] = color;
+        vertices[C2] = color;
+        vertices[C3] = color;
+        vertices[C4] = color;
+    }
+
+    /** Sets the alpha portion of the color used to tint this sprite. */
+    public void setAlpha (float a) {
+        Color.abgr8888ToColor(color, vertices[C1]);
+        color.a = a;
+        float color = this.color.toFloatBits();
+        vertices[C1] = color;
+        vertices[C2] = color;
+        vertices[C3] = color;
+        vertices[C4] = color;
+    }
+
+    /** @see #setColor(Color) */
+    public void setColor (float r, float g, float b, float a) {
+        float color = Color.toFloatBits(r, g, b, a);
+        float[] vertices = this.vertices;
+        vertices[C1] = color;
+        vertices[C2] = color;
+        vertices[C3] = color;
+        vertices[C4] = color;
+    }
+
+    /** Sets the color of this sprite, expanding the alpha from 0-254 to 0-255.
+     * @see #setColor(Color)
+     * @see Color#toFloatBits() */
+    public void setPackedColor (float packedColor) {
+        float[] vertices = this.vertices;
+        vertices[C1] = packedColor;
+        vertices[C2] = packedColor;
+        vertices[C3] = packedColor;
+        vertices[C4] = packedColor;
     }
 }
