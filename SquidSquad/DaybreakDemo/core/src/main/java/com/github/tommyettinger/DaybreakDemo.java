@@ -695,8 +695,8 @@ public class DaybreakDemo extends ApplicationAdapter {
 
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
-        batch.getShader().setUniformf("u_globalMul", 1f, 1.125f, 1.125f);
-        batch.getShader().setUniformf("u_globalAdd", -0.5f, 0f, 0f);
+        batch.getShader().setUniformf("u_globalMul", 1f, 0.8f, 0.8f); // slightly desaturates everything
+        batch.getShader().setUniformf("u_globalAdd", 0f, 0.01f, 0.03f); // tints everything yellowish-brown
         batch.begin();
 
         // you done bad. you done real bad.
