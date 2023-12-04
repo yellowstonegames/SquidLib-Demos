@@ -19,8 +19,10 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.github.yellowstonegames.grid.Coord;
 import com.github.yellowstonegames.smooth.CoordGlider;
+import com.github.yellowstonegames.smooth.ParentSprite;
 import com.github.yellowstonegames.smooth.VectorSequenceGlider;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -145,9 +147,8 @@ public class AnimatedGlidingSprite extends ParentSprite {
 
     /** Sets the alpha portion of the color used to tint this sprite. */
     public void setAlpha (float a) {
-        Color.abgr8888ToColor(color, vertices[C1]);
-        color.a = a;
-        float color = this.color.toFloatBits();
+        int bits = NumberUtils.floatToIntBits(vertices[C1]);
+        float color = NumberUtils.intBitsToFloat((bits & 0xFFFFFF) | (int)(a * 127.5f) << 25);
         vertices[C1] = color;
         vertices[C2] = color;
         vertices[C3] = color;

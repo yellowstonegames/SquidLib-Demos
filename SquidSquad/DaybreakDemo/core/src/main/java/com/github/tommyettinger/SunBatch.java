@@ -38,7 +38,10 @@ import java.nio.Buffer;
 
 import static com.github.tommyettinger.digital.BitConversion.reversedIntBitsToFloat;
 
-/** Draws batched quads using indices.
+/** A variant on {@link com.badlogic.gdx.graphics.g2d.SpriteBatch} that doesn't use Color objects as much, instead
+ * working with packed float colors (the kind produced by {@link Color#toFloatBits()}). This also defaults to using a
+ * different shader; it uses Oklab for tint colors by default, and allows global color changes to be entered via two
+ * vec3 uniforms.
  * @see Batch
  * @author mzechner
  * @author Nathan Sweet */
