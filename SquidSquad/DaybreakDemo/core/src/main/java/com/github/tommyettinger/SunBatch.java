@@ -71,7 +71,7 @@ public class SunBatch implements Batch {
 	private boolean ownsShader;
 
 	private final Color color = new Color(1f, 0.5f, 0.5f, 1);
-	public static final float NEUTRAL = BitConversion.intBitsToFloat(0xFEFFFFFF & DescriptiveColor.GRAY);
+	public static final float NEUTRAL = BitConversion.intBitsToFloat(0xFEFFFFFF & DescriptiveColor.WHITE);
 	public float colorPacked = NEUTRAL;
 
 	/** Number of render calls since the last {@link #begin()}. **/
@@ -140,19 +140,22 @@ public class SunBatch implements Batch {
 
 	/** Returns a new instance of the default shader used by SunBatch for GL2 when no shader is specified. */
 	static public ShaderProgram createDefaultShader () {
-		String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-			+ "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
-			+ "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-			+ "uniform mat4 u_projTrans;\n" //
-			+ "varying vec4 v_color;\n" //
-			+ "varying vec2 v_texCoords;\n" //
-			+ "\n" //
-			+ "void main()\n" //
-			+ "{\n" //
-			+ "   v_color = " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
-			+ "   v_color.a = v_color.a * (255.0/254.0);\n" //
-			+ "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-			+ "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
+		String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n"
+			+ "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n"
+			+ "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n"
+			+ "uniform mat4 u_projTrans;\n"
+			+ "uniform vec3 u_globalAdd;\n"
+			+ "uniform vec3 u_globalMul;\n"
+			+ "varying vec4 v_color;\n"
+			+ "varying vec2 v_texCoords;\n"
+			+ "\n"
+			+ "void main()\n"
+			+ "{\n"
+			+ "   v_color = " + ShaderProgram.COLOR_ATTRIBUTE + ";\n"
+			+ "   v_color.rgb = (v_color.rgb - 0.5) * u_globalMul + u_globalAdd;\n"
+			+ "   v_color.a = v_color.a * (255.0/254.0);\n"
+			+ "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n"
+			+ "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n"
 			+ "}\n";
 		String fragmentShaderOklab =
 				"#ifdef GL_ES\n" +
@@ -171,8 +174,8 @@ public class SunBatch implements Batch {
 						"  vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *" +
 						"             pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616) \n" +
 						"             * (tgt.rgb * tgt.rgb), forward);\n" +
-						"  lab.x = pow(clamp(pow(lab.x, 1.5) + v_color.r - 0.5, 0.0, 1.0), 0.666666);\n" +
-						"  lab.yz = clamp(lab.yz + v_color.gb * 2.0 - 1.0, -1.0, 1.0);\n" +
+						"  lab.x = pow(clamp(pow(lab.x, 1.5) + v_color.r, 0.0, 1.0), 0.666666);\n" +
+						"  lab.yz = clamp(lab.yz + v_color.gb * 2.0, -1.0, 1.0);\n" +
 						"  lab = mat3(1.0, 1.0, 1.0, +0.3963377774, -0.1055613458, -0.0894841775, +0.2158037573, -0.0638541728, -1.2914855480) * lab;\n" +
 						"  gl_FragColor = vec4(sqrt(clamp(" +
 						"                 mat3(+4.0767245293, -1.2681437731, -0.0041119885, -3.3072168827, +2.6093323231, -0.7034763098, +0.2307590544, -0.3411344290, +1.7068625689) *\n" +
