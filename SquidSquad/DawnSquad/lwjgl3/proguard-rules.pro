@@ -7,6 +7,8 @@
 -keep public class org.lwjgl.system.** { *; }
 # You will need the next line if you use scene2d for UI or gameplay
 #-keep public class com.badlogic.gdx.scenes.scene2d.** { *; }
+-keep public class com.badlogic.gdx.graphics.Color* { *; }
+-keep public class com.badlogic.gdx.graphics.g2d.BitmapFont* { *; }
 
 -keepclasseswithmembernames class * { native <methods>; }
 

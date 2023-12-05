@@ -6,7 +6,7 @@ buildscript {
 		maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
 	}
 	dependencies {
-		classpath "com.android.tools.build:gradle:$androidPluginVersion"
+		classpath "com.android.tools.build:gradle:8.1.4"
 		classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
 		classpath 'com.guardsquare:proguard-gradle:7.3.2'
 	}

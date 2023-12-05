@@ -1,0 +1,9 @@
+{
+  "resources":{
+  "includes":[
+    {
+      "pattern": ".*(\\QDawnlike-license.txt\\E|\\QDawnlike.atlas\\E|\\QDawnlike.png\\E|\\Qfont.fnt\\E|libgdx.+\\.png|lsans.+)"
+    }
+  ]},
+  "bundles":[]
+}
