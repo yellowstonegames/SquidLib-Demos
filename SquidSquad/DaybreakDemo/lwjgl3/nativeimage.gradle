@@ -8,7 +8,7 @@ project(":lwjgl3") {
   graalvmNative {
     binaries {
       main {
-        imageName = appName
+        imageName = "${appName}"
         mainClass = project.mainClassName
         buildArgs.add("-march=compatibility")
         jvmArgs.addAll("-Dfile.encoding=UTF8")
@@ -20,7 +20,7 @@ project(":lwjgl3") {
     doNotTrackState("Running the app should not be affected by Graal.")
   }
 
-  nativeCompile.dependsOn proguard
+  nativeCompile.dependsOn jar
 
   // Modified from https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/ ; thanks, Lyze!
   generateResourcesConfigFile.doFirst {
@@ -35,14 +35,14 @@ project(":lwjgl3") {
   "resources":{
   "includes":[
     {
-      "pattern": "()""")
-    fileTree(assetsFolder).each {
+      "pattern": ".*(""")
+    fileTree(assetsFolder).collect { it.name }.each {
       // the backslash-Q and backslash-E escape the start and end of a literal string, respectively.
-      resFile.append("\\\\Q${it.name}\\\\E|")
+      resFile.append("\\\\Q${it}\\\\E|")
     }
     // we also match all of the window icon images this way and the font files that are part of libGDX.
     resFile.append(
-            """libgdx.+.\\\\.png|lsans.+"
+            """libgdx.+\\\\.png|lsans.+)"
     }
   ]},
   "bundles":[]
