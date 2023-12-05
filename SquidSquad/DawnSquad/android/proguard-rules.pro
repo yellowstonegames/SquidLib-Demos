@@ -33,7 +33,7 @@
 }
 
 -keep public class !com.github.tommyettinger.Data { *; }
--keep public class !com.github.tommyettinger.DawnSquad { *; }
+-keep public class !com.github.tommyettinger.SunriseSquad { *; }
 
 -forceprocessing
 #-classobfuscationdictionary 'obfuscationClassNames.txt'
