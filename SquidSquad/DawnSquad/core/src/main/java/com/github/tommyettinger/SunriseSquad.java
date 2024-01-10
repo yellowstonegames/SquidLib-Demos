@@ -346,7 +346,7 @@ public class SunriseSquad extends ApplicationAdapter {
         font.getData().setScale(2f / cellWidth, 2f / cellHeight);
         font.getData().markupEnabled = true;
 
-        vision.rememberedOklabColor = OKLAB_MEMORY;
+        vision.rememberedColor = OKLAB_MEMORY;
 
 //        Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
 //        Pixmap pAtlas = new Pixmap(Gdx.files.classpath("dawnlike/Dawnlike.png"));

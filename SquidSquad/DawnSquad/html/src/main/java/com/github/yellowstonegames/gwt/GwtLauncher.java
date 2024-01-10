@@ -25,6 +25,7 @@ public class GwtLauncher extends GwtApplication {
 
 	@Override
 	public ApplicationListener createApplicationListener() {
+//		return new SunriseSquad(0L);
 		return new SunriseSquad(System.currentTimeMillis());
 	}
 

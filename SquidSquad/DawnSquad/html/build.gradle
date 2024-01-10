@@ -84,9 +84,12 @@ dependencies {
 //// and you can use GWT 2.10.0, which gives you access to Java 11 language features.
 //// Make sure that in the gwt block, you change gwtVersion so it is:
 //// gwtVersion = "2.10.0"
-    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
-    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
+//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
+//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
 //    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
+
+    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion"
+    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion:sources"
 
 //    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion"
 //    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion:sources"
