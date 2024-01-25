@@ -1,5 +1,7 @@
 
 project(":lwjgl3") {
+  java.sourceCompatibility = JavaVersion.VERSION_11
+  java.targetCompatibility = JavaVersion.VERSION_11
   apply plugin: "org.graalvm.buildtools.native"
 
   dependencies {
@@ -52,7 +54,10 @@ project(":lwjgl3") {
 }
 
 project(":core") {
+  java.sourceCompatibility = JavaVersion.VERSION_11
+  java.targetCompatibility = JavaVersion.VERSION_11
   dependencies {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+//    implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
   }
 }

@@ -13,7 +13,5 @@ dependencies {
 	api "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion"
 	api "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion"
 	api "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion"
-	
-	implementation "com.github.Berstanio.gdx-graalhelper:gdx-svmhelper:$graalHelperVersion"
 
 }

@@ -23,15 +23,15 @@ public class Lwjgl3Launcher {
 		Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
 		configuration.disableAudio(true);
 		configuration.setResizable(true);
-		configuration.useVsync(true);
+//		configuration.useVsync(true);
 		//// Limits FPS to the refresh rate of the currently active monitor.
-		configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
+//		configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
 		//// If you remove the above line and set Vsync to false, you may get unlimited FPS, which can be
 		//// useful for testing performance, but can also be very stressful to some hardware.
 		//// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
 		//// That would use the following two settings:
-//		configuration.useVsync(false);
-//		configuration.setForegroundFPS(0);
+		configuration.useVsync(false);
+		configuration.setForegroundFPS(0);
 
 		configuration.setTitle("SquidSquad Dawnlike Demo");
 		//// useful to know if something's wrong in a shader.
