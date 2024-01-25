@@ -32,6 +32,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
@@ -127,6 +128,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
     private BitmapFont font;
     private Viewport mainViewport;
+    private Viewport guiViewport;
     private Camera camera;
 
     private CoordObjectOrderedMap<AnimatedGlidingSprite> monsters;
@@ -328,6 +330,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
         rng = new ChopRandom(seed);
 
+        guiViewport = new ScreenViewport();
         mainViewport = new ScalingViewport(Scaling.fill, shownWidth, shownHeight);
         mainViewport.setScreenBounds(0, 0, shownWidth * cellWidth, shownHeight * cellHeight);
         camera = mainViewport.getCamera();
@@ -344,34 +347,7 @@ public class SunriseSquad extends ApplicationAdapter {
         atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
 //        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
 //        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.characters =
-                " !\"%'(),-." +
-                "0123456789" +
-                ":;=?ABCDEF" +
-                "GHIJKLMNOP" +
-                "QRSTUVWXYZ" +
-                "[]_abcdefg" +
-                "hijklmnopq" +
-                "rstuvwxyz{" +
-                "}©ÀÁÂÃÄÈÉÊ" +
-                "ËÌÍÎÏÑÒÓÔÖ" +
-                "ÙÚÛÜÝàáâãä" +
-                "èéêëìíîïñò" +
-                "óôõöùúûüýÿ" +
-                "Ÿ—\n";
-        parameter.size = 48;
-        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        font = generator.generateFont(parameter); // font size 12 pixels
-        generator.dispose(); // don't forget to dispose to avoid memory leaks!
-
-        font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
-        font.getData().markupEnabled = true;
-
+        font = generateFreetypeFont(48);
         vision.rememberedColor = OKLAB_MEMORY;
 
 //        Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
@@ -502,6 +478,37 @@ public class SunriseSquad extends ApplicationAdapter {
             }
         };
         Gdx.input.setInputProcessor(input);
+    }
+
+    private BitmapFont generateFreetypeFont(int size) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.characters =
+                " !\"%'(),-." +
+                        "0123456789" +
+                        ":;=?ABCDEF" +
+                        "GHIJKLMNOP" +
+                        "QRSTUVWXYZ" +
+                        "[]_abcdefg" +
+                        "hijklmnopq" +
+                        "rstuvwxyz{" +
+                        "}©ÀÁÂÃÄÈÉÊ" +
+                        "ËÌÍÎÏÑÒÓÔÖ" +
+                        "ÙÚÛÜÝàáâãä" +
+                        "èéêëìíîïñò" +
+                        "óôõöùúûüýÿ" +
+                        "Ÿ—\n";
+        parameter.size = size;
+        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        font = generator.generateFont(parameter);
+        generator.dispose(); // don't forget to dispose to avoid memory leaks!
+
+        font.setUseIntegerPositions(false);
+//        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
+        font.getData().markupEnabled = true;
+        return font;
     }
 
     /**
@@ -720,14 +727,18 @@ public class SunriseSquad extends ApplicationAdapter {
         if (health <= 0) {
             // still need to display the map, then write over it with a message.
             putMap();
-            float wide = mainViewport.getWorldWidth(),
-                    x = playerSprite.getX() - mainViewport.getWorldWidth() * 0.5f,
+            batch.end();
+            guiViewport.apply(false);
+            batch.setProjectionMatrix(guiViewport.getCamera().combined);
+            batch.begin();
+            float wide = guiViewport.getWorldWidth(),
+                    x = playerSprite.getX() - guiViewport.getWorldWidth() * 0.5f,
                     y = playerSprite.getY();
-            font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2, wide, Align.center, true);
-            font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + 1, wide, Align.center, true);
+            font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2 * font.getLineHeight(), wide, Align.center, true);
+            font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + font.getLineHeight(), wide, Align.center, true);
             font.draw(batch, "[FOREST]" + lang, x, y, wide, Align.center, true);
-            font.draw(batch, "[GRAY]q to quit.", x, y - 2, wide, Align.center, true);
-            font.draw(batch, "[YELLOW]r to restart.", x, y - 4, wide, Align.center, true);
+            font.draw(batch, "[GRAY]q to quit.", x, y - 2 * font.getLineHeight(), wide, Align.center, true);
+            font.draw(batch, "[YELLOW]r to restart.", x, y - 4 * font.getLineHeight(), wide, Align.center, true);
             batch.end();
             if (input.isKeyPressed(Q))
                 Gdx.app.exit();
@@ -780,8 +791,12 @@ public class SunriseSquad extends ApplicationAdapter {
             handleHeldKeys();
         }
         putMap();
-        pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight);
-        mainViewport.unproject(pos);
+        batch.end();
+        guiViewport.apply(false);
+        batch.setProjectionMatrix(guiViewport.getCamera().combined);
+        batch.begin();
+        pos.set(10, Gdx.graphics.getHeight() - font.getLineHeight());
+        guiViewport.unproject(pos);
         font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
         batch.end();
@@ -790,6 +805,8 @@ public class SunriseSquad extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+        font = generateFreetypeFont(height * 3 / shownHeight);
         mainViewport.update(width, height, false);
+        guiViewport.update(width, height, false);
     }
 }
