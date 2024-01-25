@@ -74,8 +74,8 @@ dependencies {
 //        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
 //    }
 
-//    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
-//    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
+    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
+    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
 
 	implementation project(':core')
 

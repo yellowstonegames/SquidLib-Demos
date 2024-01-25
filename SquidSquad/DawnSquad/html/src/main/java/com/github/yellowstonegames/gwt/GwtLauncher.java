@@ -29,8 +29,8 @@ public class GwtLauncher extends GwtApplication {
 		return new SunriseSquad(System.currentTimeMillis());
 	}
 
-//	@Override
-//	public void onModuleLoad() {
-//		com.badlogic.gdx.graphics.g2d.freetype.gwt.FreetypeInjector.inject(super::onModuleLoad);
-//	}
+	@Override
+	public void onModuleLoad() {
+		com.badlogic.gdx.graphics.g2d.freetype.gwt.FreetypeInjector.inject(super::onModuleLoad);
+	}
 }
