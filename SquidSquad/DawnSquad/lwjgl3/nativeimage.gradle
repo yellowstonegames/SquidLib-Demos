@@ -13,7 +13,7 @@ project(":lwjgl3") {
       main {
         imageName = "${appName}"
         mainClass = project.mainClassName
-        buildArgs.add("-march=compatibility")
+        buildArgs("-march=compatibility")
         jvmArgs.addAll("-Dfile.encoding=UTF8")
         sharedLibrary.set(false)
       }
