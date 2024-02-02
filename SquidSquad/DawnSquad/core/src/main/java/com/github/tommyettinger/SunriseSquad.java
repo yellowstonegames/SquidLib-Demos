@@ -95,6 +95,7 @@ public class SunriseSquad extends ApplicationAdapter {
     private final Coord[] playerArray = new Coord[1];
 
     private final Vector2 pos = new Vector2();
+//    private final Vector2 mouseDirection = new Vector2(1, 0);
 
     /**
      * In number of cells
@@ -423,6 +424,7 @@ public class SunriseSquad extends ApplicationAdapter {
                         if(glProfiler == null) {
                             glProfiler = new GLProfiler(Gdx.graphics);
                             glProfiler.enable();
+                            Gdx.app.log("(PERFORMANCE)", "GL Profiling enabled.");
                         } else {
                             Gdx.app.log("(PERFORMANCE)", "Calls: " + glProfiler.getCalls());
                             Gdx.app.log("(PERFORMANCE)", "Draw Calls: " + glProfiler.getDrawCalls());
@@ -819,6 +821,14 @@ public class SunriseSquad extends ApplicationAdapter {
         guiViewport.unproject(pos);
         font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
+
+//        pos.set(input.getDeltaX(), -input.getDeltaY());
+//        if(!pos.isZero())
+//        {
+//            mouseDirection.setAngleDeg(pos.angleDeg());
+//        }
+//        batch.draw(solid, 0f, 0f, 0f, 0f, mouseDirection.len() * 100f, 4f, 1f, 1f, mouseDirection.angleDeg());
+
         batch.end();
     }
 
