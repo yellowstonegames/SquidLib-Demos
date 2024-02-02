@@ -25,6 +25,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -154,6 +155,8 @@ public class SunriseSquad extends ApplicationAdapter {
      */
     private static final int OKLAB_MEMORY = 0xFF848350;
 
+    private GLProfiler glProfiler;
+
     public SunriseSquad() {
         this(1L);
     }
@@ -181,6 +184,8 @@ public class SunriseSquad extends ApplicationAdapter {
         // Starting time for the game; other times are measured relative to this so that they aren't huge numbers.
         startTime = TimeUtils.millis();
         lastMove = startTime;
+
+        Gdx.app.log("RNG", "Seed is " + seed);
         // We just need to have a random number generator.
         // This is seeded the same every time.
         rng.setSeed(seed);
@@ -323,8 +328,6 @@ public class SunriseSquad extends ApplicationAdapter {
 
     @Override
     public void create() {
-
-        Gdx.app.setLogLevel(Application.LOG_INFO);
         // We need access to a batch to render most things.
         batch = new SpriteBatch();
 
@@ -414,6 +417,20 @@ public class SunriseSquad extends ApplicationAdapter {
             @Override
             public boolean keyUp(int keycode) {
                 switch (keycode) {
+                    case BACKSLASH:
+                        // Debug
+                        Gdx.app.setLogLevel(Application.LOG_INFO);
+                        if(glProfiler == null) {
+                            glProfiler = new GLProfiler(Gdx.graphics);
+                            glProfiler.enable();
+                        } else {
+                            Gdx.app.log("(PERFORMANCE)", "Calls: " + glProfiler.getCalls());
+                            Gdx.app.log("(PERFORMANCE)", "Draw Calls: " + glProfiler.getDrawCalls());
+                            Gdx.app.log("(PERFORMANCE)", "Texture Bindings: " + glProfiler.getTextureBindings());
+                            Gdx.app.log("(PERFORMANCE)", "Shader Switches: " + glProfiler.getShaderSwitches());
+                            glProfiler.reset();
+                        }
+                        break;
                     case F:
                         // this probably isn't needed currently, since the FPS is shown on-screen.
                         // it could be useful in the future.
@@ -711,6 +728,9 @@ public class SunriseSquad extends ApplicationAdapter {
         if (input.isKeyJustPressed(R))
             restart(lang.hashCode());
 
+        if(glProfiler != null){
+            glProfiler.reset();
+        }
         // standard clear the background routine for libGDX
         ScreenUtils.clear(0f, 0f, 0f, 1f);
         // center the camera on the player's position

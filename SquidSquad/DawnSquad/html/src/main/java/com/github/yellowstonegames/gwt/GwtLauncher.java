@@ -20,6 +20,7 @@ public class GwtLauncher extends GwtApplication {
 		// and uncomment below:
 		GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(shownWidth * cellWidth, shownHeight * cellHeight);
 		cfg.disableAudio = true;
+		cfg.canCreateLog = true;
 		return cfg;
 	}
 

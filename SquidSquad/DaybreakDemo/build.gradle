@@ -15,6 +15,13 @@ buildscript {
 allprojects {
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
+
+	idea {
+		module {
+			outputDir file('build/classes/java/main')
+			testOutputDir file('build/classes/java/test')
+		}
+	}
 }
 
 configure(subprojects - project(':android')) {
@@ -26,7 +33,7 @@ configure(subprojects - project(':android')) {
 }
 
 subprojects {
-	version = '0.0.1'
+	version = '0.0.2'
 	ext.appName = 'DaybreakDemo'
 	repositories {
 		mavenCentral()
