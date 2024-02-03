@@ -1,4 +1,3 @@
-
 buildscript {
     repositories {
         mavenCentral()
@@ -53,26 +52,6 @@ dependencies {
     implementation "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion:sources"
     implementation "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion:sources"
-
-    //// These don't work currently; they still can't find many classes from dependencies (and themselves).
-//    gwt ("com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion") {
-//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
-//    }
-//    gwt ("com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion") {
-//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
-//    }
-//    gwt ("com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion") {
-//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
-//    }
-//    gwt ("com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion") {
-//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
-//    }
-//    gwt ("com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion" ){
-//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
-//    }
-//    gwt ("com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion") {
-//        attributes { attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.class, DocsType.SOURCES)) }
-//    }
 
     implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
     implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
