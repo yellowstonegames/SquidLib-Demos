@@ -14,10 +14,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.digital.ArrayTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.ObjectDeque;
-import com.github.tommyettinger.ds.ObjectList;
+import com.github.tommyettinger.random.ChopRandom;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.random.LineWobble;
-import com.github.tommyettinger.random.WhiskerRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
 import com.github.yellowstonegames.glyph.GlyphActor;
@@ -26,11 +25,9 @@ import com.github.yellowstonegames.glyph.MoreActions;
 import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
-import com.github.yellowstonegames.place.DungeonTools;
 import com.github.yellowstonegames.text.Language;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import regexodus.Pattern;
+import regexodus.Replacer;
 
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
@@ -72,7 +69,7 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.setLogLevel(Application.LOG_INFO);
         long seed = TimeUtils.millis() >>> 21;
         Gdx.app.log("SEED", "Initial seed is " + seed);
-        EnhancedRandom random = new WhiskerRandom(seed);
+        EnhancedRandom random = new ChopRandom(seed);
         stage = new Stage();
         Font font = KnownFonts.getInconsolata().scaleTo(15f, 25f).setDescent(0f);
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
@@ -88,13 +85,12 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
         gg = new GlyphGrid(font, GRID_WIDTH, GRID_HEIGHT, true);
         //use Ă to test glyph height
-        String name = Language.ANCIENT_EGYPTIAN.word(TimeUtils.millis(), true);
-        Matcher matcher = Pattern.compile("([aeiou])").matcher(name);
-        StringBuffer buffer = new StringBuffer(64);
-        if(matcher.find())
-            matcher.appendReplacement(buffer, "@").appendTail(buffer);
-        else
-            buffer.append('@');
+        String name = Language.ANCIENT_EGYPTIAN.word(random.nextLong(), true);
+        Replacer replacer = Pattern.compile(".*?[aeiouAEIOU](.*)").replacer("$1");
+        StringBuilder buffer = new StringBuilder(64).append('@');
+        replacer.replace(name, buffer, 1);
+
+        Gdx.app.log("NAME", buffer.toString());
 
         playerGlyph = new GlyphActor(buffer.charAt(buffer.length()-1), "[red orange]", gg.getFont());
         gg.addActor(playerGlyph);
@@ -203,7 +199,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //                    .append(new GridAction.CloudAction(gg, 1.5f, inView, next, 5).useToxicColors()).conclude(post));
 //            playerGlyph.addAction(MoreActions.bump(way, 0.3f).append(MoreActions.wiggle(0.125f, 0.2f)));
             playerGlyph.addAction(MoreActions.bump(way, 0.3f));
-            gg.burst((playerGlyph.getX() + next.x + 1) * 0.5f, (playerGlyph.getY() + next.y + 1) * 0.5f, 1.5f, 7, ',', 0x992200FF, 0x99220000, 0f, 120f, 1f);
+            gg.burst((playerGlyph.getX() + next.x) * 0.5f, (playerGlyph.getY() + next.y) * 0.5f, 1.5f, 7, ',', 0x992200FF, 0x99220000, 0f, 120f, 1f);
 //            gg.summon(next.x, next.y, next.x, next.y + 0.5f, '?', 0xFF22CCAA, 0xFF22CC00, 0f, 0f, 1f);
 //            gg.addAction(gg.dyeFG(next.x, next.y, 0x992200FF, 1f, Float.POSITIVE_INFINITY, null));
         }
@@ -352,10 +348,17 @@ public class DungeonDemo extends ApplicationAdapter {
         }
 
         ScreenUtils.clear(Color.BLACK);
-        Camera camera = gg.viewport.getCamera();
-        camera.position.set(gg.getGridWidth() * 0.5f, gg.getGridHeight() * 0.5f, 0f);
-        camera.update();
+        // if stage.act() is called before the camera is centered on the player,
+        // that makes the camera change more smoothly. If act() is called after,
+        // there can be short "hiccups" in the movement.
         stage.act();
+
+        Camera camera = gg.viewport.getCamera();
+        camera.position.set(playerGlyph.getX(), playerGlyph.getY(), 0f);
+        // can be used to center the camera in the same place always.
+//        camera.position.set(gg.getGridWidth() * 0.5f, gg.getGridHeight() * 0.5f, 0f);
+//        camera.update(); // called already by stage.draw()
+
         stage.draw();
         Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }

@@ -11,7 +11,7 @@ project(":lwjgl3") {
   graalvmNative {
     binaries {
       main {
-        imageName = "${appName}"
+        imageName = appName
         mainClass = project.mainClassName
         buildArgs("-march=compatibility")
         jvmArgs.addAll("-Dfile.encoding=UTF8")
@@ -23,7 +23,7 @@ project(":lwjgl3") {
     doNotTrackState("Running the app should not be affected by Graal.")
   }
 
-  nativeCompile.dependsOn jar
+  nativeCompile.dependsOn proguard
 
   // Modified from https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/ ; thanks, Lyze!
   generateResourcesConfigFile.doFirst {
