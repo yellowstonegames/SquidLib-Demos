@@ -24,12 +24,10 @@ gwt {
     compiler.strict = true
     compiler.disableCastChecking = true
     //// The next line can be useful to uncomment if you want output that hasn't been obfuscated.
-//	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
+//	compiler.style = org.docstr.gradle.plugins.gwt.Style.DETAILED
 }
 
 dependencies {
-	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
     implementation "com.github.tommyettinger:funderby:0.1.1:sources"
     implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
@@ -38,31 +36,29 @@ dependencies {
     implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
     implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
 
-    implementation "com.squidpony:SquidCore:$squidSquadVersion:sources"
-    implementation "com.squidpony:SquidGrid:$squidSquadVersion:sources"
-    implementation "com.squidpony:SquidPlace:$squidSquadVersion:sources"
-    implementation "com.squidpony:SquidPath:$squidSquadVersion:sources"
-    implementation "com.squidpony:SquidText:$squidSquadVersion:sources"
-    implementation "com.squidpony:SquidGlyph:$squidSquadVersion:sources"
+//    implementation "com.squidpony:SquidCore:$squidSquadVersion:sources"
+//    implementation "com.squidpony:SquidGrid:$squidSquadVersion:sources"
+//    implementation "com.squidpony:SquidPlace:$squidSquadVersion:sources"
+//    implementation "com.squidpony:SquidPath:$squidSquadVersion:sources"
+//    implementation "com.squidpony:SquidText:$squidSquadVersion:sources"
+//    implementation "com.squidpony:SquidGlyph:$squidSquadVersion:sources"
 
-    //implementation "com.github.yellowstonegames.SquidSquad:SquidCore:$squidSquadVersion:sources"
-    //implementation "com.github.yellowstonegames.SquidSquad:SquidGrid:$squidSquadVersion:sources"
-    //implementation "com.github.yellowstonegames.SquidSquad:SquidPlace:$squidSquadVersion:sources"
-    //implementation "com.github.yellowstonegames.SquidSquad:SquidPath:$squidSquadVersion:sources"
-    //implementation "com.github.yellowstonegames.SquidSquad:SquidText:$squidSquadVersion:sources"
-    //implementation "com.github.yellowstonegames.SquidSquad:SquidGlyph:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:SquidGlyph:$squidSquadVersion:sources"
+
+    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion"
+    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion:sources"
+    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
 	implementation project(':core')
-
-//// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
-//// If you do, follow the steps at https://github.com/tommyettinger/gdx-backends#gwt-290-support
-//// and you can use GWT 2.9.0, which gives you access to Java 11 language features.
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.100.1"
-//	implementation "com.github.tommyettinger:gdx-backend-gwt:1.100.1:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
-import org.wisepersist.gradle.plugins.gwt.GwtSuperDev
+import org.docstr.gradle.plugins.gwt.GwtSuperDev
 
 gretty.httpPort = 8080
 gretty.resourceBase = project.buildDir.path + "/gwt/draftOut"
@@ -154,15 +150,15 @@ task distZip(type: Zip, dependsOn: dist){
     from(outputPath)
     archiveBaseName.set("${appName}-dist")
     //// The result will be in html/build/ with a name containing "-dist".
-    destinationDir(file("build"))
+    destinationDirectory = file("build")
 }
 
 tasks.compileGwt.dependsOn(addSource)
 tasks.draftCompileGwt.dependsOn(addSource)
 tasks.checkGwt.dependsOn(addSource)
 
-// You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
-sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"
