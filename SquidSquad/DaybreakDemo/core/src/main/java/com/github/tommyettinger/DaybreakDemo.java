@@ -146,10 +146,10 @@ public class DaybreakDemo extends ApplicationAdapter {
      */
     private static final int OKLAB_BLOOD = DescriptiveColor.describeOklab("darkest brick");
     /**
-     * Used as the color for remembered cells that can't be currently seen. Slightly-yellow-brown,
-     * with about 30% lightness; fully opaque.
+     * Used as the color for remembered cells that can't be currently seen.
+     * Gray with about 30% lightness; fully opaque.
      */
-    private static final int OKLAB_MEMORY = 0xFF848350;
+    private static final int OKLAB_MEMORY = 0xFF808060;
 
     public DaybreakDemo() {
         this(1L);
@@ -159,7 +159,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         this.seed = seed;
         for(Color c : Colors.getColors().values()) {
             final int f = DescriptiveColor.fromRGBA(c.r, c.g, c.b, c.a);
-            c.set(channelL(f) * 0.5f, channelA(f), channelB(f), c.a);
+            c.set(channelL(f), channelA(f), channelB(f), c.a);
         }
 
     }
@@ -296,7 +296,7 @@ public class DaybreakDemo extends ApplicationAdapter {
             monsters.put(monPos, monster);
             vision.lighting.addLight(monPos, new Radiance(rng.nextFloat(3f) + 2f,
 //                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0f, 0f));
-                    FullPalette.COLOR_WHEEL_PALETTE_MID[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0.5f, 0f));
+                    FullPalette.COLOR_WHEEL_PALETTE_MID[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_MID.length)], 0.5f, 0f));
         }
 //        monsterDirector = new Director<>((e) -> e.getValue().getLocation(), monsters, 125);
         monsterDirector = new Director<>(c -> monsters.get(c).getLocation(), monsters.order(), 150);
@@ -352,7 +352,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         font.getData().setScale(2f / cellWidth, 2f / cellHeight);
         font.getData().markupEnabled = true;
 
-        vision.rememberedOklabColor = OKLAB_MEMORY;
+        vision.rememberedColor = OKLAB_MEMORY;
 
 //        Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
 //        Pixmap pAtlas = new Pixmap(Gdx.files.classpath("dawnlike/Dawnlike.png"));
@@ -696,8 +696,8 @@ public class DaybreakDemo extends ApplicationAdapter {
         mainViewport.apply(false);
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.getShader().setUniformf("u_globalMul", 1f, 0.9f, 0.9f); // slightly desaturates everything
-        batch.getShader().setUniformf("u_globalAdd", 0f, 0f, 0.01f); // tints everything yellowish-brown
+        batch.getShader().setUniformf("u_globalMul", 1f, 0.8f, 0.9f);
+        batch.getShader().setUniformf("u_globalAdd", 0f, 0.1f - health * 0.0115f, 0.08f - health * 0.0111f);
 
         // you done bad. you done real bad.
         if (health <= 0) {

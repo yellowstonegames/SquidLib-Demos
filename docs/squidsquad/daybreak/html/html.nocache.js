@@ -1,5 +1,5 @@
 function html(){
-  var $intern_0 = 'bootstrap', $intern_1 = 'begin', $intern_2 = 'gwt.codesvr.html=', $intern_3 = 'gwt.codesvr=', $intern_4 = 'html', $intern_5 = 'startup', $intern_6 = 'DUMMY', $intern_7 = 0, $intern_8 = 1, $intern_9 = 'iframe', $intern_10 = 'position:absolute; width:0; height:0; border:none; left: -1000px;', $intern_11 = ' top: -1000px;', $intern_12 = 'CSS1Compat', $intern_13 = '<!doctype html>', $intern_14 = '', $intern_15 = '<html><head><\/head><body><\/body><\/html>', $intern_16 = 'undefined', $intern_17 = 'readystatechange', $intern_18 = 10, $intern_19 = 'script', $intern_20 = 'javascript', $intern_21 = 'Failed to load ', $intern_22 = 'moduleStartup', $intern_23 = 'scriptTagAdded', $intern_24 = 'moduleRequested', $intern_25 = 'meta', $intern_26 = 'name', $intern_27 = 'html::', $intern_28 = '::', $intern_29 = 'gwt:property', $intern_30 = 'content', $intern_31 = '=', $intern_32 = 'gwt:onPropertyErrorFn', $intern_33 = 'Bad handler "', $intern_34 = '" for "gwt:onPropertyErrorFn"', $intern_35 = 'gwt:onLoadErrorFn', $intern_36 = '" for "gwt:onLoadErrorFn"', $intern_37 = '#', $intern_38 = '?', $intern_39 = '/', $intern_40 = 'img', $intern_41 = 'clear.cache.gif', $intern_42 = 'baseUrl', $intern_43 = 'html.nocache.js', $intern_44 = 'base', $intern_45 = '//', $intern_46 = 'user.agent', $intern_47 = 'webkit', $intern_48 = 'safari', $intern_49 = 'gecko', $intern_50 = 11, $intern_51 = 'gecko1_8', $intern_52 = 'selectingPermutation', $intern_53 = 'html.devmode.js', $intern_54 = 'D63A06513B99097BE248D86E5128767E', $intern_55 = ':1', $intern_56 = ':', $intern_57 = '.cache.js', $intern_58 = 'link', $intern_59 = 'rel', $intern_60 = 'stylesheet', $intern_61 = 'href', $intern_62 = 'head', $intern_63 = 'loadExternalRefs', $intern_64 = 'gwt/chrome/chrome.css', $intern_65 = 'end', $intern_66 = 'http:', $intern_67 = 'file:', $intern_68 = '_gwt_dummy_', $intern_69 = '__gwtDevModeHook:html', $intern_70 = 'Ignoring non-whitelisted Dev Mode URL: ', $intern_71 = ':moduleBase';
+  var $intern_0 = 'bootstrap', $intern_1 = 'begin', $intern_2 = 'gwt.codesvr.html=', $intern_3 = 'gwt.codesvr=', $intern_4 = 'html', $intern_5 = 'startup', $intern_6 = 'DUMMY', $intern_7 = 0, $intern_8 = 1, $intern_9 = 'iframe', $intern_10 = 'position:absolute; width:0; height:0; border:none; left: -1000px;', $intern_11 = ' top: -1000px;', $intern_12 = 'Chrome', $intern_13 = 'CSS1Compat', $intern_14 = '<!doctype html>', $intern_15 = '', $intern_16 = '<html><head><\/head><body><\/body><\/html>', $intern_17 = 'undefined', $intern_18 = 'readystatechange', $intern_19 = 10, $intern_20 = 'script', $intern_21 = 'javascript', $intern_22 = 'Failed to load ', $intern_23 = 'moduleStartup', $intern_24 = 'scriptTagAdded', $intern_25 = 'moduleRequested', $intern_26 = 'meta', $intern_27 = 'name', $intern_28 = 'html::', $intern_29 = '::', $intern_30 = 'gwt:property', $intern_31 = 'content', $intern_32 = '=', $intern_33 = 'gwt:onPropertyErrorFn', $intern_34 = 'Bad handler "', $intern_35 = '" for "gwt:onPropertyErrorFn"', $intern_36 = 'gwt:onLoadErrorFn', $intern_37 = '" for "gwt:onLoadErrorFn"', $intern_38 = '#', $intern_39 = '?', $intern_40 = '/', $intern_41 = 'img', $intern_42 = 'clear.cache.gif', $intern_43 = 'baseUrl', $intern_44 = 'html.nocache.js', $intern_45 = 'base', $intern_46 = '//', $intern_47 = 'user.agent', $intern_48 = 'webkit', $intern_49 = 'safari', $intern_50 = 'gecko', $intern_51 = 11, $intern_52 = 'gecko1_8', $intern_53 = 'selectingPermutation', $intern_54 = 'html.devmode.js', $intern_55 = 'AF570BD58A6A83994E451A221F406E9E', $intern_56 = ':1', $intern_57 = ':', $intern_58 = '.cache.js', $intern_59 = 'link', $intern_60 = 'rel', $intern_61 = 'stylesheet', $intern_62 = 'href', $intern_63 = 'head', $intern_64 = 'loadExternalRefs', $intern_65 = 'gwt/chrome/chrome.css', $intern_66 = 'end', $intern_67 = 'http:', $intern_68 = 'file:', $intern_69 = '_gwt_dummy_', $intern_70 = '__gwtDevModeHook:html', $intern_71 = 'Ignoring non-whitelisted Dev Mode URL: ', $intern_72 = ':moduleBase';
   var $wnd = window;
   var $doc = document;
   sendStats($intern_0, $intern_1);
@@ -69,17 +69,19 @@ function html(){
     scriptFrame.tabIndex = -1;
     $doc.body.appendChild(scriptFrame);
     frameDoc = scriptFrame.contentWindow.document;
-    frameDoc.open();
-    var doctype = document.compatMode == $intern_12?$intern_13:$intern_14;
-    frameDoc.write(doctype + $intern_15);
-    frameDoc.close();
+    if (navigator.userAgent.indexOf($intern_12) == -1) {
+      frameDoc.open();
+      var doctype = document.compatMode == $intern_13?$intern_14:$intern_15;
+      frameDoc.write(doctype + $intern_16);
+      frameDoc.close();
+    }
   }
 
   function installScript(filename){
     function setupWaitForBodyLoad(callback){
       function isBodyLoaded(){
-        if (typeof $doc.readyState == $intern_16) {
-          return typeof $doc.body != $intern_16 && $doc.body != null;
+        if (typeof $doc.readyState == $intern_17) {
+          return typeof $doc.body != $intern_17 && $doc.body != null;
         }
         return /loaded|complete/.test($doc.readyState);
       }
@@ -97,7 +99,7 @@ function html(){
           bodyDone = true;
           callback();
           if ($doc.removeEventListener) {
-            $doc.removeEventListener($intern_17, checkBodyDone, false);
+            $doc.removeEventListener($intern_18, checkBodyDone, false);
           }
           if (onBodyDoneTimerId) {
             clearInterval(onBodyDoneTimerId);
@@ -106,32 +108,34 @@ function html(){
       }
 
       if ($doc.addEventListener) {
-        $doc.addEventListener($intern_17, checkBodyDone, false);
+        $doc.addEventListener($intern_18, checkBodyDone, false);
       }
       var onBodyDoneTimerId = setInterval(function(){
         checkBodyDone();
       }
-      , $intern_18);
+      , $intern_19);
     }
 
     function installCode(code_0){
       var doc = getInstallLocationDoc();
       var docbody = doc.body;
-      var script = doc.createElement($intern_19);
-      script.language = $intern_20;
-      script.crossOrigin = $intern_14;
+      var script = doc.createElement($intern_20);
+      script.language = $intern_21;
+      if (location.host) {
+        script.crossOrigin = $intern_15;
+      }
       script.src = code_0;
       if (html.__errFn) {
         script.onerror = function(){
-          html.__errFn($intern_4, new Error($intern_21 + code_0));
+          html.__errFn($intern_4, new Error($intern_22 + code_0));
         }
         ;
       }
       docbody.appendChild(script);
-      sendStats($intern_22, $intern_23);
+      sendStats($intern_23, $intern_24);
     }
 
-    sendStats($intern_22, $intern_24);
+    sendStats($intern_23, $intern_25);
     setupWaitForBodyLoad(function(){
       installCode(filename);
     }
@@ -145,8 +149,8 @@ function html(){
   html.__installRunAsyncCode = function(code_0){
     var doc = getInstallLocationDoc();
     var docbody = doc.body;
-    var script = doc.createElement($intern_19);
-    script.language = $intern_20;
+    var script = doc.createElement($intern_20);
+    script.language = $intern_21;
     script.text = code_0;
     docbody.appendChild(script);
   }
@@ -155,48 +159,48 @@ function html(){
     var metaProps = {};
     var propertyErrorFunc;
     var onLoadErrorFunc;
-    var metas = $doc.getElementsByTagName($intern_25);
+    var metas = $doc.getElementsByTagName($intern_26);
     for (var i = $intern_7, n = metas.length; i < n; ++i) {
-      var meta = metas[i], name_0 = meta.getAttribute($intern_26), content_0;
+      var meta = metas[i], name_0 = meta.getAttribute($intern_27), content_0;
       if (name_0) {
-        name_0 = name_0.replace($intern_27, $intern_14);
-        if (name_0.indexOf($intern_28) >= $intern_7) {
+        name_0 = name_0.replace($intern_28, $intern_15);
+        if (name_0.indexOf($intern_29) >= $intern_7) {
           continue;
         }
-        if (name_0 == $intern_29) {
-          content_0 = meta.getAttribute($intern_30);
+        if (name_0 == $intern_30) {
+          content_0 = meta.getAttribute($intern_31);
           if (content_0) {
-            var value_0, eq = content_0.indexOf($intern_31);
+            var value_0, eq = content_0.indexOf($intern_32);
             if (eq >= $intern_7) {
               name_0 = content_0.substring($intern_7, eq);
               value_0 = content_0.substring(eq + $intern_8);
             }
              else {
               name_0 = content_0;
-              value_0 = $intern_14;
+              value_0 = $intern_15;
             }
             metaProps[name_0] = value_0;
           }
         }
-         else if (name_0 == $intern_32) {
-          content_0 = meta.getAttribute($intern_30);
+         else if (name_0 == $intern_33) {
+          content_0 = meta.getAttribute($intern_31);
           if (content_0) {
             try {
               propertyErrorFunc = eval(content_0);
             }
              catch (e) {
-              alert($intern_33 + content_0 + $intern_34);
+              alert($intern_34 + content_0 + $intern_35);
             }
           }
         }
-         else if (name_0 == $intern_35) {
-          content_0 = meta.getAttribute($intern_30);
+         else if (name_0 == $intern_36) {
+          content_0 = meta.getAttribute($intern_31);
           if (content_0) {
             try {
               onLoadErrorFunc = eval(content_0);
             }
              catch (e) {
-              alert($intern_33 + content_0 + $intern_36);
+              alert($intern_34 + content_0 + $intern_37);
             }
           }
         }
@@ -213,68 +217,68 @@ function html(){
 
   function computeScriptBase(){
     function getDirectoryOfFile(path){
-      var hashIndex = path.lastIndexOf($intern_37);
+      var hashIndex = path.lastIndexOf($intern_38);
       if (hashIndex == -1) {
         hashIndex = path.length;
       }
-      var queryIndex = path.indexOf($intern_38);
+      var queryIndex = path.indexOf($intern_39);
       if (queryIndex == -1) {
         queryIndex = path.length;
       }
-      var slashIndex = path.lastIndexOf($intern_39, Math.min(queryIndex, hashIndex));
-      return slashIndex >= $intern_7?path.substring($intern_7, slashIndex + $intern_8):$intern_14;
+      var slashIndex = path.lastIndexOf($intern_40, Math.min(queryIndex, hashIndex));
+      return slashIndex >= $intern_7?path.substring($intern_7, slashIndex + $intern_8):$intern_15;
     }
 
     function ensureAbsoluteUrl(url_0){
       if (url_0.match(/^\w+:\/\//)) {
       }
        else {
-        var img = $doc.createElement($intern_40);
-        img.src = url_0 + $intern_41;
+        var img = $doc.createElement($intern_41);
+        img.src = url_0 + $intern_42;
         url_0 = getDirectoryOfFile(img.src);
       }
       return url_0;
     }
 
     function tryMetaTag(){
-      var metaVal = __gwt_getMetaProperty($intern_42);
+      var metaVal = __gwt_getMetaProperty($intern_43);
       if (metaVal != null) {
         return metaVal;
       }
-      return $intern_14;
+      return $intern_15;
     }
 
     function tryNocacheJsTag(){
-      var scriptTags = $doc.getElementsByTagName($intern_19);
+      var scriptTags = $doc.getElementsByTagName($intern_20);
       for (var i = $intern_7; i < scriptTags.length; ++i) {
-        if (scriptTags[i].src.indexOf($intern_43) != -1) {
+        if (scriptTags[i].src.indexOf($intern_44) != -1) {
           return getDirectoryOfFile(scriptTags[i].src);
         }
       }
-      return $intern_14;
+      return $intern_15;
     }
 
     function tryBaseTag(){
-      var baseElements = $doc.getElementsByTagName($intern_44);
+      var baseElements = $doc.getElementsByTagName($intern_45);
       if (baseElements.length > $intern_7) {
         return baseElements[baseElements.length - $intern_8].href;
       }
-      return $intern_14;
+      return $intern_15;
     }
 
     function isLocationOk(){
       var loc = $doc.location;
-      return loc.href == loc.protocol + $intern_45 + loc.host + loc.pathname + loc.search + loc.hash;
+      return loc.href == loc.protocol + $intern_46 + loc.host + loc.pathname + loc.search + loc.hash;
     }
 
     var tempBase = tryMetaTag();
-    if (tempBase == $intern_14) {
+    if (tempBase == $intern_15) {
       tempBase = tryNocacheJsTag();
     }
-    if (tempBase == $intern_14) {
+    if (tempBase == $intern_15) {
       tempBase = tryBaseTag();
     }
-    if (tempBase == $intern_14 && isLocationOk()) {
+    if (tempBase == $intern_15 && isLocationOk()) {
       tempBase = getDirectoryOfFile($doc.location.href);
     }
     tempBase = ensureAbsoluteUrl(tempBase);
@@ -319,23 +323,23 @@ function html(){
       throw null;
     }
 
-    providers[$intern_46] = function(){
+    providers[$intern_47] = function(){
       var ua = navigator.userAgent.toLowerCase();
       var docMode = $doc.documentMode;
       if (function(){
-        return ua.indexOf($intern_47) != -1;
+        return ua.indexOf($intern_48) != -1;
       }
       ())
-        return $intern_48;
+        return $intern_49;
       if (function(){
-        return ua.indexOf($intern_49) != -1 || docMode >= $intern_50;
+        return ua.indexOf($intern_50) != -1 || docMode >= $intern_51;
       }
       ())
-        return $intern_51;
-      return $intern_14;
+        return $intern_52;
+      return $intern_15;
     }
     ;
-    values[$intern_46] = {'gecko1_8':$intern_7, 'safari':$intern_8};
+    values[$intern_47] = {'gecko1_8':$intern_7, 'safari':$intern_8};
     __gwt_isKnownPropertyValue = function(propName, propValue){
       return propValue in values[propName];
     }
@@ -352,25 +356,25 @@ function html(){
     ;
     html.__computePropValue = computePropValue;
     $wnd.__gwt_activeModules[$intern_4].bindings = html.__getPropMap;
-    sendStats($intern_0, $intern_52);
+    sendStats($intern_0, $intern_53);
     if (isHostedMode()) {
-      return computeUrlForResource($intern_53);
+      return computeUrlForResource($intern_54);
     }
     var strongName;
     try {
-      unflattenKeylistIntoAnswers([$intern_51], $intern_54);
-      unflattenKeylistIntoAnswers([$intern_48], $intern_54 + $intern_55);
-      strongName = answers[computePropValue($intern_46)];
-      var idx = strongName.indexOf($intern_56);
+      unflattenKeylistIntoAnswers([$intern_52], $intern_55);
+      unflattenKeylistIntoAnswers([$intern_49], $intern_55 + $intern_56);
+      strongName = answers[computePropValue($intern_47)];
+      var idx = strongName.indexOf($intern_57);
       if (idx != -1) {
-        softPermutationId = parseInt(strongName.substring(idx + $intern_8), $intern_18);
+        softPermutationId = parseInt(strongName.substring(idx + $intern_8), $intern_19);
         strongName = strongName.substring($intern_7, idx);
       }
     }
      catch (e) {
     }
     html.__softPermutationId = softPermutationId;
-    return computeUrlForResource(strongName + $intern_57);
+    return computeUrlForResource(strongName + $intern_58);
   }
 
   function loadExternalStylesheets(){
@@ -379,17 +383,17 @@ function html(){
     }
     function installOneStylesheet(stylesheetUrl){
       if (!__gwt_stylesLoaded[stylesheetUrl]) {
-        var l = $doc.createElement($intern_58);
-        l.setAttribute($intern_59, $intern_60);
-        l.setAttribute($intern_61, computeUrlForResource(stylesheetUrl));
-        $doc.getElementsByTagName($intern_62)[$intern_7].appendChild(l);
+        var l = $doc.createElement($intern_59);
+        l.setAttribute($intern_60, $intern_61);
+        l.setAttribute($intern_62, computeUrlForResource(stylesheetUrl));
+        $doc.getElementsByTagName($intern_63)[$intern_7].appendChild(l);
         __gwt_stylesLoaded[stylesheetUrl] = true;
       }
     }
 
-    sendStats($intern_63, $intern_1);
-    installOneStylesheet($intern_64);
-    sendStats($intern_63, $intern_65);
+    sendStats($intern_64, $intern_1);
+    installOneStylesheet($intern_65);
+    sendStats($intern_64, $intern_66);
   }
 
   processMetas();
@@ -397,10 +401,10 @@ function html(){
   activeModules[$intern_4].moduleBase = html.__moduleBase;
   var filename = getCompiledCodeFilename();
   if ($wnd) {
-    var devModePermitted = !!($wnd.location.protocol == $intern_66 || $wnd.location.protocol == $intern_67);
+    var devModePermitted = !!($wnd.location.protocol == $intern_67 || $wnd.location.protocol == $intern_68);
     $wnd.__gwt_activeModules[$intern_4].canRedirect = devModePermitted;
     function supportsSessionStorage(){
-      var key = $intern_68;
+      var key = $intern_69;
       try {
         $wnd.sessionStorage.setItem(key, key);
         $wnd.sessionStorage.removeItem(key);
@@ -412,27 +416,27 @@ function html(){
     }
 
     if (devModePermitted && supportsSessionStorage()) {
-      var devModeKey = $intern_69;
+      var devModeKey = $intern_70;
       var devModeUrl = $wnd.sessionStorage[devModeKey];
       if (!/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/.*$/.test(devModeUrl)) {
         if (devModeUrl && (window.console && console.log)) {
-          console.log($intern_70 + devModeUrl);
+          console.log($intern_71 + devModeUrl);
         }
-        devModeUrl = $intern_14;
+        devModeUrl = $intern_15;
       }
       if (devModeUrl && !$wnd[devModeKey]) {
         $wnd[devModeKey] = true;
-        $wnd[devModeKey + $intern_71] = computeScriptBase();
-        var devModeScript = $doc.createElement($intern_19);
+        $wnd[devModeKey + $intern_72] = computeScriptBase();
+        var devModeScript = $doc.createElement($intern_20);
         devModeScript.src = devModeUrl;
-        var head = $doc.getElementsByTagName($intern_62)[$intern_7];
+        var head = $doc.getElementsByTagName($intern_63)[$intern_7];
         head.insertBefore(devModeScript, head.firstElementChild || head.children[$intern_7]);
         return false;
       }
     }
   }
   loadExternalStylesheets();
-  sendStats($intern_0, $intern_65);
+  sendStats($intern_0, $intern_66);
   installScript(filename);
   return true;
 }

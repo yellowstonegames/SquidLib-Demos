@@ -30,7 +30,7 @@ gwt {
 dependencies {
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 //	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
+//    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 
@@ -79,14 +79,14 @@ dependencies {
 
 	implementation project(':core')
 
-//// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
-//// If you do, follow the steps at https://github.com/tommyettinger/gdx-backends#gwt-2902100-support
-//// and you can use GWT 2.10.0, which gives you access to Java 11 language features.
+//// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies. If you do,
+//// follow the steps at https://github.com/tommyettinger/gdx-backends?tab=readme-ov-file#gwt-29021002110-support
+//// and you can use GWT 2.11.0, which gives you access to Java 11 language features.
 //// Make sure that in the gwt block, you change gwtVersion so it is:
-//// gwtVersion = "2.10.0"
+//// gwtVersion = "2.11.0"
     implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
     implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
-//    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
+    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
 //    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion"
 //    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion:sources"
