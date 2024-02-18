@@ -22,7 +22,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -31,6 +33,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tommyettinger.digital.BitConversion;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -41,6 +44,7 @@ import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
+import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.CoordGlider;
 import com.github.yellowstonegames.smooth.Director;
 import com.github.yellowstonegames.smooth.VectorSequenceGlider;
@@ -57,7 +61,7 @@ public class DaybreakDemo extends ApplicationAdapter {
 
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
 
-    private SunBatch batch;
+    private SpriteBatch batch;
     private Phase phase = Phase.WAIT;
 
     // random number generator; this one is more efficient on GWT, but less-so on desktop.
@@ -150,6 +154,8 @@ public class DaybreakDemo extends ApplicationAdapter {
      * Gray with about 30% lightness; fully opaque.
      */
     private static final int OKLAB_MEMORY = 0xFF808060;
+
+    public static final float NEUTRAL_PACKED = BitConversion.intBitsToFloat(0xFEFFFFFF & DescriptiveColor.WHITE);
 
     public DaybreakDemo() {
         this(1L);
@@ -278,6 +284,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         playerSprite = new AnimatedGlidingSprite(new Animation<>(DURATION,
                 atlas.findRegions(rng.randomElement(Data.possibleCharacters)), Animation.PlayMode.LOOP), player);
         playerSprite.setSize(1f, 1f);
+        playerSprite.setPackedColor(NEUTRAL_PACKED);
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
         vision.restart(linePlaceMap, player, 8);
 //        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0f, 0f));
@@ -322,13 +329,63 @@ public class DaybreakDemo extends ApplicationAdapter {
                 new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"", "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
 
     }
+    /**
+     * Returns a new instance of an Oklab shader for GL2 when no shader is specified.
+     */
+    public static ShaderProgram createDefaultShader () {
+        String vertexShader = "attribute vec4 a_position;\n"
+                + "attribute vec4 a_color;\n"
+                + "attribute vec2 a_texCoord0;\n"
+                + "uniform mat4 u_projTrans;\n"
+                + "uniform vec3 u_globalAdd;\n"
+                + "uniform vec3 u_globalMul;\n"
+                + "varying vec4 v_color;\n"
+                + "varying vec2 v_texCoords;\n"
+                + "\n"
+                + "void main(){\n"
+                + "   v_color = a_color;\n"
+                + "   v_color.r = (v_color.r - 0.5) * 0.5 * u_globalMul.r + u_globalAdd.r - 0.25;\n"
+                + "   v_color.gb = (v_color.gb - 0.5) * u_globalMul.gb + u_globalAdd.gb;\n"
+                + "   v_color.a = v_color.a * (255.0/254.0);\n"
+                + "   v_texCoords = a_texCoord0;\n"
+                + "   gl_Position = u_projTrans * a_position;\n"
+                + "}\n";
+        String fragmentShaderOklab =
+                "#ifdef GL_ES\n" +
+                        "#define LOWP lowp\n" +
+                        "precision mediump float;\n" +
+                        "#else\n" +
+                        "#define LOWP \n" +
+                        "#endif\n" +
+                        "varying vec2 v_texCoords;\n" +
+                        "varying LOWP vec4 v_color;\n" +
+                        "uniform sampler2D u_texture;\n" +
+                        "const vec3 forward = vec3(1.0 / 3.0);\n" +
+                        "void main(){\n" +
+                        "  vec4 tgt = texture2D( u_texture, v_texCoords );\n" +
+                        "  vec3 lab = mat3(+0.2104542553, +1.9779984951, +0.0259040371, +0.7936177850, -2.4285922050, +0.7827717662, -0.0040720468, +0.4505937099, -0.8086757660) *" +
+                        "             pow(mat3(0.4121656120, 0.2118591070, 0.0883097947, 0.5362752080, 0.6807189584, 0.2818474174, 0.0514575653, 0.1074065790, 0.6302613616) \n" +
+                        "             * (tgt.rgb * tgt.rgb), forward);\n" +
+                        "  lab.x = pow(clamp(pow(lab.x, 1.5) + v_color.r, 0.0, 1.0), 0.666666);\n" +
+                        "  lab.yz = clamp(lab.yz + v_color.gb * 2.0, -1.0, 1.0);\n" +
+                        "  lab = mat3(1.0, 1.0, 1.0, +0.3963377774, -0.1055613458, -0.0894841775, +0.2158037573, -0.0638541728, -1.2914855480) * lab;\n" +
+                        "  gl_FragColor = vec4(sqrt(clamp(" +
+                        "                 mat3(+4.0767245293, -1.2681437731, -0.0041119885, -3.3072168827, +2.6093323231, -0.7034763098, +0.2307590544, -0.3411344290, +1.7068625689) *\n" +
+                        "                 (lab * lab * lab)," +
+                        "                 0.0, 1.0)), v_color.a * tgt.a);\n" +
+                        "}";
+
+        ShaderProgram shader = new ShaderProgram(vertexShader, fragmentShaderOklab);
+        if (!shader.isCompiled()) throw new IllegalArgumentException("Error compiling shader: " + shader.getLog());
+        return shader;
+    }
 
     @Override
     public void create() {
 
         Gdx.app.setLogLevel(Application.LOG_INFO);
         // We need access to a batch to render most things.
-        batch = new SunBatch();
+        batch = new SpriteBatch(8000, createDefaultShader());
 
         rng = new ChopRandom(seed);
 
@@ -497,7 +554,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         if (cg.getChange() != 0f && cg.getChange() != 1f) return;
 
         int newX = next.x, newY = next.y;
-        playerSprite.setPackedColor(SunBatch.NEUTRAL);
+        playerSprite.setPackedColor(NEUTRAL_PACKED);
         if (newX >= 0 && newY >= 0 && newX < placeWidth && newY < placeHeight
                 && barePlaceMap[newX][newY] != '#') {
             // '+' is a door.
@@ -643,7 +700,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         }
 //        batch.setPackedColor(intBitsToFloat(0xFEFFFFFF));
 //        playerSprite.setPackedColor(intBitsToFloat(0xFEFFFFFF & vision.getForegroundColor(player.x, player.y, change)));
-//        batch.setPackedColor(SunBatch.NEUTRAL);
+//        batch.setPackedColor(NEUTRAL_PACKED);
         playerSprite.animate(time).draw(batch);
 //        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
