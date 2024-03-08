@@ -22,6 +22,10 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
 else {
 	apply plugin: 'application'
 }
+apply plugin: 'java-library'
+compileJava {
+	options.incremental = true
+}
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
@@ -42,7 +46,7 @@ def jarName = "${appName}-${version}.jar"
 def os = System.properties['os.name'].toLowerCase()
 
 run {
-	workingDir = rootProject.file('assets').path
+//	workingDir = rootProject.file('assets').path
 	setIgnoreExitValue(true)
 
 	if (os.contains('mac')) jvmArgs += "-XstartOnFirstThread"

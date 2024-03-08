@@ -17,14 +17,6 @@ allprojects {
 	apply plugin: 'idea'
 }
 
-configure(subprojects - project(':android')) {
-	apply plugin: 'java-library'
-	sourceCompatibility = 8
-	compileJava {
-		options.incremental = true
-	}
-}
-
 subprojects {
 	version = '0.0.1'
 	ext.appName = 'DawnSquad'

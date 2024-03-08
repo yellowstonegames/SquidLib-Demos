@@ -1,6 +1,11 @@
+apply plugin: 'java-library'
+compileJava {
+	options.incremental = true
+}
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
-
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
 dependencies {
 	api "com.badlogicgames.gdx:gdx:$gdxVersion"
 //	api "com.squidpony:SquidPlace:$squidSquadVersion"
