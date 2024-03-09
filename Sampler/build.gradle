@@ -1,13 +1,12 @@
 buildscript {
   repositories {
-    mavenLocal()
     mavenCentral()
     google()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     gradlePluginPortal()
   }
   dependencies {
-    classpath 'com.guardsquare:proguard-gradle:7.3.0'
+    classpath 'com.guardsquare:proguard-gradle:7.4.2'
   }
 }
 

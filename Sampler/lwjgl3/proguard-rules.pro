@@ -5,8 +5,9 @@
 -keepclasseswithmembers public class * { public static void main(java.lang.String[]); }
 
 -keep public class org.lwjgl.system.** { *; }
--keep public class com.badlogic.gdx.graphics.g2d.** { *; }
--keep public class com.badlogic.gdx.graphics.Color { *; }
+# -keep public class com.badlogic.gdx.graphics.g2d.** { *; }
+-keep public class com.badlogic.gdx.graphics.Color* { *; }
+-keep public class com.badlogic.gdx.graphics.g2d.BitmapFont* { *; }
 -keep public class com.badlogic.gdx.scenes.scene2d.** { *; }
 
 -keepclasseswithmembernames class * { native <methods>; }

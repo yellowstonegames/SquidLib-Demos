@@ -2,9 +2,6 @@ apply plugin: 'com.android.application'
 
 //android.packagingOptions.exclude "**.gwt.xml"
 
-// forces a crash, we're trying to see if we can conditionally exclude android
-var bytezzz = file("blahblah").readBytes()
-
 android {
 	namespace 'com.github.yellowstonegames'
 	compileSdk 34

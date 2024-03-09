@@ -1,3 +1,1 @@
-include 'lwjgl3', 'html', 'core'
-if(System.getenv("BuildAndroid") == "true")
-    include 'android'
+include 'lwjgl3', 'html', 'core', 'android'
