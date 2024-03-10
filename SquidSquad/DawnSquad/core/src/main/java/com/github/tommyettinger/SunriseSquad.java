@@ -28,13 +28,11 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tommyettinger.digital.BitConversion;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -329,6 +327,80 @@ public class SunriseSquad extends ApplicationAdapter {
 
     @Override
     public void create() {
+
+        Gdx.app.setLogLevel(Application.LOG_ERROR);
+        int x;
+        long y;
+        Gdx.app.error("NUMBERUTILS", "Testing int to float to int...");
+        x = Integer.MIN_VALUE;
+        while(true)
+        {
+            float f = NumberUtils.intBitsToFloat(x);
+            int r = NumberUtils.floatToRawIntBits(f);
+
+            if(r != x)
+            {
+                Gdx.app.error("NUMBERUTILS", x + " does not match " + r);
+            }
+
+            if(x == Integer.MAX_VALUE)
+                break;
+
+            x++;
+        }
+        Gdx.app.error("BITCONVERSION", "Testing int to float to int...");
+        x = Integer.MIN_VALUE;
+        while(true)
+        {
+            float f = BitConversion.intBitsToFloat(x);
+            int r = BitConversion.floatToRawIntBits(f);
+
+            if(r != x)
+            {
+                Gdx.app.error("BITCONVERSION", x + " does not match " + r);
+            }
+
+            if(x == Integer.MAX_VALUE)
+                break;
+
+            x++;
+        }
+//        Gdx.app.error("NUMBERUTILS_DOUBLE", "Testing long to double to long...");
+//        y = Long.MIN_VALUE;
+//        while(true)
+//        {
+//            double f = NumberUtils.longBitsToDouble(y);
+//            long r = NumberUtils.doubleToLongBits(f);
+//
+//            if(r != y)
+//            {
+//                Gdx.app.error("NUMBERUTILS_DOUBLE", y + " does not match " + r);
+//            }
+//
+//            if(y == 0x7FFFFF0000000000L)
+//                break;
+//
+//            y+= 0x10000000000L;
+//        }
+        Gdx.app.error("BITCONVERSION_DOUBLE", "Testing long to double to long...");
+        y = Long.MIN_VALUE;
+        while(true)
+        {
+            double f = BitConversion.longBitsToDouble(y);
+            long r = BitConversion.doubleToRawLongBits(f);
+
+            if(r != y)
+            {
+                Gdx.app.error("BITCONVERSION_DOUBLE", y + " does not match " + r);
+            }
+
+            if(y == 0x7FFFFF0000000000L)
+                break;
+
+            y+= 0x10000000000L;
+        }
+
+
         // We need access to a batch to render most things.
         batch = new SpriteBatch();
 
