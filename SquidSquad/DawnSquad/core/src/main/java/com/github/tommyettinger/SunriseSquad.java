@@ -19,20 +19,20 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.github.tommyettinger.digital.BitConversion;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -348,9 +348,12 @@ public class SunriseSquad extends ApplicationAdapter {
 
         // Stores all images we use here efficiently, as well as the font image
         atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
-//        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
+        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
 //        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
-        font = generateFreetypeFont(48);
+        font.getData().markupEnabled = true;
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(3);
+//        font = generateFreetypeFont(48);
         vision.rememberedColor = OKLAB_MEMORY;
 
 //        Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
@@ -498,36 +501,36 @@ public class SunriseSquad extends ApplicationAdapter {
         Gdx.input.setInputProcessor(input);
     }
 
-    private BitmapFont generateFreetypeFont(int size) {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.characters =
-                " !\"%'(),-." +
-                        "0123456789" +
-                        ":;=?ABCDEF" +
-                        "GHIJKLMNOP" +
-                        "QRSTUVWXYZ" +
-                        "[]_abcdefg" +
-                        "hijklmnopq" +
-                        "rstuvwxyz{" +
-                        "}©ÀÁÂÃÄÈÉÊ" +
-                        "ËÌÍÎÏÑÒÓÔÖ" +
-                        "ÙÚÛÜÝàáâãä" +
-                        "èéêëìíîïñò" +
-                        "óôõöùúûüýÿ" +
-                        "Ÿ—\n";
-        parameter.size = size;
-        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        font = generator.generateFont(parameter);
-        generator.dispose(); // don't forget to dispose to avoid memory leaks!
-
-        font.setUseIntegerPositions(false);
-//        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
-        font.getData().markupEnabled = true;
-        return font;
-    }
+//    private BitmapFont generateFreetypeFont(int size) {
+//        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
+//        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+//        parameter.characters =
+//                " !\"%'(),-." +
+//                        "0123456789" +
+//                        ":;=?ABCDEF" +
+//                        "GHIJKLMNOP" +
+//                        "QRSTUVWXYZ" +
+//                        "[]_abcdefg" +
+//                        "hijklmnopq" +
+//                        "rstuvwxyz{" +
+//                        "}©ÀÁÂÃÄÈÉÊ" +
+//                        "ËÌÍÎÏÑÒÓÔÖ" +
+//                        "ÙÚÛÜÝàáâãä" +
+//                        "èéêëìíîïñò" +
+//                        "óôõöùúûüýÿ" +
+//                        "Ÿ—\n";
+//        parameter.size = size;
+//        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
+//        parameter.magFilter = Texture.TextureFilter.Linear;
+//        parameter.minFilter = Texture.TextureFilter.Linear;
+//        font = generator.generateFont(parameter);
+//        generator.dispose(); // don't forget to dispose to avoid memory leaks!
+//
+//        font.setUseIntegerPositions(false);
+////        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
+//        font.getData().markupEnabled = true;
+//        return font;
+//    }
 
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
@@ -834,7 +837,7 @@ public class SunriseSquad extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-        font = generateFreetypeFont(height * 3 / shownHeight);
+//        font = generateFreetypeFont(height * 3 / shownHeight);
         mainViewport.update(width, height, false);
         guiViewport.update(width, height, false);
     }

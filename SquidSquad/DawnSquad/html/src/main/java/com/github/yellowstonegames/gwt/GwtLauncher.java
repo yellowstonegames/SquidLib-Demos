@@ -20,7 +20,6 @@ public class GwtLauncher extends GwtApplication {
 		// and uncomment below:
 		GwtApplicationConfiguration cfg = new GwtApplicationConfiguration(shownWidth * cellWidth, shownHeight * cellHeight);
 		cfg.disableAudio = true;
-		cfg.canCreateLog = true;
 		return cfg;
 	}
 
@@ -29,9 +28,9 @@ public class GwtLauncher extends GwtApplication {
 //		return new SunriseSquad(0L);
 		return new SunriseSquad(System.currentTimeMillis());
 	}
-
-	@Override
-	public void onModuleLoad() {
-		com.badlogic.gdx.graphics.g2d.freetype.gwt.FreetypeInjector.inject(super::onModuleLoad);
-	}
+//
+//	@Override
+//	public void onModuleLoad() {
+//		com.badlogic.gdx.graphics.g2d.freetype.gwt.FreetypeInjector.inject(super::onModuleLoad);
+//	}
 }

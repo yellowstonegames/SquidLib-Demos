@@ -37,7 +37,7 @@ java.targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-	implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
+//	implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
 	implementation project(':core')
 }
@@ -117,7 +117,7 @@ if (JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_14)) {
 			skipInstaller = true
 // this may need to be set to a different path if your JAVA_HOME points to a low JDK version.
 			jpackageHome = javaHome.getOrElse("")
-			mainJar = appName
+			mainJar = jarName
 			if (os.contains('win')) {
 				imageOptions = ["--icon", "icons/logo.ico"]
 			} else if (os.contains('nix') || os.contains('nux') || os.contains('bsd')) {
