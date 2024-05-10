@@ -27,10 +27,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tommyettinger.digital.BitConversion;
@@ -281,9 +278,13 @@ public class DaybreakDemo extends ApplicationAdapter {
         //if you gave a seed to the RNG constructor, then the cell this chooses will be reliable for testing. If you
         //don't seed the RNG, any valid cell should be possible.
         player = floors.singleRandom(rng);
+        Array<TextureAtlas.AtlasRegion> playerRegions = atlas.findRegions(rng.randomElement(Data.possibleCharacters));
+        for(TextureAtlas.AtlasRegion reg : playerRegions){
+            reg.setRegion(reg.getRegionX()-1, reg.getRegionY()-1, reg.getRegionWidth()+2, reg.getRegionHeight()+2);
+        }
         playerSprite = new AnimatedGlidingSprite(new Animation<>(DURATION,
-                atlas.findRegions(rng.randomElement(Data.possibleCharacters)), Animation.PlayMode.LOOP), player);
-        playerSprite.setSize(1f, 1f);
+                playerRegions, Animation.PlayMode.LOOP), player);
+        playerSprite.setSize(18f/16f, 18f/16f);
         playerSprite.setPackedColor(NEUTRAL_PACKED);
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
         vision.restart(linePlaceMap, player, 8);
@@ -296,10 +297,14 @@ public class DaybreakDemo extends ApplicationAdapter {
             Coord monPos = floors.singleRandom(rng);
             floors.remove(monPos);
             String enemy = rng.randomElement(Data.possibleEnemies);
+            Array<TextureAtlas.AtlasRegion> enemyRegions = atlas.findRegions(enemy);
+            for(TextureAtlas.AtlasRegion reg : enemyRegions){
+                reg.setRegion(reg.getRegionX()-1, reg.getRegionY()-1, reg.getRegionWidth()+2, reg.getRegionHeight()+2);
+            }
             AnimatedGlidingSprite monster =
                     new AnimatedGlidingSprite(new Animation<>(DURATION,
-                            atlas.findRegions(enemy), Animation.PlayMode.LOOP), monPos);
-            monster.setSize(1f, 1f);
+                            enemyRegions, Animation.PlayMode.LOOP), monPos);
+            monster.setSize(18f/16f, 18f/16f);
             monsters.put(monPos, monster);
             vision.lighting.addLight(monPos, new Radiance(rng.nextFloat(3f) + 2f,
 //                    FullPalette.COLOR_WHEEL_PALETTE_LIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_LIGHT.length)], 0f, 0f));
@@ -431,7 +436,7 @@ public class DaybreakDemo extends ApplicationAdapter {
                 "                    isExteriorPoint = true;\n" +
                 "                if (isInteriorPoint && isExteriorPoint)\n" +
                 "                {\n" +
-                "                    gl_FragColor = u_borderColor;\n" +
+                "                    gl_FragColor = v_color.a * u_borderColor;\n" +
                 "                    return;\n" +
                 "                }\n" +
                 "            }\n" +
@@ -834,7 +839,7 @@ public class DaybreakDemo extends ApplicationAdapter {
         batch.getShader().setUniformf("u_globalMul", 1f, 0.8f, 0.9f);
         batch.getShader().setUniformf("u_globalAdd", 0f, 0.1f - health * 0.0115f, 0.08f - health * 0.0111f);
         batch.getShader().setUniformf("u_imageSize", 2048f, 1024f);
-        batch.getShader().setUniformf("u_borderColor", 1f, 1f, 0f, 1f);
+        batch.getShader().setUniformf("u_borderColor", 1f, 1f, 1f, 1f);
         // you done bad. you done real bad.
         if (health <= 0) {
             // still need to display the map, then write over it with a message.
@@ -842,6 +847,7 @@ public class DaybreakDemo extends ApplicationAdapter {
             float wide = mainViewport.getWorldWidth(),
                     x = playerSprite.getX() - mainViewport.getWorldWidth() * 0.5f,
                     y = playerSprite.getY();
+            batch.getShader().setUniformf("u_borderColor", 1f, 1f, 1f, 0f);
             font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2, wide, Align.center, true);
             font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + 1, wide, Align.center, true);
             font.draw(batch, "[FOREST]" + lang, x, y, wide, Align.center, true);
@@ -901,6 +907,8 @@ public class DaybreakDemo extends ApplicationAdapter {
         putMap();
         pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight);
         mainViewport.unproject(pos);
+        batch.flush();
+        batch.getShader().setUniformf("u_borderColor", 1f, 1f, 1f, 0f);
         font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
         batch.end();
