@@ -71,8 +71,8 @@ dependencies {
 //    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
 //    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
 
-    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion"
-    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion:sources"
+    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
+    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
 
     implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
