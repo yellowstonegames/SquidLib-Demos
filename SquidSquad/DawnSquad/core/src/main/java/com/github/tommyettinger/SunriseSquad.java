@@ -198,7 +198,6 @@ public class SunriseSquad extends ApplicationAdapter {
         //TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS or TilesetType.CAVES_LIMIT_CONNECTIVITY to change the sections that
         //this will use, or just pass in a full 2D char array produced from some other generator, such as
         //SerpentMapGenerator, OrganicMapGenerator, or DenseRoomMapGenerator.
-        System.out.println("Before: " + rng.stringSerialize());
         DungeonProcessor dungeonGen = new DungeonProcessor(placeWidth, placeHeight, rng);
         //this next line randomly adds water to the dungeon in pools.
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
@@ -245,8 +244,6 @@ public class SunriseSquad extends ApplicationAdapter {
         //this is also good to compare against if the map looks incorrect, and you need an example of a correct map when
         //no parameters are given to generate().
         char[][] linePlaceMap = LineTools.hashesToLines(dungeonGen.generate(), true);
-        System.out.println("After: " + rng.stringSerialize());
-        rng.stringDeserialize("ChpR`-54956321~74625E0~1B0F5FDF~-426CA1FF`");
         //linePlaceMap is given the dungeon with any decorations we specified. (Here, we didn't, unless you chose to add
         //water to the dungeon. In that case, linePlaceMap will have different contents than barePlaceMap, next.)
         //getBarePlaceGrid() provides the simplest view of the generated dungeon -- '#' for walls, '.' for floors.
@@ -285,9 +282,6 @@ public class SunriseSquad extends ApplicationAdapter {
                 atlas.findRegions(rng.randomElement(Data.possibleCharacters)), Animation.PlayMode.LOOP), player);
         playerSprite.setSize(1f, 1f);
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
-
-        linePlaceMap[player.x][player.y] = '@';
-        DungeonTools.debugPrint(linePlaceMap);
 
         vision.restart(linePlaceMap, player, 8);
 //        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0f, 0f));
@@ -335,7 +329,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
     @Override
     public void create() {
-
+        Gdx.app.setLogLevel(Application.LOG_INFO);
         // We need access to a batch to render most things.
         batch = new SpriteBatch();
 
@@ -430,7 +424,6 @@ public class SunriseSquad extends ApplicationAdapter {
                 switch (keycode) {
                     case BACKSLASH:
                         // Debug
-                        Gdx.app.setLogLevel(Application.LOG_INFO);
                         if(glProfiler == null) {
                             glProfiler = new GLProfiler(Gdx.graphics);
                             glProfiler.enable();
@@ -446,7 +439,7 @@ public class SunriseSquad extends ApplicationAdapter {
                     case F:
                         // this probably isn't needed currently, since the FPS is shown on-screen.
                         // it could be useful in the future.
-                        System.out.println(Gdx.graphics.getFramesPerSecond());
+                        Gdx.app.log("FPS", String.valueOf(Gdx.graphics.getFramesPerSecond()));
                         break;
                     case ESCAPE:
                         Gdx.app.exit();
