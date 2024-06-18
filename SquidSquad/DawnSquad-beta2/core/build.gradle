@@ -15,4 +15,6 @@ dependencies {
   api "com.squidpony:squidplace:$squidPlaceVersion"
   api "com.squidpony:squidsmooth:$squidSmoothVersion"
   api "com.squidpony:squidtext:$squidTextVersion"
+
+  testImplementation 'junit:junit:4.13.2'
 }
