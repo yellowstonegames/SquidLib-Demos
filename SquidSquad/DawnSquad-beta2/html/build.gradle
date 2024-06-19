@@ -46,6 +46,7 @@ dependencies {
   implementation "com.squidpony:squidplace:$squidPlaceVersion:sources"
   implementation "com.squidpony:squidsmooth:$squidSmoothVersion:sources"
   implementation "com.squidpony:squidtext:$squidTextVersion:sources"
+  implementation 'com.github.tommyettinger:delongator:0.0.1:sources'
   implementation project(':core')
 
 }

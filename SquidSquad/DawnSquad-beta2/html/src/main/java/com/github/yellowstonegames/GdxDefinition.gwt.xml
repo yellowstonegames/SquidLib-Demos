@@ -16,6 +16,7 @@
   <inherits name="com.github.yellowstonegames.squidsmooth" />
   <inherits name="com.github.yellowstonegames.squidtext" />
   <inherits name="regexodus.regexodus" />
+  <inherits name="com.github.tommyettinger.delongator" />
   <entry-point class="com.github.yellowstonegames.gwt.GwtLauncher" />
   <set-configuration-property name="gdx.assetpath" value="../assets" />
   <set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>
