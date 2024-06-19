@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tommyettinger.digital.ArrayTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -99,29 +100,29 @@ public class SunriseSquad extends ApplicationAdapter {
     /**
      * In number of cells
      */
-    public static final int shownWidth = 32;
+    public static final int shownWidth = 32 * 2;
     /**
      * In number of cells
      */
-    public static final int shownHeight = 24;
+    public static final int shownHeight = 24 * 2;
 
     /**
      * In number of cells
      */
-    public static final int placeWidth = shownWidth * 2;
+    public static final int placeWidth = shownWidth * 3;
     /**
      * In number of cells
      */
-    public static final int placeHeight = shownHeight * 2;
+    public static final int placeHeight = shownHeight * 3;
 
     /**
      * The pixel width of a cell
      */
-    public static final int cellWidth = 32;
+    public static final int cellWidth = 16;
     /**
      * The pixel height of a cell
      */
-    public static final int cellHeight = 32;
+    public static final int cellHeight = 16;
 
     private boolean onGrid(int screenX, int screenY) {
         return screenX >= 0 && screenX < placeWidth && screenY >= 0 && screenY < placeHeight;
@@ -284,6 +285,7 @@ public class SunriseSquad extends ApplicationAdapter {
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
 
         vision.restart(linePlaceMap, player, 8);
+        ArrayTools.fill(vision.lighting.resistances, 0f);
 //        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0f, 0f));
         vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0.3f, 0f));
         floors.remove(player);
@@ -324,6 +326,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
         lang = '"' + Language.DEMONIC.sentence(rng, 4, 7,
                 new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"", "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
+        move(player);
 
     }
 
@@ -554,6 +557,7 @@ public class SunriseSquad extends ApplicationAdapter {
             // '+' is a door.
             if (vision.prunedPlaceMap[newX][newY] == '+') {
                 vision.editSingle(next, '/');
+                ArrayTools.fill(vision.lighting.resistances, 0f);
             } else {
                 // if a monster was at the position we moved into, and so was successfully removed...
                 if (monsters.containsKey(next)) {
@@ -643,6 +647,7 @@ public class SunriseSquad extends ApplicationAdapter {
      */
     public void putMap() {
         float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4.0, 0.0), 1000.0);
+        ArrayTools.fill(vision.lighting.resistances, 0f);
         vision.update(change);
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
 //        final float sun = 1f - ((time * 0.1f) - (int)(time * 0.1f)),

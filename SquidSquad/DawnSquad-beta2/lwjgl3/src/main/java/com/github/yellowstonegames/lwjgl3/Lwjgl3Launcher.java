@@ -43,12 +43,12 @@ public class Lwjgl3Launcher {
         String env = System.getenv("seed");
         long seed;
         if(env == null)
-            seed = System.currentTimeMillis();
+            seed = 0L;//System.currentTimeMillis();
         else {
             try {
                 seed = Long.parseLong(env);
             } catch (NumberFormatException e){
-                seed = System.currentTimeMillis();
+                seed = 0L;//System.currentTimeMillis();
             }
         }
         return new Lwjgl3Application(new SunriseSquad(seed), configuration);

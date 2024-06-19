@@ -62,7 +62,6 @@ jar {
     file(archiveFile).setExecutable(true, false)
   }
 }
-
 construo {
     // name of the executable
     name.set(appName)
@@ -70,6 +69,8 @@ construo {
     humanName.set(appName)
     // Optional, defaults to project version
     version.set("0.0.0")
+    roast.useZgc.set(true)
+
 
     targets.configure {
       create("linuxX64", Target.Linux) {
