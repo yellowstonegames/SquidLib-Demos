@@ -17,4 +17,6 @@ dependencies {
   api "com.squidpony:squidtext:$squidTextVersion"
 
   testImplementation 'junit:junit:4.13.2'
+  testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+  testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 }
