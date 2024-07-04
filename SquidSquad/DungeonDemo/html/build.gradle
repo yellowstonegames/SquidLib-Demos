@@ -29,12 +29,13 @@ gwt {
 
 dependencies {
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-    implementation "com.github.tommyettinger:funderby:0.1.1:sources"
+    implementation "com.github.tommyettinger:funderby:0.1.2:sources"
+    implementation "com.github.tommyettinger:crux:0.0.1:sources"
     implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
     implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
-    implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
+    implementation "com.github.tommyettinger.textratypist:textratypist:$typistVersion:sources"
 
 //    implementation "com.squidpony:SquidCore:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidGrid:$squidSquadVersion:sources"
@@ -43,15 +44,15 @@ dependencies {
 //    implementation "com.squidpony:SquidText:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidGlyph:$squidSquadVersion:sources"
 
-    implementation "com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion:sources"
-    implementation "com.github.yellowstonegames.squidsquad:SquidGlyph:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion:sources"
+    implementation "com.github.yellowstonegames.squidsquad:squidglyph:$squidSquadVersion:sources"
 
-    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion"
-    implementation "com.github.tommyettinger.gdx-backends:gdx-backend-gwt:$gdxBackendsVersion:sources"
+    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
+    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
     implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
 	implementation project(':core')
