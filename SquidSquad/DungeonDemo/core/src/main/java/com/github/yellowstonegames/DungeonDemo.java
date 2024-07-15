@@ -71,7 +71,7 @@ public class DungeonDemo extends ApplicationAdapter {
         Gdx.app.log("SEED", "Initial seed is " + seed);
         EnhancedRandom random = new ChopRandom(seed);
         stage = new Stage();
-        Font font = KnownFonts.getInconsolata().scaleTo(15f, 25f).setDescent(0f);
+        Font font = KnownFonts.getInconsolata(Font.DistanceFieldType.MSDF).multiplyCrispness(0.5f).scaleTo(15f, 25f).adjustLineHeight(1.25f);
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
 //        font = KnownFonts.getIosevka().scale(0.75f, 0.75f);
 //        Font font = KnownFonts.getCascadiaMono();
