@@ -35,7 +35,7 @@ dependencies {
     implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
-    implementation "com.github.tommyettinger.textratypist:textratypist:$typistVersion:sources"
+    implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
 
 //    implementation "com.squidpony:SquidCore:$squidSquadVersion:sources"
 //    implementation "com.squidpony:SquidGrid:$squidSquadVersion:sources"

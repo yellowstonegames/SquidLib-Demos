@@ -19,7 +19,7 @@ public class Lwjgl3Launcher {
 
 	private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode(GRID_WIDTH * CELL_WIDTH, GRID_HEIGHT * CELL_HEIGHT);
+		config.setWindowedMode(PLACE_WIDTH * CELL_WIDTH, PLACE_HEIGHT * CELL_HEIGHT);
 		config.disableAudio(true);
 		config.setForegroundFPS(0);
 		config.useVsync(true);

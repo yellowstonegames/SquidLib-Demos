@@ -38,7 +38,7 @@ public class Lwjgl3Launcher {
         ShaderProgram.prependFragmentCode = "#version 110\n";
         // these are constants in the main game class; they should match your
         // initial viewport size in pixels before it gets resized to fullscreen.
-        configuration.setWindowedMode(shownWidth * cellWidth, shownHeight * cellHeight);
+        configuration.setWindowedMode(SHOWN_WIDTH * CELL_WIDTH, SHOWN_HEIGHT * CELL_HEIGHT);
 
         String env = System.getenv("seed");
         long seed;

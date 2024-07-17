@@ -33,7 +33,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.github.tommyettinger.digital.ArrayTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
@@ -106,32 +105,32 @@ public class SunriseSquad extends ApplicationAdapter {
     /**
      * In number of cells
      */
-    public static final int shownWidth = 32 * 2;
+    public static final int SHOWN_WIDTH = 32 * 2;
     /**
      * In number of cells
      */
-    public static final int shownHeight = 24 * 2;
+    public static final int SHOWN_HEIGHT = 24 * 2;
 
     /**
      * In number of cells
      */
-    public static final int placeWidth = shownWidth * 3;
+    public static final int PLACE_WIDTH = SHOWN_WIDTH * 3;
     /**
      * In number of cells
      */
-    public static final int placeHeight = shownHeight * 3;
+    public static final int PLACE_HEIGHT = SHOWN_HEIGHT * 3;
 
     /**
      * The pixel width of a cell
      */
-    public static final int cellWidth = 16;
+    public static final int CELL_WIDTH = 16;
     /**
      * The pixel height of a cell
      */
-    public static final int cellHeight = 16;
+    public static final int CELL_HEIGHT = 16;
 
     private boolean onGrid(int screenX, int screenY) {
-        return screenX >= 0 && screenX < placeWidth && screenY >= 0 && screenY < placeHeight;
+        return screenX >= 0 && screenX < PLACE_WIDTH && screenY >= 0 && screenY < PLACE_HEIGHT;
     }
 
     private BitmapFont font;
@@ -205,7 +204,7 @@ public class SunriseSquad extends ApplicationAdapter {
         //TilesetType.ROUND_ROOMS_DIAGONAL_CORRIDORS or TilesetType.CAVES_LIMIT_CONNECTIVITY to change the sections that
         //this will use, or just pass in a full 2D char array produced from some other generator, such as
         //SerpentMapGenerator, OrganicMapGenerator, or DenseRoomMapGenerator.
-        DungeonProcessor dungeonGen = new DungeonProcessor(placeWidth, placeHeight, rng);
+        DungeonProcessor dungeonGen = new DungeonProcessor(PLACE_WIDTH, PLACE_HEIGHT, rng);
         //this next line randomly adds water to the dungeon in pools.
         dungeonGen.addWater(DungeonProcessor.ALL, 12);
         //this next line makes 10% of valid door positions into complete doors.
@@ -335,7 +334,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
         lang = '"' + Language.DEMONIC.sentence(rng, 4, 7,
                 new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"", "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
-        move(player);
+//        move(player);
 
     }
 
@@ -349,8 +348,8 @@ public class SunriseSquad extends ApplicationAdapter {
         rng = new ChopRandom(seed);
 
         guiViewport = new ScreenViewport();
-        mainViewport = new ScalingViewport(Scaling.fill, shownWidth, shownHeight);
-        mainViewport.setScreenBounds(0, 0, shownWidth * cellWidth, shownHeight * cellHeight);
+        mainViewport = new ScalingViewport(Scaling.fill, SHOWN_WIDTH, SHOWN_HEIGHT);
+        mainViewport.setScreenBounds(0, 0, SHOWN_WIDTH * CELL_WIDTH, SHOWN_HEIGHT * CELL_HEIGHT);
         camera = mainViewport.getCamera();
         camera.update();
 
@@ -561,7 +560,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
         int newX = next.x, newY = next.y;
         playerSprite.setPackedColor(Color.WHITE_FLOAT_BITS);
-        if (newX >= 0 && newY >= 0 && newX < placeWidth && newY < placeHeight
+        if (newX >= 0 && newY >= 0 && newX < PLACE_WIDTH && newY < PLACE_HEIGHT
                 && barePlaceMap[newX][newY] != '#') {
             // '+' is a door.
             if (vision.prunedPlaceMap[newX][newY] == '+') {
@@ -677,8 +676,8 @@ public class SunriseSquad extends ApplicationAdapter {
 
         float[][] lightLevels = vision.lighting.fovResult;
 
-        for (int x = 0; x < placeWidth; x++) {
-            for (int y = 0; y < placeHeight; y++) {
+        for (int x = 0; x < PLACE_WIDTH; x++) {
+            for (int y = 0; y < PLACE_HEIGHT; y++) {
                 char glyph = vision.prunedPlaceMap[x][y];
                 if (vision.seen.contains(x, y)) {
                     // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
@@ -693,8 +692,8 @@ public class SunriseSquad extends ApplicationAdapter {
         }
         AnimatedGlidingSprite monster;
 
-        for (int i = 0; i < placeWidth; i++) {
-            for (int j = 0; j < placeHeight; j++) {
+        for (int i = 0; i < PLACE_WIDTH; i++) {
+            for (int j = 0; j < PLACE_HEIGHT; j++) {
                 if (lightLevels[i][j] > 0.01) {
                     if ((monster = monsters.get(Coord.get(i, j))) != null) {
                         monster = monster.animate(time);

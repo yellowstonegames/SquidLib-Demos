@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.github.tommyettinger.digital.ArrayTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.random.ChopRandom;
@@ -19,6 +18,8 @@ import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.tommyettinger.random.LineWobble;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.KnownFonts;
+import com.github.yellowstonegames.core.DescriptiveColor;
+import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.glyph.GlyphActor;
 import com.github.yellowstonegames.glyph.GlyphGrid;
 import com.github.yellowstonegames.glyph.MoreActions;
@@ -34,23 +35,47 @@ import static com.badlogic.gdx.Input.Keys.*;
 import static com.github.yellowstonegames.core.DescriptiveColor.*;
 
 public class DungeonDemo extends ApplicationAdapter {
+    private static final float DURATION = 0.375f;
+    private long startTime, lastMove;
+
     private Stage stage;
     private GlyphGrid gg;
     private DungeonProcessor dungeonProcessor;
-    private char[][] bare, dungeon, prunedDungeon;
-    private float[][] res, light;
-    private Region seen, inView, blockage;
+    /**
+     * The dungeon map using only {@code '#'} for walls and {@code '.'} for floors.
+     */
+    private char[][] barePlaceMap;
+
+    /**
+     * All floors that the player can walk on.
+     */
+    private Region floors;
+
+    /**
+     * Handles field of view calculations as they change when the player moves around; also, lighting with colors.
+     */
+    private final VisionFramework vision = new VisionFramework();
+    /**
+     * The 2D position of the player (the moving character who the FOV centers upon).
+     */
+    private Coord player;
+
+    private final Coord[] playerArray = new Coord[1];
+
     private final Noise waves = new Noise(123, 0.5f, Noise.FOAM, 1);
     private GlyphActor playerGlyph;
     private DijkstraMap playerToCursor;
-    private final ObjectDeque<Coord> toCursor = new ObjectDeque<>(100);
-    private final ObjectDeque<Coord> awaitedMoves = new ObjectDeque<>(50);
+    private final ObjectDeque<Coord> toCursor = new ObjectDeque<>(200);
+    private final ObjectDeque<Coord> awaitedMoves = new ObjectDeque<>(200);
+    private final ObjectDeque<Coord> nextMovePositions = new ObjectDeque<>(200);
     private Coord cursor = Coord.get(-1, -1);
     private final Vector2 pos = new Vector2();
     private Runnable post;
 
-    public static final int GRID_WIDTH = 40;
-    public static final int GRID_HEIGHT = 25;
+    public static final int SHOWN_WIDTH = 40;
+    public static final int SHOWN_HEIGHT = 25;
+    public static final int PLACE_WIDTH = SHOWN_WIDTH;
+    public static final int PLACE_HEIGHT = SHOWN_HEIGHT;
     public static final int CELL_WIDTH = 32;
     public static final int CELL_HEIGHT = 32;
 
@@ -64,12 +89,21 @@ public class DungeonDemo extends ApplicationAdapter {
     private static final int grassText = toRGBA8888(offsetLightness(GRASS_OKLAB));
     private static final int stoneText = toRGBA8888(describeOklab("gray dullmost butter bronze"));
 
+    /**
+     * Used as the color for remembered cells that can't be currently seen. Slightly-yellow-brown,
+     * with about 30% lightness; fully opaque.
+     */
+    private static final int OKLAB_MEMORY = 0xFF848350;
+
     @Override
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_INFO);
         long seed = TimeUtils.millis() >>> 21;
         Gdx.app.log("SEED", "Initial seed is " + seed);
         EnhancedRandom random = new ChopRandom(seed);
+
+        vision.rememberedColor = OKLAB_MEMORY;
+
         stage = new Stage();
         Font font = KnownFonts.getInconsolata(Font.DistanceFieldType.MSDF).multiplyCrispness(0.5f).scaleTo(15f, 25f).adjustLineHeight(1.25f);
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
@@ -83,7 +117,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getAStarry().scaleTo(16, 16);
 //        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
 //        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
-        gg = new GlyphGrid(font, GRID_WIDTH, GRID_HEIGHT, true);
+        gg = new GlyphGrid(font, PLACE_WIDTH, PLACE_HEIGHT, true);
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(random.nextLong(), true);
         Replacer replacer = Pattern.compile(".*?[aeiouAEIOU](.*)").replacer("$1");
@@ -95,21 +129,18 @@ public class DungeonDemo extends ApplicationAdapter {
         playerGlyph = new GlyphActor(buffer.charAt(buffer.length()-1), "[red orange]", gg.getFont());
         gg.addActor(playerGlyph);
         post = () -> {
-            seen.or(inView.refill(FOV.reuseFOV(res, light,
-                    Math.round(playerGlyph.getX()), Math.round(playerGlyph.getY()), 6.5f, Radius.CIRCLE), 0.001f, 999f));
-            blockage.remake(seen).not().fringe8way();
-            LineTools.pruneLines(dungeon, seen, prunedDungeon);
+            Coord next = Coord.get(Math.round(playerGlyph.getX()), Math.round(playerGlyph.getY()));
+            vision.moveViewer(player, next);
+            // we can move the player's light now that we know there is no light for an enemy at next.
+            vision.lighting.moveLight(player, next);
+            player = next;
+            vision.finishChanges();
         };
 
-        dungeonProcessor = new DungeonProcessor(GRID_WIDTH, GRID_HEIGHT, random);
+        dungeonProcessor = new DungeonProcessor(PLACE_WIDTH, PLACE_HEIGHT, random);
         dungeonProcessor.addWater(DungeonProcessor.ALL, 30);
         dungeonProcessor.addGrass(DungeonProcessor.ALL, 10);
         waves.setFractalType(Noise.RIDGED_MULTI);
-        light = new float[GRID_WIDTH][GRID_HEIGHT];
-        seen = new Region(GRID_WIDTH, GRID_HEIGHT);
-        blockage = new Region(GRID_WIDTH, GRID_HEIGHT);
-        prunedDungeon = new char[GRID_WIDTH][GRID_HEIGHT];
-        inView = new Region(GRID_WIDTH, GRID_HEIGHT);
         input.setInputProcessor(new InputAdapter(){
             @Override
             public boolean keyDown(int keycode) {
@@ -182,12 +213,12 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void move(Direction way){
-
+        lastMove = TimeUtils.millis();
         // this prevents movements from restarting while a slide is already in progress.
         if(playerGlyph.hasActions()) return;
 
         final Coord next = Coord.get(Math.round(playerGlyph.getX() + way.deltaX), Math.round(playerGlyph.getY() + way.deltaY));
-        if(next.isWithin(GRID_WIDTH, GRID_HEIGHT) && bare[next.x][next.y] == '.') {
+        if(next.isWithin(PLACE_WIDTH, PLACE_HEIGHT) && barePlaceMap[next.x][next.y] == '.') {
             playerGlyph.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
         }
         else{
@@ -206,84 +237,114 @@ public class DungeonDemo extends ApplicationAdapter {
     }
 
     public void regenerate(){
-        dungeonProcessor.setPlaceGrid(dungeon = LineTools.hashesToLines(dungeonProcessor.generate(), true));
-        bare = dungeonProcessor.getBarePlaceGrid();
-        ArrayTools.insert(dungeon, prunedDungeon, 0, 0);
-        res = FOV.generateSimpleResistances(bare);
-        Coord player = new Region(bare, '.').singleRandom(dungeonProcessor.rng);
+        char[][] linePlaceMap = LineTools.hashesToLines(dungeonProcessor.generate(), true);
+        dungeonProcessor.setPlaceGrid(linePlaceMap);
+        barePlaceMap = dungeonProcessor.getBarePlaceGrid();
+        floors = floors == null ? new Region(barePlaceMap, '.') : floors.refill(barePlaceMap, '.');
+        player = floors.singleRandom(dungeonProcessor.rng);
         playerGlyph.setPosition(player.x, player.y);
-        seen.remake(inView.refill(FOV.reuseFOV(res, light, player.x, player.y, 6.5f, Radius.CIRCLE), 0.001f, 2f));
-        blockage.remake(seen).not().fringe8way();
-        LineTools.pruneLines(dungeon, seen, prunedDungeon);
-        gg.backgrounds = new int[GRID_WIDTH][GRID_HEIGHT];
+        vision.restart(linePlaceMap, player, 8);
+        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0.3f, 0f));
+        floors.remove(player);
+
+        gg.backgrounds = new int[PLACE_WIDTH][PLACE_HEIGHT];
         gg.map.clear();
         if(playerToCursor == null)
-            playerToCursor = new DijkstraMap(bare, Measurement.EUCLIDEAN);
+            playerToCursor = new DijkstraMap(barePlaceMap, Measurement.EUCLIDEAN);
         else
-            playerToCursor.initialize(bare);
+            playerToCursor.initialize(barePlaceMap);
         playerToCursor.setGoal(player);
-        playerToCursor.partialScan(13, blockage);
+        playerToCursor.partialScan(13, vision.blockage);
+        toCursor.clear();
+        awaitedMoves.clear();
+        nextMovePositions.clear();
+        // Starting time for the game; other times are measured relative to this so that they aren't huge numbers.
+        startTime = TimeUtils.millis();
+        lastMove = startTime;
+
     }
 
-    public void recolor(){
+    public void putMap(){
         int playerX = Math.round(playerGlyph.getX());
         int playerY = Math.round(playerGlyph.getY());
-        float modifiedTime = (TimeUtils.millis() & 0xFFFFFL) * 0x1p-9f;
-        int rainbow = toRGBA8888(
-                limitToGamut(100,
-                        (int) (TrigTools.sinTurns(modifiedTime * 0.2f) * 40f) + 128, (int) (TrigTools.cosTurns(modifiedTime * 0.2f) * 40f) + 128, 255));
-        FOV.reuseFOV(res, light, playerX, playerY, LineWobble.wobble(12345, modifiedTime) * 2.5f + 4f, Radius.CIRCLE);
-        for (int y = 0; y < GRID_HEIGHT; y++) {
-            for (int x = 0; x < GRID_WIDTH; x++) {
-                if (inView.contains(x, y)) {
-                    if(toCursor.contains(Coord.get(x, y))){
-                        gg.backgrounds[x][y] = rainbow;
-                        gg.put(x, y, prunedDungeon[x][y], stoneText);
-                    }
-                    else {
-                        switch (prunedDungeon[x][y]) {
-                            case '~':
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(DEEP_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
-                                gg.put(x, y, prunedDungeon[x][y], deepText);
-                                break;
-                            case ',':
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(SHALLOW_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
-                                gg.put(x, y, prunedDungeon[x][y], shallowText);
-                                break;
-                            case '"':
-                                gg.backgrounds[x][y] = toRGBA8888(darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
-                                gg.put(x, y, prunedDungeon[x][y], grassText);
-                                break;
-                            case ' ':
-                                gg.backgrounds[x][y] = 0;
-                                break;
-                            default:
-                                gg.backgrounds[x][y] = toRGBA8888(lighten(STONE_OKLAB, 0.6f * light[x][y]));
-                                gg.put(x, y, prunedDungeon[x][y], stoneText);
-                        }
-                    }
-                } else if (seen.contains(x, y)) {
-                    switch (prunedDungeon[x][y]) {
-                        case '~':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], deepText);
-                            break;
-                        case ',':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], shallowText);
-                            break;
-                        case ' ':
-                            gg.backgrounds[x][y] = 0;
-                            break;
-                        default:
-                            gg.backgrounds[x][y] = toRGBA8888(edit(STONE_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, prunedDungeon[x][y], stoneText);
-                    }
-                } else {
-                    gg.backgrounds[x][y] = 0;
+        float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4.0, 0.0), 1000.0);
+        // Makes everything visible, mainly for FPS tests
+//        ArrayTools.fill(vision.lighting.resistances, 0f);
+        vision.update(change);
+        final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
+        int rainbow = DescriptiveColor.maximizeSaturation(160,
+                (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
+
+        for (int i = 0; i < toCursor.size(); i++) {
+            Coord curr = toCursor.get(i);
+            if (vision.inView.contains(curr))
+                vision.backgroundColors[curr.x][curr.y] = rainbow;
+        }
+
+//        float[][] light = vision.lighting.fovResult;
+
+        for (int x = 0; x < PLACE_WIDTH; x++) {
+            for (int y = 0; y < PLACE_HEIGHT; y++) {
+                char glyph = vision.prunedPlaceMap[x][y];
+                if (vision.seen.contains(x, y)) {
+                    // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
+                    gg.backgrounds[x][y] = toRGBA8888(vision.backgroundColors[x][y]);
+                    gg.put(x, y, glyph, stoneText);
                 }
             }
         }
+
+//        for (int y = 0; y < PLACE_HEIGHT; y++) {
+//            for (int x = 0; x < PLACE_WIDTH; x++) {
+//                if (vision.inView.contains(x, y)) {
+//                    if(toCursor.contains(Coord.get(x, y))){
+//                        gg.backgrounds[x][y] = rainbow;
+//                        gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
+//                    }
+//                    else {
+//                        switch (vision.prunedPlaceMap[x][y]) {
+//                            case '~':
+//                                gg.backgrounds[x][y] = toRGBA8888(lighten(DEEP_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+//                                gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
+//                                break;
+//                            case ',':
+//                                gg.backgrounds[x][y] = toRGBA8888(lighten(SHALLOW_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
+//                                gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
+//                                break;
+//                            case '"':
+//                                gg.backgrounds[x][y] = toRGBA8888(darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
+//                                gg.put(x, y, vision.prunedPlaceMap[x][y], grassText);
+//                                break;
+//                            case ' ':
+//                                gg.backgrounds[x][y] = 0;
+//                                break;
+//                            default:
+//                                gg.backgrounds[x][y] = toRGBA8888(lighten(STONE_OKLAB, 0.6f * light[x][y]));
+//                                gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
+//                        }
+//                    }
+//                } else if (seen.contains(x, y)) {
+//                    switch (vision.prunedPlaceMap[x][y]) {
+//                        case '~':
+//                            gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
+//                            break;
+//                        case ',':
+//                            gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
+//                            break;
+//                        case ' ':
+//                            gg.backgrounds[x][y] = 0;
+//                            break;
+//                        default:
+//                            gg.backgrounds[x][y] = toRGBA8888(edit(STONE_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
+//                    }
+//                } else {
+//                    gg.backgrounds[x][y] = 0;
+//                }
+//            }
+//        }
     }
 
     /**
@@ -312,7 +373,7 @@ public class DungeonDemo extends ApplicationAdapter {
 
     @Override
     public void render() {
-        recolor();
+        putMap();
         handleHeldKeys();
 
         if(!gg.areChildrenActing() && !awaitedMoves.isEmpty())
@@ -342,7 +403,7 @@ public class DungeonDemo extends ApplicationAdapter {
                     // DijkstraMap.partialScan only finds the distance to get to a cell if that distance is less than some limit,
                     // which is 13 here. It also won't try to find distances through an impassable cell, which here is the blockage
                     // GreasedRegion that contains the cells just past the edge of the player's FOV area.
-                    playerToCursor.partialScan(13, blockage);
+                    playerToCursor.partialScan(13, vision.blockage);
                 }
             }
         }
@@ -371,6 +432,6 @@ public class DungeonDemo extends ApplicationAdapter {
 
     private boolean onGrid(int screenX, int screenY)
     {
-        return screenX >= 0 && screenX < GRID_WIDTH && screenY >= 0 && screenY < GRID_HEIGHT;
+        return screenX >= 0 && screenX < PLACE_WIDTH && screenY >= 0 && screenY < PLACE_HEIGHT;
     }
 }
