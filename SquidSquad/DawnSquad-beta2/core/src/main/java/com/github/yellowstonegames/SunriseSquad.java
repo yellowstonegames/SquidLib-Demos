@@ -41,10 +41,16 @@ import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.ChopRandom;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
-import com.github.yellowstonegames.grid.*;
+import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
+import com.github.yellowstonegames.grid.Direction;
+import com.github.yellowstonegames.grid.LineTools;
+import com.github.yellowstonegames.grid.Measurement;
+import com.github.yellowstonegames.grid.Radiance;
+import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.VisionFramework;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
-import com.github.yellowstonegames.place.DungeonTools;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.CoordGlider;
 import com.github.yellowstonegames.smooth.Director;
@@ -285,7 +291,10 @@ public class SunriseSquad extends ApplicationAdapter {
         playerDirector = new Director<>(AnimatedGlidingSprite::getLocation, ObjectList.with(playerSprite), 150);
 
         vision.restart(linePlaceMap, player, 8);
-        ArrayTools.fill(vision.lighting.resistances, 0f);
+
+        // Makes everything visible, mainly for FPS tests
+//        ArrayTools.fill(vision.lighting.resistances, 0f);
+
 //        vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0f, 0f));
         vision.lighting.addLight(player, new Radiance(8, FullPalette.COSMIC_LATTE, 0.3f, 0f));
         floors.remove(player);
@@ -557,7 +566,8 @@ public class SunriseSquad extends ApplicationAdapter {
             // '+' is a door.
             if (vision.prunedPlaceMap[newX][newY] == '+') {
                 vision.editSingle(next, '/');
-                ArrayTools.fill(vision.lighting.resistances, 0f);
+                // Makes everything visible, mainly for FPS tests
+//                ArrayTools.fill(vision.lighting.resistances, 0f);
             } else {
                 // if a monster was at the position we moved into, and so was successfully removed...
                 if (monsters.containsKey(next)) {
@@ -647,7 +657,8 @@ public class SunriseSquad extends ApplicationAdapter {
      */
     public void putMap() {
         float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4.0, 0.0), 1000.0);
-        ArrayTools.fill(vision.lighting.resistances, 0f);
+        // Makes everything visible, mainly for FPS tests
+//        ArrayTools.fill(vision.lighting.resistances, 0f);
         vision.update(change);
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
 //        final float sun = 1f - ((time * 0.1f) - (int)(time * 0.1f)),
