@@ -289,62 +289,58 @@ public class DungeonDemo extends ApplicationAdapter {
                 if (vision.seen.contains(x, y)) {
                     // cells that were seen more than one frame ago, and aren't visible now, appear as a gray memory.
                     gg.backgrounds[x][y] = toRGBA8888(vision.backgroundColors[x][y]);
-                    gg.put(x, y, glyph, stoneText);
+                    gg.put(x, y, (x == playerX && y == playerY) ? ' ' : glyph, stoneText);
                 }
             }
         }
 
-//        for (int y = 0; y < PLACE_HEIGHT; y++) {
-//            for (int x = 0; x < PLACE_WIDTH; x++) {
-//                if (vision.inView.contains(x, y)) {
-//                    if(toCursor.contains(Coord.get(x, y))){
-//                        gg.backgrounds[x][y] = rainbow;
-//                        gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
-//                    }
-//                    else {
-//                        switch (vision.prunedPlaceMap[x][y]) {
-//                            case '~':
-//                                gg.backgrounds[x][y] = toRGBA8888(lighten(DEEP_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
-//                                gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
-//                                break;
-//                            case ',':
-//                                gg.backgrounds[x][y] = toRGBA8888(lighten(SHALLOW_OKLAB, 0.6f * Math.min(1.2f, Math.max(0, light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime)))));
-//                                gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
-//                                break;
-//                            case '"':
-//                                gg.backgrounds[x][y] = toRGBA8888(darken(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.4f * Math.min(1.1f, Math.max(0, 1f - light[x][y] + waves.getConfiguredNoise(x, y, modifiedTime * 0.7f)))));
-//                                gg.put(x, y, vision.prunedPlaceMap[x][y], grassText);
-//                                break;
-//                            case ' ':
-//                                gg.backgrounds[x][y] = 0;
-//                                break;
-//                            default:
-//                                gg.backgrounds[x][y] = toRGBA8888(lighten(STONE_OKLAB, 0.6f * light[x][y]));
-//                                gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
-//                        }
-//                    }
-//                } else if (seen.contains(x, y)) {
-//                    switch (vision.prunedPlaceMap[x][y]) {
-//                        case '~':
-//                            gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-//                            gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
-//                            break;
-//                        case ',':
-//                            gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-//                            gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
-//                            break;
-//                        case ' ':
-//                            gg.backgrounds[x][y] = 0;
-//                            break;
-//                        default:
-//                            gg.backgrounds[x][y] = toRGBA8888(edit(STONE_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-//                            gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
-//                    }
-//                } else {
-//                    gg.backgrounds[x][y] = 0;
-//                }
-//            }
-//        }
+        for (int y = 0; y < PLACE_HEIGHT; y++) {
+            for (int x = 0; x < PLACE_WIDTH; x++) {
+                if (vision.inView.contains(x, y)) {
+                    {
+                        switch (vision.prunedPlaceMap[x][y]) {
+                            case '~':
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(DEEP_OKLAB, vision.backgroundColors[x][y], 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
+                                gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
+                                break;
+                            case ',':
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(SHALLOW_OKLAB, vision.backgroundColors[x][y], 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
+                                gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
+                                break;
+                            case '"':
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), vision.backgroundColors[x][y], 0.3f + 0.2f * waves.getConfiguredNoise(x, y, time * 0.7f)));
+                                gg.put(x, y, vision.prunedPlaceMap[x][y], grassText);
+                                break;
+                            case ' ':
+                                gg.backgrounds[x][y] = 0;
+                                break;
+                            default:
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(STONE_OKLAB, vision.backgroundColors[x][y], 0.5f));
+                                gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
+                        }
+                    }
+                } else if (vision.seen.contains(x, y)) {
+                    switch (vision.prunedPlaceMap[x][y]) {
+                        case '~':
+                            gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
+                            break;
+                        case ',':
+                            gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
+                            break;
+                        case ' ':
+                            gg.backgrounds[x][y] = 0;
+                            break;
+                        default:
+                            gg.backgrounds[x][y] = toRGBA8888(edit(STONE_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+                            gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
+                    }
+                } else {
+                    gg.backgrounds[x][y] = 0;
+                }
+            }
+        }
     }
 
     /**
