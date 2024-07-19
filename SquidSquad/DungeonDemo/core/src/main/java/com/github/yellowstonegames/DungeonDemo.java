@@ -70,7 +70,6 @@ public class DungeonDemo extends ApplicationAdapter {
     private final ObjectDeque<Coord> nextMovePositions = new ObjectDeque<>(200);
     private Coord cursor = Coord.get(-1, -1);
     private final Vector2 pos = new Vector2();
-    private Runnable post;
 
     public static final int SHOWN_WIDTH = 40;
     public static final int SHOWN_HEIGHT = 25;
@@ -128,14 +127,6 @@ public class DungeonDemo extends ApplicationAdapter {
 
         playerGlyph = new GlyphActor(buffer.charAt(buffer.length()-1), "[red orange]", gg.getFont());
         gg.addActor(playerGlyph);
-        post = () -> {
-            Coord next = Coord.get(Math.round(playerGlyph.getX()), Math.round(playerGlyph.getY()));
-            vision.moveViewer(player, next);
-            // we can move the player's light now that we know there is no light for an enemy at next.
-            vision.lighting.moveLight(player, next);
-            player = next;
-            vision.finishChanges();
-        };
 
         dungeonProcessor = new DungeonProcessor(PLACE_WIDTH, PLACE_HEIGHT, random);
         dungeonProcessor.addWater(DungeonProcessor.ALL, 30);
@@ -219,7 +210,10 @@ public class DungeonDemo extends ApplicationAdapter {
 
         final Coord next = Coord.get(Math.round(playerGlyph.getX() + way.deltaX), Math.round(playerGlyph.getY() + way.deltaY));
         if(next.isWithin(PLACE_WIDTH, PLACE_HEIGHT) && barePlaceMap[next.x][next.y] == '.') {
-            playerGlyph.addAction(MoreActions.slideTo(next.x, next.y, 0.2f, post));
+            playerGlyph.addAction(MoreActions.slideTo(next.x, next.y, 0.2f));
+            vision.moveViewer(player, next);
+            vision.lighting.moveLight(player, next);
+            player = next;
         }
         else{
 //            if(MathUtils.randomBoolean())
@@ -230,10 +224,11 @@ public class DungeonDemo extends ApplicationAdapter {
 //                    .append(new GridAction.CloudAction(gg, 1.5f, inView, next, 5).useToxicColors()).conclude(post));
 //            playerGlyph.addAction(MoreActions.bump(way, 0.3f).append(MoreActions.wiggle(0.125f, 0.2f)));
             playerGlyph.addAction(MoreActions.bump(way, 0.3f));
-            gg.burst((playerGlyph.getX() + next.x) * 0.5f, (playerGlyph.getY() + next.y) * 0.5f, 1.5f, 7, ',', 0x992200FF, 0x99220000, 0f, 120f, 1f);
+            gg.burst((playerGlyph.getX() + next.x) * 0.5f, (playerGlyph.getY() + next.y) * 0.5f, 1.5f, 6, '?', 0x992200FF, 0x99220000, -30f, 0f, 1f);
 //            gg.summon(next.x, next.y, next.x, next.y + 0.5f, '?', 0xFF22CCAA, 0xFF22CC00, 0f, 0f, 1f);
 //            gg.addAction(gg.dyeFG(next.x, next.y, 0x992200FF, 1f, Float.POSITIVE_INFINITY, null));
         }
+        vision.finishChanges();
     }
 
     public void regenerate(){
@@ -267,7 +262,7 @@ public class DungeonDemo extends ApplicationAdapter {
     public void putMap(){
         int playerX = Math.round(playerGlyph.getX());
         int playerY = Math.round(playerGlyph.getY());
-        float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4.0, 0.0), 1000.0);
+        float change = (float) Math.min(Math.max(TimeUtils.timeSinceMillis(lastMove) * 4f, 0.0), 1000.0);
         // Makes everything visible, mainly for FPS tests
 //        ArrayTools.fill(vision.lighting.resistances, 0f);
         vision.update(change);
@@ -296,46 +291,46 @@ public class DungeonDemo extends ApplicationAdapter {
 
         for (int y = 0; y < PLACE_HEIGHT; y++) {
             for (int x = 0; x < PLACE_WIDTH; x++) {
-                if (vision.inView.contains(x, y)) {
+                if (vision.seen.contains(x, y)) {
                     {
                         switch (vision.prunedPlaceMap[x][y]) {
                             case '~':
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(DEEP_OKLAB, vision.backgroundColors[x][y], 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], DEEP_OKLAB, 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
                                 gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
                                 break;
                             case ',':
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(SHALLOW_OKLAB, vision.backgroundColors[x][y], 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], SHALLOW_OKLAB, 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
                                 gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
                                 break;
                             case '"':
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), vision.backgroundColors[x][y], 0.3f + 0.2f * waves.getConfiguredNoise(x, y, time * 0.7f)));
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.3f + 0.2f * waves.getConfiguredNoise(x, y, time * 0.7f)));
                                 gg.put(x, y, vision.prunedPlaceMap[x][y], grassText);
                                 break;
                             case ' ':
                                 gg.backgrounds[x][y] = 0;
                                 break;
                             default:
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColors(STONE_OKLAB, vision.backgroundColors[x][y], 0.5f));
+                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], STONE_OKLAB, 0.5f));
                                 gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
                         }
                     }
-                } else if (vision.seen.contains(x, y)) {
-                    switch (vision.prunedPlaceMap[x][y]) {
-                        case '~':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
-                            break;
-                        case ',':
-                            gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
-                            break;
-                        case ' ':
-                            gg.backgrounds[x][y] = 0;
-                            break;
-                        default:
-                            gg.backgrounds[x][y] = toRGBA8888(edit(STONE_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
-                            gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
-                    }
+//                } else if (vision.seen.contains(x, y)) {
+//                    switch (vision.prunedPlaceMap[x][y]) {
+//                        case '~':
+//                            gg.backgrounds[x][y] = toRGBA8888(edit(DEEP_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
+//                            break;
+//                        case ',':
+//                            gg.backgrounds[x][y] = toRGBA8888(edit(SHALLOW_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
+//                            break;
+//                        case ' ':
+//                            gg.backgrounds[x][y] = 0;
+//                            break;
+//                        default:
+//                            gg.backgrounds[x][y] = toRGBA8888(edit(STONE_OKLAB, 0f, 0f, 0f, 0f, 0.7f, 0f, 0f, 1f));
+//                            gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
+//                    }
                 } else {
                     gg.backgrounds[x][y] = 0;
                 }
