@@ -19,10 +19,7 @@ package com.github.yellowstonegames;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -65,7 +62,7 @@ public class SunriseSquad extends ApplicationAdapter {
 
     private enum Phase {WAIT, PLAYER_ANIM, MONSTER_ANIM}
 
-    private SpriteBatch batch;
+    private TextureArraySpriteBatch batch;
     private Phase phase = Phase.WAIT;
 
     // random number generator; this one is more efficient on GWT, but less-so on desktop.
@@ -343,7 +340,7 @@ public class SunriseSquad extends ApplicationAdapter {
         Gdx.app.setLogLevel(Application.LOG_INFO);
 
         // We need access to a batch to render most things.
-        batch = new SpriteBatch();
+        batch = new TextureArraySpriteBatch();
 
         rng = new ChopRandom(seed);
 

@@ -34,8 +34,8 @@ public class Lwjgl3Launcher {
         //// useful to know if something's wrong in a shader.
         //// you should remove or comment out the next line for a release.
 //		configuration.enableGLDebugOutput(true, System.out);
-        ShaderProgram.prependVertexCode = "#version 110\n";
-        ShaderProgram.prependFragmentCode = "#version 110\n";
+//        ShaderProgram.prependVertexCode = "#version 110\n";
+//        ShaderProgram.prependFragmentCode = "#version 110\n";
         // these are constants in the main game class; they should match your
         // initial viewport size in pixels before it gets resized to fullscreen.
         configuration.setWindowedMode(SHOWN_WIDTH * CELL_WIDTH, SHOWN_HEIGHT * CELL_HEIGHT);
