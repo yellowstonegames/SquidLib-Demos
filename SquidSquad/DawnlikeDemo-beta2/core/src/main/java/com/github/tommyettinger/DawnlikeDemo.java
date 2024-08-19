@@ -463,7 +463,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                     // you're finding a path to a monster or loot, and want to bump into it, but here can be
                     // confusing because you would "move into yourself" as your first move without this.
                     if (!toCursor.isEmpty()) {
-                        toCursor.remove(0);
+                        toCursor.removeFirst();
                     }
                 }
                 return false;
@@ -672,7 +672,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
         {
             Coord m = awaitedMoves.removeFirst();
             if (!toCursor.isEmpty())
-                toCursor.remove(0);
+                toCursor.removeFirst();
             move(m.x, m.y);
         }
         else if(phase == Phase.PLAYER_ANIM) {
