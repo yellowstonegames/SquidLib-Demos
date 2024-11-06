@@ -16,6 +16,7 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication() {
+        TexturePacker.processIfModified("../raw_assets", "./", "Dawnlike.atlas");
         return new Lwjgl3Application(new DawnlikeDemo(), getDefaultConfiguration());
     }
 

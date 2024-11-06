@@ -146,8 +146,12 @@ public class DawnlikeDemo extends ApplicationAdapter {
         camera = mainViewport.getCamera();
         camera.update();
 
-        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
-        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
+        atlas =
+            Gdx.app.getType() != Application.ApplicationType.Desktop
+                ? new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"))
+                : new TextureAtlas(Gdx.files.internal("Dawnlike.atlas"), Gdx.files.internal(""));
+        font = new BitmapFont(Gdx.files.internal(Gdx.app.getType() != Application.ApplicationType.Desktop
+            ? "dawnlike/PlainAndSimplePlus.fnt" : "PlainAndSimplePlus.fnt"), atlas.findRegion("font"));
         font.setUseIntegerPositions(false);
         font.getData().setScale(1f/cellWidth, 1f/cellHeight);
         font.getData().markupEnabled = true;
