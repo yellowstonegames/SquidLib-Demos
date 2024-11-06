@@ -146,8 +146,12 @@ public class DawnlikeDemo extends ApplicationAdapter {
         camera = mainViewport.getCamera();
         camera.update();
 
-        atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
-        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
+        atlas =
+            Gdx.app.getType() != Application.ApplicationType.Desktop
+                ? new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"))
+                : new TextureAtlas(Gdx.files.internal("Dawnlike.atlas"), Gdx.files.internal(""));
+        font = new BitmapFont(Gdx.files.internal(Gdx.app.getType() != Application.ApplicationType.Desktop
+            ? "dawnlike/PlainAndSimplePlus.fnt" : "PlainAndSimplePlus.fnt"), atlas.findRegion("font"));
         font.setUseIntegerPositions(false);
         font.getData().setScale(1f/cellWidth, 1f/cellHeight);
         font.getData().markupEnabled = true;
@@ -480,6 +484,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
      */
     private void move(int newX, int newY) {
         if (health <= 0) return;
+        // resets the color of playerSprite to "no tint"
         playerSprite.setPackedColor(Color.WHITE_FLOAT_BITS);
         if (newX >= 0 && newY >= 0 && newX < bigWidth && newY < bigHeight
                 && bareDungeon[newX][newY] != '#') {
@@ -608,6 +613,7 @@ public class DawnlikeDemo extends ApplicationAdapter {
                 }
             }
         }
+        // resets the batch tint color to "no tint"
         batch.setPackedColor(Color.WHITE_FLOAT_BITS);
         AnimatedGlidingSprite monster;
         for (int i = 0; i < bigWidth; i++) {

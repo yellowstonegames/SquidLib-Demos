@@ -3,10 +3,10 @@ package com.github.tommyettinger.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.github.tommyettinger.DawnlikeDemo;
 
 import static com.github.tommyettinger.DawnlikeDemo.*;
-import static com.github.tommyettinger.DawnlikeDemo.cellHeight;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -16,6 +16,7 @@ public class Lwjgl3Launcher {
     }
 
     private static Lwjgl3Application createApplication() {
+        TexturePacker.processIfModified("../raw_assets", "./", "Dawnlike.atlas");
         return new Lwjgl3Application(new DawnlikeDemo(), getDefaultConfiguration());
     }
 
