@@ -65,7 +65,7 @@ public class SunriseSquad extends ApplicationAdapter {
     // random number generator; this one is more efficient on GWT, but less-so on desktop.
     private ChopRandom rng;
 
-    public long seed = 0L;
+    public long seed;
 
     // Stores all images we use here efficiently, as well as the font image
     private TextureAtlas atlas;
