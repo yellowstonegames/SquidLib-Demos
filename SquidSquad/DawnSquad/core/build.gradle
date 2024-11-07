@@ -4,22 +4,22 @@ compileJava {
 }
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
 dependencies {
 	api "com.badlogicgames.gdx:gdx:$gdxVersion"
-	api "com.squidpony:squidcore:$squidSquadVersion"
-	api "com.squidpony:squidgrid:$squidSquadVersion"
-	api "com.squidpony:squidplace:$squidSquadVersion"
-	api "com.squidpony:squidpath:$squidSquadVersion"
-	api "com.squidpony:squidtext:$squidSquadVersion"
-	api "com.squidpony:squidsmooth:$squidSquadVersion"
-//	api "com.github.yellowstonegames.squidsquad:SquidCore:$squidSquadVersion"
-//	api "com.github.yellowstonegames.squidsquad:SquidGrid:$squidSquadVersion"
-//	api "com.github.yellowstonegames.squidsquad:SquidPlace:$squidSquadVersion"
-//	api "com.github.yellowstonegames.squidsquad:SquidPath:$squidSquadVersion"
-//	api "com.github.yellowstonegames.squidsquad:SquidText:$squidSquadVersion"
-//	api "com.github.yellowstonegames.squidsquad:SquidSmooth:$squidSquadVersion"
+//	api "com.squidpony:squidcore:$squidSquadVersion"
+//	api "com.squidpony:squidgrid:$squidSquadVersion"
+//	api "com.squidpony:squidplace:$squidSquadVersion"
+//	api "com.squidpony:squidpath:$squidSquadVersion"
+//	api "com.squidpony:squidtext:$squidSquadVersion"
+//	api "com.squidpony:squidsmooth:$squidSquadVersion"
+	api "com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"
+	api "com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion"
+	api "com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion"
+	api "com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion"
+	api "com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion"
+	api "com.github.yellowstonegames.squidsquad:squidsmooth:$squidSquadVersion"
 
 //	api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 }
