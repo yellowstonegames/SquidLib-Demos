@@ -1,0 +1,17 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.github.tommyettinger:crux:$cruxVersion"
+  api "com.github.tommyettinger:gand:$gandVersion"
+  api "com.github.tommyettinger:gdcrux:$gdcruxVersion"
+  api "com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"
+  api "com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion"
+  api "com.github.yellowstonegames.squidsquad:squidglyph:$squidSquadVersion"
+  api "com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion"
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+}

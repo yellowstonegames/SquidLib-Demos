@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 
 android {
 	namespace 'com.github.yellowstonegames'
-	compileSdk 34
+	compileSdk 35
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -36,9 +36,9 @@ android {
 
 	defaultConfig {
 		applicationId 'com.github.yellowstonegames'
-		minSdkVersion 19
+		minSdkVersion 21
 		//noinspection EditedTargetSdkVersion
-		targetSdkVersion 34
+		targetSdkVersion 35
 		versionCode 1
 		versionName "1.0"
 		multiDexEnabled true
@@ -65,7 +65,7 @@ repositories {
 configurations { natives }
 
 dependencies {
-	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
+	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.3'
 	implementation "androidx.core:core:1.15.0"
 	implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 	implementation project(':core')
