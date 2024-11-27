@@ -29,6 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tommyettinger.digital.ArrayTools;
+import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.gand.GradientGridI2;
 import com.github.tommyettinger.gand.ds.ObjectDeque;
 import com.github.tommyettinger.gdcrux.PointI2;
@@ -230,11 +231,13 @@ public class Main extends ApplicationAdapter {
         Coord player = floors.singleRandom(rng);
         playerGlyph.setPosition(player.x, player.y);
 
-        lighting = new LightingManager(res, DescriptiveColor.describeOklab("dark gray black"), Radius.CIRCLE, 9f, LightingManager.SymmetryMode.SYMMETRICAL);
+        lighting = new LightingManager(res, DescriptiveColor.describeOklab("dark gray black"), Radius.CIRCLE, 9f, LightingManager.SymmetryMode.FAST);
         Coord[] lightPositions = floors.separatedBlue(0.075f);
         for (int i = 0; i < lightPositions.length; i++) {
-            lighting.addLight(lightPositions[i], new Radiance(rng.nextFloat(3f) + 2f,
-                FullPalette.COLOR_WHEEL_PALETTE_BRIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_BRIGHT.length)], 0.5f, 0f));
+            LightSource lightSource = new LightSource(lightPositions[i], new Radiance(rng.nextFloat(3f) + 2f,
+                FullPalette.COLOR_WHEEL_PALETTE_BRIGHT[rng.nextInt(FullPalette.COLOR_WHEEL_PALETTE_BRIGHT.length)], 0.5f, 0f),
+                rng.nextFloat(), rng.nextFloat(0.13f, 0.37f));
+            lighting.addLight(lightSource);
         }
         lighting.calculateFOV(player.x, player.y, player.x - 10, player.y - 10, player.x + 11, player.y + 11);
         inView = inView == null ? new Region(lighting.fovResult, 0.01f, 2f) : inView.refill(lighting.fovResult, 0.01f, 2f);
@@ -304,6 +307,10 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        float slowTime = ((TimeUtils.millis()) % 4000f) * 8E-6f;
+        for(LightSource src : lighting.lights){
+            src.direction = MathTools.fract(src.direction + slowTime);
+        }
         lighting.update();
         recolor();
         handleHeldKeys();

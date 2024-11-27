@@ -32,23 +32,38 @@ gwt {
 }
 
 dependencies {
+
+  // libGDX!
   implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
-  implementation "com.github.tommyettinger:crux:$cruxVersion:sources"
+
+  // gand and its dependencies
   implementation "com.github.tommyettinger:gand:$gandVersion:sources"
+  implementation "com.github.tommyettinger:crux:$cruxVersion:sources"
   implementation "com.github.tommyettinger:gdcrux:$gdcruxVersion:sources"
-  implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
-  implementation "com.github.tommyettinger:funderby:$funderbyVersion:sources"
-  implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
-  implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
-  implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
-  implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
+
+  // squidcore and its many dependencies
   implementation "com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion:sources"
+  implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
+  implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
+  implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
+  implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
+  implementation "com.github.tommyettinger:funderby:$funderbyVersion:sources"
+
+  // squidgrid also uses crux, from the same block as gand's dependencies, and squidcore
   implementation "com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion:sources"
-  implementation "com.github.yellowstonegames.squidsquad:squidglyph:$squidSquadVersion:sources"
+
+  // squidplace depends on squidgrid and squidcore
   implementation "com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion:sources"
+
+  // squidglyph needs TextraTypist, squidgrid, and squidcore
+  implementation "com.github.yellowstonegames.squidsquad:squidglyph:$squidSquadVersion:sources"
+  implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
+
+  // third-party GWT backend, needed for libGDX 1.12.1, but not 1.13.0 (which has bigger problems)
   implementation "com.github.tommyettinger:gdx-backend-gwt:1.1210.1"
   implementation "com.github.tommyettinger:gdx-backend-gwt:1.1210.1:sources"
   implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
+
   implementation project(':core')
 
 }
