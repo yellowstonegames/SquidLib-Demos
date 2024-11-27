@@ -19,6 +19,16 @@
   <inherits name="com.github.tommyettinger.crux" />
   <inherits name="com.github.tommyettinger.gand" />
   <inherits name="com.github.tommyettinger.gdcrux" />
+    <inherits name="com.github.tommyettinger.textratypist" />
+    <inherits name="com.github.yellowstonegames.squidcore" />
+    <inherits name="com.github.yellowstonegames.squidglyph" />
+    <inherits name="com.github.yellowstonegames.squidgrid" />
+    <inherits name="com.github.yellowstonegames.squidplace" />
+    <inherits name="com.github.tommyettinger.juniper" />
+    <inherits name="com.github.tommyettinger.funderby" />
+    <inherits name="com.github.tommyettinger.digital" />
+    <inherits name="com.github.tommyettinger.jdkgdxds" />
+    <inherits name="regexodus.regexodus"/>
 
   <!-- You must change this if you rename packages later, or rename GwtLauncher. -->
   <entry-point class="com.github.tommyettinger.gwt.GwtLauncher" />
