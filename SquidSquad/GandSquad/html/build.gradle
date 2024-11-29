@@ -60,9 +60,16 @@ dependencies {
   implementation "com.github.tommyettinger:textratypist:$typistVersion:sources"
 
   // third-party GWT backend, needed for libGDX 1.12.1, but not 1.13.0 (which has bigger problems)
-  implementation "com.github.tommyettinger:gdx-backend-gwt:1.1210.1"
-  implementation "com.github.tommyettinger:gdx-backend-gwt:1.1210.1:sources"
+//  implementation "com.github.tommyettinger:gdx-backend-gwt:1.1210.1"
+//  implementation "com.github.tommyettinger:gdx-backend-gwt:1.1210.1:sources"
+//  implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
+
+  // Official libGDX 1.13.0 backend, using the same GWT version as above. Requires...
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+  implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
   implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
+  // ... This dep on ReplicantBatch for libGDX 1.13.0 to work on GWT.
+  implementation 'com.github.tommyettinger:replicantbatch:614271060c:sources'
 
   implementation project(':core')
 

@@ -48,6 +48,9 @@
     <!-- SquidSquad place map generation -->
     <inherits name="com.github.yellowstonegames.squidplace" />
 
+    <!-- Fixes SpriteBatch on GWT when using libGDX 1.13.0 -->
+    <inherits name="com.github.tommyettinger.replicant" />
+
 
     <!-- You must change this if you rename packages later, or rename GwtLauncher. -->
     <entry-point class="com.github.tommyettinger.gwt.GwtLauncher" />

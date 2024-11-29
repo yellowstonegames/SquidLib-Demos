@@ -69,7 +69,7 @@ public class Main extends ApplicationAdapter {
     private Runnable post;
     private LightingManager lighting;
 
-    public static final int GRID_WIDTH = 50;
+    public static final int GRID_WIDTH = 40;
     public static final int GRID_HEIGHT = 25;
     public static final int CELL_WIDTH = 32;
     public static final int CELL_HEIGHT = 32;
