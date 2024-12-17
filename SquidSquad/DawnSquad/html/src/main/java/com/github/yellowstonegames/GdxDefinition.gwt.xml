@@ -5,9 +5,25 @@
 	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
 
 <!--	<inherits name="com.badlogic.gdx.graphics.g2d.freetype.freetype-gwt" />-->
+
+	<!-- SquidSquad core classes -->
 	<inherits name="com.github.yellowstonegames.squidcore" />
+	<!-- cross-platform regexes, used by squidcore and textratypist -->
+	<inherits name="regexodus.regexodus"/>
+	<!-- random numbers, uses digital -->
+	<inherits name="com.github.tommyettinger.juniper" />
+	<!-- data structures, uses digital and funderby -->
+	<inherits name="com.github.tommyettinger.jdkgdxds" />
+	<!-- RoboVM-compatible and primitive-based functional interfaces -->
+	<inherits name="com.github.tommyettinger.funderby" />
+	<!-- core number-related code -->
+	<inherits name="com.github.tommyettinger.digital" />
+
+	<!-- SquidSquad code relating to positions, noise, a lot of stuff -->
 	<inherits name="com.github.yellowstonegames.squidgrid" />
+	<!-- SquidSquad place map generation -->
 	<inherits name="com.github.yellowstonegames.squidplace" />
+
 	<inherits name="com.github.yellowstonegames.squidpath" />
 	<inherits name="com.github.yellowstonegames.squidtext" />
 	<inherits name="com.github.yellowstonegames.squidsmooth" />

@@ -40,7 +40,7 @@ dependencies {
     implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
     implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
-    implementation "com.github.tommyettinger:crux:0.1.0:sources"
+    implementation "com.github.tommyettinger:crux:0.1.2:sources"
     implementation "com.github.tommyettinger:funderby:0.1.2:sources"
     implementation "com.github.tommyettinger:regexodus:0.1.16:sources"
 
