@@ -4,43 +4,63 @@ buildscript {
     mavenCentral()
     google()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-    jcenter()
-  }
-  dependencies {
-    classpath "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-    classpath "org.wisepersist:gwt-gradle-plugin:$gwtPluginVersion"
   }
 }
 
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
+
+  // This allows you to "Build and run using IntelliJ IDEA", an option in IDEA's Settings.
+  idea {
+    module {
+      outputDir file('build/classes/java/main')
+      testOutputDir file('build/classes/java/test')
+    }
+  }
 }
 
 configure(subprojects) {
-  apply plugin: 'java'
-  sourceCompatibility = 1.7
+  apply plugin: 'java-library'
+  sourceCompatibility = 11
+
+  // From https://lyze.dev/2021/04/29/libGDX-Internal-Assets-List/
+  // The article can be helpful when using assets.txt in your project.
+  tasks.register('generateAssetList') {
+    inputs.dir("${project.rootDir}/assets/")
+    // projectFolder/assets
+    File assetsFolder = new File("${project.rootDir}/assets/")
+    // projectFolder/assets/assets.txt
+    File assetsFile = new File(assetsFolder, "assets.txt")
+    // delete that file in case we've already created it
+    assetsFile.delete()
+
+    // iterate through all files inside that folder
+    // convert it to a relative path
+    // and append it to the file assets.txt
+    fileTree(assetsFolder).collect { assetsFolder.relativePath(it) }.sort().each {
+      assetsFile.append(it + "\n")
+    }
+  }
+  processResources.dependsOn 'generateAssetList'
+
   compileJava {
-    options.fork = true
     options.incremental = true
   }
 }
 
 subprojects {
-  version = '0.0.1-SNAPSHOT'
-  ext.appName = 'WFCDemo'
+  version = "$projectVersion"
+  ext.appName = 'WfcDemo'
   repositories {
-    mavenLocal()
     mavenCentral()
+    maven { url 'https://s01.oss.sonatype.org' }
+    // You may want to remove the following line if you have errors downloading dependencies.
+    mavenLocal()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
-    jcenter()
   }
 }
 
-// Clearing Eclipse project data in root folder:
-tasks.eclipse.doLast {
-  delete '.project'
-  delete '.classpath'
-  delete '.settings/'
-}
+eclipse.project.name = 'WfcDemo' + '-parent'
