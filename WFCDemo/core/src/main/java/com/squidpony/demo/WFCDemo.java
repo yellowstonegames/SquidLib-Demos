@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.NumberUtils;
 import jagd.MimicWFC;
 import jagd.RNG;
 
@@ -60,6 +61,13 @@ public class WFCDemo extends ApplicationAdapter {
                     case Input.Keys.ESCAPE:
                         Gdx.app.exit();
                         break;
+                    case Input.Keys.PRINT_SCREEN:
+                        System.out.println("Printing screen.");
+                        break;
+                    case Input.Keys.R:
+                        System.out.println("Now using initial state " +
+                                (rng.state = NumberUtils.doubleToLongBits(Math.random()) ^ NumberUtils.doubleToLongBits(Math.random()) >>> 32));
+                        // FALLTHROUGH
                     default:
                         remake();
                         renderer.setMap(tiledMap);
