@@ -31,8 +31,8 @@ gwt {
 }
 
 dependencies {
-//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
-//	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
     implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
@@ -68,18 +68,13 @@ dependencies {
 //// and you can use GWT 2.11.0, which gives you access to Java 11 language features.
 //// Make sure that in the gwt block, you change gwtVersion so it is:
 //// gwtVersion = "2.11.0"
-    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
-    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
+//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
+//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
 
 //    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
 //    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
 
 //    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
-
-
-//// These lines would use GWT 2.8.2. You would need to set gwtVersion to "2.8.2" instead.
-//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
-//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
