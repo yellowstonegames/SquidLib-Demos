@@ -3,7 +3,7 @@ buildscript {
 		gradlePluginPortal()
 	}
 	dependencies {
-		classpath "io.github.fourlastor:construo:1.5.1"
+		classpath "io.github.fourlastor:construo:1.7.1"
 		if(enableGraalNative == 'true') {
 			classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28"
 		}
@@ -42,9 +42,6 @@ dependencies {
 	implementation project(':core')
 	if(enableGraalNative == 'true') {
 		implementation "io.github.berstanio:gdx-svmhelper-backend-lwjgl3:$graalHelperVersion"
-		implementation "io.github.berstanio:gdx-svmhelper-extension-box2d:$graalHelperVersion"
-		implementation "io.github.berstanio:gdx-svmhelper-extension-bullet:$graalHelperVersion"
-		implementation "io.github.berstanio:gdx-svmhelper-extension-freetype:$graalHelperVersion"
 	}
 
 }
@@ -127,10 +124,11 @@ construo {
 			// macOS needs an identifier
 			identifier.set("gdx.liftoff." + appName)
 			// Optional: icon for macOS
-			macIcon.set(project.file("icons/logo.icns"))
+			macIcon.set(file("icons/logo.icns"))
 		}
 		create("winX64", Target.Windows) {
 			architecture.set(Target.Architecture.X86_64)
+			icon.set(file("icons/logo.png"))
 			jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.12_7.zip")
 			// Uncomment the next line to show a console when the game runs, to print messages.
 			//useConsole.set(true)

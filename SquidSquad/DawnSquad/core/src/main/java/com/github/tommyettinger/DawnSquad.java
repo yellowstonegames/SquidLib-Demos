@@ -43,7 +43,6 @@ import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.grid.*;
 import com.github.yellowstonegames.path.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
-import com.github.yellowstonegames.place.DungeonTools;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.CoordGlider;
 import com.github.yellowstonegames.smooth.Director;
@@ -53,7 +52,7 @@ import com.github.yellowstonegames.text.Language;
 import static com.badlogic.gdx.Gdx.input;
 import static com.badlogic.gdx.Input.Keys.*;
 
-public class SunriseSquad extends ApplicationAdapter {
+public class DawnSquad extends ApplicationAdapter {
     private static final float DURATION = 0.375f;
     private long startTime, lastMove;
 
@@ -157,11 +156,11 @@ public class SunriseSquad extends ApplicationAdapter {
 
     private GLProfiler glProfiler;
 
-    public SunriseSquad() {
+    public DawnSquad() {
         this(1L);
     }
 
-    public SunriseSquad(long seed) {
+    public DawnSquad(long seed) {
         this.seed = seed;
     }
 

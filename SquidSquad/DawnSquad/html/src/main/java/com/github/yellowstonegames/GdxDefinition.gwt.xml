@@ -23,12 +23,14 @@
 	<inherits name="com.github.yellowstonegames.squidgrid" />
 	<!-- SquidSquad place map generation -->
 	<inherits name="com.github.yellowstonegames.squidplace" />
-
+	<!-- SquidSquad pathfinding and basic AI -->
 	<inherits name="com.github.yellowstonegames.squidpath" />
+	<!-- SquidSquad procedural text generation -->
 	<inherits name="com.github.yellowstonegames.squidtext" />
+	<!-- SquidSquad smooth turn-based interpolation code -->
 	<inherits name="com.github.yellowstonegames.squidsmooth" />
 
-	<inherits name="com.github.tommyettinger.SunriseSquad" />
+	<inherits name="com.github.tommyettinger.DawnSquad" />
 	<entry-point class="com.github.yellowstonegames.gwt.GwtLauncher" />
 	<set-configuration-property name="gdx.assetpath" value="../assets" />
 	<set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>

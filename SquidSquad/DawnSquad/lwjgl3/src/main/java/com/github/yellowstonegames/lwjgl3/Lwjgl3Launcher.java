@@ -3,9 +3,9 @@ package com.github.yellowstonegames.lwjgl3;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.github.tommyettinger.SunriseSquad;
+import com.github.tommyettinger.DawnSquad;
 
-import static com.github.tommyettinger.SunriseSquad.*;
+import static com.github.tommyettinger.DawnSquad.*;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -50,6 +50,6 @@ public class Lwjgl3Launcher {
 				seed = System.currentTimeMillis();
 			}
 		}
-		return new Lwjgl3Application(new SunriseSquad(seed), configuration);
+		return new Lwjgl3Application(new DawnSquad(seed), configuration);
 	}
 }
