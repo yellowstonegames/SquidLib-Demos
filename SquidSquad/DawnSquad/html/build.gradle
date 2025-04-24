@@ -3,37 +3,36 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.gretty:gretty:3.1.0"
+        classpath "org.gretty:gretty:3.1.5"
+        classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
     }
 }
 apply plugin: "gwt"
 apply plugin: "war"
 apply plugin: "org.gretty"
-apply plugin: 'java-library'
-compileJava {
-    options.incremental = true
-}
 
 gwt {
     gwtVersion = "$gwtFrameworkVersion" // Should match the version used for building the GWT backend. See gradle.properties.
     maxHeapSize = '1G' // Default 256m is not enough for the GWT compiler. GWT is HUNGRY.
     minHeapSize = '1G'
 
-    src = files(file('src/main/java')) // Needs to be in front of "modules" below.
-    modules 'com.github.yellowstonegames.GdxDefinition'
-    devModules 'com.github.yellowstonegames.GdxDefinitionSuperdev'
+    // Needs to be in front of "modules" below.
+    src = files(file('src/main/java'), project(":core").file('src/main/java'))
+    modules += ['com.github.yellowstonegames.GdxDefinition']
+    devModules += ['com.github.yellowstonegames.GdxDefinitionSuperdev']
     project.webAppDirName = 'webapp'
 
     compiler.strict = true
     compiler.disableCastChecking = true
     //// The next line can be useful to uncomment if you want output that hasn't been obfuscated.
 //    compiler.style = org.docstr.gradle.plugins.gwt.Style.DETAILED
+
+    sourceLevel = 1.8
 }
 
 dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 
@@ -42,7 +41,7 @@ dependencies {
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:crux:0.1.2:sources"
     implementation "com.github.tommyettinger:funderby:0.1.2:sources"
-    implementation "com.github.tommyettinger:regexodus:0.1.16:sources"
+    implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
 
 //    implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
 //    implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
@@ -62,30 +61,19 @@ dependencies {
 //    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
 
 	implementation project(':core')
-
-//// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
-//// If you do, follow the steps at https://github.com/tommyettinger/gdx-backends#gwt-2902100-support
-//// and you can use GWT 2.11.0, which gives you access to Java 11 language features.
-//// Make sure that in the gwt block, you change gwtVersion so it is:
-//// gwtVersion = "2.11.0"
-//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
-//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
-
-//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion"
-//    implementation "com.github.tommyettinger:gdx-backend-gwt:$gdxBackendsVersion:sources"
-
-//    implementation "com.google.jsinterop:jsinterop-annotations:2.0.2:sources"
 }
 
 import org.akhikhl.gretty.AppBeforeIntegrationTestTask
 import org.docstr.gradle.plugins.gwt.GwtSuperDev
 
 gretty.httpPort = 8080
-gretty.resourceBase = project.projectDir.path + "/build/gwt/draftOut"
+// The line below will need to be changed only if you change the build directory to something other than "build".
+gretty.resourceBase = "${project.layout.buildDirectory.asFile.get().absolutePath}/gwt/draftOut"
 gretty.contextPath = "/"
 gretty.portPropertiesFileName = "TEMP_PORTS.properties"
 
-task startHttpServer (dependsOn: [draftCompileGwt]) {
+tasks.register('startHttpServer') {
+    dependsOn("draftCompileGwt")
     doFirst {
         copy {
             from "webapp"
@@ -97,29 +85,37 @@ task startHttpServer (dependsOn: [draftCompileGwt]) {
         }
     }
 }
-task beforeRun(type: AppBeforeIntegrationTestTask, dependsOn: startHttpServer) {
+
+tasks.register('beforeRun', AppBeforeIntegrationTestTask) {
+    dependsOn("startHttpServer")
+    gretty {
+        integrationTestTask("superDev")
+    }
     // The next line allows ports to be reused instead of
     // needing a process to be manually terminated.
     file("build/TEMP_PORTS.properties").delete()
-    // Somewhat of a hack; uses Gretty's support for wrapping a task in
-    // a start and then stop of a Jetty server that serves files while
-    // also running the SuperDev code server.
-    integrationTestTask 'superDev'
-
-    interactive false
+    interactive = false
 }
 
-task superDev(type: GwtSuperDev) {
+tasks.register('superDev', GwtSuperDev) {
+    group("gwt")
+    dependsOn("beforeRun")
     doFirst {
         gwt.modules = gwt.devModules
     }
 }
+
+//// We delete the (temporary) war/ folder because if any extra files get into it, problems occur.
+//// The war/ folder shouldn't be committed to version control.
+clean.delete += [file("war")]
+
 // This next line can be changed if you want to, for instance, always build into the
 // docs/ folder of a Git repo, which can be set to automatically publish on GitHub Pages.
 // This is relative to the html/ folder.
 var outputPath = "build/dist/"
 
-task dist(dependsOn: [clean, compileGwt]) {
+tasks.register('dist') {
+    dependsOn(["clean", "compileGwt"])
     doLast {
         // Uncomment the next line if you have changed outputPath and know that its contents
         // should be replaced by a new dist build. Some large JS files are not cleaned up by
@@ -130,7 +126,7 @@ task dist(dependsOn: [clean, compileGwt]) {
 
         file(outputPath).mkdirs()
         copy {
-            from("build/gwt/out"){
+            from("build/gwt/out") {
                 exclude '**/*.symbolMap' // Not used by a dist, and these can be large.
             }
             into outputPath
@@ -148,6 +144,8 @@ task dist(dependsOn: [clean, compileGwt]) {
                 include 'index.html'
                 filter { String line -> line.replaceAll('<a class="superdev" .+', '') }
                 // This does not modify the original index.html, only the copy in the dist.
+                // If you decide to manually remove or comment out the superdev button from index.html, you should also
+                // either remove or comment out only the "filter" line above this.
             }
             into outputPath
         }
@@ -158,24 +156,27 @@ task dist(dependsOn: [clean, compileGwt]) {
     }
 }
 
-task addSource {
+tasks.register('addSource') {
     doLast {
         sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
-        
+        sourceSets.main.compileClasspath += files("../core/build/generated/sources/annotationProcessor/java/main")
+
     }
 }
 
-task distZip(type: Zip, dependsOn: dist){
-    //// This uses the output of the dist task, which removes the superdev buttons from index.html .
+tasks.register("distZip", Zip) {
+    dependsOn("dist")
+    //// This uses the output of the dist task, which removes the superdev button from index.html .
     from(outputPath)
+    archiveVersion = projectVersion
     archiveBaseName.set("${appName}-dist")
     //// The result will be in html/build/ with a name containing "-dist".
-    destinationDirectory = file("build")
+    destinationDirectory.set(file("build"))
 }
 
-tasks.compileGwt.dependsOn(addSource)
-tasks.draftCompileGwt.dependsOn(addSource)
-tasks.checkGwt.dependsOn(addSource)
+tasks.compileGwt.dependsOn("addSource")
+tasks.draftCompileGwt.dependsOn("addSource")
+tasks.checkGwt.dependsOn("addSource")
 
 // You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
 java.sourceCompatibility = JavaVersion.VERSION_1_8

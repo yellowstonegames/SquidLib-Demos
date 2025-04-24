@@ -10,7 +10,6 @@ buildscript {
 	}
 	dependencies {
 		classpath "com.android.tools.build:gradle:8.6.1"
-		classpath "org.docstr:gwt-gradle-plugin:$gwtPluginVersion"
 		classpath 'com.guardsquare:proguard-gradle:7.5.0'
 	}
 }
