@@ -13,12 +13,40 @@ dependencies {
 //	api "com.squidpony:squidpath:$squidSquadVersion"
 //	api "com.squidpony:squidtext:$squidSquadVersion"
 //	api "com.squidpony:squidsmooth:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion"
-	api "com.github.yellowstonegames.squidsquad:squidsmooth:$squidSquadVersion"
+	api("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.squidsquad:squidsmooth:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api "com.github.tommyettinger:digital:$digitalVersion"
+	api "com.github.tommyettinger:funderby:$funderbyVersion"
+	api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"
+	api "com.github.tommyettinger:juniper:$juniperVersion"
 
 	if(enableGraalNative == 'true') {
 		implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
