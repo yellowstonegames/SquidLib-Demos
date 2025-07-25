@@ -38,6 +38,8 @@ import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.random.ChopRandom;
+import com.github.tommyettinger.textra.Font;
+import com.github.tommyettinger.textra.Layout;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.grid.*;
@@ -126,7 +128,8 @@ public class DawnSquad extends ApplicationAdapter {
         return screenX >= 0 && screenX < placeWidth && screenY >= 0 && screenY < placeHeight;
     }
 
-    private BitmapFont font;
+    private Font font;
+    private Layout gameOver;
     private Viewport mainViewport;
     private Viewport guiViewport;
     private Camera camera;
@@ -324,6 +327,14 @@ public class DawnSquad extends ApplicationAdapter {
         lang = '"' + Language.DEMONIC.sentence(rng, 4, 7,
                 new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"", "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
 
+        gameOver.clear();
+
+        gameOver.setTargetWidth(shownWidth * cellWidth);
+        font.markup("[RED]YOUR CRAWL IS OVER!\n" +
+                "[GRAY]A monster sniffs your corpse and says,\n[FOREST]"+
+                lang + "\n[GRAY]q to quit.\n[YELLOW]r to restart.", gameOver);
+        font.regenerateLayout(gameOver);
+
     }
 
     @Override
@@ -349,12 +360,18 @@ public class DawnSquad extends ApplicationAdapter {
 
         // Stores all images we use here efficiently, as well as the font image
         atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
-        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
-//        font = new BitmapFont(Gdx.files.internal("dawnlike/PlainAndSimplePlus.fnt"), atlas.findRegion("PlainAndSimplePlus"));
-        font.getData().markupEnabled = true;
-        font.setUseIntegerPositions(false);
-        font.getData().setScale(3);
+//        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
+//        font.getData().markupEnabled = true;
+//        font.setUseIntegerPositions(false);
+//        font.getData().setScale(3);
+
 //        font = generateFreetypeFont(48);
+
+        font = new Font(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"), Font.DistanceFieldType.STANDARD, 0, 0, 0, 0, false);
+        font.scale(3, 3);
+
+        gameOver = new Layout(font);
+
         vision.rememberedColor = OKLAB_MEMORY;
 
 //        Pixmap pCursor = new Pixmap(cellWidth, cellHeight, Pixmap.Format.RGBA8888);
@@ -756,13 +773,14 @@ public class DawnSquad extends ApplicationAdapter {
             batch.setProjectionMatrix(guiViewport.getCamera().combined);
             batch.begin();
             float wide = guiViewport.getWorldWidth(),
-                    x = playerSprite.getX() - guiViewport.getWorldWidth() * 0.5f,
+                    x = playerSprite.getX() - wide * 0.4f,
                     y = playerSprite.getY();
-            font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2 * font.getLineHeight(), wide, Align.center, true);
-            font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + font.getLineHeight(), wide, Align.center, true);
-            font.draw(batch, "[FOREST]" + lang, x, y, wide, Align.center, true);
-            font.draw(batch, "[GRAY]q to quit.", x, y - 2 * font.getLineHeight(), wide, Align.center, true);
-            font.draw(batch, "[YELLOW]r to restart.", x, y - 4 * font.getLineHeight(), wide, Align.center, true);
+            font.drawGlyphs(batch, gameOver, x, y + 2 * font.cellHeight, Align.left);
+//            font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2 * font.getLineHeight(), wide, Align.center, true);
+//            font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + font.getLineHeight(), wide, Align.center, true);
+//            font.draw(batch, "[FOREST]" + lang, x, y, wide, Align.center, true);
+//            font.draw(batch, "[GRAY]q to quit.", x, y - 2 * font.getLineHeight(), wide, Align.center, true);
+//            font.draw(batch, "[YELLOW]r to restart.", x, y - 4 * font.getLineHeight(), wide, Align.center, true);
             batch.end();
             if (input.isKeyPressed(Q))
                 Gdx.app.exit();
@@ -819,9 +837,9 @@ public class DawnSquad extends ApplicationAdapter {
         guiViewport.apply(false);
         batch.setProjectionMatrix(guiViewport.getCamera().combined);
         batch.begin();
-        pos.set(10, Gdx.graphics.getHeight() - font.getLineHeight());
+        pos.set(10, Gdx.graphics.getHeight() - font.cellHeight);
         guiViewport.unproject(pos);
-        font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
+        font.drawMarkupText(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
 
 //        pos.set(input.getDeltaX(), -input.getDeltaY());

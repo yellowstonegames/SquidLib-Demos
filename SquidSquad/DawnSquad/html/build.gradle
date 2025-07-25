@@ -41,7 +41,8 @@ dependencies {
     implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
     implementation "com.github.tommyettinger:crux:0.1.2:sources"
     implementation "com.github.tommyettinger:funderby:$funderbyVersion:sources"
-    implementation "com.github.tommyettinger:regexodus:$regexodusVersion:sources"
+    implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
+    implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
 
 //    implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
 //    implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
