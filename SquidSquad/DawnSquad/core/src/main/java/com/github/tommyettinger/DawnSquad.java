@@ -772,10 +772,8 @@ public class DawnSquad extends ApplicationAdapter {
             guiViewport.apply(false);
             batch.setProjectionMatrix(guiViewport.getCamera().combined);
             batch.begin();
-            float wide = guiViewport.getWorldWidth(),
-                    x = playerSprite.getX() - wide * 0.4f,
-                    y = playerSprite.getY();
-            font.drawGlyphs(batch, gameOver, x, y + 2 * font.cellHeight, Align.left);
+            float x = playerSprite.getX(), y = playerSprite.getY();
+            font.drawGlyphs(batch, gameOver, x, y + 2 * font.cellHeight, Align.center);
 //            font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2 * font.getLineHeight(), wide, Align.center, true);
 //            font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + font.getLineHeight(), wide, Align.center, true);
 //            font.draw(batch, "[FOREST]" + lang, x, y, wide, Align.center, true);
