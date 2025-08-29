@@ -20,10 +20,8 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -156,8 +154,6 @@ public class DawnSquad extends ApplicationAdapter {
      * with about 30% lightness; fully opaque.
      */
     private static final int OKLAB_MEMORY = 0xFF848350;
-
-    private GLProfiler glProfiler;
 
     public DawnSquad() {
         this(1L);
@@ -339,7 +335,7 @@ public class DawnSquad extends ApplicationAdapter {
 
     @Override
     public void create() {
-        Gdx.app.setLogLevel(Application.LOG_INFO);
+        Gdx.app.setLogLevel(Application.LOG_ERROR);
         // We need access to a batch to render most things.
         batch = new SpriteBatch();
 
@@ -438,20 +434,6 @@ public class DawnSquad extends ApplicationAdapter {
             @Override
             public boolean keyUp(int keycode) {
                 switch (keycode) {
-                    case BACKSLASH:
-                        // Debug
-                        if(glProfiler == null) {
-                            glProfiler = new GLProfiler(Gdx.graphics);
-                            glProfiler.enable();
-                            Gdx.app.log("(PERFORMANCE)", "GL Profiling enabled.");
-                        } else {
-                            Gdx.app.log("(PERFORMANCE)", "Calls: " + glProfiler.getCalls());
-                            Gdx.app.log("(PERFORMANCE)", "Draw Calls: " + glProfiler.getDrawCalls());
-                            Gdx.app.log("(PERFORMANCE)", "Texture Bindings: " + glProfiler.getTextureBindings());
-                            Gdx.app.log("(PERFORMANCE)", "Shader Switches: " + glProfiler.getShaderSwitches());
-                            glProfiler.reset();
-                        }
-                        break;
                     case F:
                         // this probably isn't needed currently, since the FPS is shown on-screen.
                         // it could be useful in the future.
@@ -670,7 +652,7 @@ public class DawnSquad extends ApplicationAdapter {
 
         for (int i = 0; i < toCursor.size(); i++) {
             Coord curr = toCursor.get(i);
-            if (vision.inView.contains(curr))
+            if (curr != null && vision.inView.contains(curr))
                 vision.backgroundColors[curr.x][curr.y] = rainbow;
         }
 
@@ -709,7 +691,6 @@ public class DawnSquad extends ApplicationAdapter {
         }
         batch.setPackedColor(Color.WHITE_FLOAT_BITS);
         playerSprite.animate(time).draw(batch);
-//        Gdx.graphics.setTitle(Gdx.graphics.getFramesPerSecond() + " FPS");
     }
 
     /**
@@ -749,9 +730,6 @@ public class DawnSquad extends ApplicationAdapter {
         if (input.isKeyJustPressed(R))
             restart(lang.hashCode());
 
-        if(glProfiler != null){
-            glProfiler.reset();
-        }
         // standard clear the background routine for libGDX
         ScreenUtils.clear(0f, 0f, 0f, 1f);
         // center the camera on the player's position
