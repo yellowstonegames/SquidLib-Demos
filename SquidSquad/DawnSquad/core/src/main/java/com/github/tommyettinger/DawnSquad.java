@@ -35,13 +35,14 @@ import com.github.tommyettinger.digital.TrigTools;
 import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.ds.ObjectList;
+import com.github.tommyettinger.gand.utils.GridMetric;
 import com.github.tommyettinger.random.ChopRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.Layout;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.grid.*;
-import com.github.yellowstonegames.path.DijkstraMap;
+import com.github.yellowstonegames.seek.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
 import com.github.yellowstonegames.smooth.CoordGlider;
@@ -90,7 +91,7 @@ public class DawnSquad extends ApplicationAdapter {
      */
     private Coord player;
 
-    private final Coord[] playerArray = new Coord[1];
+    private final ObjectList<Coord> playerList = ObjectList.with(Coord.get(0, 0));
 
     private final Vector2 pos = new Vector2();
 
@@ -137,9 +138,9 @@ public class DawnSquad extends ApplicationAdapter {
     private Director<Coord> monsterDirector, directorSmall;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
-    private ObjectDeque<Coord> toCursor;
+    private com.github.tommyettinger.gand.ds.ObjectDeque<Coord> toCursor;
     private ObjectDeque<Coord> awaitedMoves;
-    private ObjectDeque<Coord> nextMovePositions;
+    private com.github.tommyettinger.gand.ds.ObjectDeque<Coord> nextMovePositions;
     private String lang;
     private TextureAtlas.AtlasRegion solid;
     private int health = 9;
@@ -313,8 +314,8 @@ public class DawnSquad extends ApplicationAdapter {
         //Measurement used is EUCLIDEAN, which allows 8 directions, but will prefer orthogonal moves unless diagonal
         //ones are clearly closer "as the crow flies." Alternatives are MANHATTAN, which means 4-way movement only, no
         //diagonals possible, and CHEBYSHEV, which allows 8 directions of movement at the same cost for all directions.
-        playerToCursor = new DijkstraMap(barePlaceMap, Measurement.EUCLIDEAN);
-        getToPlayer = new DijkstraMap(barePlaceMap, Measurement.EUCLIDEAN);
+        playerToCursor = new DijkstraMap(barePlaceMap, GridMetric.EUCLIDEAN);
+        getToPlayer = new DijkstraMap(barePlaceMap, GridMetric.EUCLIDEAN);
         //These next two lines mark the player as something we want paths to go to or from, and get the distances to the
         // player from somewhat-nearby walkable cells in the dungeon.
         playerToCursor.setGoal(player);
@@ -351,11 +352,11 @@ public class DawnSquad extends ApplicationAdapter {
         camera.update();
 
         //This is used to allow clicks or taps to take the player to the desired area.
-        toCursor = new ObjectDeque<>(200);
+        toCursor = new com.github.tommyettinger.gand.ds.ObjectDeque<>(200);
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
         awaitedMoves = new ObjectDeque<>(200);
 
-        nextMovePositions = new ObjectDeque<>(200);
+        nextMovePositions = new com.github.tommyettinger.gand.ds.ObjectDeque<>(200);
 
         // Stores all images we use here efficiently, as well as the font image
         atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
@@ -584,7 +585,7 @@ public class DawnSquad extends ApplicationAdapter {
     private void afterChange() {
         phase = Phase.MONSTER_ANIM;
         // updates our mutable player array in-place, because a Coord like player is immutable.
-        playerArray[0] = player;
+        playerList.set(0, player);
         int monCount = monsters.size();
         // handle monster turns
         float[][] lightLevels = vision.lighting.fovResult;
@@ -606,7 +607,7 @@ public class DawnSquad extends ApplicationAdapter {
                 // again to reduce allocations, the target position (and there could be more than one in many games) is
                 // stored in a one-element array that gets modified, instead of using a new varargs every time (which
                 // silently creates an array each time it is called).
-                getToPlayer.findPath(nextMovePositions, 1, 7, monsters.keySet(), null, pos, playerArray);
+                getToPlayer.findPath(nextMovePositions, 1, 7, monsters.keySet(), null, pos, playerList);
                 if (nextMovePositions.notEmpty()) {
                     Coord tmp = nextMovePositions.get(0);
                     if (tmp == null) continue;

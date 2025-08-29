@@ -11,9 +11,10 @@ dependencies {
 	api "com.squidpony:squidcore:$squidSquadVersion"
 	api "com.squidpony:squidgrid:$squidSquadVersion"
 	api "com.squidpony:squidplace:$squidSquadVersion"
-	api "com.squidpony:squidpath:$squidSquadVersion"
+	api "com.squidpony:squidseek:$squidSquadVersion"
 	api "com.squidpony:squidtext:$squidSquadVersion"
 	api "com.squidpony:squidsmooth:$squidSquadVersion"
+    api "com.github.tommyettinger:gand:$gandVersion"
 //	api("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"){
 //		exclude module: 'jdkgdxds'
 //		exclude module: 'juniper'

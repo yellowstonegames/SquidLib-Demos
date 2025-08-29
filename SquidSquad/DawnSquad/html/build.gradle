@@ -47,10 +47,10 @@ dependencies {
     implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
     implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
     implementation "com.squidpony:squidplace:$squidSquadVersion:sources"
-    implementation "com.squidpony:squidpath:$squidSquadVersion:sources"
+    implementation "com.squidpony:squidseek:$squidSquadVersion:sources"
     implementation "com.squidpony:squidtext:$squidSquadVersion:sources"
     implementation "com.squidpony:squidsmooth:$squidSquadVersion:sources"
-
+    implementation "com.github.tommyettinger:gand:$gandVersion:sources"
 //    implementation("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion:sources"){
 //        exclude module: 'jdkgdxds'
 //        exclude module: 'juniper'
