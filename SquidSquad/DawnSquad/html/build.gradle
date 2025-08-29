@@ -44,43 +44,43 @@ dependencies {
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
     implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
 
-//    implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
-//    implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
-//    implementation "com.squidpony:squidplace:$squidSquadVersion:sources"
-//    implementation "com.squidpony:squidpath:$squidSquadVersion:sources"
-//    implementation "com.squidpony:squidtext:$squidSquadVersion:sources"
-//    implementation "com.squidpony:squidsmooth:$squidSquadVersion:sources"
+    implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
+    implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
+    implementation "com.squidpony:squidplace:$squidSquadVersion:sources"
+    implementation "com.squidpony:squidpath:$squidSquadVersion:sources"
+    implementation "com.squidpony:squidtext:$squidSquadVersion:sources"
+    implementation "com.squidpony:squidsmooth:$squidSquadVersion:sources"
 
-    implementation("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.github.yellowstonegames.squidsquad:squidsmooth:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
+//    implementation("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.github.yellowstonegames.squidsquad:squidsmooth:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
 
 //    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
 //    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
@@ -203,7 +203,7 @@ tasks.compileGwt.dependsOn("addSource")
 tasks.draftCompileGwt.dependsOn("addSource")
 tasks.checkGwt.dependsOn("addSource")
 
-// You can change the version below to JavaVersion.VERSION_11 if you use the 2.9.0 backend.
+// You can change the version below to JavaVersion.VERSION_11 if you want. Version 11 isn't iOS-compatible.
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
