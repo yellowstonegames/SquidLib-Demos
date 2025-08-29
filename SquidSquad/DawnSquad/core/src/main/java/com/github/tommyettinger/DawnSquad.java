@@ -93,7 +93,6 @@ public class DawnSquad extends ApplicationAdapter {
     private final Coord[] playerArray = new Coord[1];
 
     private final Vector2 pos = new Vector2();
-//    private final Vector2 mouseDirection = new Vector2(1, 0);
 
     /**
      * In number of cells
@@ -151,9 +150,13 @@ public class DawnSquad extends ApplicationAdapter {
     private static final int OKLAB_BLOOD = DescriptiveColor.describeOklab("darkest brick");
     /**
      * Used as the color for remembered cells that can't be currently seen. Slightly-yellow-brown,
-     * with about 30% lightness; fully opaque.
+     * with 30% lightness; fully opaque. The A and B arguments are 0.515f and 0.52f, which makes
+     * the color more red than green (with 0.515f A) and more yellow than blue (with 0.52 B).
+     * Lowering A to less than 0.5f would make the color more of a gross greenish-yellow vomit
+     * color. Lowering B to less than 0.5f would make the color slightly purplish. Lowering both
+     * would make it cyan or sea green.
      */
-    private static final int OKLAB_MEMORY = 0xFF848350;
+    private static final int OKLAB_MEMORY = DescriptiveColor.oklab(0.3f, 0.515f, 0.52f, 1f);
 
     public DawnSquad() {
         this(1L);
