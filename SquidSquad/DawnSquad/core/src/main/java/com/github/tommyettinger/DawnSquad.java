@@ -138,9 +138,9 @@ public class DawnSquad extends ApplicationAdapter {
     private Director<Coord> monsterDirector, directorSmall;
     private DijkstraMap getToPlayer, playerToCursor;
     private Coord cursor;
-    private com.github.tommyettinger.gand.ds.ObjectDeque<Coord> toCursor;
+    private ObjectDeque<Coord> toCursor;
     private ObjectDeque<Coord> awaitedMoves;
-    private com.github.tommyettinger.gand.ds.ObjectDeque<Coord> nextMovePositions;
+    private ObjectDeque<Coord> nextMovePositions;
     private String lang;
     private TextureAtlas.AtlasRegion solid;
     private int health = 9;
@@ -352,11 +352,11 @@ public class DawnSquad extends ApplicationAdapter {
         camera.update();
 
         //This is used to allow clicks or taps to take the player to the desired area.
-        toCursor = new com.github.tommyettinger.gand.ds.ObjectDeque<>(200);
+        toCursor = new ObjectDeque<>(200);
         //When a path is confirmed by clicking, we draw from this List to find which cell is next to move into.
         awaitedMoves = new ObjectDeque<>(200);
 
-        nextMovePositions = new com.github.tommyettinger.gand.ds.ObjectDeque<>(200);
+        nextMovePositions = new ObjectDeque<>(200);
 
         // Stores all images we use here efficiently, as well as the font image
         atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
