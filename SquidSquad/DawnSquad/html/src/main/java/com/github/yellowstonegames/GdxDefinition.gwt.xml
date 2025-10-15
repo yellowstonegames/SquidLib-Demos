@@ -4,7 +4,7 @@
 	<source path="" />
 	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
 
-<!--	<inherits name="com.badlogic.gdx.graphics.g2d.freetype.freetype-gwt" />-->
+	<inherits name="com.badlogic.gdx.graphics.g2d.freetype.freetype-gwt" />
 
 	<!-- SquidSquad core classes -->
 	<inherits name="com.github.yellowstonegames.squidcore" />
@@ -24,7 +24,7 @@
 	<!-- SquidSquad place map generation -->
 	<inherits name="com.github.yellowstonegames.squidplace" />
 	<!-- SquidSquad pathfinding and basic AI -->
-	<inherits name="com.github.yellowstonegames.squidpath" />
+	<inherits name="com.github.yellowstonegames.squidseek" />
 	<!-- SquidSquad procedural text generation -->
 	<inherits name="com.github.yellowstonegames.squidtext" />
 	<!-- SquidSquad smooth turn-based interpolation code -->

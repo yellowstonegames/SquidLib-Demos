@@ -19,9 +19,12 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -36,12 +39,18 @@ import com.github.tommyettinger.ds.IntObjectMap;
 import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.gand.utils.GridMetric;
-import com.github.tommyettinger.random.ChopRandom;
+import com.github.tommyettinger.random.Xoshiro160RoadroxoRandom;
 import com.github.tommyettinger.textra.Font;
 import com.github.tommyettinger.textra.Layout;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
-import com.github.yellowstonegames.grid.*;
+import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.CoordObjectOrderedMap;
+import com.github.yellowstonegames.grid.Direction;
+import com.github.yellowstonegames.grid.LineTools;
+import com.github.yellowstonegames.grid.Radiance;
+import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.VisionFramework;
 import com.github.yellowstonegames.seek.DijkstraMap;
 import com.github.yellowstonegames.place.DungeonProcessor;
 import com.github.yellowstonegames.smooth.AnimatedGlidingSprite;
@@ -63,7 +72,7 @@ public class DawnSquad extends ApplicationAdapter {
     private Phase phase = Phase.WAIT;
 
     // random number generator; this one is more efficient on GWT, but less-so on desktop.
-    private ChopRandom rng;
+    private Xoshiro160RoadroxoRandom rng;
 
     public long seed;
 
@@ -126,7 +135,7 @@ public class DawnSquad extends ApplicationAdapter {
         return screenX >= 0 && screenX < placeWidth && screenY >= 0 && screenY < placeHeight;
     }
 
-    private Font font;
+    private BitmapFont font;
     private Layout gameOver;
     private Viewport mainViewport;
     private Viewport guiViewport;
@@ -326,15 +335,6 @@ public class DawnSquad extends ApplicationAdapter {
 
         lang = '"' + Language.DEMONIC.sentence(rng, 4, 7,
                 new String[]{",", ",", ",", " -"}, new String[]{"...\"", ", heh...\"", ", nyehehe...\"", "!\"", "!\"", "!\"", "!\" *PTOOEY!*",}, 0.2);
-
-        gameOver.clear();
-
-        gameOver.setTargetWidth(shownWidth * cellWidth);
-        font.markup("[RED]YOUR CRAWL IS OVER!\n" +
-                "[GRAY]A monster sniffs your corpse and says,\n[FOREST]"+
-                lang + "\n[GRAY]q to quit.\n[YELLOW]r to restart.", gameOver);
-        font.regenerateLayout(gameOver);
-
     }
 
     @Override
@@ -343,7 +343,7 @@ public class DawnSquad extends ApplicationAdapter {
         // We need access to a batch to render most things.
         batch = new SpriteBatch();
 
-        rng = new ChopRandom(seed);
+        rng = new Xoshiro160RoadroxoRandom(seed);
 
         guiViewport = new ScreenViewport();
         mainViewport = new ScalingViewport(Scaling.fill, shownWidth, shownHeight);
@@ -365,12 +365,13 @@ public class DawnSquad extends ApplicationAdapter {
 //        font.setUseIntegerPositions(false);
 //        font.getData().setScale(3);
 
-//        font = generateFreetypeFont(48);
+        font = generateFreetypeFont(48);
+//        font.getData().setScale(2f/cellWidth, 2f/cellHeight);
+        font.getData().markupEnabled = true;
 
-        font = new Font(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"), Font.DistanceFieldType.STANDARD, 0, 0, 0, 0, false);
-        font.scale(3, 3);
-
-        gameOver = new Layout(font);
+//
+//        font = new Font(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"), Font.DistanceFieldType.STANDARD, 0, 0, 0, 0, false);
+//        font.scale(3, 3);
 
         vision.rememberedColor = OKLAB_MEMORY;
 
@@ -504,36 +505,36 @@ public class DawnSquad extends ApplicationAdapter {
         Gdx.input.setInputProcessor(input);
     }
 
-//    private BitmapFont generateFreetypeFont(int size) {
-//        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
-//        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-//        parameter.characters =
-//                " !\"%'(),-." +
-//                        "0123456789" +
-//                        ":;=?ABCDEF" +
-//                        "GHIJKLMNOP" +
-//                        "QRSTUVWXYZ" +
-//                        "[]_abcdefg" +
-//                        "hijklmnopq" +
-//                        "rstuvwxyz{" +
-//                        "}©ÀÁÂÃÄÈÉÊ" +
-//                        "ËÌÍÎÏÑÒÓÔÖ" +
-//                        "ÙÚÛÜÝàáâãä" +
-//                        "èéêëìíîïñò" +
-//                        "óôõöùúûüýÿ" +
-//                        "Ÿ—\n";
-//        parameter.size = size;
-//        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
-//        parameter.magFilter = Texture.TextureFilter.Linear;
-//        parameter.minFilter = Texture.TextureFilter.Linear;
-//        font = generator.generateFont(parameter);
-//        generator.dispose(); // don't forget to dispose to avoid memory leaks!
-//
-//        font.setUseIntegerPositions(false);
-////        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
-//        font.getData().markupEnabled = true;
-//        return font;
-//    }
+    private BitmapFont generateFreetypeFont(int size) {
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.characters =
+                " !\"%'(),-." +
+                        "0123456789" +
+                        ":;=?ABCDEF" +
+                        "GHIJKLMNOP" +
+                        "QRSTUVWXYZ" +
+                        "[]_abcdefg" +
+                        "hijklmnopq" +
+                        "rstuvwxyz{" +
+                        "}©ÀÁÂÃÄÈÉÊ" +
+                        "ËÌÍÎÏÑÒÓÔÖ" +
+                        "ÙÚÛÜÝàáâãä" +
+                        "èéêëìíîïñò" +
+                        "óôõöùúûüýÿ" +
+                        "Ÿ—\n";
+        parameter.size = size;
+        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
+        parameter.magFilter = Texture.TextureFilter.Linear;
+        parameter.minFilter = Texture.TextureFilter.Linear;
+        font = generator.generateFont(parameter);
+        generator.dispose(); // don't forget to dispose to avoid memory leaks!
+
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
+        font.getData().markupEnabled = true;
+        return font;
+    }
 
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
@@ -750,17 +751,14 @@ public class DawnSquad extends ApplicationAdapter {
         if (health <= 0) {
             // still need to display the map, then write over it with a message.
             putMap();
-            batch.end();
-            guiViewport.apply(false);
-            batch.setProjectionMatrix(guiViewport.getCamera().combined);
-            batch.begin();
-            float x = playerSprite.getX(), y = playerSprite.getY();
-            font.drawGlyphs(batch, gameOver, x, y + 2 * font.cellHeight, Align.center);
-//            font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2 * font.getLineHeight(), wide, Align.center, true);
-//            font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + font.getLineHeight(), wide, Align.center, true);
-//            font.draw(batch, "[FOREST]" + lang, x, y, wide, Align.center, true);
-//            font.draw(batch, "[GRAY]q to quit.", x, y - 2 * font.getLineHeight(), wide, Align.center, true);
-//            font.draw(batch, "[YELLOW]r to restart.", x, y - 4 * font.getLineHeight(), wide, Align.center, true);
+            float wide = mainViewport.getWorldWidth(),
+                    x = playerSprite.getX() - mainViewport.getWorldWidth() * 0.5f,
+                    y = playerSprite.getY();
+            font.draw(batch, "[RED]YOUR CRAWL IS OVER!", x, y + 2, wide, Align.center, true);
+            font.draw(batch, "[GRAY]A monster sniffs your corpse and says,", x, y + 1, wide, Align.center, true);
+            font.draw(batch, "[FOREST]" + lang, x, y, wide, Align.center, true);
+            font.draw(batch, "[GRAY]q to quit.", x, y - 2, wide, Align.center, true);
+            font.draw(batch, "[YELLOW]r to restart.", x, y - 4, wide, Align.center, true);
             batch.end();
             if (input.isKeyPressed(Q))
                 Gdx.app.exit();
@@ -813,29 +811,16 @@ public class DawnSquad extends ApplicationAdapter {
             handleHeldKeys();
         }
         putMap();
-        batch.end();
-        guiViewport.apply(false);
-        batch.setProjectionMatrix(guiViewport.getCamera().combined);
-        batch.begin();
-        pos.set(10, Gdx.graphics.getHeight() - font.cellHeight);
-        guiViewport.unproject(pos);
-        font.drawMarkupText(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
+        pos.set(10, Gdx.graphics.getHeight() - cellHeight - cellHeight);
+        mainViewport.unproject(pos);
+        font.draw(batch, "[GRAY]Current Health: [RED]" + health + "[WHITE] at "
                 + Gdx.graphics.getFramesPerSecond() + " FPS", pos.x, pos.y);
-
-//        pos.set(input.getDeltaX(), -input.getDeltaY());
-//        if(!pos.isZero())
-//        {
-//            mouseDirection.setAngleDeg(pos.angleDeg());
-//        }
-//        batch.draw(solid, 0f, 0f, 0f, 0f, mouseDirection.len() * 100f, 4f, 1f, 1f, mouseDirection.angleDeg());
-
         batch.end();
     }
 
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
-//        font = generateFreetypeFont(height * 3 / shownHeight);
         mainViewport.update(width, height, false);
         guiViewport.update(width, height, false);
     }

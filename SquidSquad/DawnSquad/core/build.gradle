@@ -58,5 +58,5 @@ dependencies {
 		implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
 	}
 
-//	api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+	api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 }
