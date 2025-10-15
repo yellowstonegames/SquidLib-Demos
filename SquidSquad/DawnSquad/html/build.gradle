@@ -45,12 +45,43 @@ dependencies {
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
     implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
 
-    implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
-    implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
-    implementation "com.squidpony:squidplace:$squidSquadVersion:sources"
-    implementation "com.squidpony:squidseek:$squidSquadVersion:sources"
-    implementation "com.squidpony:squidtext:$squidSquadVersion:sources"
-    implementation "com.squidpony:squidsmooth:$squidSquadVersion:sources"
+    implementation("com.squidpony:squidcore:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.squidpony:squidgrid:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.squidpony:squidplace:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.squidpony:squidseek:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.squidpony:squidtext:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.squidpony:squidsmooth:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+
+//    implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
+//    implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
+//    implementation "com.squidpony:squidplace:$squidSquadVersion:sources"
+//    implementation "com.squidpony:squidseek:$squidSquadVersion:sources"
+//    implementation "com.squidpony:squidtext:$squidSquadVersion:sources"
+//    implementation "com.squidpony:squidsmooth:$squidSquadVersion:sources"
     implementation "com.github.tommyettinger:gand:$gandVersion:sources"
     implementation "com.github.tommyettinger:gdcrux:$gdcruxVersion:sources"
 //    implementation("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion:sources"){
@@ -68,7 +99,7 @@ dependencies {
 //        exclude module: 'juniper'
 //        exclude module: 'digital'
 //    }
-//    implementation("com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion:sources"){
+//    implementation("com.github.yellowstonegames.squidsquad:squidseek:$squidSquadVersion:sources"){
 //        exclude module: 'jdkgdxds'
 //        exclude module: 'juniper'
 //        exclude module: 'digital'
