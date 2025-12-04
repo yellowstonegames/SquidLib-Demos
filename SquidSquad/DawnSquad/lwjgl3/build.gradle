@@ -3,7 +3,7 @@ buildscript {
 		gradlePluginPortal()
 	}
 	dependencies {
-		classpath "io.github.fourlastor:construo:1.7.1"
+		classpath "io.github.fourlastor:construo:2.1.0"
 		if(enableGraalNative == 'true') {
 			classpath "org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.9.28"
 		}
@@ -25,8 +25,7 @@ compileJava {
 }
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
-mainClassName = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
-application.setMainClass(mainClassName)
+application.mainClass = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
@@ -60,7 +59,7 @@ jar {
 // sets the name of the .jar file this produces to the name of the game or app.
 	archiveFileName.set(jarName)
 // the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
-	duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	dependsOn configurations.runtimeClasspath
 	from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 // these "exclude" lines remove some unnecessary duplicate files in the output JAR.
@@ -70,7 +69,7 @@ jar {
 	}
 // setting the manifest makes the JAR runnable.
 	manifest {
-		attributes 'Main-Class': project.mainClassName
+		attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED'
 	}
 // this last step may help on some OSes that need extra instruction to make runnable JARs.
 	doLast {
@@ -81,7 +80,7 @@ jar {
 tasks.register('proguard', ProGuardTask) {
 	inputs.file(project.layout.buildDirectory.asFile.get().absolutePath + "/libs/${jarName}")
 	outputs.upToDateWhen { false }
-	configuration 'proguard-rules.pro'
+	configuration('proguard-rules.pro')
 	//printmapping 'build/lib/out.map'
 	var buildDirectory = project.layout.buildDirectory.asFile.get().absolutePath
 
@@ -98,42 +97,42 @@ tasks.register('proguard', ProGuardTask) {
 proguard.dependsOn jar
 
 construo {
-	// name of the executable
-	name.set(appName)
-	// human-readable name, used for example in the `.app` name for macOS
-	humanName.set(appName)
-	// Optional, defaults to project version property
-	version.set("$projectVersion")
+    // name of the executable
+    name.set(appName)
+    // human-readable name, used for example in the `.app` name for macOS
+    humanName.set(appName)
 
-	targets.configure {
-		create("linuxX64", Target.Linux) {
-			architecture.set(Target.Architecture.X86_64)
-			jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_linux_hotspot_17.0.12_7.tar.gz")
-		}
-		create("macM1", Target.MacOs) {
-			architecture.set(Target.Architecture.AARCH64)
-			jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.12_7.tar.gz")
-			// macOS needs an identifier
-			identifier.set("gdx.liftoff." + appName)
-			// Optional: icon for macOS
-			macIcon.set(project.file("icons/logo.icns"))
-		}
-		create("macX64", Target.MacOs) {
-			architecture.set(Target.Architecture.X86_64)
-			jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_mac_hotspot_17.0.12_7.tar.gz")
-			// macOS needs an identifier
-			identifier.set("gdx.liftoff." + appName)
-			// Optional: icon for macOS
-			macIcon.set(file("icons/logo.icns"))
-		}
-		create("winX64", Target.Windows) {
-			architecture.set(Target.Architecture.X86_64)
-			icon.set(file("icons/logo.png"))
-			jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.12%2B7/OpenJDK17U-jdk_x64_windows_hotspot_17.0.12_7.zip")
-			// Uncomment the next line to show a console when the game runs, to print messages.
-			//useConsole.set(true)
-		}
-	}
+    targets.configure {
+        register("linuxX64", Target.Linux) {
+            architecture.set(Target.Architecture.X86_64)
+            jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
+            // Linux does not currently have a way to set the icon on the executable
+        }
+        register("macM1", Target.MacOs) {
+            architecture.set(Target.Architecture.AARCH64)
+            jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
+            // macOS needs an identifier
+            identifier.set("com.github.yellowstonegames." + appName)
+            // Optional: icon for macOS, as an ICNS file
+            macIcon.set(project.file("icons/logo.icns"))
+        }
+        register("macX64", Target.MacOs) {
+            architecture.set(Target.Architecture.X86_64)
+            jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_mac_hotspot_17.0.15_6.tar.gz")
+            // macOS needs an identifier
+            identifier.set("com.github.yellowstonegames." + appName)
+            // Optional: icon for macOS, as an ICNS file
+            macIcon.set(project.file("icons/logo.icns"))
+        }
+        register("winX64", Target.Windows) {
+            architecture.set(Target.Architecture.X86_64)
+            // Optional: icon for Windows, as a PNG
+            icon.set(project.file("icons/logo.png"))
+            jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_windows_hotspot_17.0.15_6.zip")
+            // Uncomment the next line to show a console when the game runs, to print messages.
+            //useConsole.set(true)
+        }
+    }
 }
 
 // Equivalent to the jar task; here for compatibility with gdx-setup.
