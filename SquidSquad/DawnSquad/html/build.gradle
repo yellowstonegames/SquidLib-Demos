@@ -6,7 +6,6 @@ buildscript {
     }
     dependencies {
         classpath "org.docstr.gwt:org.docstr.gwt.gradle.plugin:$gwtPluginVersion"
-
     }
 }
 apply plugin: "org.docstr.gwt"
@@ -139,11 +138,15 @@ dependencies {
 	implementation project(':core')
 }
 
-
 //// We delete the (temporary) war/ folder because if any extra files get into it, problems occur.
 //// The war/ folder shouldn't be committed to version control.
 clean.delete += [file("war")]
 
+//// The compileJava task is run at the start of any GWT build; we need to clean the output directory BEFORE
+//// anything can be built into that output directory, so the rest of the build can use it.
+tasks.named("compileJava").get().dependsOn("clean")
+
+//// You should always be running the dist task (which could be folded into the "other" group), not the build task.
 tasks.register('dist') {
     dependsOn(["build"])
     doLast {
