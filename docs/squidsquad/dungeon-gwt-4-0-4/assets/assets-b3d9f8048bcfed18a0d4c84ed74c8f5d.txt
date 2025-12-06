@@ -1,0 +1,3 @@
+Inconsolata-LGC-License.txt
+Inconsolata-LGC-msdf.json.lzma
+Inconsolata-LGC-msdf.png

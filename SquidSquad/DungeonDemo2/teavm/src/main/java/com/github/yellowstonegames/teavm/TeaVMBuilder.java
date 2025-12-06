@@ -23,7 +23,7 @@ public class TeaVMBuilder {
      * This works well when the targetType is set to JAVASCRIPT, but you can still set the targetType to WEBASSEMBLY_GC
      * while this is true in order to test that higher-performance target before releasing.
      */
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static void main(String[] args) throws IOException {
         TeaBuildConfiguration teaBuildConfiguration = new TeaBuildConfiguration();
