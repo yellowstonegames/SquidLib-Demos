@@ -267,7 +267,7 @@ public class DungeonDemo extends ApplicationAdapter {
         vision.update(change);
         final float time = TimeUtils.timeSinceMillis(startTime) * 0.001f;
         int rainbow = DescriptiveColor.maximizeSaturation(160,
-                (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
+            (int) (TrigTools.sinTurns(time * 0.5f) * 30f) + 128, (int) (TrigTools.cosTurns(time * 0.5f) * 30f) + 128, 255);
 
         for (int i = 0; i < toCursor.size(); i++) {
             Coord curr = toCursor.get(i);

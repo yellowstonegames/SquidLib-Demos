@@ -1,0 +1,24 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.github.tommyettinger:crux:$cruxVersion"
+  api "com.github.tommyettinger:digital:$digitalVersion"
+  api "com.github.tommyettinger:funderby:$funderbyVersion"
+  api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"
+  api "com.github.tommyettinger:juniper:$juniperVersion"
+  api "com.github.tommyettinger:regexodus:$regExodusVersion"
+  api "com.github.tommyettinger:textratypist:$textratypistVersion"
+  api "com.squidpony:squidcore:$squidCoreVersion"
+  api "com.squidpony:squidglyph:$squidGlyphVersion"
+  api "com.squidpony:squidgrid:$squidGridVersion"
+  api "com.squidpony:squidpath:$squidPathVersion"
+  api "com.squidpony:squidplace:$squidPlaceVersion"
+  api "com.squidpony:squidpress:$squidPressVersion"
+  api "com.squidpony:squidtext:$squidTextVersion"
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+}
