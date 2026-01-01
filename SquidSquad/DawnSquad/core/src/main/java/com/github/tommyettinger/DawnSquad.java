@@ -40,8 +40,8 @@ import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.gand.utils.GridMetric;
 import com.github.tommyettinger.random.Xoshiro160RoadroxoRandom;
-import com.github.tommyettinger.textra.Font;
-import com.github.tommyettinger.textra.Layout;
+//import com.github.tommyettinger.textra.Font;
+//import com.github.tommyettinger.textra.Layout;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.grid.Coord;
@@ -136,7 +136,7 @@ public class DawnSquad extends ApplicationAdapter {
     }
 
     private BitmapFont font;
-    private Layout gameOver;
+//    private Layout gameOver;
     private Viewport mainViewport;
     private Viewport guiViewport;
     private Camera camera;

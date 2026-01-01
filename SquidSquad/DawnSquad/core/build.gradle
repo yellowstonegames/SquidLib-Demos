@@ -51,7 +51,6 @@ dependencies {
 	api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"
 	api "com.github.tommyettinger:juniper:$juniperVersion"
 	api "com.github.tommyettinger:regexodus:$regExodusVersion"
-	api "com.github.tommyettinger:textratypist:$textratypistVersion"
 
 
 	if(enableGraalNative == 'true') {
