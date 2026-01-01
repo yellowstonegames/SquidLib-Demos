@@ -11,7 +11,9 @@ dependencies {
   api "com.github.tommyettinger:regexodus:$regExodusVersion"
   api "com.github.tommyettinger:textratypist:$textratypistVersion"
   api "com.squidpony:squidcore:$squidCoreVersion"
-  api "com.squidpony:squidglyph:$squidGlyphVersion"
+  api("com.squidpony:squidglyph:$squidGlyphVersion"){
+    exclude module: 'textratypist'
+  }
   api "com.squidpony:squidgrid:$squidGridVersion"
   api "com.squidpony:squidpath:$squidPathVersion"
   api "com.squidpony:squidplace:$squidPlaceVersion"
