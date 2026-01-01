@@ -53,8 +53,13 @@ dependencies {
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 
     implementation "com.github.tommyettinger:digital:$digitalVersion:sources"
-    implementation "com.github.tommyettinger:juniper:$juniperVersion:sources"
-    implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"
+    implementation("com.github.tommyettinger:juniper:$juniperVersion:sources"){
+        exclude module: 'digital'
+    }
+
+    implementation("com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion:sources"){
+        exclude module: 'digital'
+    }
     implementation "com.github.tommyettinger:crux:0.1.3:sources"
     implementation "com.github.tommyettinger:funderby:$funderbyVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"

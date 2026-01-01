@@ -27,10 +27,10 @@ compileJava {
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 application.mainClass = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
-if (JavaVersion.current().isJava9Compatible()) {
-	compileJava.options.release.set(8)
+java.sourceCompatibility = JavaVersion.VERSION_11
+java.targetCompatibility = JavaVersion.VERSION_11
+if (JavaVersion.current().isJava11Compatible()) {
+	compileJava.options.release.set(11)
 }
 
 dependencies {

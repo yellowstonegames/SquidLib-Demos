@@ -6,14 +6,37 @@ idea.module.excludeDirs += [file("src/main/java/com/github/tommyettinger/emu/"),
 [compileJava, compileTestJava, javadoc]*.exclude("com/github/tommyettinger/emu")
 
 dependencies {
-	//noinspection GDXOutdatedVersionGradleGroovy
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
-	api "com.squidpony:squidcore:$squidSquadVersion"
-	api "com.squidpony:squidgrid:$squidSquadVersion"
-	api "com.squidpony:squidplace:$squidSquadVersion"
-	api "com.squidpony:squidseek:$squidSquadVersion"
-	api "com.squidpony:squidtext:$squidSquadVersion"
-	api "com.squidpony:squidsmooth:$squidSquadVersion"
+	api("com.squidpony:squidcore:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.squidpony:squidgrid:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.squidpony:squidplace:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.squidpony:squidseek:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.squidpony:squidtext:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.squidpony:squidsmooth:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
     api "com.github.tommyettinger:gand:$gandVersion"
     api "com.github.tommyettinger:gdcrux:$gdcruxVersion"
 //	api("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"){
@@ -48,8 +71,14 @@ dependencies {
 //	}
 	api "com.github.tommyettinger:digital:$digitalVersion"
 	api "com.github.tommyettinger:funderby:$funderbyVersion"
-	api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"
-	api "com.github.tommyettinger:juniper:$juniperVersion"
+	api("com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"){
+		exclude module: 'digital'
+	}
+
+	api("com.github.tommyettinger:juniper:$juniperVersion"){
+		exclude module: 'digital'
+	}
+
 	api "com.github.tommyettinger:regexodus:$regExodusVersion"
 
 
