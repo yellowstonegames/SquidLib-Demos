@@ -1,10 +1,13 @@
 d:assets:assets:0:application/unknown:1
-t:assets.txt:assets-589ede168a46e8bb6a633f1ed79ce87a.txt:94:text/plain:1
+t:assets.txt:assets-278fdf4d598d7f0c0c55eeb0d5e02106.txt:151:text/plain:1
 d:dawnlike:dawnlike:0:application/unknown:1
 t:dawnlike/Dawnlike-license.txt:dawnlike/Dawnlike-license-ea64186a642543d86c8f7600285eb631.txt:860:text/plain:1
-t:dawnlike/Dawnlike.atlas:dawnlike/Dawnlike-bd7f350ccbc0c21419d959f6b8ce4636.atlas:233601:application/unknown:1
-i:dawnlike/Dawnlike.png:dawnlike/Dawnlike-6d35d6582def10876c722c3b7c85d897.png:442906:image/png:1
-t:dawnlike/font.fnt:dawnlike/font-14a9bae2e82922e849b834b7cda1eb0a.fnt:19286:application/unknown:1
+t:dawnlike/Dawnlike.atlas:dawnlike/Dawnlike-82fd582c9a2e802234606f046610a53e.atlas:220428:application/unknown:1
+i:dawnlike/Dawnlike.png:dawnlike/Dawnlike-368d94c30f50867d9f9fe89a629d50a4.png:406805:image/png:1
+t:dawnlike/font.fnt:dawnlike/font-58a7abc6a70e8d572a8f0569aaaccec1.fnt:19155:application/unknown:1
+t:NugothicA-License.txt:NugothicA-License-0c07003c14ed3188687571c9e40afd2c.txt:232:text/plain:1
+t:NugothicA-readme.txt:NugothicA-readme-72d41295fd98d484a7fd953e645f9164.txt:1283:text/plain:1
+b:NugothicA.ttf:NugothicA-085da38e0e626050581a900a01ee1f7c.ttf:34056:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.fragment.glsl:particles.fragment-b90524761fdf09b0a836056d590c30b8.glsl:820:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/particles/particles.vertex.glsl:particles.vertex-f25b8b2fae10b9bfa09bfdd484923148.glsl:2886:application/unknown:1
 t:com/badlogic/gdx/graphics/g3d/shaders/default.fragment.glsl:default.fragment-e1c018bd48044c8b67c7bbc53145e540.glsl:5874:application/unknown:1
