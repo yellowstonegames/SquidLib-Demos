@@ -527,6 +527,11 @@ public class DawnSquad extends ApplicationAdapter {
         parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
         parameter.magFilter = Texture.TextureFilter.Linear;
         parameter.minFilter = Texture.TextureFilter.Linear;
+        parameter.borderColor = Color.BLACK;
+        parameter.borderStraight = true;
+        parameter.borderWidth = 3;
+        parameter.borderGamma = 2.2f;
+        parameter.spaceX = -2;
         font = generator.generateFont(parameter);
         generator.dispose(); // don't forget to dispose to avoid memory leaks!
 
