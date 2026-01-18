@@ -26,6 +26,7 @@ compileJava {
 
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 application.mainClass = 'com.github.yellowstonegames.lwjgl3.Lwjgl3Launcher'
+application.applicationName = appName
 eclipse.project.name = appName + '-lwjgl3'
 java.sourceCompatibility = JavaVersion.VERSION_11
 java.targetCompatibility = JavaVersion.VERSION_11

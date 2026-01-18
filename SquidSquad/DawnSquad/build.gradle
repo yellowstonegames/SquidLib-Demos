@@ -6,8 +6,8 @@ buildscript {
 		google()
 	}
 	dependencies {
-		classpath "com.android.tools.build:gradle:8.6.1"
-		classpath 'com.guardsquare:proguard-gradle:7.5.0'
+		classpath "com.android.tools.build:gradle:8.9.1"
+		classpath 'com.guardsquare:proguard-gradle:7.8.2'
 	}
 }
 

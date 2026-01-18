@@ -4,7 +4,7 @@ apply plugin: 'com.android.application'
 
 android {
 	namespace 'com.github.yellowstonegames'
-	compileSdk 35
+	compileSdk 36
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
