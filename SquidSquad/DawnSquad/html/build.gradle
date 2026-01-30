@@ -61,39 +61,43 @@ dependencies {
         exclude module: 'digital'
     }
     implementation "com.github.tommyettinger:crux:0.1.3:sources"
+
+    implementation "com.github.tommyettinger:gand:$gandVersion:sources"
+    implementation "com.github.tommyettinger:gdcrux:$gdcruxVersion:sources"
+
     implementation "com.github.tommyettinger:funderby:$funderbyVersion:sources"
     implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
 
-    implementation("com.squidpony:squidcore:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.squidpony:squidgrid:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.squidpony:squidplace:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.squidpony:squidseek:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.squidpony:squidtext:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
-    implementation("com.squidpony:squidsmooth:$squidSquadVersion:sources"){
-        exclude module: 'jdkgdxds'
-        exclude module: 'juniper'
-        exclude module: 'digital'
-    }
+//    implementation("com.squidpony:squidcore:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.squidpony:squidgrid:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.squidpony:squidplace:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.squidpony:squidseek:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.squidpony:squidtext:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
+//    implementation("com.squidpony:squidsmooth:$squidSquadVersion:sources"){
+//        exclude module: 'jdkgdxds'
+//        exclude module: 'juniper'
+//        exclude module: 'digital'
+//    }
 
 //    implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
 //    implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
@@ -101,38 +105,37 @@ dependencies {
 //    implementation "com.squidpony:squidseek:$squidSquadVersion:sources"
 //    implementation "com.squidpony:squidtext:$squidSquadVersion:sources"
 //    implementation "com.squidpony:squidsmooth:$squidSquadVersion:sources"
-    implementation "com.github.tommyettinger:gand:$gandVersion:sources"
-    implementation "com.github.tommyettinger:gdcrux:$gdcruxVersion:sources"
-//    implementation("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion:sources"){
-//        exclude module: 'jdkgdxds'
-//        exclude module: 'juniper'
-//        exclude module: 'digital'
-//    }
-//    implementation("com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion:sources"){
-//        exclude module: 'jdkgdxds'
-//        exclude module: 'juniper'
-//        exclude module: 'digital'
-//    }
-//    implementation("com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion:sources"){
-//        exclude module: 'jdkgdxds'
-//        exclude module: 'juniper'
-//        exclude module: 'digital'
-//    }
-//    implementation("com.github.yellowstonegames.squidsquad:squidseek:$squidSquadVersion:sources"){
-//        exclude module: 'jdkgdxds'
-//        exclude module: 'juniper'
-//        exclude module: 'digital'
-//    }
-//    implementation("com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion:sources"){
-//        exclude module: 'jdkgdxds'
-//        exclude module: 'juniper'
-//        exclude module: 'digital'
-//    }
-//    implementation("com.github.yellowstonegames.squidsquad:squidsmooth:$squidSquadVersion:sources"){
-//        exclude module: 'jdkgdxds'
-//        exclude module: 'juniper'
-//        exclude module: 'digital'
-//    }
+
+    implementation("com.github.yellowstonegames.SquidSquad:squidcore:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.github.yellowstonegames.SquidSquad:squidgrid:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.github.yellowstonegames.SquidSquad:squidplace:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.github.yellowstonegames.SquidSquad:squidseek:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.github.yellowstonegames.SquidSquad:squidtext:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
+    implementation("com.github.yellowstonegames.SquidSquad:squidsmooth:$squidSquadVersion:sources"){
+        exclude module: 'jdkgdxds'
+        exclude module: 'juniper'
+        exclude module: 'digital'
+    }
 
 //    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
 //    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"

@@ -7,68 +7,71 @@ idea.module.excludeDirs += [file("src/main/java/com/github/tommyettinger/emu/"),
 
 dependencies {
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
-	api("com.squidpony:squidcore:$squidSquadVersion"){
-		exclude module: 'jdkgdxds'
-		exclude module: 'juniper'
-		exclude module: 'digital'
-	}
-	api("com.squidpony:squidgrid:$squidSquadVersion"){
-		exclude module: 'jdkgdxds'
-		exclude module: 'juniper'
-		exclude module: 'digital'
-	}
-	api("com.squidpony:squidplace:$squidSquadVersion"){
-		exclude module: 'jdkgdxds'
-		exclude module: 'juniper'
-		exclude module: 'digital'
-	}
-	api("com.squidpony:squidseek:$squidSquadVersion"){
-		exclude module: 'jdkgdxds'
-		exclude module: 'juniper'
-		exclude module: 'digital'
-	}
-	api("com.squidpony:squidtext:$squidSquadVersion"){
-		exclude module: 'jdkgdxds'
-		exclude module: 'juniper'
-		exclude module: 'digital'
-	}
-	api("com.squidpony:squidsmooth:$squidSquadVersion"){
-		exclude module: 'jdkgdxds'
-		exclude module: 'juniper'
-		exclude module: 'digital'
-	}
-    api "com.github.tommyettinger:gand:$gandVersion"
-    api "com.github.tommyettinger:gdcrux:$gdcruxVersion"
-//	api("com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"){
+	api "com.github.tommyettinger:gand:$gandVersion"
+	api "com.github.tommyettinger:gdcrux:$gdcruxVersion"
+
+//	api("com.squidpony:squidcore:$squidSquadVersion"){
 //		exclude module: 'jdkgdxds'
 //		exclude module: 'juniper'
 //		exclude module: 'digital'
 //	}
-//	api("com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion"){
+//	api("com.squidpony:squidgrid:$squidSquadVersion"){
 //		exclude module: 'jdkgdxds'
 //		exclude module: 'juniper'
 //		exclude module: 'digital'
 //	}
-//	api("com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion"){
+//	api("com.squidpony:squidplace:$squidSquadVersion"){
 //		exclude module: 'jdkgdxds'
 //		exclude module: 'juniper'
 //		exclude module: 'digital'
 //	}
-//	api("com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion"){
+//	api("com.squidpony:squidseek:$squidSquadVersion"){
 //		exclude module: 'jdkgdxds'
 //		exclude module: 'juniper'
 //		exclude module: 'digital'
 //	}
-//	api("com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion"){
+//	api("com.squidpony:squidtext:$squidSquadVersion"){
 //		exclude module: 'jdkgdxds'
 //		exclude module: 'juniper'
 //		exclude module: 'digital'
 //	}
-//	api("com.github.yellowstonegames.squidsquad:squidsmooth:$squidSquadVersion"){
+//	api("com.squidpony:squidsmooth:$squidSquadVersion"){
 //		exclude module: 'jdkgdxds'
 //		exclude module: 'juniper'
 //		exclude module: 'digital'
 //	}
+
+	api("com.github.yellowstonegames.SquidSquad:squidcore:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidgrid:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidplace:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidseek:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidtext:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidsmooth:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+
 	api "com.github.tommyettinger:digital:$digitalVersion"
 	api "com.github.tommyettinger:funderby:$funderbyVersion"
 	api("com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"){
