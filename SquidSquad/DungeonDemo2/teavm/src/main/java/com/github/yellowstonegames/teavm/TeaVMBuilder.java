@@ -7,6 +7,7 @@ import com.github.xpenatan.gdx.teavm.backends.web.config.backend.WebBackend;
 import java.io.File;
 import java.io.IOException;
 
+import com.github.yellowstonegames.DungeonDemo;
 import org.teavm.tooling.TeaVMSourceFilePolicy;
 import org.teavm.vm.TeaVMOptimizationLevel;
 
@@ -17,20 +18,25 @@ public class TeaVMBuilder {
      * This defaults to false in new projects; set this to false when you want to release.
      * If this is true, the output will not be obfuscated, and debug information will usually be produced.
      * You can still set obfuscation to false in a release if you want the source to be at least a little legible.
-     * This works well when the targetType is set to JAVASCRIPT, but you can still set the targetType to WEBASSEMBLY_GC
-     * while this is true in order to test that higher-performance target before releasing.
      */
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static void main(String[] args) throws IOException {
-        new TeaCompiler(new WebBackend().setStartJettyAfterBuild(true))
+        new TeaCompiler(
+            new WebBackend()
+                .setHtmlWidth(DungeonDemo.SHOWN_WIDTH * DungeonDemo.CELL_WIDTH)
+                .setHtmlHeight(DungeonDemo.SHOWN_HEIGHT * DungeonDemo.CELL_HEIGHT)
+                .setHtmlTitle("Dungeon Demo!")
+                .setWebAssembly(true)
+//                .setStartJettyAfterBuild(true)
+        )
             .addAssets(new AssetFileHandle("../assets"))
-            .setOptimizationLevel(TeaVMOptimizationLevel.SIMPLE)
+            .setOptimizationLevel(DEBUG ? TeaVMOptimizationLevel.SIMPLE : TeaVMOptimizationLevel.ADVANCED)
             .setMainClass(TeaVMLauncher.class.getName())
-            .setObfuscated(false)
-            .setDebugInformationGenerated(true)
-            .setSourceMapsFileGenerated(true)
-            .setSourceFilePolicy(TeaVMSourceFilePolicy.LINK_LOCAL_FILES)
+            .setObfuscated(!DEBUG)
+            .setDebugInformationGenerated(DEBUG)
+            .setSourceMapsFileGenerated(DEBUG)
+            .setSourceFilePolicy(TeaVMSourceFilePolicy.COPY)
             .build(new File("build/dist"));
 
     }
