@@ -6,6 +6,8 @@ import com.github.xpenatan.gdx.teavm.backends.web.config.backend.WebBackend;
 
 import java.io.File;
 import java.io.IOException;
+
+import org.teavm.tooling.TeaVMSourceFilePolicy;
 import org.teavm.vm.TeaVMOptimizationLevel;
 
 /** Builds the TeaVM/HTML application. */
@@ -18,14 +20,17 @@ public class TeaVMBuilder {
      * This works well when the targetType is set to JAVASCRIPT, but you can still set the targetType to WEBASSEMBLY_GC
      * while this is true in order to test that higher-performance target before releasing.
      */
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     public static void main(String[] args) throws IOException {
         new TeaCompiler(new WebBackend().setStartJettyAfterBuild(true))
             .addAssets(new AssetFileHandle("../assets"))
-            .setOptimizationLevel(TeaVMOptimizationLevel.ADVANCED)
+            .setOptimizationLevel(TeaVMOptimizationLevel.SIMPLE)
             .setMainClass(TeaVMLauncher.class.getName())
             .setObfuscated(false)
+            .setDebugInformationGenerated(true)
+            .setSourceMapsFileGenerated(true)
+            .setSourceFilePolicy(TeaVMSourceFilePolicy.LINK_LOCAL_FILES)
             .build(new File("build/dist"));
 
     }
