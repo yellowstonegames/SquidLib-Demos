@@ -10,15 +10,15 @@ dependencies {
   api "com.github.tommyettinger:juniper:$juniperVersion"
   api "com.github.tommyettinger:regexodus:$regExodusVersion"
   api "com.github.tommyettinger:textratypist:$textratypistVersion"
-  api "com.squidpony:squidcore:$squidCoreVersion"
-  api("com.squidpony:squidglyph:$squidGlyphVersion"){
+  api "com.squidpony:squidcore:$squidSquadVersion"
+  api("com.squidpony:squidglyph:$squidSquadVersion"){
     exclude module: 'textratypist'
   }
-  api "com.squidpony:squidgrid:$squidGridVersion"
-  api "com.squidpony:squidpath:$squidPathVersion"
-  api "com.squidpony:squidplace:$squidPlaceVersion"
-  api "com.squidpony:squidpress:$squidPressVersion"
-  api "com.squidpony:squidtext:$squidTextVersion"
+  api "com.squidpony:squidgrid:$squidSquadVersion"
+  api "com.squidpony:squidpath:$squidSquadVersion"
+  api "com.squidpony:squidplace:$squidSquadVersion"
+  api "com.squidpony:squidpress:$squidSquadVersion"
+  api "com.squidpony:squidtext:$squidSquadVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"

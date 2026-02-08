@@ -74,8 +74,8 @@ public class DungeonDemo extends ApplicationAdapter {
     public static final int SHOWN_HEIGHT = 25;
     public static final int PLACE_WIDTH = SHOWN_WIDTH;
     public static final int PLACE_HEIGHT = SHOWN_HEIGHT;
-    public static final int CELL_WIDTH = 32;
-    public static final int CELL_HEIGHT = 32;
+    public static final int CELL_WIDTH = 24;
+    public static final int CELL_HEIGHT = 24;
 
     private static final int DEEP_OKLAB = describeOklab("dark dull cobalt");
     private static final int SHALLOW_OKLAB = describeOklab("dull denim");
@@ -103,9 +103,9 @@ public class DungeonDemo extends ApplicationAdapter {
         vision.rememberedColor = OKLAB_MEMORY;
 
         stage = new Stage();
-        KnownFonts.setAssetPrefix("fonts/bitmap/Monogram/");
-        Font font = KnownFonts.getMonogramFamily();
-//        Font font = KnownFonts.getInconsolata(Font.DistanceFieldType.MSDF).multiplyCrispness(0.5f).scaleTo(15f, 25f).adjustLineHeight(1.25f);
+//        KnownFonts.setAssetPrefix("fonts/bitmap/Monogram/");
+//        Font font = KnownFonts.getMonogramFamily();
+        Font font = KnownFonts.getInconsolata(Font.DistanceFieldType.MSDF).multiplyCrispness(0.625f).scaleTo(18f, 24f);
 //        font = KnownFonts.getCascadiaMono().scale(0.5f, 0.5f);
 //        font = KnownFonts.getIosevka().scale(0.75f, 0.75f);
 //        Font font = KnownFonts.getCascadiaMono();
@@ -116,7 +116,7 @@ public class DungeonDemo extends ApplicationAdapter {
 //        Font font = KnownFonts.getIosevkaMSDF().scaleTo(24, 24);
 //        Font font = KnownFonts.getAStarry().scaleTo(16, 16);
 //        Font font = KnownFonts.getAStarry().fitCell(24, 24, true);
-//        Font font = KnownFonts.getInconsolataMSDF().fitCell(24, 24, true);
+//        Font font = KnownFonts.getInconsolataMSDF().multiplyCrispness(0.625f).scaleTo(18, 24);
         gg = new GlyphGrid(font, PLACE_WIDTH, PLACE_HEIGHT, true);
         //use Ă to test glyph height
         String name = Language.ANCIENT_EGYPTIAN.word(random.nextLong(), true);
