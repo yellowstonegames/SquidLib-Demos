@@ -27,7 +27,7 @@ public class TeaVMBuilder {
                 .setHtmlWidth(DungeonDemo.SHOWN_WIDTH * DungeonDemo.CELL_WIDTH)
                 .setHtmlHeight(DungeonDemo.SHOWN_HEIGHT * DungeonDemo.CELL_HEIGHT)
                 .setHtmlTitle("Dungeon Demo!")
-                .setWebAssembly(true)
+//                .setWebAssembly(true)
 //                .setStartJettyAfterBuild(true)
         )
             .addAssets(new AssetFileHandle("../assets"))

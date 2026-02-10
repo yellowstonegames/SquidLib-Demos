@@ -63,15 +63,15 @@ dependencies {
   implementation "com.github.tommyettinger:regexodus:$regExodusVersion:sources"
   implementation "com.github.tommyettinger:textratypist:$textratypistVersion:sources"
   implementation "com.google.jsinterop:jsinterop-annotations:2.1.0:sources"
-  implementation "com.squidpony:squidcore:$squidSquadVersion:sources"
-  implementation("com.squidpony:squidglyph:$squidSquadVersion:sources"){
+  implementation "com.github.yellowstonegames.SquidSquad:squidcore:$squidSquadVersion:sources"
+  implementation("com.github.yellowstonegames.SquidSquad:squidglyph:$squidSquadVersion:sources"){
     exclude module: 'textratypist'
   }
-  implementation "com.squidpony:squidgrid:$squidSquadVersion:sources"
-  implementation "com.squidpony:squidpath:$squidSquadVersion:sources"
-  implementation "com.squidpony:squidplace:$squidSquadVersion:sources"
-  implementation "com.squidpony:squidpress:$squidSquadVersion:sources"
-  implementation "com.squidpony:squidtext:$squidSquadVersion:sources"
+  implementation "com.github.yellowstonegames.SquidSquad:squidgrid:$squidSquadVersion:sources"
+  implementation "com.github.yellowstonegames.SquidSquad:squidpath:$squidSquadVersion:sources"
+  implementation "com.github.yellowstonegames.SquidSquad:squidplace:$squidSquadVersion:sources"
+  implementation "com.github.yellowstonegames.SquidSquad:squidpress:$squidSquadVersion:sources"
+  implementation "com.github.yellowstonegames.SquidSquad:squidtext:$squidSquadVersion:sources"
   implementation project(':core')
 
 }
