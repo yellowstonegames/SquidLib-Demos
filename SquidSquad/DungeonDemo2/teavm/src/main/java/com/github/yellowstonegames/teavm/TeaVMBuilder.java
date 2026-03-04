@@ -9,34 +9,37 @@ import java.io.IOException;
 
 import com.github.yellowstonegames.DungeonDemo;
 import org.teavm.tooling.TeaVMSourceFilePolicy;
+import org.teavm.tooling.sources.DirectorySourceFileProvider;
 import org.teavm.vm.TeaVMOptimizationLevel;
 
 /** Builds the TeaVM/HTML application. */
 public class TeaVMBuilder {
-    /**
-     * A single point to configure most debug vs. release settings.
-     * This defaults to false in new projects; set this to false when you want to release.
-     * If this is true, the output will not be obfuscated, and debug information will usually be produced.
-     * You can still set obfuscation to false in a release if you want the source to be at least a little legible.
-     */
-    private static final boolean DEBUG = false;
-
     public static void main(String[] args) throws IOException {
+        // typically set by the Gradle task, but can also be set here or with the command-line arg "debug"
+        boolean debug = false;
+        // typically set by the Gradle task, but can also be set here or with the command-line arg "run"
+        boolean startJetty = false;
+        for (int i = 0; i < args.length; i++) {
+            if("debug".equals(args[i])) debug = true;
+            else if("run".equals(args[i])) startJetty = true;
+        }
         new TeaCompiler(
             new WebBackend()
                 .setHtmlWidth(DungeonDemo.SHOWN_WIDTH * DungeonDemo.CELL_WIDTH)
                 .setHtmlHeight(DungeonDemo.SHOWN_HEIGHT * DungeonDemo.CELL_HEIGHT)
                 .setHtmlTitle("Dungeon Demo!")
 //                .setWebAssembly(true)
-//                .setStartJettyAfterBuild(true)
+                .setStartJettyAfterBuild(startJetty)
         )
             .addAssets(new AssetFileHandle("../assets"))
-            .setOptimizationLevel(DEBUG ? TeaVMOptimizationLevel.SIMPLE : TeaVMOptimizationLevel.ADVANCED)
+            .setOptimizationLevel(debug ? TeaVMOptimizationLevel.SIMPLE : TeaVMOptimizationLevel.ADVANCED)
             .setMainClass(TeaVMLauncher.class.getName())
-            .setObfuscated(!DEBUG)
-            .setDebugInformationGenerated(DEBUG)
-            .setSourceMapsFileGenerated(DEBUG)
+            .setObfuscated(!debug)
+            .setDebugInformationGenerated(debug)
+            .setSourceMapsFileGenerated(debug)
             .setSourceFilePolicy(TeaVMSourceFilePolicy.COPY)
+            .addSourceFileProvider(new DirectorySourceFileProvider(new File("../core/src/main/java/")))
+//            .addReflectionClass(Styles.class)
             .build(new File("build/dist"));
 
     }
