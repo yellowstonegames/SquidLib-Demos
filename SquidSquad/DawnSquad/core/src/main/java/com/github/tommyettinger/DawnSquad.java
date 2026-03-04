@@ -19,12 +19,10 @@ package com.github.tommyettinger;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
@@ -40,8 +38,6 @@ import com.github.tommyettinger.ds.ObjectDeque;
 import com.github.tommyettinger.ds.ObjectList;
 import com.github.tommyettinger.gand.utils.GridMetric;
 import com.github.tommyettinger.random.Xoshiro160RoadroxoRandom;
-//import com.github.tommyettinger.textra.Font;
-//import com.github.tommyettinger.textra.Layout;
 import com.github.yellowstonegames.core.DescriptiveColor;
 import com.github.yellowstonegames.core.FullPalette;
 import com.github.yellowstonegames.grid.Coord;
@@ -360,14 +356,13 @@ public class DawnSquad extends ApplicationAdapter {
 
         // Stores all images we use here efficiently, as well as the font image
         atlas = new TextureAtlas(Gdx.files.internal("dawnlike/Dawnlike.atlas"), Gdx.files.internal("dawnlike"));
-//        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
-//        font.getData().markupEnabled = true;
-//        font.setUseIntegerPositions(false);
-//        font.getData().setScale(3);
-
-        font = generateFreetypeFont(48);
-//        font.getData().setScale(2f/cellWidth, 2f/cellHeight);
+        font = new BitmapFont(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"));
         font.getData().markupEnabled = true;
+        font.setUseIntegerPositions(false);
+        font.getData().setScale(1f/16f);
+
+//        font = generateFreetypeFont(48);
+//        font.getData().markupEnabled = true;
 
 //
 //        font = new Font(Gdx.files.internal("dawnlike/font.fnt"), atlas.findRegion("font"), Font.DistanceFieldType.STANDARD, 0, 0, 0, 0, false);
@@ -505,41 +500,41 @@ public class DawnSquad extends ApplicationAdapter {
         Gdx.input.setInputProcessor(input);
     }
 
-    private BitmapFont generateFreetypeFont(int size) {
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.characters =
-                " !\"%'(),-." +
-                        "0123456789" +
-                        ":;=?ABCDEF" +
-                        "GHIJKLMNOP" +
-                        "QRSTUVWXYZ" +
-                        "[]_abcdefg" +
-                        "hijklmnopq" +
-                        "rstuvwxyz{" +
-                        "}©ÀÁÂÃÄÈÉÊ" +
-                        "ËÌÍÎÏÑÒÓÔÖ" +
-                        "ÙÚÛÜÝàáâãä" +
-                        "èéêëìíîïñò" +
-                        "óôõöùúûüýÿ" +
-                        "Ÿ—\n";
-        parameter.size = size;
-        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
-        parameter.magFilter = Texture.TextureFilter.Linear;
-        parameter.minFilter = Texture.TextureFilter.Linear;
-        parameter.borderColor = Color.BLACK;
-        parameter.borderStraight = true;
-        parameter.borderWidth = 3;
-        parameter.borderGamma = 2.2f;
-        parameter.spaceX = -2;
-        font = generator.generateFont(parameter);
-        generator.dispose(); // don't forget to dispose to avoid memory leaks!
-
-        font.setUseIntegerPositions(false);
-        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
-        font.getData().markupEnabled = true;
-        return font;
-    }
+//    private BitmapFont generateFreetypeFont(int size) {
+//        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("NugothicA.ttf"));
+//        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+//        parameter.characters =
+//                " !\"%'(),-." +
+//                        "0123456789" +
+//                        ":;=?ABCDEF" +
+//                        "GHIJKLMNOP" +
+//                        "QRSTUVWXYZ" +
+//                        "[]_abcdefg" +
+//                        "hijklmnopq" +
+//                        "rstuvwxyz{" +
+//                        "}©ÀÁÂÃÄÈÉÊ" +
+//                        "ËÌÍÎÏÑÒÓÔÖ" +
+//                        "ÙÚÛÜÝàáâãä" +
+//                        "èéêëìíîïñò" +
+//                        "óôõöùúûüýÿ" +
+//                        "Ÿ—\n";
+//        parameter.size = size;
+//        parameter.hinting = FreeTypeFontGenerator.Hinting.Medium;
+//        parameter.magFilter = Texture.TextureFilter.Linear;
+//        parameter.minFilter = Texture.TextureFilter.Linear;
+//        parameter.borderColor = Color.BLACK;
+//        parameter.borderStraight = true;
+//        parameter.borderWidth = 3;
+//        parameter.borderGamma = 2.2f;
+//        parameter.spaceX = -2;
+//        font = generator.generateFont(parameter);
+//        generator.dispose(); // don't forget to dispose to avoid memory leaks!
+//
+//        font.setUseIntegerPositions(false);
+//        font.getData().setScale(1f / cellWidth, 1f / cellHeight);
+//        font.getData().markupEnabled = true;
+//        return font;
+//    }
 
     /**
      * Move the player if he isn't bumping into a wall or trying to go off the map somehow.
