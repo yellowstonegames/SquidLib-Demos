@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.11.0//EN" "https://www.gwtproject.org/doctype/2.11.0/gwt-module.dtd">
+<module rename-to="html">
+	<source path="" />
+	<inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
+
+	<inherits name="com.badlogic.gdx.graphics.g2d.freetype.freetype-gwt" />
+
+	<!-- SquidSquad core classes -->
+	<inherits name="com.github.yellowstonegames.squidcore" />
+	<!-- cross-platform regexes, used by squidcore and textratypist -->
+	<inherits name="regexodus.regexodus"/>
+	<!-- random numbers, uses digital -->
+	<inherits name="com.github.tommyettinger.juniper" />
+	<!-- data structures, uses digital and funderby -->
+	<inherits name="com.github.tommyettinger.jdkgdxds" />
+	<!-- RoboVM-compatible and primitive-based functional interfaces -->
+	<inherits name="com.github.tommyettinger.funderby" />
+	<!-- core number-related code -->
+	<inherits name="com.github.tommyettinger.digital" />
+
+	<!-- SquidSquad code relating to positions, noise, a lot of stuff -->
+	<inherits name="com.github.yellowstonegames.squidgrid" />
+	<!-- SquidSquad place map generation -->
+	<inherits name="com.github.yellowstonegames.squidplace" />
+	<!-- SquidSquad pathfinding and basic AI -->
+	<inherits name="com.github.yellowstonegames.squidseek" />
+	<!-- SquidSquad procedural text generation -->
+	<inherits name="com.github.yellowstonegames.squidtext" />
+	<!-- SquidSquad smooth turn-based interpolation code -->
+	<inherits name="com.github.yellowstonegames.squidsmooth" />
+
+	<inherits name="com.github.tommyettinger.DawnSquad" />
+	<entry-point class="com.github.yellowstonegames.gwt.GwtLauncher" />
+	<set-configuration-property name="gdx.assetpath" value="../assets" />
+	<set-configuration-property name="xsiframe.failIfScriptTag" value="FALSE"/>
+	<!-- These two lines reduce the work GWT has to do during compilation and also shrink output size. -->
+	<set-property name="user.agent" value="gecko1_8, safari"/>
+	<collapse-property name="user.agent" values="*" />
+	<!-- Remove the "user.agent" lines above if you encounter issues with Safari or other Gecko browsers. -->
+</module>
