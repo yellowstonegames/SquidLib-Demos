@@ -37,6 +37,7 @@ if (JavaVersion.current().isJava11Compatible()) {
 dependencies {
 	implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+	implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
 	implementation project(':core')
 	if(enableGraalNative == 'true') {
@@ -69,7 +70,7 @@ jar {
 	}
 // setting the manifest makes the JAR runnable.
 	manifest {
-		attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED', 'Multi-Release': 'true'
+		attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED'
 	}
 // this last step may help on some OSes that need extra instruction to make runnable JARs.
 	doLast {

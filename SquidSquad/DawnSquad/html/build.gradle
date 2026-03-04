@@ -137,6 +137,11 @@ dependencies {
         exclude module: 'digital'
     }
 
+//    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion"
+//    implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$freetypeGwtVersion:sources"
+    implementation "com.github.tommyettinger:gdx-freetype-gwt:$freetypeGwtVersion"
+    implementation "com.github.tommyettinger:gdx-freetype-gwt:$freetypeGwtVersion:sources"
+
 	implementation project(':core')
 }
 

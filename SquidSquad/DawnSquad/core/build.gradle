@@ -88,4 +88,6 @@ dependencies {
 	if(enableGraalNative == 'true') {
 		implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
 	}
+
+	api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 }

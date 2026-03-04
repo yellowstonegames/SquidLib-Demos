@@ -1,3 +1,6 @@
+NugothicA-License.txt
+NugothicA-readme.txt
+NugothicA.ttf
 dawnlike/Dawnlike-license.txt
 dawnlike/Dawnlike.atlas
 dawnlike/Dawnlike.png
