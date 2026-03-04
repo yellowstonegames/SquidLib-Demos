@@ -29,7 +29,72 @@ if (JavaVersion.current().isJava9Compatible()) {
 }
 
 dependencies {
-  implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+  implementation ("com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"){
+    exclude group: "org.lwjgl", module: "lwjgl-openal"
+    exclude group: 'org.lwjgl', module: 'lwjgl-glfw'
+    exclude group: 'org.lwjgl', module: 'lwjgl-opengl'
+    exclude group: 'org.lwjgl', module: 'lwjgl-stb'
+    exclude group: 'org.lwjgl', module: 'lwjgl'
+    exclude group: 'org.lwjgl', module: 'lwjgl-jemalloc'
+  }
+
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version"
+// Linux //
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-linux"
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-linux-arm32"
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-linux-arm64"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-linux"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-linux-arm32"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-linux-arm64"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-linux"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-linux-arm32"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-linux-arm64"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-linux"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-linux-arm32"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-linux-arm64"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version:natives-linux"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version:natives-linux-arm32"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version:natives-linux-arm64"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-linux"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-linux-arm32"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-linux-arm64"
+
+  // MacOS //
+
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-macos"
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-macos-arm64"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-macos"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-macos-arm64"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-macos"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-macos-arm64"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-macos"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-macos-arm64"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version:natives-macos"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version:natives-macos-arm64"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-macos"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-macos-arm64"
+
+
+  // Windows //
+
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-windows"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-windows"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-windows"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-windows"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version:natives-windows"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-windows"
+  implementation "org.lwjgl:lwjgl-jemalloc:$lwjgl3Version:natives-windows-x86"
+  implementation "org.lwjgl:lwjgl-glfw:$lwjgl3Version:natives-windows-x86"
+  implementation "org.lwjgl:lwjgl-openal:$lwjgl3Version:natives-windows-x86"
+  implementation "org.lwjgl:lwjgl-opengl:$lwjgl3Version:natives-windows-x86"
+  implementation "org.lwjgl:lwjgl-stb:$lwjgl3Version:natives-windows-x86"
+  implementation "org.lwjgl:lwjgl:$lwjgl3Version:natives-windows-x86"
+
   implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
   implementation project(':core')
 
@@ -64,7 +129,7 @@ jar {
 // setting the manifest makes the JAR runnable.
 // enabling native access helps avoid a warning when Java 24 or later runs the JAR.
   manifest {
-    attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED'
+    attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED', 'Multi-Release': 'true'
   }
 // this last step may help on some OSes that need extra instruction to make runnable JARs.
   doLast {
