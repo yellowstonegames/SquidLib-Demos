@@ -1,0 +1,91 @@
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
+
+apply plugin: 'idea'
+idea.module.excludeDirs += [file("src/main/java/com/github/tommyettinger/emu/"), file("docs/")]
+[compileJava, compileTestJava, javadoc]*.exclude("com/github/tommyettinger/emu")
+
+dependencies {
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+	api "com.github.tommyettinger:gand:$gandVersion"
+	api "com.github.tommyettinger:gdcrux:$gdcruxVersion"
+
+//	api("com.squidpony:squidcore:$squidSquadVersion"){
+//		exclude module: 'jdkgdxds'
+//		exclude module: 'juniper'
+//		exclude module: 'digital'
+//	}
+//	api("com.squidpony:squidgrid:$squidSquadVersion"){
+//		exclude module: 'jdkgdxds'
+//		exclude module: 'juniper'
+//		exclude module: 'digital'
+//	}
+//	api("com.squidpony:squidplace:$squidSquadVersion"){
+//		exclude module: 'jdkgdxds'
+//		exclude module: 'juniper'
+//		exclude module: 'digital'
+//	}
+//	api("com.squidpony:squidseek:$squidSquadVersion"){
+//		exclude module: 'jdkgdxds'
+//		exclude module: 'juniper'
+//		exclude module: 'digital'
+//	}
+//	api("com.squidpony:squidtext:$squidSquadVersion"){
+//		exclude module: 'jdkgdxds'
+//		exclude module: 'juniper'
+//		exclude module: 'digital'
+//	}
+//	api("com.squidpony:squidsmooth:$squidSquadVersion"){
+//		exclude module: 'jdkgdxds'
+//		exclude module: 'juniper'
+//		exclude module: 'digital'
+//	}
+
+	api("com.github.yellowstonegames.SquidSquad:squidcore:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidgrid:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidplace:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidseek:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidtext:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+	api("com.github.yellowstonegames.SquidSquad:squidsmooth:$squidSquadVersion"){
+		exclude module: 'jdkgdxds'
+		exclude module: 'juniper'
+		exclude module: 'digital'
+	}
+
+	api "com.github.tommyettinger:digital:$digitalVersion"
+	api "com.github.tommyettinger:funderby:$funderbyVersion"
+	api("com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"){
+		exclude module: 'digital'
+	}
+
+	api("com.github.tommyettinger:juniper:$juniperVersion"){
+		exclude module: 'digital'
+	}
+
+	api "com.github.tommyettinger:regexodus:$regExodusVersion"
+
+
+	if(enableGraalNative == 'true') {
+		implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+	}
+}
