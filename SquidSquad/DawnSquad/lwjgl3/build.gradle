@@ -181,6 +181,13 @@ distributions {
 startScripts.dependsOn(':lwjgl3:jar')
 startScripts.classpath = project.tasks.jar.outputs.files
 
+// Helps if debugging on Linux with an Nvidia GPU.
+// This means StartupHelper won't need to restart the JVM.
+// This only applies to Gradle tasks, not main methods debugged when launching a main() method directly.
+tasks.withType(JavaExec.class).configureEach {
+  environment("__GL_THREADED_OPTIMIZATIONS", 0)
+}
+
 if(enableGraalNative == 'true') {
   apply from: file("nativeimage.gradle")
 }

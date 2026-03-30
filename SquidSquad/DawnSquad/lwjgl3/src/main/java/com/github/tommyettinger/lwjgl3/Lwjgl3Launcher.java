@@ -17,7 +17,7 @@ public class Lwjgl3Launcher {
 
         String env = System.getenv("seed");
         long seed;
-        if(env == null) seed = System.currentTimeMillis();
+        if(env == null) seed = 1L;//System.currentTimeMillis();
         else {
             try {
                 seed = Long.parseLong(env);
