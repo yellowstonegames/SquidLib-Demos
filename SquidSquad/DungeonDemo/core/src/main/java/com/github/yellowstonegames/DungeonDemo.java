@@ -289,31 +289,29 @@ public class DungeonDemo extends ApplicationAdapter {
                 }
             }
         }
-
         for (int y = 0; y < PLACE_HEIGHT; y++) {
             for (int x = 0; x < PLACE_WIDTH; x++) {
+                boolean isNotPlayerPosition = x != playerX || y != playerY;
                 if (vision.seen.contains(x, y)) {
-                    {
-                        switch (vision.prunedPlaceMap[x][y]) {
-                            case '~':
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], DEEP_OKLAB, 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
-                                gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
-                                break;
-                            case ',':
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], SHALLOW_OKLAB, 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
-                                gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
-                                break;
-                            case '"':
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.3f + 0.2f * waves.getConfiguredNoise(x, y, time * 0.7f)));
-                                gg.put(x, y, vision.prunedPlaceMap[x][y], grassText);
-                                break;
-                            case ' ':
-                                gg.backgrounds[x][y] = 0;
-                                break;
-                            default:
-                                gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], STONE_OKLAB, 0.5f));
-                                gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
-                        }
+                    switch (vision.prunedPlaceMap[x][y]) {
+                        case '~':
+                            gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], DEEP_OKLAB, 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
+                            if(isNotPlayerPosition) gg.put(x, y, vision.prunedPlaceMap[x][y], deepText);
+                            break;
+                        case ',':
+                            gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], SHALLOW_OKLAB, 0.4f + 0.3f * waves.getConfiguredNoise(x, y, time)));
+                            if(isNotPlayerPosition) gg.put(x, y, vision.prunedPlaceMap[x][y], shallowText);
+                            break;
+                        case '"':
+                            gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], lerpColors(GRASS_OKLAB, DRY_OKLAB, waves.getConfiguredNoise(x, y) * 0.5f + 0.5f), 0.3f + 0.2f * waves.getConfiguredNoise(x, y, time * 0.7f)));
+                            if(isNotPlayerPosition) gg.put(x, y, vision.prunedPlaceMap[x][y], grassText);
+                            break;
+                        case ' ':
+                            gg.backgrounds[x][y] = 0;
+                            break;
+                        default:
+                            gg.backgrounds[x][y] = toRGBA8888(lerpColorsBlended(vision.backgroundColors[x][y], STONE_OKLAB, 0.5f));
+                            if(isNotPlayerPosition) gg.put(x, y, vision.prunedPlaceMap[x][y], stoneText);
                     }
 //                } else if (vision.seen.contains(x, y)) {
 //                    switch (vision.prunedPlaceMap[x][y]) {
