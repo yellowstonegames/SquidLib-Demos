@@ -2,18 +2,33 @@
 eclipse.project.name = appName + '-core'
 
 dependencies {
-	api "com.badlogicgames.gdx:gdx:$gdxVersion"
-//    implementation "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"
-//    implementation "com.squidpony:SquidCore:$squidSquadVersion"
-//    implementation "com.squidpony:SquidGrid:$squidSquadVersion"
-//    implementation "com.squidpony:SquidPlace:$squidSquadVersion"
-//    implementation "com.squidpony:SquidPath:$squidSquadVersion"
-//    implementation "com.squidpony:SquidText:$squidSquadVersion"
-//    implementation "com.squidpony:SquidGlyph:$squidSquadVersion"
-    implementation "com.github.yellowstonegames.SquidSquad:squidcore:$squidSquadVersion"
-    implementation "com.github.yellowstonegames.SquidSquad:squidgrid:$squidSquadVersion"
-    implementation "com.github.yellowstonegames.SquidSquad:squidplace:$squidSquadVersion"
-    implementation "com.github.yellowstonegames.SquidSquad:squidpath:$squidSquadVersion"
-    implementation "com.github.yellowstonegames.SquidSquad:squidtext:$squidSquadVersion"
-    implementation "com.github.yellowstonegames.SquidSquad:squidglyph:$squidSquadVersion"
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.github.tommyettinger:crux:$cruxVersion"
+  api "com.github.tommyettinger:digital:$digitalVersion"
+  api "com.github.tommyettinger:funderby:$funderbyVersion"
+  api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"
+  api "com.github.tommyettinger:juniper:$juniperVersion"
+  api "com.github.tommyettinger:regexodus:$regExodusVersion"
+  api "com.github.tommyettinger:textratypist:$textratypistVersion"
+  api "com.squidpony:squidcore:$squidSquadVersion"
+  api "com.squidpony:squidglyph:$squidSquadVersion"
+  api "com.squidpony:squidgrid:$squidSquadVersion"
+  api "com.squidpony:squidpath:$squidSquadVersion"
+  api "com.squidpony:squidplace:$squidSquadVersion"
+  api "com.squidpony:squidpress:$squidSquadVersion"
+  api "com.squidpony:squidtext:$squidSquadVersion"
+
+//  api "com.github.yellowstonegames.SquidSquad:squidcore:$squidSquadVersion"
+//  api("com.github.yellowstonegames.SquidSquad:squidglyph:$squidSquadVersion"){
+//    exclude module: 'textratypist'
+//  }
+//  api "com.github.yellowstonegames.SquidSquad:squidgrid:$squidSquadVersion"
+//  api "com.github.yellowstonegames.SquidSquad:squidpath:$squidSquadVersion"
+//  api "com.github.yellowstonegames.SquidSquad:squidplace:$squidSquadVersion"
+//  api "com.github.yellowstonegames.SquidSquad:squidpress:$squidSquadVersion"
+//  api "com.github.yellowstonegames.SquidSquad:squidtext:$squidSquadVersion"
+
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
 }
