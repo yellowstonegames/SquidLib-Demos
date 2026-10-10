@@ -87,7 +87,7 @@ public class Main extends ApplicationAdapter {
      * <br>
      * CUSTOM TO YOUR GAME. This is closely related to {@link AssetData}, and if one changes, both should.
      */
-    public static final String ATLAS_FILE_NAME = "isometric-trpg.atlas";
+    public static final String ATLAS_FILE_NAME = "PandoraTheBoxer.atlas";
     /**
      * This is the actual TextureAtlas of 2D assets used in the game. It uses
      * <a href="https://gvituri.itch.io/isometric-trpg">these free-to-use assets by Gustavo Vituri</a> and
@@ -108,7 +108,7 @@ public class Main extends ApplicationAdapter {
      * <br>
      * CUSTOM TO YOUR GAME.
      */
-    private Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations;
+    private Array<Array<Animation<Sprite>>> animations;
 
     /**
      * This is drawn separately from the gameplay, at 100% pixel-perfect size.
@@ -367,7 +367,7 @@ public class Main extends ApplicationAdapter {
         // Uses the same assets and a libGDX Skin JSON file to tell scene2d.ui widgets how to draw themselves.
         // See <a href="https://github.com/raeleus/skin-composer/wiki/From-the-Ground-Up:-Scene2D.UI-Tutorials">some scene2d.ui docs</a>
         // for more information on how to use a Skin.
-        Skin skin = new Skin(Gdx.files.internal("isometric-trpg.json"), atlas);
+        Skin skin = new Skin(Gdx.files.internal("PandoraTheBoxer.json"), atlas);
         // scene2d.ui uses a Table-based layout system. Here, root is our outermost table, and others are nested.
         Table root = new Table(skin);
         // The touchpad allows movement on mobile devices without a keyboard.
@@ -478,28 +478,22 @@ public class Main extends ApplicationAdapter {
         // This step will be different for every game's assets.
         animations = new Array<>(4);
         // We create a single ArraySupplier with a constructor reference so Android won't create four different ones.
-        ArraySupplier<Animation<TextureAtlas.AtlasSprite>[]> animationSupplier = Animation[]::new;
+        ArraySupplier<Animation<Sprite>[]> animationSupplier = Animation[]::new;
         // Apologies for the duplicated lines; these use libGDX 1.13.5 and later's way of initializing an Array.
         animations.add(new Array<>(true, 16, animationSupplier));
         animations.add(new Array<>(true, 16, animationSupplier));
         animations.add(new Array<>(true, 16, animationSupplier));
         animations.add(new Array<>(true, 16, animationSupplier));
-        // Entities are stored in an odd order because of the tile sheet originally used for the atlas.
-        // The original tile sheet is stored in the development repo for this demo:
-        // https://github.com/tommyettinger/IsometricVoxelDemo/blob/a3ed3ca4f0685e5dcb6a25e9250c62609f2627c1/raw-assets/isometric-trpg-originals/IsometricTRPGAssetPack_Entities.png?raw=true
-        // It stores each 2-frame animation on the same row as another animation, and the next row has backwards-facing
-        // versions of the forwards-facing animations above them. The tile sheet determined what indices each
-        // AtlasRegion received, so we have to keep the tricky numbering convention. Your own game will probably have
-        // different art anyway!
-        for (int i = 0, outer = 0; i < 16; i++, outer += 8) {
-            /* Index 0 is front-facing idle animations.   */
-            /* Index 1 is rear-facing idle animations.    */
-            /* Index 2 is front-facing attack animations. */
-            /* Index 3 is rear-facing attack animations.  */
-            animations.get(0).add(new Animation<>(0.4f, Array.with(new TextureAtlas.AtlasSprite(entities.get(outer  )), new TextureAtlas.AtlasSprite(entities.get(outer+1))), Animation.PlayMode.LOOP));
-            animations.get(1).add(new Animation<>(0.4f, Array.with(new TextureAtlas.AtlasSprite(entities.get(outer+4)), new TextureAtlas.AtlasSprite(entities.get(outer+5))), Animation.PlayMode.LOOP));
-            animations.get(2).add(new Animation<>(0.2f, Array.with(new TextureAtlas.AtlasSprite(entities.get(outer+2)), new TextureAtlas.AtlasSprite(entities.get(outer+3))), Animation.PlayMode.LOOP));
-            animations.get(3).add(new Animation<>(0.2f, Array.with(new TextureAtlas.AtlasSprite(entities.get(outer+6)), new TextureAtlas.AtlasSprite(entities.get(outer+7))), Animation.PlayMode.LOOP));
+
+        for (String name : AssetData.entityNames) {
+            /* Index 0 is F-facing animations. */
+            /* Index 1 is G-facing animations. */
+            /* Index 2 is T-facing animations. */
+            /* Index 3 is R-facing animations. */
+            animations.get(0).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle0"), Animation.PlayMode.LOOP));
+            animations.get(1).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle1"), Animation.PlayMode.LOOP));
+            animations.get(2).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle2"), Animation.PlayMode.LOOP));
+            animations.get(3).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle3"), Animation.PlayMode.LOOP));
         }
 
         // Initialize a Camera with the width and height of the area to be shown.
@@ -553,12 +547,12 @@ public class Main extends ApplicationAdapter {
             atlas);
         map.totalFish = FISH_COUNT;
         map.fishSaved = 0;
-        map.placeFish(seed, map.totalFish, animations);
+        map.placeBoxes(seed, map.totalFish, animations);
         mapCenter = (map.getFSize() - 1f) * 0.5f;
         // Random initial position for the player.
         int rf = MathUtils.random(1, MAP_SIZE - 2), rg = MathUtils.random(1, MAP_SIZE - 2);
         // Random character graphic for the player; id 0-3 will always be a human wearing blue.
-        int id = MathUtils.random(3);
+        int id = AssetData.ENTITIES.indexOf("Pandora");
         player = new Mover(map, animations, id, rf, rg, MAP_PEAK - 1);
         map.addMover(player, Mover.PLAYER_W);
 
@@ -569,14 +563,14 @@ public class Main extends ApplicationAdapter {
         playerAxisX.setY(SCREEN_VERTICAL - 4f);
         // We try to place the y-axis indicator on the very edge of the left of the screen.
         playerAxisY.setX(SCREEN_HORIZONTAL * -0.5f);
+        // id will always be a floating angry head.
+        id = AssetData.ENTITIES.indexOf("Eye_Tyrant");
 
         enemies = new Array<>(ENEMY_COUNT);
         for (int i = 0; i < ENEMY_COUNT; i++) {
             // enemies can be anywhere except the very edges of the map.
             rf = MathUtils.random(1, MAP_SIZE - 2);
             rg = MathUtils.random(1, MAP_SIZE - 2);
-            // id 4-7 will always be a green-skinned, brawny orc.
-            id = MathUtils.random(4, 7);
             // Here we drop the orcs from just below the highest elevation on the map to ensure they land on ground,
             // rather than potentially starting "buried" in the ground itself.
             Mover enemy = new Mover(map, animations, id, rf, rg, MAP_PEAK - 1.6f);

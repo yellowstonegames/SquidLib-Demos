@@ -1,6 +1,7 @@
 package com.github.yellowstonegames.game;
 
 import com.badlogic.gdx.utils.*;
+import com.github.tommyettinger.ds.NumberedSet;
 import com.github.yellowstonegames.LocalMap;
 
 /**
@@ -220,7 +221,11 @@ public final class AssetData {
     public static final int UNKNOWN     = 129;
 
     public static final ObjectIntMap<String> TILES = new ObjectIntMap<>(128);
-    public static final ObjectIntMap<String> ENTITIES = new ObjectIntMap<>(24);
+
+    public static final String[] entityNames = {
+        "Pandora", "Pandora_Attack", "Eye_Tyrant", "Eye_Tyrant_Attack", "Box_Closed", "Box_Open"
+    };
+    public static final NumberedSet<String> ENTITIES = new NumberedSet<>(entityNames);
     public static final IntSet UNIT_VOXELS;
     public static final IntSet HALF_VOXELS;
     public static final IntSet BASE_VOXELS;
@@ -350,23 +355,6 @@ public final class AssetData {
         TILES.put("half deco bed gr"    , HALF_DECO_BED_GR    );
         TILES.put("half deco bed ft"    , HALF_DECO_BED_FT    );
         TILES.put("deco fence ft"       , DECO_FENCE_FT       );
-
-        ENTITIES.put("knight"      , KNIGHT      );
-        ENTITIES.put("lancer"      , LANCER      );
-        ENTITIES.put("archer"      , ARCHER      );
-        ENTITIES.put("rogue"       , ROGUE       );
-        ENTITIES.put("orc brute"   , ORC_BRUTE   );
-        ENTITIES.put("orc guard"   , ORC_GUARD   );
-        ENTITIES.put("orc butcher" , ORC_BUTCHER );
-        ENTITIES.put("orc slinger" , ORC_SLINGER );
-        ENTITIES.put("shadow"      , SHADOW      );
-        ENTITIES.put("wizard"      , WIZARD      );
-        ENTITIES.put("demon"       , DEMON       );
-        ENTITIES.put("crossbowman" , CROSSBOWMAN );
-        ENTITIES.put("mite"        , MITE        );
-        ENTITIES.put("fish"        , FISH        );
-        ENTITIES.put("bat"         , BAT         );
-        ENTITIES.put("jelly"       , JELLY       );
 
         ROTATIONS.put(HALF_COVER_WATER_FGH, new int[]{HALF_COVER_WATER_FGH, HALF_COVER_WATER_GH, HALF_COVER_WATER_H, HALF_COVER_WATER_FH, });
         ROTATIONS.put(HALF_COVER_WATER_FH, new int[]{HALF_COVER_WATER_FH, HALF_COVER_WATER_GH, HALF_COVER_WATER_H, HALF_COVER_WATER_H, });

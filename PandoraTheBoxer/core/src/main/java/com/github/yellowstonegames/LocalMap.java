@@ -509,31 +509,31 @@ public class LocalMap {
     }
 
     /**
-     * Places goldfish {@link AnimatedIsoSprite} instances at various valid locations, chosen sub-randomly.
-     * Sub-random here means it is extremely unlikely two goldfish will spawn nearby each other, but their position is
+     * Places box {@link AnimatedIsoSprite} instances at various valid locations, chosen sub-randomly.
+     * Sub-random here means it is extremely unlikely two boxes will spawn nearby each other, but their position is
      * otherwise random-seeming.
      * <br>
      * This should be customized for your game.
      * @param seed if this {@code long} is the same, the same map will be produced on each call
-     * @param fishCount how many fish to place
-     * @param animations used to get the animation for a fish so we can make {@link AnimatedIsoSprite}s per fish
+     * @param boxCount how many boxes to place
+     * @param animations used to get the animation for a box so we can make {@link AnimatedIsoSprite}s per box
      * @return this LocalMap for chaining
      */
-    public LocalMap placeFish(long seed, int fishCount, Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations) {
+    public LocalMap placeBoxes(long seed, int boxCount, Array<Array<Animation<Sprite>>> animations) {
         GridPoint2 point = new GridPoint2();
         int fs = getFSize(), gs = getGSize(), hs = getHSize();
         // Randomizes seed a little. Very similar seeds before this call will be very different after it.
         seed = (seed ^ 0x9E3779B97F4A7C15L) * 0xD1B54A32D192ED03L;
-        for (int i = 0; i < fishCount; i++) {
+        for (int i = 0; i < boxCount; i++) {
             // Assigns a somewhat-random position to point, based on seed and i.
             // This uses the R2 sequence, which won't put points too close to each other when
             // the second parameter goes between just a few close-together numbers.
             MathSupport.fillR2(point, seed + i, fs, gs);
-            // "Drop" the fish from above so it doesn't start inside a tile.
+            // "Drop" the box from above so it doesn't start inside a tile.
             for (int h = hs - 2; h >= 0; h--) {
                 int below = getTile(point.x, point.y, h);
                 if (below != -1) {
-                    setEntity(point.x, point.y, h + 1, Mover.FISH_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.FISH), point.x, point.y, h + 1));
+                    setEntity(point.x, point.y, h + 1, Mover.NPC_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.ENTITIES.indexOf("Box_Open")), point.x, point.y, h + 1));
                     break;
                 }
             }
