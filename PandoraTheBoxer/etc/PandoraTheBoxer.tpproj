@@ -11,7 +11,7 @@ fast=true
 filterMag=Nearest
 filterMin=Nearest
 ignoreBlankImages=true
-maxHeight=1024
+maxHeight=2048
 maxWidth=2048
 minHeight=16
 minWidth=16
@@ -34,7 +34,7 @@ prettyPrint=false
 legacyOutput=false
 
 scaleFactors=[{suffix:"",factor:1,resampling:bicubic}]
-inputFiles=[{path:../raw,type:Input,dirFilePrefix:null,recursive:true,flattenPaths:false}]
+inputFiles=[{path:../raw,type:Input,dirFilePrefix:null,recursive:true,flattenPaths:true}]
 keepInputFileExtensions=false
 
 
