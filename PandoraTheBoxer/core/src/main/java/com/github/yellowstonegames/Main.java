@@ -798,30 +798,6 @@ public class Main extends ApplicationAdapter {
             playMusic = true;
             backgroundMusic.play();
         }
-
-        /*
-        // These are sort-of present (in a block comment) for debugging.
-        // Left-clicking the top of a voxel will stack a random voxel on it.
-        // Right-clicking the top of a voxel will remove it.
-        if (Gdx.input.justTouched()) {
-            Vector3 targetBlock = raycastToBlock(Gdx.input.getX(), Gdx.input.getY());
-
-            // raycastToBlock() returns a Vector3 full of integers; they just need to be cast to int.
-            int f = (int)targetBlock.x, g = (int)targetBlock.y, h = (int)targetBlock.z;
-            Gdx.app.log("CLICK", "targetBlock " + targetBlock);
-
-            if (map.isValid(f, g, h)) {
-                if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-                    if(map.getTile(f, g, h) == -1)
-                        map.setTile(f, g, h, MathUtils.random(3));
-                    else
-                        map.setTile(f, g, h + 1, MathUtils.random(3));
-                } else if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
-                    map.setTile(f, g, h, -1);
-                }
-            }
-        }
-        */
     }
 
     /**
@@ -836,66 +812,6 @@ public class Main extends ApplicationAdapter {
         map.previousRotation = map.rotationDegrees;
         map.targetRotation = (MathUtils.round(map.rotationDegrees * (1f/90f)) + amount & 3) * 90;
         animationStart = TimeUtils.millis();
-    }
-
-    /**
-     * Used to take a screen position and find the isometric tile position of the voxel shown at that screen position.
-     * This returns {@link #isoTempVector} and modifies it every time this is called, so you should use its value
-     * immediately or set() it into another Vector3.
-     * <br>
-     * This is only used in a comment here, but if you uncomment the end of {@link #handleInput(float)}, then this will
-     * be in use, and clicking the top of a block will use this method to figure out which block was clicked.
-     * @param screenX screen coordinate, horizontal
-     * @param screenY screen coordinate, vertical; note that this uses y-down by libGDX convention
-     * @return an isometric tile position of a voxel or an empty space at ground level; always {@link #isoTempVector}
-     */
-    public Vector3 raycastToBlock(float screenX, float screenY) {
-        Vector3 worldPos = camera.unproject(projectionTempVector.set(screenX, screenY, 0));
-        // Why is the projection slightly off on both x and y? It is a mystery!
-        worldPos.x -= AssetData.TILE_WIDTH;
-        worldPos.y -= AssetData.TILE_HEIGHT * 4;
-        // Check from highest to lowest Z
-        for (int h = MAP_PEAK - 1; h >= 0; h--) {
-            int f = MathUtils.ceil(worldPos.y * (0.5f / AssetData.TILE_HEIGHT) + worldPos.x * (0.5f / AssetData.TILE_WIDTH) - h);
-            int g = MathUtils.ceil(worldPos.y * (0.5f / AssetData.TILE_HEIGHT) - worldPos.x * (0.5f / AssetData.TILE_WIDTH) - h);
-            if (f >= 0 && f < MAP_SIZE && g >= 0 && g < MAP_SIZE) {
-                if (map.getTile(f, g, h) != -1) { // Found a solid block
-                    return isoTempVector.set(f, g, h); // Return the first valid block found
-                }
-            }
-        }
-
-        // No block was hit, return ground level
-        Vector3 groundCoords = worldToIso(worldPos.x, worldPos.y);
-        return groundCoords.set(MathUtils.ceil(groundCoords.x), MathUtils.ceil(groundCoords.y), 0);
-    }
-
-    /**
-     * Currently unused; converts an un-rotated isometric tile position to a world position in viewport units.
-     * Because this doesn't understand rotation, it isn't as useful.
-     * World positions use y-up.
-     * @param f France to Finland axis
-     * @param g Germany to Greenland axis
-     * @param h heel to head axis
-     * @return {@link #screenTempVector}, modified in-place and returned directly
-     */
-    public static Vector2 isoToWorld(float f, float g, float h) {
-        float screenX = (f - g) * AssetData.TILE_WIDTH;
-        float screenY = (f + g) * AssetData.TILE_HEIGHT + h * AssetData.TILE_DEPTH;
-        return screenTempVector.set(screenX, screenY);
-    }
-
-    /**
-     * Currently unused; converts a world position in viewport units to an un-rotated isometric tile position.
-     * Because this doesn't understand rotation, it isn't as useful.
-     * @param worldX world position, horizontal in viewport units
-     * @param worldY world position; vertical in viewport units; uses y-up like most of libGDX
-     * @return {@link #isoTempVector}, modified in-place and returned directly
-     */
-    public static Vector3 worldToIso(float worldX, float worldY) {
-        float f = worldY * (0.5f / AssetData.TILE_HEIGHT) + worldX * (0.5f / AssetData.TILE_WIDTH) + 1;
-        float g = worldY * (0.5f / AssetData.TILE_HEIGHT) - worldX * (0.5f / AssetData.TILE_WIDTH) + 1;
-        return isoTempVector.set(f, g, 0);
     }
 
     /**

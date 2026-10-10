@@ -37,10 +37,10 @@ public class LocalMap {
      * The Array of voxel types that can be shown here, typically drawn from a TextureAtlas.
      */
     public Array<TextureAtlas.AtlasRegion> tileset;
-    /**
-     * The reused Sprite for all voxel edges, each of which is a translucent outline above the upper edges of the voxel.
-     */
-    public Sprite edge;
+//    /**
+//     * The reused Sprite for all voxel edges, each of which is a translucent outline above the upper edges of the voxel.
+//     */
+//    public Sprite edge;
     /**
      * The center position, in fractional tiles, of the entire map's f-size.
      */
@@ -108,7 +108,7 @@ public class LocalMap {
 
     /**
      * Present for serialization only, this creates a LocalMap but needs many fields initialized.
-     * {@link #tileset}, {@link #tiles}, {@link #edge}, {@link #fCenter}, {@link #gCenter}, {@link #movers}, and of
+     * {@link #tileset}, {@link #tiles},  {@link #fCenter}, {@link #gCenter}, {@link #movers}, and of
      * course {@link #everything} need to be initialized if you use this.
      */
     public LocalMap() {
@@ -119,11 +119,11 @@ public class LocalMap {
      * @param width the f-size of the map
      * @param height the g-size of the map
      * @param layers the h-size of the map
-     * @param atlas a TextureAtlas this will pull all "tile" regions from and the Sprite for "edge"
+     * @param atlas a TextureAtlas this will pull many regions from
      */
     public LocalMap(int width, int height, int layers, TextureAtlas atlas) {
-        this.tileset = atlas.findRegions("tile");
-        this.edge = atlas.createSprite("edge");
+        this.tileset = atlas.findRegions("Rock_Cube_angle0");
+//        this.edge = atlas.createSprite("edge");
         tiles = new int[width][height][layers];
         fCenter = (width - 1) * 0.5f;
         gCenter = (height - 1) * 0.5f;
@@ -264,7 +264,7 @@ public class LocalMap {
     /**
      * Sets the voxel terrain tile at the given isometric tile position to the tile with the given ID.
      * IDs can be seen in {@link AssetData}.
-     * This also places an {@link #edge} at the same isometric position but a lower depth, so it only shows if there is
+     * This also places an edge at the same isometric position but a lower depth, so it only shows if there is
      * empty space behind the voxel in the depth sort.
      * @param f f-position as an int
      * @param g g-position as an int
@@ -272,6 +272,7 @@ public class LocalMap {
      * @param tileId an ID for a tile, typically from {@link AssetData}; may be -1 to remove a tile
      */
     public void setTile(int f, int g, int h, int tileId) {
+        tileId >>= 31; //TODO: this is here to limit tileId to -1 or 0; when more than 0 is available, remove this!
         if (isValid(f, g, h)) {
             tiles[f][g][h] = tileId;
             if (tileId == -1) {
@@ -283,12 +284,12 @@ public class LocalMap {
                     iso.setSprite(new TextureAtlas.AtlasSprite(tileset.get(tileId)));
                 } else {
                     everything.put(new Vector4(f, g, h, 0), iso = new IsoSprite(new TextureAtlas.AtlasSprite(tileset.get(tileId)), f, g, h));
-                    // Environment tiles have an outline that may render if there is empty space behind them.
-                    // The position has -1.5 for w, and w is added to the depth for the purpose of sorting.
-                    // Adjacent environment tiles should have a depth that is +1 or -1 from this tile.
-                    // Because the outline is -1.5 behind this tile, adjacent environment tiles will render over it,
-                    // but if there is empty space behind a tile, the outline will be in front of the further tiles.
-                    everything.put(new Vector4(f, g, h, -1.5f), new IsoSprite(edge, f, g, h));
+//                    // Environment tiles have an outline that may render if there is empty space behind them.
+//                    // The position has -1.5 for w, and w is added to the depth for the purpose of sorting.
+//                    // Adjacent environment tiles should have a depth that is +1 or -1 from this tile.
+//                    // Because the outline is -1.5 behind this tile, adjacent environment tiles will render over it,
+//                    // but if there is empty space behind a tile, the outline will be in front of the further tiles.
+//                    everything.put(new Vector4(f, g, h, -1.5f), new IsoSprite(edge, f, g, h));
                 }
                 // Environment tiles (not outlines) get darkened based on their elevation (h axis).
                 final float tint = Math.min(1f, h * 0.08f + 0.6f);
@@ -300,12 +301,13 @@ public class LocalMap {
     /**
      * Sets the voxel terrain tile at the given isometric tile position (as a Vector4, which will be rounded when used
      * in {@link #tiles}) to the tile with the given ID. IDs can be seen in {@link AssetData}.
-     * This also places an {@link #edge} at the same isometric position but a lower depth, so it only shows if there is
+     * This also places an edge at the same isometric position but a lower depth, so it only shows if there is
      * empty space behind the voxel in the depth sort.
-     * @param point a Vector4 of which x, y, and z will be used for a position and w will genrerally be treated as 0
+     * @param point a Vector4 of which x, y, and z will be used for a position and w will generally be treated as 0
      * @param tileId an ID for a tile, typically from {@link AssetData}
      */
     public void setTile(Vector4 point, int tileId) {
+        tileId >>= 31; //TODO: this is here to limit tileId to -1 or 0; when more than 0 is available, remove this!
         int f = round(point.x);
         int g = round(point.y);
         int h = round(point.z);
@@ -321,12 +323,12 @@ public class LocalMap {
                     iso.setPosition(point.x, point.y, point.z);
                 } else {
                     everything.put(point, iso = new IsoSprite(new TextureAtlas.AtlasSprite(tileset.get(tileId)), point.x, point.y, point.z));
-                    // Environment tiles have an outline that may render if there is empty space behind them.
-                    // The position has -1.5 for w, and w is added to the depth for the purpose of sorting.
-                    // Adjacent environment tiles should have a depth that is +1 or -1 from this tile.
-                    // Because the outline is -1.5 behind this tile, adjacent environment tiles will render over it,
-                    // but if there is empty space behind a tile, the outline will be in front of the further tiles.
-                    everything.put(new Vector4(point.x, point.y, point.z, -1.5f), new IsoSprite(edge, point.x, point.y, point.z));
+//                    // Environment tiles have an outline that may render if there is empty space behind them.
+//                    // The position has -1.5 for w, and w is added to the depth for the purpose of sorting.
+//                    // Adjacent environment tiles should have a depth that is +1 or -1 from this tile.
+//                    // Because the outline is -1.5 behind this tile, adjacent environment tiles will render over it,
+//                    // but if there is empty space behind a tile, the outline will be in front of the further tiles.
+//                    everything.put(new Vector4(point.x, point.y, point.z, -1.5f), new IsoSprite(edge, point.x, point.y, point.z));
                 }
                 // Environment tiles (not outlines) get darkened based on their elevation (h axis).
                 final float tint = Math.min(1f, h * 0.08f + 0.6f);
