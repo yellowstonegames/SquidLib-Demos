@@ -171,14 +171,14 @@ public class Main extends ApplicationAdapter {
      */
     private Mover player;
 
-    /**
-     * A "crosshair-like" indicator of where the player character is on the x-axis, for when they can't be seen.
-     */
-    private Sprite playerAxisX;
-    /**
-     * A "crosshair-like" indicator of where the player character is on the y-axis, for when they can't be seen.
-     */
-    private Sprite playerAxisY;
+//    /**
+//     * A "crosshair-like" indicator of where the player character is on the x-axis, for when they can't be seen.
+//     */
+//    private Sprite playerAxisX;
+//    /**
+//     * A "crosshair-like" indicator of where the player character is on the y-axis, for when they can't be seen.
+//     */
+//    private Sprite playerAxisY;
     /**
      * The enemies are stored in a simple Array. There aren't ever so many of them that the data structure could matter.
      * There's currently no logic for an enemy receiving damage; the player just tries to avoid the orc enemies.
@@ -556,13 +556,13 @@ public class Main extends ApplicationAdapter {
         player = new Mover(map, animations, id, rf, rg, MAP_PEAK - 1);
         map.addMover(player, Mover.PLAYER_W);
 
-        // The player axis sprites show a crosshair-like indicator of where the player character is on the x and y axes.
-        playerAxisX = atlas.createSprite("highlight", 4);
-        playerAxisY = atlas.createSprite("highlight", 4);
-        // We try to place the x-axis indicator on the horizontal line just above the buttons.
-        playerAxisX.setY(SCREEN_VERTICAL - 4f);
-        // We try to place the y-axis indicator on the very edge of the left of the screen.
-        playerAxisY.setX(SCREEN_HORIZONTAL * -0.5f);
+//        // The player axis sprites show a crosshair-like indicator of where the player character is on the x and y axes.
+//        playerAxisX = atlas.createSprite("highlight", 4);
+//        playerAxisY = atlas.createSprite("highlight", 4);
+//        // We try to place the x-axis indicator on the horizontal line just above the buttons.
+//        playerAxisX.setY(SCREEN_VERTICAL - 4f);
+//        // We try to place the y-axis indicator on the very edge of the left of the screen.
+//        playerAxisY.setX(SCREEN_HORIZONTAL * -0.5f);
         // id will always be a floating angry head.
         id = AssetData.ENTITIES.indexOf("Eye_Tyrant");
 
@@ -652,10 +652,10 @@ public class Main extends ApplicationAdapter {
             map.everything.remove(tempVector4);
             ((Main)Gdx.app.getApplicationListener()).updateFish();
         }
-        playerAxisX.setX(player.visual.getSprite().getX());
-        playerAxisY.setY(player.visual.getSprite().getY());
-        playerAxisX.draw(batch);
-        playerAxisY.draw(batch);
+//        playerAxisX.setX(player.visual.getSprite().getX());
+//        playerAxisY.setY(player.visual.getSprite().getY());
+//        playerAxisX.draw(batch);
+//        playerAxisY.draw(batch);
 
         // When we end the batch, everything scheduled to draw so far actually gets drawn.
         batch.end();
