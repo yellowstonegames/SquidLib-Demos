@@ -224,7 +224,7 @@ public class Main extends ApplicationAdapter {
      * The base width and height in tiles of a map; this may vary slightly when the map is created, for variety.
      * The variance only goes up by 0 to 3 width and height (by the same amount).
      */
-    public static final int MAP_SIZE = 40;
+    public static final int MAP_SIZE = 20;
     /**
      * The maximum number of voxels and creatures that can be stacked on top of each other in the map; typically also
      * includes some room to jump higher.
@@ -234,7 +234,7 @@ public class Main extends ApplicationAdapter {
      * A scale factor applied to the smaller pixel art "canvas" so scaling it doesn't get as blurry. This works well
      * if it's set to about 4 or 8, with 4 being a little more blurry and 8 being a little less. They're very similar.
      */
-    public static int ZOOM = 8;
+    public static int ZOOM = 4;
     /**
      * To avoid having to cast ZOOM to a float and divide by it repeatedly, we just store its inverse here.
      */
