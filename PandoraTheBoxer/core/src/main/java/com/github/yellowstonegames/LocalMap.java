@@ -454,65 +454,6 @@ public class LocalMap {
             }
         }
 
-        // Here we add a little pathway to the map.
-        // We start at a random position with centered f-position and low g-position.
-        int pathF = mapSize / 2 + MathUtils.random(mapSize / -4, mapSize / 4);
-        int pathG = mapSize / 4 + MathUtils.random(mapSize / -6, mapSize / 6);
-        // angle is 0, 1, 2, or 3.
-        float angle = 1f;
-        // We randomly may swap f and g...
-        if(MathUtils.randomBoolean()){
-            int temp = pathG;
-            pathG = pathF;
-            pathF = temp;
-            angle = 0f;
-        }
-        // and randomly may make them start on the opposite side, making pathG high instead of low (f if swapped).
-        if(MathUtils.randomBoolean()){
-            pathF = mapSize - 1 - pathF;
-            pathG = mapSize - 1 - pathG;
-            angle += 2f;
-        }
-
-        // We use 1D noise to make the path change angle.
-        baseNoise.setOctaves(1);
-        for (int i = 0, n = mapSize + mapSize; i < n; i++) {
-            if(map.isValid(pathF, pathG, 0)) {
-                for (int h = mapPeak - 1; h >= 0; h--) {
-                    if(map.getTile(pathF, pathG, h) != -1) {
-                        // we have an 80% change to place a path at any valid position, if we still have one.
-                        if(MathUtils.randomBoolean(0.8f))
-                            map.setTile(pathF, pathG, h, AssetData.PATH_GRASS_FGTR);
-                        break;
-                    }
-                }
-            } else {
-                // If the current position is invalid, try again with a new start position.
-                pathF = mapSize / 2 + MathUtils.random(mapSize / -4, mapSize / 4);
-                pathG = mapSize / 4 + MathUtils.random(mapSize / -6, mapSize / 6);
-                angle = 1f;
-                if(MathUtils.randomBoolean()){
-                    int temp = pathG;
-                    pathG = pathF;
-                    pathF = temp;
-                    angle = 0f;
-                }
-                if(MathUtils.randomBoolean()){
-                    pathF = mapSize - 1 - pathF;
-                    pathG = mapSize - 1 - pathG;
-                    angle += 2f;
-                }
-
-            }
-            // Gradually change the angle of the path using continuous noise.
-            angle = (angle + baseNoise.getNoise(i * 25f) * 0.7f + 4f) % 4f;
-            GridPoint2 dir = DIRECTIONS[(int) angle];
-            pathF += dir.x;
-            pathG += dir.y;
-        }
-
-        // When we're done, we just need to take all the all-connected path tiles and change them to linear paths.
-        AssetData.realignPaths(map);
         // Remove this next line if you intend to allow players to edit the map or destroy tiles during play.
         removeInvisibleTiles(map);
         return map;

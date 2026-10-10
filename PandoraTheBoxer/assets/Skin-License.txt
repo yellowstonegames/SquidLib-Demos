@@ -1,8 +1,8 @@
-The resource "Clean Crispy Skin" is licensed under the CC-BY 4.0 license,
+The resource "Flat Earth" is licensed under the CC-BY 4.0 license,
 and was authored by Raymond Buckley.
 
-Retrieved from https://ray3k.wordpress.com/clean-crispy-ui-skin-for-libgdx/
-on April 25, 2025.
+Retrieved from https://ray3k.wordpress.com/flat-earth-ui-skin-for-libgdx/
+on October 9, 2026.
 
 Attribution 4.0 International
 

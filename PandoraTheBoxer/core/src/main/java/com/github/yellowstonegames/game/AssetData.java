@@ -6,9 +6,8 @@ import com.github.yellowstonegames.LocalMap;
 /**
  * Data specific to the art assets used here. If the art assets change, you will need to update this class.
  * This tracks not just the numbers associated with unnamed art assets, but also which tiles are rotations of other
- * tiles for when the map rotates, which path tiles can connect to which other path tiles, and so on. The
- * {@link #realignPaths(LocalMap)} method takes a LocalMap and updates the rotations of paths in it so they all line up
- * coherently. There are also some numbers and names for entities, but the code here mostly doesn't use them because the
+ * tiles for when the map rotates, which path tiles can connect to which other path tiles, and so on.
+ * There are also some numbers and names for entities, but the code here mostly doesn't use them because the
  * specific assets were already sorted how we needed them -- entities 0-3 are playable humans, and 4-7 are enemy orcs.
  * <br>
  * This has constants to provide names for the numbered tiles and entities in the {@code isometric-trpg.atlas}, a map
@@ -66,21 +65,21 @@ public final class AssetData {
      * <br>
      * This depends on your exact terrain assets, and it will potentially change if your art does.
      */
-    public static final int TILE_WIDTH = 8;
+    public static final int TILE_WIDTH = 32;
     /**
      * The vertical distance in pixels between adjacent tiles. This is equivalent to the distance of one diagonal side
      * of the diamond-shaped top of any solid tile here, measured from bottom to top for a single side.
      * <br>
      * This depends on your exact terrain assets, and it will potentially change if your art does.
      */
-    public static final int TILE_HEIGHT = 4;
+    public static final int TILE_HEIGHT = 16;
     /**
      * The vertical distance in pixels between stacked tiles. This is equivalent to the distance of a vertical side of
      * any full-sized solid tile (on the left or right side of the block), measured from bottom to top of a solid side.
      * <br>
      * This depends on your exact terrain assets, and it will potentially change if your art does.
      */
-    public static final int TILE_DEPTH = 8;
+    public static final int TILE_DEPTH = 32;
 
     /**
      * No need to instantiate.
@@ -239,12 +238,6 @@ public final class AssetData {
      * form of indices, each an array of exactly 4 int indices (for the listed rotations, in that order).
      */
     public static final IntMap<int[]> ROTATIONS = new IntMap<>(58);
-    /**
-     * Maps keys that are ints storing data on which adjacent cells are also paths, to indices to the appropriate tiles
-     * to change to. This defaults to returning paths over grass; to get paths over half-voxel grass, add 11. For paths
-     * over dry brush, add 22, and for paths over half-voxel dry brush, add 33.
-     */
-    public static final IntIntMap PATHS = new IntIntMap(16);
 
     static {
         TILES.put("dirt"                , DIRT                );
@@ -434,22 +427,6 @@ public final class AssetData {
         ROTATIONS.put(DECO_FENCE_GR, new int[]{DECO_FENCE_GR, DECO_FENCE_FT, DECO_FENCE_GR, DECO_FENCE_FT, });
         ROTATIONS.put(DECO_FENCE_FT, new int[]{DECO_FENCE_FT, DECO_FENCE_GR, DECO_FENCE_FT, DECO_FENCE_GR, });
 
-        PATHS.put( 1, PATH_GRASS_FT);
-        PATHS.put( 2, PATH_GRASS_GR);
-        PATHS.put( 3, PATH_GRASS_FG);
-        PATHS.put( 4, PATH_GRASS_FT);
-        PATHS.put( 5, PATH_GRASS_FT);
-        PATHS.put( 6, PATH_GRASS_GT);
-        PATHS.put( 7, PATH_GRASS_FGT);
-        PATHS.put( 8, PATH_GRASS_GR);
-        PATHS.put( 9, PATH_GRASS_FR);
-        PATHS.put(10, PATH_GRASS_GR);
-        PATHS.put(11, PATH_GRASS_FGR);
-        PATHS.put(12, PATH_GRASS_TR);
-        PATHS.put(13, PATH_GRASS_FTR);
-        PATHS.put(14, PATH_GRASS_GTR);
-        PATHS.put(15, PATH_GRASS_FGTR);
-
         UNIT_VOXELS = new IntSet(128);
         HALF_VOXELS = new IntSet(64);
         BASE_VOXELS = new IntSet(64);
@@ -488,146 +465,4 @@ public final class AssetData {
         BASE_ANY.addAll(BASE_VOXELS);
         BASE_ANY.addAll(BASE_COVERS);
     }
-
-    public static final IntArray UNIT_VOXELS_ARRAY = UNIT_VOXELS.iterator().toArray();
-    public static final IntArray HALF_VOXELS_ARRAY = HALF_VOXELS.iterator().toArray();
-    public static final IntArray BASE_VOXELS_ARRAY = BASE_VOXELS.iterator().toArray();
-    public static final IntArray HALF_COVERS_ARRAY = HALF_COVERS.iterator().toArray();
-    public static final IntArray BASE_COVERS_ARRAY = BASE_COVERS.iterator().toArray();
-    public static final IntArray DECORATIONS_ARRAY = DECORATIONS.iterator().toArray();
-    public static final IntArray HALF_DECORATIONS_ARRAY = HALF_DECORATIONS.iterator().toArray();
-    public static final IntArray UNIT_ANY_ARRAY = UNIT_ANY.iterator().toArray();
-    public static final IntArray HALF_ANY_ARRAY = HALF_ANY.iterator().toArray();
-    public static final IntArray BASE_ANY_ARRAY = BASE_ANY.iterator().toArray();
-
-    public static boolean isGrass(int index) {
-        return index == GRASS || index == DIRT ||
-            (index >= PATH_GRASS_GR && index <= PATH_GRASS_FR);
-    }
-    public static boolean isHalfGrass(int index) {
-        return index == HALF_GRASS || index == HALF_DIRT ||
-            (index >= HALF_PATH_GRASS_GR && index <= HALF_PATH_GRASS_FR);
-    }
-    public static boolean isDry(int index) {
-        return index == DRY || index == SAND ||
-            (index >= PATH_DRY_GR && index <= PATH_DRY_FR);
-    }
-    public static boolean isHalfDry(int index) {
-        return index == HALF_DRY || index == HALF_SAND ||
-            (index >= HALF_PATH_DRY_GR && index <= HALF_PATH_DRY_FR);
-    }
-    public static boolean isGrassPath(int index) {
-        return (index >= PATH_GRASS_GR && index <= PATH_GRASS_FR);
-    }
-    public static boolean isHalfGrassPath(int index) {
-        return (index >= HALF_PATH_GRASS_GR && index <= HALF_PATH_GRASS_FR);
-    }
-    public static boolean isDryPath(int index) {
-        return (index >= PATH_DRY_GR && index <= PATH_DRY_FR);
-    }
-    public static boolean isHalfDryPath(int index) {
-        return (index >= HALF_PATH_DRY_GR && index <= HALF_PATH_DRY_FR);
-    }
-
-    /**
-     * Meant to be called on a map where paths have been placed but don't necessarily line up or connect fully. If this
-     * can return a path or path-like (walkable) tile, it does that, so it should only be called where you want a path
-     * to form.
-     * @param centerIndex the tile index of the tile you could turn into a path or connect properly to other paths
-     * @param adjacentF the tile index of the tile in the F direction (negative F, towards the front and left)
-     * @param adjacentG the tile index of the tile in the G direction (negative G, towards the front and right)
-     * @param adjacentT the tile index of the tile in the T direction (positive F, towards the back and right)
-     * @param adjacentR the tile index of the tile in the R direction (positive G, towards the back and left)
-     * @return the tile index to use instead of {@code centerIndex} to make it become a path
-     */
-    public static int getPathIndex(int centerIndex, int adjacentF, int adjacentG, int adjacentT, int adjacentR) {
-        int bits = 0;
-
-        if(centerIndex == LAVA || centerIndex == BASALT) centerIndex = BASALT;
-        else if(centerIndex == HALF_LAVA || centerIndex == HALF_BASALT) centerIndex = HALF_BASALT;
-        else if(centerIndex == ICE || centerIndex == SNOW) centerIndex = SNOW;
-        else if(centerIndex == HALF_ICE || centerIndex == HALF_SNOW) centerIndex = HALF_SNOW;
-        else if(centerIndex >= HALF_COVER_WATER_FGH && centerIndex <= HALF_COVER_WATER_H) centerIndex = DRY;
-        else if(centerIndex >= BASE_COVER_WATER_FGH && centerIndex <= BASE_COVER_WATER_H) centerIndex = HALF_DRY;
-        else if(centerIndex >= HALF_COVER_SWAMP_FGH && centerIndex <= HALF_COVER_SWAMP_H) centerIndex = GRASS;
-        else if(centerIndex >= BASE_COVER_SWAMP_FGH && centerIndex <= BASE_COVER_SWAMP_H) centerIndex = HALF_GRASS;
-
-        if(isGrass(centerIndex)) {
-            if(isGrassPath(adjacentF)) bits |= 1;
-            if(isGrassPath(adjacentG)) bits |= 2;
-            if(isGrassPath(adjacentT)) bits |= 4;
-            if(isGrassPath(adjacentR)) bits |= 8;
-            centerIndex = PATHS.get(bits, PATH_GRASS_GR);
-        } else if(isHalfGrass(centerIndex)) {
-            if(isHalfGrassPath(adjacentF)) bits |= 1;
-            if(isHalfGrassPath(adjacentG)) bits |= 2;
-            if(isHalfGrassPath(adjacentT)) bits |= 4;
-            if(isHalfGrassPath(adjacentR)) bits |= 8;
-            centerIndex = PATHS.get(bits, PATH_GRASS_GR) + 11;
-        } else if(isDry(centerIndex)) {
-            if(isDryPath(adjacentF)) bits |= 1;
-            if(isDryPath(adjacentG)) bits |= 2;
-            if(isDryPath(adjacentT)) bits |= 4;
-            if(isDryPath(adjacentR)) bits |= 8;
-            centerIndex = PATHS.get(bits, PATH_GRASS_GR) + 22;
-        } else if(isHalfDry(centerIndex)) {
-            if(isHalfDryPath(adjacentF)) bits |= 1;
-            if(isHalfDryPath(adjacentG)) bits |= 2;
-            if(isHalfDryPath(adjacentT)) bits |= 4;
-            if(isHalfDryPath(adjacentR)) bits |= 8;
-            centerIndex = PATHS.get(bits, PATH_GRASS_GR) + 33;
-        }
-        return centerIndex;
-    }
-
-    /**
-     * Given a 3D int array indexed in {@code [f][g][h]} order, this takes existing paths that may have become unaligned
-     * and resets their connections so they link up to each other. This also takes into account neighboring paths with
-     * up to one tile difference on h, higher or lower.
-     * @param area a 3D int array indexed in {@code [f][g][h]} order that will be modified in-place
-     * @return {@code area}, potentially after modifications, for chaining
-     */
-    public static LocalMap realignPaths(LocalMap area) {
-        final int fSize = area.getFSize(), gSize = area.getGSize(), hSize = area.getHSize();
-        final int fLimit = fSize - 1, gLimit = gSize - 1, hLimit = hSize - 1;
-        final int[][][] tiles = area.tiles;
-        for (int f = 0; f < fSize; f++) {
-            for (int g = 0; g < gSize; g++) {
-                for (int h = hLimit; h >= 0; h--) {
-                    int t = tiles[f][g][h];
-                    if(t == -1) continue;
-                    int bits = 0;
-                    if(isGrassPath(t)) {
-                        if(f == 0 || isGrassPath(tiles[f-1][g][h]) || (h > 0 && isGrassPath(tiles[f-1][g][h-1])) || (h < hLimit && isGrassPath(tiles[f-1][g][h+1]))) bits |= 1;
-                        if(g == 0 || isGrassPath(tiles[f][g-1][h]) || (h > 0 && isGrassPath(tiles[f][g-1][h-1])) || (h < hLimit && isGrassPath(tiles[f][g-1][h+1]))) bits |= 2;
-                        if(f == fLimit || isGrassPath(tiles[f+1][g][h]) || (h > 0 && isGrassPath(tiles[f+1][g][h-1])) || (h < hLimit && isGrassPath(tiles[f+1][g][h+1]))) bits |= 4;
-                        if(g == gLimit || isGrassPath(tiles[f][g+1][h]) || (h > 0 && isGrassPath(tiles[f][g+1][h-1])) || (h < hLimit && isGrassPath(tiles[f][g+1][h+1]))) bits |= 8;
-                        area.setTile(f, g, h, PATHS.get(bits, PATH_GRASS_GR));
-                    } else if(isHalfGrassPath(t)) {
-                        if(f == 0 || isHalfGrassPath(tiles[f-1][g][h]) || (h > 0 && isHalfGrassPath(tiles[f-1][g][h-1])) || (h < hLimit && isHalfGrassPath(tiles[f-1][g][h+1]))) bits |= 1;
-                        if(g == 0 || isHalfGrassPath(tiles[f][g-1][h]) || (h > 0 && isHalfGrassPath(tiles[f][g-1][h-1])) || (h < hLimit && isHalfGrassPath(tiles[f][g-1][h+1]))) bits |= 2;
-                        if(f == fLimit || isHalfGrassPath(tiles[f+1][g][h]) || (h > 0 && isHalfGrassPath(tiles[f+1][g][h-1])) || (h < hLimit && isHalfGrassPath(tiles[f+1][g][h+1]))) bits |= 4;
-                        if(g == gLimit || isHalfGrassPath(tiles[f][g+1][h]) || (h > 0 && isHalfGrassPath(tiles[f][g+1][h-1])) || (h < hLimit && isHalfGrassPath(tiles[f][g+1][h+1]))) bits |= 8;
-                        area.setTile(f, g, h, PATHS.get(bits, PATH_GRASS_GR) + 11);
-                    } else if(isDryPath(t)) {
-                        if(f == 0 || isDryPath(tiles[f-1][g][h]) || (h > 0 && isDryPath(tiles[f-1][g][h-1])) || (h < hLimit && isDryPath(tiles[f-1][g][h+1]))) bits |= 1;
-                        if(g == 0 || isDryPath(tiles[f][g-1][h]) || (h > 0 && isDryPath(tiles[f][g-1][h-1])) || (h < hLimit && isDryPath(tiles[f][g-1][h+1]))) bits |= 2;
-                        if(f == fLimit || isDryPath(tiles[f+1][g][h]) || (h > 0 && isDryPath(tiles[f+1][g][h-1])) || (h < hLimit && isDryPath(tiles[f+1][g][h+1]))) bits |= 4;
-                        if(g == gLimit || isDryPath(tiles[f][g+1][h]) || (h > 0 && isDryPath(tiles[f][g+1][h-1])) || (h < hLimit && isDryPath(tiles[f][g+1][h+1]))) bits |= 8;
-                        area.setTile(f, g, h, PATHS.get(bits, PATH_GRASS_GR) + 22);
-                    } else if(isHalfDryPath(t)) {
-                        if(f == 0 || isHalfDryPath(tiles[f-1][g][h]) || (h > 0 && isHalfDryPath(tiles[f-1][g][h-1])) || (h < hLimit && isHalfDryPath(tiles[f-1][g][h+1]))) bits |= 1;
-                        if(g == 0 || isHalfDryPath(tiles[f][g-1][h]) || (h > 0 && isHalfDryPath(tiles[f][g-1][h-1])) || (h < hLimit && isHalfDryPath(tiles[f][g-1][h+1]))) bits |= 2;
-                        if(f == fLimit || isHalfDryPath(tiles[f+1][g][h]) || (h > 0 && isHalfDryPath(tiles[f+1][g][h-1])) || (h < hLimit && isHalfDryPath(tiles[f+1][g][h+1]))) bits |= 4;
-                        if(g == gLimit || isHalfDryPath(tiles[f][g+1][h]) || (h > 0 && isHalfDryPath(tiles[f][g+1][h-1])) || (h < hLimit && isHalfDryPath(tiles[f][g+1][h+1]))) bits |= 8;
-                        area.setTile(f, g, h, PATHS.get(bits, PATH_GRASS_GR) + 33);
-                    }
-
-                    break;
-                }
-            }
-        }
-        return area;
-    }
-
 }
