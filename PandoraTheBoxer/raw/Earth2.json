@@ -1,19 +1,19 @@
 {
 BitmapFont: {
 	button: {
-		file: Crete-Round-Button.fnt
+		file: font-button.fnt
 		scaledSize: -1
 		markupEnabled: true
 		flip: false
 	}
 	font: {
-		file: Crete-Round.fnt
+		file: font.fnt
 		scaledSize: -1
 		markupEnabled: true
 		flip: false
 	}
 	title: {
-		file: Crete-Round-Title.fnt
+		file: font-title.fnt
 		scaledSize: -1
 		markupEnabled: true
 		flip: false
