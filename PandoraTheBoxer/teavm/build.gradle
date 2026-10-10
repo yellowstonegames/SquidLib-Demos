@@ -1,0 +1,66 @@
+import org.teavm.gradle.api.OptimizationLevel
+
+plugins {
+  id 'java'
+  id("com.github.xpenatan.gdx-teavm") version "$gdxTeaVMVersion"
+}
+
+eclipse.project.name = appName + "-teavm"
+
+// This must be at least 17, and no lower than the JDK version this project is built with.
+java.targetCompatibility = "17"
+// This should probably be equal to targetCompatibility, above. This only affects the TeaVM module.
+java.sourceCompatibility = "17"
+
+dependencies {
+  implementation "com.github.xpenatan.gdx-teavm:backend-web:$gdxTeaVMVersion"
+  implementation project(':core')
+
+}
+
+/// The tasks set up for debugging are gdx_teavm_web_js_build and gdx_teavm_web_js_run .
+/// These auto-build and reload changed sources; they don't obfuscate their output.
+/// The tasks for releases are gdx_teavm_web_js_release_build, gdx_teavm_web_js_release_run,
+/// gdx_teavm_web_wasm_release_build, and gdx_teavm_web_wasm_release_run .
+/// The build tasks will place a build in build/dist/js/release/webapp or build/dist/wasm/release/webapp .
+/// The run tasks (including debug) will provide a link to click in the build output.
+/// The run tasks won't end on their own; you can open the link multiple times until you stop the build.
+
+gdxTeaVM {
+  assets.from(rootProject.files('assets'))
+
+  /// You can add additional classes or packages that need reflection here.
+  //reflection.add("com.github.yellowstonegames.reflect")
+
+  webDefaults {
+    mainClass.set("com.github.yellowstonegames.teavm.TeaVMLauncher")
+    htmlTitle.set(appName)
+  }
+
+  js {
+    devServer {
+      enabled.set(true)
+      autoBuild.set(true)
+      autoReload.set(true)
+      optimization.set(OptimizationLevel.NONE)
+    }
+  }
+
+  js("release") {
+    obfuscated.set(true)
+    serverPort.set(8180)
+    optimization.set(OptimizationLevel.BALANCED)
+  }
+
+  wasm("release") {
+    obfuscated.set(true)
+    serverPort.set(8181)
+    optimization.set(OptimizationLevel.BALANCED)
+  }
+}
+
+// For backwards compatibility with the earlier run and build tasks.
+tasks.register("run"){
+  dependsOn("gdx_teavm_web_wasm_release_run")
+}
+build.dependsOn("gdx_teavm_web_wasm_release_build")

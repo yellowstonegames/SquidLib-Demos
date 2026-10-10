@@ -1,11 +1,25 @@
-apply plugin: "java"
-
-sourceCompatibility = 1.7
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+eclipse.project.name = appName + '-core'
 
-sourceSets.main.java.srcDirs = [ "src/" ]
+dependencies {
+  api "com.badlogicgames.gdx:gdx:$gdxVersion"
+  api "com.github.tommyettinger:crux:$cruxVersion"
+  api "com.github.tommyettinger:digital:$digitalVersion"
+  api "com.github.tommyettinger:funderby:$funderbyVersion"
+  api "com.github.tommyettinger:jdkgdxds:$jdkgdxdsVersion"
+  api "com.github.tommyettinger:juniper:$juniperVersion"
+  api "com.github.tommyettinger:regexodus:$regExodusVersion"
+  api "com.github.yellowstonegames.squidsquad:squidcore:$squidSquadVersion"
+  api "com.github.yellowstonegames.squidsquad:squidgrid:$squidSquadVersion"
+  api "com.github.yellowstonegames.squidsquad:squidpath:$squidSquadVersion"
+  api "com.github.yellowstonegames.squidsquad:squidplace:$squidSquadVersion"
+  api "com.github.yellowstonegames.squidsquad:squidtext:$squidSquadVersion"
 
+  if(enableGraalNative == 'true') {
+    implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
+  }
+}
 
-eclipse.project {
-    name = appName + "-core"
+jar {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
