@@ -1,6 +1,6 @@
-info face="Crete-Title" size=12 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=2 padding=1,1,1,1 spacing=0,0
+info face="Crete-Round-Title" size=12 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=2 padding=1,1,1,1 spacing=0,0
 common lineHeight=47 base=36 scaleW=505 scaleH=231 pages=1 packed=0 alphaChnl=0 redChnl=0 greenChnl=0 blueChnl=0
-page id=0 file="Crete-Title.png"
+page id=0 file="Crete-Round-Title.png"
 chars count=193
 char id=0     x=0    y=0    width=0    height=0    xoffset=-1   yoffset=36   xadvance=0    page=0    chnl=0
 char id=32    x=0    y=0    width=0    height=0    xoffset=-1   yoffset=-1   xadvance=7    page=0    chnl=0
