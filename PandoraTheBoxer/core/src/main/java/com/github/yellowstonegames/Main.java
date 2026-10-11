@@ -490,10 +490,10 @@ public class Main extends ApplicationAdapter {
             /* Index 1 is G-facing animations. */
             /* Index 2 is T-facing animations. */
             /* Index 3 is R-facing animations. */
-            animations.get(0).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle0"), Animation.PlayMode.LOOP));
-            animations.get(1).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle1"), Animation.PlayMode.LOOP));
-            animations.get(2).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle2"), Animation.PlayMode.LOOP));
-            animations.get(3).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle3"), Animation.PlayMode.LOOP));
+            animations.get(0).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle0"), Animation.PlayMode.LOOP_PINGPONG));
+            animations.get(1).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle1"), Animation.PlayMode.LOOP_PINGPONG));
+            animations.get(2).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle2"), Animation.PlayMode.LOOP_PINGPONG));
+            animations.get(3).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle3"), Animation.PlayMode.LOOP_PINGPONG));
         }
 
         // Initialize a Camera with the width and height of the area to be shown.

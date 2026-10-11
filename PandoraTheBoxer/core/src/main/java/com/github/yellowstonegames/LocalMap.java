@@ -9,7 +9,10 @@ import com.badlogic.gdx.utils.OrderedMap;
 import com.github.tommyettinger.random.AceRandom;
 import com.github.yellowstonegames.game.AssetData;
 import com.github.yellowstonegames.game.Mover;
+import com.github.yellowstonegames.place.FlowingCaveGenerator;
 import com.github.yellowstonegames.place.OrganicConnectingMapGenerator;
+import com.github.yellowstonegames.place.PlaceGenerator;
+import com.github.yellowstonegames.place.tileset.TilesetType;
 import com.github.yellowstonegames.util.HasPosition3D;
 import com.github.yellowstonegames.util.MathSupport;
 import com.github.yellowstonegames.util.MiniNoise;
@@ -439,7 +442,8 @@ public class LocalMap {
         mapPeak = Math.max(4, mapPeak);
 
         LocalMap map = new LocalMap(mapSize, mapSize, mapPeak, atlas);
-        OrganicConnectingMapGenerator mapGen = new OrganicConnectingMapGenerator(mapSize, mapSize, 6, 6, 3, new AceRandom(seed));
+        PlaceGenerator mapGen = new FlowingCaveGenerator(mapSize, mapSize, TilesetType.DEFAULT_DUNGEON, new AceRandom(seed));
+//        PlaceGenerator mapGen = new OrganicConnectingMapGenerator(mapSize, mapSize, 6, 6, 3, new AceRandom(seed));
         char[][] dungeon = mapGen.generate();
         // Random voxels as a base, with height determined by noise. Either dirt 25% of the time, or grass the rest.
         for (int f = 0; f < mapSize; f++) {
