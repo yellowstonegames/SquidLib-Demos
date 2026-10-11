@@ -8,6 +8,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Vector4;
 import com.badlogic.gdx.utils.Array;
+import com.github.tommyettinger.digital.MathTools;
+import com.github.tommyettinger.digital.TrigTools;
 import com.github.yellowstonegames.AnimatedIsoSprite;
 import com.github.yellowstonegames.Main;
 import com.github.yellowstonegames.LocalMap;
@@ -204,13 +206,7 @@ public class Mover implements HasPosition3D {
             handleCollision();
             position.add(velocity);
 
-            // while jumping, show attack animation; while standing, show idle animation. NPCs are always attacking.
-            if (npc || velocity.z != 0) {
-                /* The "currentDirection + 2" gets an attack animation instead of an idle one for the appropriate facing. */
-                visual.animation = animations.get(currentDirection + 2).get(animationIndex);
-            } else {
-                visual.animation = animations.get(currentDirection).get(animationIndex);
-            }
+            visual.animation = animations.get(currentDirection).get(animationIndex);
 
             visual.setPosition(position);
             map.everything.remove(tempVectorA);
@@ -290,11 +286,12 @@ public class Mover implements HasPosition3D {
         velocity.x = df * speed;
         velocity.y = dg * speed;
 
-        if (df == 0 && dg == 0) return;
+//        if (df == 0 && dg == 0) return;
 
+        currentDirection = (int)((TrigTools.atan2Deg360Finite(dg, df) + (720 + 45 + 180) + map.rotationDegrees) % 360) / 90;
         // Determine direction based on movement
-        if (MathUtils.cosDeg(-45f - map.rotationDegrees) * dg - MathUtils.sinDeg(-45f - map.rotationDegrees) * df > 0.1f) currentDirection = 1; // Up
-        else currentDirection = 0; // Down
+//        if (MathUtils.cosDeg(-45f - map.rotationDegrees) * dg - MathUtils.sinDeg(-45f - map.rotationDegrees) * df > 0.1f) currentDirection = 1; // Up
+//        else currentDirection = 0; // Down
     }
 
     /**
