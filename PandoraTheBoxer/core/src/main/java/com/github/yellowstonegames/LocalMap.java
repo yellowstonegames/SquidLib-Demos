@@ -10,6 +10,7 @@ import com.github.tommyettinger.random.AceRandom;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.yellowstonegames.game.AssetData;
 import com.github.yellowstonegames.game.Mover;
+import com.github.yellowstonegames.grid.Coord;
 import com.github.yellowstonegames.grid.Region;
 import com.github.yellowstonegames.place.FlowingCaveGenerator;
 import com.github.yellowstonegames.place.OrganicConnectingMapGenerator;
@@ -521,31 +522,18 @@ public class LocalMap {
      * otherwise random-seeming.
      * <br>
      * This should be customized for your game.
-     * @param seed if this {@code long} is the same, the same map will be produced on each call
+     * @param random if this is seeded identically, the same map will be produced on each call
      * @param boxCount how many boxes to place
      * @param animations used to get the animation for a box so we can make {@link AnimatedIsoSprite}s per box
      * @return this LocalMap for chaining
      */
-    public LocalMap placeBoxes(long seed, int boxCount, Array<Array<Animation<Sprite>>> animations) {
-        GridPoint2 point = new GridPoint2();
-        int fs = getFSize(), gs = getGSize(), hs = getHSize();
-        // Randomizes seed a little. Very similar seeds before this call will be very different after it.
-        seed = (seed ^ 0x9E3779B97F4A7C15L) * 0xD1B54A32D192ED03L;
-        for (int i = 0; i < boxCount; i++) {
-            // Assigns a somewhat-random position to point, based on seed and i.
-            // This uses the R2 sequence, which won't put points too close to each other when
-            // the second parameter goes between just a few close-together numbers.
-            MathSupport.fillR2(point, seed + i, fs, gs);
-            // "Drop" the box from above so it doesn't start inside a tile.
-            for (int h = hs - 2; h >= 0; h--) {
-                int below = getTile(point.x, point.y, h);
-                if (below != -1) {
-                    setEntity(point.x, point.y, h + 1, Mover.NPC_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.ENTITIES.indexOf("Box_Open")), point.x, point.y, h + 1));
-                    break;
-                }
-            }
+    public Coord[] placeBoxes(EnhancedRandom random, int boxCount, Array<Array<Animation<Sprite>>> animations) {
+        Coord[] found = floors.separatedPoisson(random, 3, boxCount);
+        for(Coord point : found)
+        {
+            setEntity(point.x, point.y, 1, Mover.NPC_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.ENTITIES.indexOf("Box_Open")), point.x, point.y, 1));
         }
-        return this;
+        return found;
     }
 
     /**

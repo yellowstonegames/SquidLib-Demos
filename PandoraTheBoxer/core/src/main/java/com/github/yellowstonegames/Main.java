@@ -555,10 +555,11 @@ public class Main extends ApplicationAdapter {
             atlas);
         map.totalFish = FISH_COUNT;
         map.fishSaved = 0;
-        map.placeBoxes(seed, map.totalFish, animations);
+        Coord[] boxPositions = map.placeBoxes(random, map.totalFish, animations);
         mapCenter = (map.getFSize() - 1f) * 0.5f;
         // Random initial position for the player.
         Region floorCopy = new Region(map.floors);
+        floorCopy.removeSeveral(boxPositions);
         Coord choice = floorCopy.singleRandom(random);
         int rf = choice.x, rg = choice.y;
         floorCopy.remove(choice);
