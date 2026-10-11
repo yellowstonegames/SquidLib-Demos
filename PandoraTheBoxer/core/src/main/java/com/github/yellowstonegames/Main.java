@@ -564,8 +564,9 @@ public class Main extends ApplicationAdapter {
         floorCopy.remove(choice);
         // Pandora is a boxer! She has big boxing gloves and wears a toga.
         int id = AssetData.ENTITIES.indexOf("Pandora");
-        map.addMover(player, Mover.PLAYER_W);
         player = new Mover(map, animations, id, rf, rg, 1f);
+        player.place(Mover.PLAYER_W);
+        map.movers.entities.add(player);
 
 //        // The player axis sprites show a crosshair-like indicator of where the player character is on the x and y axes.
 //        playerAxisX = atlas.createSprite("highlight", 4);
@@ -589,7 +590,8 @@ public class Main extends ApplicationAdapter {
             // We track enemies here as well as tracking them as general Movers in the map so that we can handle the
             // semi-random movement of enemies when we update them in Main, without semi-randomly moving the player.
             enemies.add(enemy);
-            map.addMover(enemy, Mover.NPC_W);
+            enemy.place(Mover.NPC_W);
+            map.movers.entities.add(enemy);
         }
     }
 
