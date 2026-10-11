@@ -35,8 +35,12 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tommyettinger.random.EnhancedRandom;
+import com.github.tommyettinger.random.Xoshiro160RoadroxoRandom;
 import com.github.yellowstonegames.game.AssetData;
 import com.github.yellowstonegames.game.Mover;
+import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.Region;
 
 import java.util.Comparator;
 
@@ -141,6 +145,8 @@ public class Main extends ApplicationAdapter {
      * CUSTOM TO YOUR GAME.
      */
     private LocalMap map;
+
+    public EnhancedRandom random;
     /**
      * The camera we use to show things with an isometric, or for sticklers, "dimetric" camera projection.
      * We can't use a PerspectiveCamera here, even with sort-of 3D positions, because it wouldn't be pixel-perfect.
@@ -340,6 +346,8 @@ public class Main extends ApplicationAdapter {
 //        Gdx.app.setLogLevel(Application.LOG_INFO);
         Gdx.app.setLogLevel(Application.LOG_ERROR);
 
+        random = new Xoshiro160RoadroxoRandom(1, 2, 3, 4, 5);
+
         // We can't start playing music immediately on GWT or TeaVM backends.
         if(Gdx.app.getType() != Application.ApplicationType.WebGL)
             playMusic = true;
@@ -533,12 +541,12 @@ public class Main extends ApplicationAdapter {
      * @param seed may be any long
      */
     public void regenerate(long seed) {
-
+        random.setSeed(seed);
         // Needed so the PC Mover always has id 1.
         Mover.ID_COUNTER = 1;
         startTime = TimeUtils.millis();
         map = LocalMap.generateMap(
-            seed,
+            random,
             /* Used for both dimensions of the ground plane. */
             MAP_SIZE + ((int)seed & 3),
             /* Used for the number of layers of the map, in elevation. */
@@ -550,11 +558,14 @@ public class Main extends ApplicationAdapter {
         map.placeBoxes(seed, map.totalFish, animations);
         mapCenter = (map.getFSize() - 1f) * 0.5f;
         // Random initial position for the player.
-        int rf = MathUtils.random(1, MAP_SIZE - 2), rg = MathUtils.random(1, MAP_SIZE - 2);
-        // Random character graphic for the player; id 0-3 will always be a human wearing blue.
+        Region floorCopy = new Region(map.floors);
+        Coord choice = floorCopy.singleRandom(random);
+        int rf = choice.x, rg = choice.y;
+        floorCopy.remove(choice);
+        // Pandora is a boxer! She has big boxing gloves and wears a toga.
         int id = AssetData.ENTITIES.indexOf("Pandora");
-        player = new Mover(map, animations, id, rf, rg, MAP_PEAK - 1);
         map.addMover(player, Mover.PLAYER_W);
+        player = new Mover(map, animations, id, rf, rg, 1f);
 
 //        // The player axis sprites show a crosshair-like indicator of where the player character is on the x and y axes.
 //        playerAxisX = atlas.createSprite("highlight", 4);
@@ -567,13 +578,14 @@ public class Main extends ApplicationAdapter {
         id = AssetData.ENTITIES.indexOf("Eye_Tyrant");
 
         enemies = new Array<>(ENEMY_COUNT);
+
         for (int i = 0; i < ENEMY_COUNT; i++) {
             // enemies can be anywhere except the very edges of the map.
-            rf = MathUtils.random(1, MAP_SIZE - 2);
-            rg = MathUtils.random(1, MAP_SIZE - 2);
-            // Here we drop the orcs from just below the highest elevation on the map to ensure they land on ground,
-            // rather than potentially starting "buried" in the ground itself.
-            Mover enemy = new Mover(map, animations, id, rf, rg, MAP_PEAK - 1.6f);
+            choice = floorCopy.singleRandom(random);
+            rf = choice.x;
+            rg = choice.y;
+            floorCopy.remove(choice);
+            Mover enemy = new Mover(map, animations, id, rf, rg, 1);
             // We track enemies here as well as tracking them as general Movers in the map so that we can handle the
             // semi-random movement of enemies when we update them in Main, without semi-randomly moving the player.
             enemies.add(enemy);

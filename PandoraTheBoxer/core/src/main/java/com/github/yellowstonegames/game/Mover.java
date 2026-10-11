@@ -286,12 +286,7 @@ public class Mover implements HasPosition3D {
         velocity.x = df * speed;
         velocity.y = dg * speed;
 
-//        if (df == 0 && dg == 0) return;
-
         currentDirection = (int)((TrigTools.atan2Deg360Finite(dg, df) + (720 + 45 + 180) + map.rotationDegrees) % 360) / 90;
-        // Determine direction based on movement
-//        if (MathUtils.cosDeg(-45f - map.rotationDegrees) * dg - MathUtils.sinDeg(-45f - map.rotationDegrees) * df > 0.1f) currentDirection = 1; // Up
-//        else currentDirection = 0; // Down
     }
 
     /**

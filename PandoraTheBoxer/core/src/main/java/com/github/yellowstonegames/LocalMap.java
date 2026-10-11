@@ -7,8 +7,10 @@ import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.github.tommyettinger.random.AceRandom;
+import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.yellowstonegames.game.AssetData;
 import com.github.yellowstonegames.game.Mover;
+import com.github.yellowstonegames.grid.Region;
 import com.github.yellowstonegames.place.FlowingCaveGenerator;
 import com.github.yellowstonegames.place.OrganicConnectingMapGenerator;
 import com.github.yellowstonegames.place.PlaceGenerator;
@@ -31,6 +33,11 @@ public class LocalMap {
      * byte IDs, and some games might require short IDs, but int is used just because Java can directly create ints.
      */
     public int[][][] tiles;
+
+    /**
+     * A SquidSquad Region that stores all Coord points where a floor is walkable.
+     */
+    public Region floors;
     /**
      * The critical, sortable mapping of Vector4 positions to visible IsoSprites. This includes two IsoSprites for each
      * voxel of terrain: one is the terrain cube itself, and one is its outline, which has a substantial depth modifier
@@ -130,6 +137,7 @@ public class LocalMap {
         this.tileset = atlas.findRegions("Rock_Cube_angle0");
 //        this.edge = atlas.createSprite("edge");
         tiles = new int[width][height][layers];
+        floors = new Region(width, height);
         fCenter = (width - 1) * 0.5f;
         gCenter = (height - 1) * 0.5f;
         for (int f = 0; f < width; f++) {
@@ -416,35 +424,31 @@ public class LocalMap {
     private static final GridPoint2[] DIRECTIONS = {new GridPoint2(1, 0), new GridPoint2(0, 1), new GridPoint2(-1, 0), new GridPoint2(0, -1)};
 
     /**
-     * Generates a simple test map that assumes a specific tileset (using {@code isometric-trpg.atlas} as
-     * {@code tileset}, {@code tileset.findRegions("tile")}). Allows setting a specific seed to get the same map every
-     * time. This requires a minimum {@code mapSize} of 11 and a minimum {@code mapPeak} of 4.
+     * Generates a simple test map that assumes a specific tileset. Allows setting a specific seed to get the same map
+     * every time. This requires a minimum {@code mapSize} of 11 and a minimum {@code mapPeak} of 4.
      * <br>
      * CUSTOM TO YOUR GAME.
-     * @param seed if this {@code long} is the same, the same map will be produced on each call
+     * @param random a juniper EnhancedRandom
      * @param mapSize the width and height of the map, or the dimensions of the ground plane in tiles
      * @param mapPeak the layer count or max elevation of the map
-     * @param atlas should probably be the TextureAtlas loaded from {@code isometric-trpg.atlas}
+     * @param atlas should probably be the TextureAtlas loaded from {@code PandoraTheBoxer.atlas}
      * @return a new LocalMap
      */
-    public static LocalMap generateMap(long seed, int mapSize, int mapPeak, TextureAtlas atlas) {
+    public static LocalMap generateMap(EnhancedRandom random, int mapSize, int mapPeak, TextureAtlas atlas) {
 
         // Noise that gradually moves a little
-        MiniNoise baseNoise = new MiniNoise((int) (seed), 0.06f, MiniNoise.FBM, 3);
+        MiniNoise baseNoise = new MiniNoise(random.nextInt(), 0.06f, MiniNoise.FBM, 3);
         // Noise that is usually a low value, but has ridges of high values
-        MiniNoise ridgeNoise = new MiniNoise((int) (seed >> 32), 0.1f, MiniNoise.RIDGED, 1);
-        // This makes calls to MathUtils random number methods predictable, including after this call completes!
-        // You may want to re-randomize MathUtils' random number generator after this completes, using:
-        //  MathUtils.random.setSeed(System.currentTimeMillis());
-        MathUtils.random.setSeed(seed);
+        MiniNoise ridgeNoise = new MiniNoise(random.nextInt(), 0.1f, MiniNoise.RIDGED, 1);
 
         mapSize = Math.max(11, mapSize);
         mapPeak = Math.max(4, mapPeak);
 
         LocalMap map = new LocalMap(mapSize, mapSize, mapPeak, atlas);
-        PlaceGenerator mapGen = new FlowingCaveGenerator(mapSize, mapSize, TilesetType.DEFAULT_DUNGEON, new AceRandom(seed));
+        PlaceGenerator mapGen = new FlowingCaveGenerator(mapSize, mapSize, TilesetType.DEFAULT_DUNGEON, random);
 //        PlaceGenerator mapGen = new OrganicConnectingMapGenerator(mapSize, mapSize, 6, 6, 3, new AceRandom(seed));
         char[][] dungeon = mapGen.generate();
+        map.floors.refill(dungeon, '.');
         // Random voxels as a base, with height determined by noise. Either dirt 25% of the time, or grass the rest.
         for (int f = 0; f < mapSize; f++) {
             for (int g = 0; g < mapSize; g++) {
