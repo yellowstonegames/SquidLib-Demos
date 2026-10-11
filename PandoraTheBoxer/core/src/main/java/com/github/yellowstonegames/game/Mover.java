@@ -194,7 +194,7 @@ public class Mover implements HasPosition3D {
             float rf = c * df + s * dg;
             float rg = c * dg - s * df;
 
-            if(isGrounded && df * df + dg * dg > 0.5f) jump();
+//            if(isGrounded && df * df + dg * dg > 0.5f) jump();
             move(rf, rg, NPC_MOVE_SPEED);
         }
         accumulator += deltaTime;
@@ -306,7 +306,6 @@ public class Mover implements HasPosition3D {
 
         // If there was an earlier collision, it shouldn't affect the current frame.
         map.movers.colliding.clear();
-        boolean lateralCollision = false;
 
         // these blocks are, sadly, mostly-repeated code.
         // Each block defines lo and hi differently, and checks them against different axes.
@@ -322,7 +321,6 @@ public class Mover implements HasPosition3D {
             if (position.x >= lo && position.x <= hi) {
                 position.x = lo;
                 velocity.x = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -339,7 +337,6 @@ public class Mover implements HasPosition3D {
             if (position.y >= lo && position.y <= hi) {
                 position.y = lo;
                 velocity.y = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -356,7 +353,6 @@ public class Mover implements HasPosition3D {
             if (position.x >= lo && position.x <= hi) {
                 position.x = hi;
                 velocity.x = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -373,7 +369,6 @@ public class Mover implements HasPosition3D {
             if (position.y >= lo && position.y <= hi) {
                 position.y = hi;
                 velocity.y = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -400,7 +395,6 @@ public class Mover implements HasPosition3D {
                 position.y = loY;
                 velocity.x = 0;
                 velocity.y = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -421,7 +415,6 @@ public class Mover implements HasPosition3D {
                 position.y = hiY;
                 velocity.x = 0;
                 velocity.y = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -442,7 +435,6 @@ public class Mover implements HasPosition3D {
                 position.y = loY;
                 velocity.x = 0;
                 velocity.y = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -463,7 +455,6 @@ public class Mover implements HasPosition3D {
                 position.y = hiY;
                 velocity.x = 0;
                 velocity.y = 0;
-                lateralCollision = true;
             }
             if(!npc && map.movers.colliding.notEmpty()) {
                 takeDamage();
@@ -484,15 +475,6 @@ public class Mover implements HasPosition3D {
                 position.z = MathUtils.round(position.z);
                 isGrounded = true;
                 velocity.z = 0;
-                // If we start to overlap with another tile, force a jump to avoid an unwanted collision.
-                if(!lateralCollision) {
-                    if     (map.getTile(position.x - 0.5f, position.y - 0.5f, position.z) != -1 ||
-                            map.getTile(position.x - 0.5f, position.y + 0.5f, position.z) != -1 ||
-                            map.getTile(position.x + 0.5f, position.y - 0.5f, position.z) != -1 ||
-                            map.getTile(position.x + 0.5f, position.y + 0.5f, position.z) != -1) {
-                        jump();
-                    }
-                }
             }
         } else {
             // If nothing is below the Mover in the 4 nearby cells below, they are falling.
