@@ -82,6 +82,144 @@ public final class AssetData {
      */
     public static final int TILE_DEPTH = 32;
 
+    public static final int NORTH  = 1 << 3;
+    public static final int WEST   = 1 << 2;
+    public static final int SOUTH  = 1 << 1;
+    public static final int EAST   = 1;
+
+    public static final NumberedSet<String> LAND = NumberedSet.with(
+        "Rock_Corner_angle0",
+        "Rock_Corner_angle1",
+        "Rock_Corner_angle2",
+        "Rock_Corner_angle3",
+        "Rock_Cube_angle0",
+        "Rock_Cube_angle1",
+        "Rock_Cube_angle2",
+        "Rock_Cube_angle3",
+        "Rock_Nick_angle0",
+        "Rock_Nick_angle1",
+        "Rock_Nick_angle2",
+        "Rock_Nick_angle3",
+        "Rock_Ridge_angle0",
+        "Rock_Ridge_angle1",
+        "Rock_Ridge_angle2",
+        "Rock_Ridge_angle3",
+        "Rock_Slope_angle0",
+        "Rock_Slope_angle1",
+        "Rock_Slope_angle2",
+        "Rock_Slope_angle3",
+        "Rock_Valley_angle0",
+        "Rock_Valley_angle1",
+        "Rock_Valley_angle2",
+        "Rock_Valley_angle3",
+        "Rock_Lichen_Corner_angle0",
+        "Rock_Lichen_Corner_angle1",
+        "Rock_Lichen_Corner_angle2",
+        "Rock_Lichen_Corner_angle3",
+        "Rock_Lichen_Cube_angle0",
+        "Rock_Lichen_Cube_angle1",
+        "Rock_Lichen_Cube_angle2",
+        "Rock_Lichen_Cube_angle3",
+        "Rock_Lichen_Nick_angle0",
+        "Rock_Lichen_Nick_angle1",
+        "Rock_Lichen_Nick_angle2",
+        "Rock_Lichen_Nick_angle3",
+        "Rock_Lichen_Ridge_angle0",
+        "Rock_Lichen_Ridge_angle1",
+        "Rock_Lichen_Ridge_angle2",
+        "Rock_Lichen_Ridge_angle3",
+        "Rock_Lichen_Slope_angle0",
+        "Rock_Lichen_Slope_angle1",
+        "Rock_Lichen_Slope_angle2",
+        "Rock_Lichen_Slope_angle3",
+        "Rock_Lichen_Valley_angle0",
+        "Rock_Lichen_Valley_angle1",
+        "Rock_Lichen_Valley_angle2",
+        "Rock_Lichen_Valley_angle3",
+        "Rock_Moss_Corner_angle0",
+        "Rock_Moss_Corner_angle1",
+        "Rock_Moss_Corner_angle2",
+        "Rock_Moss_Corner_angle3",
+        "Rock_Moss_Cube_angle0",
+        "Rock_Moss_Cube_angle1",
+        "Rock_Moss_Cube_angle2",
+        "Rock_Moss_Cube_angle3",
+        "Rock_Moss_Nick_angle0",
+        "Rock_Moss_Nick_angle1",
+        "Rock_Moss_Nick_angle2",
+        "Rock_Moss_Nick_angle3",
+        "Rock_Moss_Ridge_angle0",
+        "Rock_Moss_Ridge_angle1",
+        "Rock_Moss_Ridge_angle2",
+        "Rock_Moss_Ridge_angle3",
+        "Rock_Moss_Slope_angle0",
+        "Rock_Moss_Slope_angle1",
+        "Rock_Moss_Slope_angle2",
+        "Rock_Moss_Slope_angle3",
+        "Rock_Moss_Valley_angle0",
+        "Rock_Moss_Valley_angle1",
+        "Rock_Moss_Valley_angle2",
+        "Rock_Moss_Valley_angle3");
+    static {
+        LAND.setDefaultValue(-1);
+    }
+    public static final String[][] SLOPES = {
+        {
+            "Empty",
+            "Rock_Corner_angle1",
+            "Rock_Corner_angle0",
+            "Rock_Slope_angle1",
+            "Rock_Corner_angle3",
+            "Rock_Valley_angle0",
+            "Rock_Slope_angle0",
+            "Rock_Nick_angle0",
+            "Rock_Corner_angle2",
+            "Rock_Slope_angle2",
+            "Rock_Valley_angle1",
+            "Rock_Nick_angle1",
+            "Rock_Slope_angle3",
+            "Rock_Nick_angle2",
+            "Rock_Nick_angle3",
+            "Rock_Cube_angle0",
+        },
+        {
+            "Empty",
+            "Rock_Lichen_Corner_angle1",
+            "Rock_Lichen_Corner_angle0",
+            "Rock_Lichen_Slope_angle1",
+            "Rock_Lichen_Corner_angle3",
+            "Rock_Lichen_Valley_angle0",
+            "Rock_Lichen_Slope_angle0",
+            "Rock_Lichen_Nick_angle0",
+            "Rock_Lichen_Corner_angle2",
+            "Rock_Lichen_Slope_angle2",
+            "Rock_Lichen_Valley_angle1",
+            "Rock_Lichen_Nick_angle1",
+            "Rock_Lichen_Slope_angle3",
+            "Rock_Lichen_Nick_angle2",
+            "Rock_Lichen_Nick_angle3",
+            "Rock_Lichen_Cube_angle0",
+        },
+        {
+            "Empty",
+            "Rock_Moss_Corner_angle1",
+            "Rock_Moss_Corner_angle0",
+            "Rock_Moss_Slope_angle1",
+            "Rock_Moss_Corner_angle3",
+            "Rock_Moss_Valley_angle0",
+            "Rock_Moss_Slope_angle0",
+            "Rock_Moss_Nick_angle0",
+            "Rock_Moss_Corner_angle2",
+            "Rock_Moss_Slope_angle2",
+            "Rock_Moss_Valley_angle1",
+            "Rock_Moss_Nick_angle1",
+            "Rock_Moss_Slope_angle3",
+            "Rock_Moss_Nick_angle2",
+            "Rock_Moss_Nick_angle3",
+            "Rock_Moss_Cube_angle0",
+        },
+    };
+
     /**
      * No need to instantiate.
      */
@@ -197,23 +335,6 @@ public final class AssetData {
     public static final int HALF_DECO_BED_GR     =   8 + 99;
     public static final int HALF_DECO_BED_FT     =   9 + 99;
     public static final int DECO_FENCE_FT        =  10 + 99;
-
-    public static final int KNIGHT      = 0;
-    public static final int LANCER      = 1;
-    public static final int ARCHER      = 2;
-    public static final int ROGUE       = 3;
-    public static final int ORC_BRUTE   = 4;
-    public static final int ORC_GUARD   = 5;
-    public static final int ORC_BUTCHER = 6;
-    public static final int ORC_SLINGER = 7;
-    public static final int SHADOW      = 8;
-    public static final int WIZARD      = 9;
-    public static final int DEMON       = 10;
-    public static final int CROSSBOWMAN = 11;
-    public static final int MITE        = 12;
-    public static final int FISH        = 13;
-    public static final int BAT         = 14;
-    public static final int JELLY       = 15;
 
     /** Special index; not an animation. */
     public static final int TOMBSTONE   = 128;

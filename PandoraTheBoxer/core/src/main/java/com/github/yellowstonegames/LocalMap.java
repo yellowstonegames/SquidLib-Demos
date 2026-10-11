@@ -438,7 +438,7 @@ public class LocalMap {
     public static LocalMap generateMap(EnhancedRandom random, int mapSize, int mapPeak, TextureAtlas atlas) {
 
         // Noise that gradually moves a little
-        MiniNoise baseNoise = new MiniNoise(random.nextInt(), 0.06f, MiniNoise.FBM, 3);
+        MiniNoise baseNoise = new MiniNoise(random.nextInt(), 0.07f, MiniNoise.FBM, 3);
         // Noise that is usually a low value, but has ridges of high values
         MiniNoise ridgeNoise = new MiniNoise(random.nextInt(), 0.1f, MiniNoise.RIDGED, 1);
 
@@ -459,7 +459,7 @@ public class LocalMap {
                 map.setTile(f, g, height, 0);
                 // Anything below one of these tiles must be dirt.
                 for (int h = height - 1; h >= 0; h--) {
-                    map.setTile(f, g, h, AssetData.DIRT);
+                    map.setTile(f, g, h, 0);
                 }
             }
         }
