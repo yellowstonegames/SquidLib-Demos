@@ -83,9 +83,9 @@ public final class AssetData {
     public static final int TILE_DEPTH = 32;
 
     public static final int NORTH  = 1 << 3;
-    public static final int WEST   = 1 << 2;
+    public static final int EAST   = 1 << 2;
     public static final int SOUTH  = 1 << 1;
-    public static final int EAST   = 1;
+    public static final int WEST   = 1;
 
     /**
      * Allows getting names in the atlas given indices, and vice versa. All shapes are in groups of 4.
@@ -249,6 +249,19 @@ public final class AssetData {
      */
     public static int rotateIndex(int index, int relativeRotation){
         return (index & ~3) | (index + relativeRotation & 3) | (index >> 31);
+    }
+
+    /**
+     * Given an index from {@link #SLOPE_INDICES} and a number of quarter-turns to rotate it from an unrotated angle,
+     * gets the rotated index that can be looked up in {@link #LAND} with {@link NumberedSet#getAt(int)}.
+     * If the index is negative, this always returns -1, which importantly can't be looked up with getAt(), but may be a
+     * correct tile index.
+     * @param index an index from {@link #SLOPE_INDICES}
+     * @param rotation how many quarter-turns to rotate the image at the given index from unrotated; may be negative
+     * @return the rotated index
+     */
+    public static int setRotationIndex(int index, int rotation){
+        return (index & ~3) | (rotation & 3) | (index >> 31);
     }
 
     /**

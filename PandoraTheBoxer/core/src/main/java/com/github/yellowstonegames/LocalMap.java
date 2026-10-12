@@ -459,9 +459,9 @@ public class LocalMap {
                 map.setTile(f, g, height, 4);
                 if(height == 0){
                     int n = baseNoise.getNoise(f+1, g+1) > 0f ? AssetData.NORTH : 0;
-                    int w = baseNoise.getNoise(f  , g+1) > 0f ? AssetData.WEST : 0; // west and east seem flipped?
+                    int w = baseNoise.getNoise(f+1, g  ) > 0f ? AssetData.WEST : 0;
                     int s = baseNoise.getNoise(f  , g  ) > 0f ? AssetData.SOUTH : 0;
-                    int e = baseNoise.getNoise(f+1, g) > 0f ? AssetData.EAST : 0;
+                    int e = baseNoise.getNoise(f  , g+1) > 0f ? AssetData.EAST : 0;
                     map.setTile(f, g, 1, AssetData.SLOPE_INDICES[0][n|w|s|e]);
                 }
                 // Anything below one of these tiles must be solid.

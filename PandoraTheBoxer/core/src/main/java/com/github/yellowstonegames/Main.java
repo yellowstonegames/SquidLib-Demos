@@ -631,9 +631,7 @@ public class Main extends ApplicationAdapter {
             for (int i = 0, n = order.size; i < n; i++) {
                 Vector4 pt = order.get(i);
                 if(pt.w != 0f) continue; // 0f is used for terrain, higher values for creatures, lower for outlines.
-                int[] rots = AssetData.ROTATIONS.get(map.getTile(pt)); // some tiles change appearance when rotated
-                if(rots != null)
-                    map.everything.get(pt).sprite.setRegion(map.tileset.get(rots[rotationIndex]));
+                map.everything.get(pt).sprite.setRegion(map.tileset.get(AssetData.rotateIndex(map.getTile(pt), rotationIndex)));
             }
         }
 
