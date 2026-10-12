@@ -451,13 +451,12 @@ public class LocalMap {
 //        PlaceGenerator mapGen = new OrganicConnectingMapGenerator(mapSize, mapSize, 6, 6, 3, new AceRandom(seed));
         char[][] dungeon = mapGen.generate();
         map.floors.refill(dungeon, '.');
-        // Random voxels as a base, with height determined by noise. Either dirt 25% of the time, or grass the rest.
+        // Cave map as a base, with slopes determined by noise.
         for (int f = 0; f < mapSize; f++) {
             for (int g = 0; g < mapSize; g++) {
                 int height = dungeon[f][g] == '#' ? 2 : 0;
-                // Some tiles are dirt, but most are grass; the 1.1f + 0.6f * baseNoise... is usually 1, but sometimes 0.
-//                int tile = (int)(1.1f + 0.6f * baseNoise.getNoiseWithSeed(f * 2.3f, g * 2.3f, ~baseNoise.getSeed()));
-                map.setTile(f, g, height, 0);
+                // tile ID 4 is a solid rock cube.
+                map.setTile(f, g, height, 4);
                 if(height == 0){
                     int n = baseNoise.getNoise(f+1, g+1) > 0f ? AssetData.NORTH : 0;
                     int w = baseNoise.getNoise(f+1, g  ) > 0f ? AssetData.WEST : 0;
@@ -465,15 +464,15 @@ public class LocalMap {
                     int e = baseNoise.getNoise(f  , g+1) > 0f ? AssetData.EAST : 0;
                     map.setTile(f, g, 1, AssetData.SLOPE_INDICES[0][n|w|s|e]);
                 }
-                // Anything below one of these tiles must be dirt.
+                // Anything below one of these tiles must be solid.
                 for (int h = height - 1; h >= 0; h--) {
-                    map.setTile(f, g, h, 0);
+                    map.setTile(f, g, h, 4);
                 }
             }
         }
 
         // Remove this next line if you intend to allow players to edit the map or destroy tiles during play.
-        removeInvisibleTiles(map);
+//        removeInvisibleTiles(map);
         return map;
     }
 
