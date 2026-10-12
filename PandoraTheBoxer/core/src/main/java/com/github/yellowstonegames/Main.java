@@ -641,7 +641,7 @@ public class Main extends ApplicationAdapter {
             for (int i = 0, n = order.size; i < n; i++) {
                 Vector4 pt = order.get(i);
                 if(pt.w != 0f) continue; // 0f is used for terrain, higher values for creatures, lower for outlines.
-                map.everything.get(pt).sprite.setRegion(map.tileset.get(AssetData.rotateIndex(map.getTile(pt), rotationIndex)));
+                setVisual(map.everything.get(pt).sprite, map.tileset.get(AssetData.rotateIndex(map.getTile(pt), rotationIndex)));
             }
         }
 
@@ -712,6 +712,15 @@ public class Main extends ApplicationAdapter {
         stage.act(delta);
         // This draws the Stage and its contents completely separately from the rest of the gameplay sprites.
         stage.draw();
+    }
+
+    private static void setVisual(TextureAtlas.AtlasSprite sprite, TextureAtlas.AtlasRegion region) {
+        TextureAtlas.AtlasRegion r = sprite.getAtlasRegion();
+        r.offsetX = region.offsetX;
+        r.offsetY = region.offsetY;
+        sprite.setRegion(region);
+        sprite.setOrigin(region.originalWidth / 2f, region.originalHeight / 2f);
+        sprite.setBounds(0, 0, region.originalWidth, region.originalHeight);
     }
 
     /**
