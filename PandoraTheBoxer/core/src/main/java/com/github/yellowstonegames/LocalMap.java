@@ -135,7 +135,10 @@ public class LocalMap {
      * @param atlas a TextureAtlas this will pull many regions from
      */
     public LocalMap(int width, int height, int layers, TextureAtlas atlas) {
-        this.tileset = atlas.findRegions("Rock_Cube_angle0");
+        this.tileset = new Array<>(AssetData.LAND.size());
+        for(String land : AssetData.LAND){
+            this.tileset.add(atlas.findRegion(land, 0));
+        }
 //        this.edge = atlas.createSprite("edge");
         tiles = new int[width][height][layers];
         floors = new Region(width, height);
@@ -286,7 +289,6 @@ public class LocalMap {
      * @param tileId an ID for a tile, typically from {@link AssetData}; may be -1 to remove a tile
      */
     public void setTile(int f, int g, int h, int tileId) {
-        tileId >>= 31; //TODO: this is here to limit tileId to -1 or 0; when more than 0 is available, remove this!
         if (isValid(f, g, h)) {
             tiles[f][g][h] = tileId;
             if (tileId == -1) {
@@ -321,7 +323,6 @@ public class LocalMap {
      * @param tileId an ID for a tile, typically from {@link AssetData}
      */
     public void setTile(Vector4 point, int tileId) {
-        tileId >>= 31; //TODO: this is here to limit tileId to -1 or 0; when more than 0 is available, remove this!
         int f = round(point.x);
         int g = round(point.y);
         int h = round(point.z);
@@ -457,6 +458,13 @@ public class LocalMap {
                 // Some tiles are dirt, but most are grass; the 1.1f + 0.6f * baseNoise... is usually 1, but sometimes 0.
 //                int tile = (int)(1.1f + 0.6f * baseNoise.getNoiseWithSeed(f * 2.3f, g * 2.3f, ~baseNoise.getSeed()));
                 map.setTile(f, g, height, 0);
+                if(height == 0){
+                    int n = baseNoise.getNoise(f+1, g+1) > 0f ? AssetData.NORTH : 0;
+                    int w = baseNoise.getNoise(f+1, g  ) > 0f ? AssetData.WEST : 0;
+                    int s = baseNoise.getNoise(f  , g  ) > 0f ? AssetData.SOUTH : 0;
+                    int e = baseNoise.getNoise(f  , g+1) > 0f ? AssetData.EAST : 0;
+                    map.setTile(f, g, 1, AssetData.SLOPE_INDICES[0][n|w|s|e]);
+                }
                 // Anything below one of these tiles must be dirt.
                 for (int h = height - 1; h >= 0; h--) {
                     map.setTile(f, g, h, 0);
@@ -531,7 +539,8 @@ public class LocalMap {
         Coord[] found = floors.separatedPoisson(random, 3, boxCount);
         for(Coord point : found)
         {
-            setEntity(point.x, point.y, 1, Mover.NPC_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.ENTITIES.indexOf("Box_Open")), point.x, point.y, 1));
+            int h = tiles[point.x][point.y][1] == -1 ? 1 : 2;
+            setEntity(point.x, point.y, h, Mover.NPC_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.ENTITIES.indexOf("Box_Open")), point.x, point.y, h));
         }
         return found;
     }
