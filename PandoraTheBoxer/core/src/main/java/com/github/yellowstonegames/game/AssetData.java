@@ -87,6 +87,9 @@ public final class AssetData {
     public static final int SOUTH  = 1 << 1;
     public static final int EAST   = 1;
 
+    /**
+     * Allows getting names in the atlas given indices, and vice versa. All shapes are in groups of 4.
+     */
     public static final NumberedSet<String> LAND = NumberedSet.with(
         "Rock_Corner_angle0",
         "Rock_Corner_angle1",
@@ -161,6 +164,11 @@ public final class AssetData {
         "Rock_Moss_Valley_angle2",
         "Rock_Moss_Valley_angle3");
 
+    /**
+     * 3 arrays of 16 combinations of corner heights. The index into the outer array should correspond to whether you
+     * want Rock, Rock with Lichen, or Rock with Moss. The index into the inner array can be composed by the height of
+     * the corners of a tile, as composed by ORing {@link #NORTH}, {@link #SOUTH}, {@link #EAST}, and {@link #WEST}.
+     */
     public static final String[][] SLOPES = {
         {
             "Empty_angle0",
@@ -218,6 +226,9 @@ public final class AssetData {
         },
     };
 
+    /**
+     * Tile indices that can be looked up in {@link #LAND}; includes -1 when no voxel should be present.
+     */
     public static final int[][] SLOPE_INDICES = new int[3][16];
     static {
         LAND.setDefaultValue(-1);
@@ -226,6 +237,18 @@ public final class AssetData {
                 SLOPE_INDICES[t][s] = LAND.indexOf(SLOPES[t][s]);
             }
         }
+    }
+
+    /**
+     * Given an index from {@link #SLOPE_INDICES} and a number of quarter-turns to rotate it, gets the rotated index
+     * that can be looked up in {@link #LAND} with {@link NumberedSet#getAt(int)}. If the index is negative, this always
+     * returns -1, which importantly can't be looked up with getAt(), but may be a correct tile index.
+     * @param index an index from {@link #SLOPE_INDICES}
+     * @param relativeRotation how many quarter-turns to rotate the image at the given index; may be negative
+     * @return the rotated index
+     */
+    public static int rotateIndex(int index, int relativeRotation){
+        return (index & ~3) | (index + relativeRotation & 3) | (index >> 31);
     }
 
     /**
