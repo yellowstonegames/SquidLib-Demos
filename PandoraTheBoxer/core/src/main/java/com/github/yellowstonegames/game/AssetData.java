@@ -160,12 +160,10 @@ public final class AssetData {
         "Rock_Moss_Valley_angle1",
         "Rock_Moss_Valley_angle2",
         "Rock_Moss_Valley_angle3");
-    static {
-        LAND.setDefaultValue(-1);
-    }
+
     public static final String[][] SLOPES = {
         {
-            "Empty",
+            "Empty_angle0",
             "Rock_Corner_angle1",
             "Rock_Corner_angle0",
             "Rock_Slope_angle1",
@@ -183,7 +181,7 @@ public final class AssetData {
             "Rock_Cube_angle0",
         },
         {
-            "Empty",
+            "Empty_angle0",
             "Rock_Lichen_Corner_angle1",
             "Rock_Lichen_Corner_angle0",
             "Rock_Lichen_Slope_angle1",
@@ -201,7 +199,7 @@ public final class AssetData {
             "Rock_Lichen_Cube_angle0",
         },
         {
-            "Empty",
+            "Empty_angle0",
             "Rock_Moss_Corner_angle1",
             "Rock_Moss_Corner_angle0",
             "Rock_Moss_Slope_angle1",
@@ -219,6 +217,16 @@ public final class AssetData {
             "Rock_Moss_Cube_angle0",
         },
     };
+
+    public static final int[][] SLOPE_INDICES = new int[3][16];
+    static {
+        LAND.setDefaultValue(-1);
+        for (int t = 0; t < 3; t++) {
+            for (int s = 0; s < 16; s++) {
+                SLOPE_INDICES[t][s] = LAND.indexOf(SLOPES[t][s]);
+            }
+        }
+    }
 
     /**
      * No need to instantiate.
