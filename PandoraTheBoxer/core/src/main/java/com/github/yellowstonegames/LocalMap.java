@@ -3,6 +3,7 @@ package com.github.yellowstonegames;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
@@ -297,9 +298,9 @@ public class LocalMap {
             } else {
                 IsoSprite iso;
                 if ((iso = everything.get(tempVec4.set(f, g, h, 0))) != null) {
-                    iso.setSprite(new TextureAtlas.AtlasSprite(tileset.get(tileId)));
+                    iso.setSprite(new AtlasSprite(tileset.get(tileId)));
                 } else {
-                    everything.put(new Vector4(f, g, h, 0), iso = new IsoSprite(new TextureAtlas.AtlasSprite(tileset.get(tileId)), f, g, h));
+                    everything.put(new Vector4(f, g, h, 0), iso = new IsoSprite(new AtlasSprite(tileset.get(tileId)), f, g, h));
 //                    // Environment tiles have an outline that may render if there is empty space behind them.
 //                    // The position has -1.5 for w, and w is added to the depth for the purpose of sorting.
 //                    // Adjacent environment tiles should have a depth that is +1 or -1 from this tile.
@@ -337,7 +338,7 @@ public class LocalMap {
                 if ((iso = everything.get(point)) != null) {
                     iso.setPosition(point.x, point.y, point.z);
                 } else {
-                    everything.put(point, iso = new IsoSprite(new TextureAtlas.AtlasSprite(tileset.get(tileId)), point.x, point.y, point.z));
+                    everything.put(point, iso = new IsoSprite(new AtlasSprite(tileset.get(tileId)), point.x, point.y, point.z));
 //                    // Environment tiles have an outline that may render if there is empty space behind them.
 //                    // The position has -1.5 for w, and w is added to the depth for the purpose of sorting.
 //                    // Adjacent environment tiles should have a depth that is +1 or -1 from this tile.
@@ -534,7 +535,7 @@ public class LocalMap {
      * @param animations used to get the animation for a box so we can make {@link AnimatedIsoSprite}s per box
      * @return this LocalMap for chaining
      */
-    public Coord[] placeBoxes(EnhancedRandom random, int boxCount, Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations) {
+    public Coord[] placeBoxes(EnhancedRandom random, int boxCount, Array<Array<Animation<AtlasSprite>>> animations) {
         Coord[] found = floors.separatedPoisson(random, 3, boxCount);
         for(Coord point : found)
         {

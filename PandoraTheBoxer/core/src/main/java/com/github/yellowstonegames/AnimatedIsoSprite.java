@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
+
 /**
  * A variant on {@link IsoSprite} that changes its visual Sprite based on an animation, typically a looping one.
  */
@@ -11,13 +12,13 @@ public class AnimatedIsoSprite extends IsoSprite {
     /**
      * The Animation of Sprite that determines which Sprite will be currently shown.
      */
-    public Animation<? extends TextureAtlas.AtlasSprite> animation;
+    public Animation<? extends AtlasSprite> animation;
 
     /**
      * Creates an AnimatedIsoSprite with the given Animation of Sprite, setting the initial visual to its first frame.
      * @param animation an Animation of Sprite or subclasses of Sprite
      */
-    public AnimatedIsoSprite(Animation<? extends TextureAtlas.AtlasSprite> animation) {
+    public AnimatedIsoSprite(Animation<? extends AtlasSprite> animation) {
         super(animation.getKeyFrame(0, true));
         this.animation = animation;
     }
@@ -30,7 +31,7 @@ public class AnimatedIsoSprite extends IsoSprite {
      * @param g isometric tile g-coordinate
      * @param h isometric tile h-coordinate
      */
-    public AnimatedIsoSprite(Animation<? extends TextureAtlas.AtlasSprite> animation, float f, float g, float h) {
+    public AnimatedIsoSprite(Animation<? extends AtlasSprite> animation, float f, float g, float h) {
         super(animation.getKeyFrame(0, true));
         this.animation = animation;
         setPosition(f, g, h);

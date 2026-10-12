@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -112,7 +113,7 @@ public class Main extends ApplicationAdapter {
      * <br>
      * CUSTOM TO YOUR GAME.
      */
-    private Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations;
+    private Array<Array<Animation<AtlasSprite>>> animations;
 
     /**
      * This is drawn separately from the gameplay, at 100% pixel-perfect size.
@@ -486,8 +487,8 @@ public class Main extends ApplicationAdapter {
         // This step will be different for every game's assets.
         animations = new Array<>(4);
         // We create a single ArraySupplier with a constructor reference so Android won't create four different ones.
-        ArraySupplier<Animation<TextureAtlas.AtlasSprite>[]> animationSupplier = Animation[]::new;
-        ArraySupplier<TextureAtlas.AtlasSprite[]> spriteSupplier = TextureAtlas.AtlasSprite[]::new;
+        ArraySupplier<Animation<AtlasSprite>[]> animationSupplier = Animation[]::new;
+        ArraySupplier<AtlasSprite[]> spriteSupplier = AtlasSprite[]::new;
         // Apologies for the duplicated lines; these use libGDX 1.13.5 and later's way of initializing an Array.
         animations.add(new Array<>(true, 16, animationSupplier));
         animations.add(new Array<>(true, 16, animationSupplier));
@@ -537,11 +538,11 @@ public class Main extends ApplicationAdapter {
         Gdx.graphics.setVSync(cap != 0);
     }
 
-    private Array<TextureAtlas.AtlasSprite> createSprites(String s, ArraySupplier<TextureAtlas.AtlasSprite[]> supplier) {
-        Array<TextureAtlas.AtlasSprite> array = new Array<>(true, 4, supplier);
+    private Array<AtlasSprite> createSprites(String s, ArraySupplier<AtlasSprite[]> supplier) {
+        Array<AtlasSprite> array = new Array<>(true, 4, supplier);
         Array<TextureAtlas.AtlasRegion> rs = atlas.findRegions(s);
         for (int i = 0; i < rs.size; i++) {
-            array.add(new TextureAtlas.AtlasSprite(rs.get(i)));
+            array.add(new AtlasSprite(rs.get(i)));
         }
         return array;
     }
@@ -714,13 +715,19 @@ public class Main extends ApplicationAdapter {
         stage.draw();
     }
 
-    private static void setVisual(TextureAtlas.AtlasSprite sprite, TextureAtlas.AtlasRegion region) {
+    private static void setVisual(AtlasSprite sprite, TextureAtlas.AtlasRegion region) {
         TextureAtlas.AtlasRegion r = sprite.getAtlasRegion();
-        r.offsetX = region.offsetX;
-        r.offsetY = region.offsetY;
+        sprite.originalOffsetX = region.offsetX;
+        sprite.originalOffsetY = region.offsetY;
         sprite.setRegion(region);
         sprite.setOrigin(region.originalWidth / 2f, region.originalHeight / 2f);
-        sprite.setBounds(0, 0, region.originalWidth, region.originalHeight);
+        int width = region.getRegionWidth();
+        int height = region.getRegionHeight();
+        if (region.rotate) {
+            sprite.rotate90(true);
+            sprite.setSuperBounds(region.offsetX, region.offsetY, height, width);
+        } else
+            sprite.setSuperBounds(region.offsetX, region.offsetY, width, height);
     }
 
     /**

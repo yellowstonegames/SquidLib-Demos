@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Array;
 import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.digital.TrigTools;
 import com.github.yellowstonegames.AnimatedIsoSprite;
+import com.github.yellowstonegames.AtlasSprite;
 import com.github.yellowstonegames.Main;
 import com.github.yellowstonegames.LocalMap;
 import com.github.yellowstonegames.util.HasPosition3D;
@@ -75,7 +76,7 @@ public class Mover implements HasPosition3D {
      * <br>
      * This will likely need to change if the assets change.
      */
-    private final Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations;
+    private final Array<Array<Animation<AtlasSprite>>> animations;
     /**
      * The index into the inner Arrays of {@link #animations}, determining which creature this appears as.
      * <br>
@@ -154,7 +155,7 @@ public class Mover implements HasPosition3D {
      * @param gPos isometric tile g-coordinate
      * @param hPos isometric tile h-coordinate
      */
-    public Mover(LocalMap map, Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations, int index,
+    public Mover(LocalMap map, Array<Array<Animation<AtlasSprite>>> animations, int index,
                  float fPos, float gPos, float hPos) {
         this.map = map;
         this.position.set(fPos, gPos, hPos);
