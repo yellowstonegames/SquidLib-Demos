@@ -534,7 +534,7 @@ public class LocalMap {
      * @param animations used to get the animation for a box so we can make {@link AnimatedIsoSprite}s per box
      * @return this LocalMap for chaining
      */
-    public Coord[] placeBoxes(EnhancedRandom random, int boxCount, Array<Array<Animation<Sprite>>> animations) {
+    public Coord[] placeBoxes(EnhancedRandom random, int boxCount, Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations) {
         Coord[] found = floors.separatedPoisson(random, 3, boxCount);
         for(Coord point : found)
         {

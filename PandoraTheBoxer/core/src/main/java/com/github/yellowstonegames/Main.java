@@ -112,7 +112,7 @@ public class Main extends ApplicationAdapter {
      * <br>
      * CUSTOM TO YOUR GAME.
      */
-    private Array<Array<Animation<Sprite>>> animations;
+    private Array<Array<Animation<TextureAtlas.AtlasSprite>>> animations;
 
     /**
      * This is drawn separately from the gameplay, at 100% pixel-perfect size.
@@ -486,7 +486,8 @@ public class Main extends ApplicationAdapter {
         // This step will be different for every game's assets.
         animations = new Array<>(4);
         // We create a single ArraySupplier with a constructor reference so Android won't create four different ones.
-        ArraySupplier<Animation<Sprite>[]> animationSupplier = Animation[]::new;
+        ArraySupplier<Animation<TextureAtlas.AtlasSprite>[]> animationSupplier = Animation[]::new;
+        ArraySupplier<TextureAtlas.AtlasSprite[]> spriteSupplier = TextureAtlas.AtlasSprite[]::new;
         // Apologies for the duplicated lines; these use libGDX 1.13.5 and later's way of initializing an Array.
         animations.add(new Array<>(true, 16, animationSupplier));
         animations.add(new Array<>(true, 16, animationSupplier));
@@ -498,10 +499,10 @@ public class Main extends ApplicationAdapter {
             /* Index 1 is G-facing animations. */
             /* Index 2 is T-facing animations. */
             /* Index 3 is R-facing animations. */
-            animations.get(0).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle0"), Animation.PlayMode.LOOP_PINGPONG));
-            animations.get(1).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle1"), Animation.PlayMode.LOOP_PINGPONG));
-            animations.get(2).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle2"), Animation.PlayMode.LOOP_PINGPONG));
-            animations.get(3).add(new Animation<>(0.1f, atlas.createSprites(name + "_angle3"), Animation.PlayMode.LOOP_PINGPONG));
+            animations.get(0).add(new Animation<>(0.1f, createSprites(name + "_angle0", spriteSupplier), Animation.PlayMode.LOOP_PINGPONG));
+            animations.get(1).add(new Animation<>(0.1f, createSprites(name + "_angle1", spriteSupplier), Animation.PlayMode.LOOP_PINGPONG));
+            animations.get(2).add(new Animation<>(0.1f, createSprites(name + "_angle2", spriteSupplier), Animation.PlayMode.LOOP_PINGPONG));
+            animations.get(3).add(new Animation<>(0.1f, createSprites(name + "_angle3", spriteSupplier), Animation.PlayMode.LOOP_PINGPONG));
         }
 
         // Initialize a Camera with the width and height of the area to be shown.
@@ -534,6 +535,15 @@ public class Main extends ApplicationAdapter {
         // Pressing 'C' will toggle the frame rate cap on or off.
         Gdx.graphics.setForegroundFPS(cap);
         Gdx.graphics.setVSync(cap != 0);
+    }
+
+    private Array<TextureAtlas.AtlasSprite> createSprites(String s, ArraySupplier<TextureAtlas.AtlasSprite[]> supplier) {
+        Array<TextureAtlas.AtlasSprite> array = new Array<>(true, 4, supplier);
+        Array<TextureAtlas.AtlasRegion> rs = atlas.findRegions(s);
+        for (int i = 0; i < rs.size; i++) {
+            array.add(new TextureAtlas.AtlasSprite(rs.get(i)));
+        }
+        return array;
     }
 
     /**

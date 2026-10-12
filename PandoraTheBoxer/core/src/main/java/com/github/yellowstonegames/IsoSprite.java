@@ -2,6 +2,7 @@ package com.github.yellowstonegames;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.GridPoint3;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.NumberUtils;
@@ -31,7 +32,7 @@ public class IsoSprite {
     /**
      * The Sprite this wraps and knows how to display.
      */
-    public Sprite sprite;
+    public TextureAtlas.AtlasSprite sprite;
     /**
      * The f-coordinate, on the diagonal axis from "France to Finland".
      */
@@ -46,17 +47,10 @@ public class IsoSprite {
     public float h;
 
     /**
-     * Creates an IsoSprite with an empty {@link Sprite#Sprite()} for its visual.
-     */
-    public IsoSprite() {
-        this(new Sprite());
-    }
-
-    /**
      * Creates an IsoSprite with the given Sprite for its visual.
      * @param sprite the Sprite to show
      */
-    public IsoSprite(Sprite sprite) {
+    public IsoSprite(TextureAtlas.AtlasSprite sprite) {
         this.sprite = sprite;
     }
 
@@ -67,7 +61,7 @@ public class IsoSprite {
      * @param g isometric tile g-coordinate
      * @param h isometric tile h-coordinate
      */
-    public IsoSprite(Sprite sprite, float f, float g, float h) {
+    public IsoSprite(TextureAtlas.AtlasSprite sprite, float f, float g, float h) {
         this.sprite = sprite;
         setPosition(f, g, h);
     }
@@ -77,7 +71,7 @@ public class IsoSprite {
      * @param sprite the Sprite to show
      * @param position an isometric tile position, storing f,g,h in the Vector3's x,y,z
      */
-    public IsoSprite(Sprite sprite, Vector3 position) {
+    public IsoSprite(TextureAtlas.AtlasSprite sprite, Vector3 position) {
         this.sprite = sprite;
         setPosition(position.x, position.y, position.z);
     }
@@ -87,7 +81,7 @@ public class IsoSprite {
      * @param sprite the Sprite to show
      * @param position an isometric tile position, storing f,g,h in the GridPoint3's x,y,z
      */
-    public IsoSprite(Sprite sprite, GridPoint3 position) {
+    public IsoSprite(TextureAtlas.AtlasSprite sprite, GridPoint3 position) {
         this.sprite = sprite;
         setPosition(position.x, position.y, position.z);
     }
@@ -176,7 +170,7 @@ public class IsoSprite {
      * what this IsoSprite uses, then making the {@link #sprite} the same reference as the parameter.
      * @param sprite a Sprite that will be modified to match this IsoSprite's color, position, and origin
      */
-    public void setSprite(Sprite sprite) {
+    public void setSprite(TextureAtlas.AtlasSprite sprite) {
         float worldX = (f - g) * (2 * UNIT);
         float worldY = (f + g) * UNIT + h * (2 * UNIT) + OFFSET_Y;
         sprite.setPosition(worldX, worldY);
