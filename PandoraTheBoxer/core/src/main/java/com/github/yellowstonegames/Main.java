@@ -644,6 +644,7 @@ public class Main extends ApplicationAdapter {
                 if(pt.w != 0f) continue; // 0f is used for terrain, higher values for creatures, lower for outlines.
                 setVisual(map.everything.get(pt).sprite, map.tileset.get(AssetData.rotateIndex(map.getTile(pt), rotationIndex)));
             }
+            player.handleFacing();
         }
 
         // When the rotation has finished, we set the previous rotation to what we just ended on.

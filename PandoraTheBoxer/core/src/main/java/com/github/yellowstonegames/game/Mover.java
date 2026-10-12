@@ -292,8 +292,8 @@ public class Mover implements HasPosition3D {
             handleFacing();
     }
 
-    private void handleFacing() {
-        currentDirection = (int)((TrigTools.atan2Deg360Finite(velocity.y, velocity.x) + (720 + 45 + 180) + map.rotationDegrees) % 360) / 90;
+    public void handleFacing() {
+        currentDirection = (int)((TrigTools.atan2Deg360Finite(velocity.y, velocity.x) + (720 + 180) + map.rotationDegrees) % 360) / 90;
 
     }
 
