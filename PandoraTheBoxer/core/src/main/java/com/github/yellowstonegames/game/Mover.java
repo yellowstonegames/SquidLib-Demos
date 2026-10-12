@@ -169,6 +169,7 @@ public class Mover implements HasPosition3D {
         id = ID_COUNTER++;
         npc = id > 1;
         if(!npc) invincibilityEndTime = totalMoveTime + 2f;
+        handleFacing();
     }
 
     /**
@@ -287,7 +288,13 @@ public class Mover implements HasPosition3D {
         velocity.x = df * speed;
         velocity.y = dg * speed;
 
-        currentDirection = (int)((TrigTools.atan2Deg360Finite(dg, df) + (720 + 45 + 180) + map.rotationDegrees) % 360) / 90;
+        if(!velocity.isZero())
+            handleFacing();
+    }
+
+    private void handleFacing() {
+        currentDirection = (int)((TrigTools.atan2Deg360Finite(velocity.y, velocity.x) + (720 + 45 + 180) + map.rotationDegrees) % 360) / 90;
+
     }
 
     /**
