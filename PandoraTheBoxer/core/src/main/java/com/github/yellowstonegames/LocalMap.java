@@ -1,25 +1,22 @@
 package com.github.yellowstonegames;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.OrderedMap;
-import com.github.tommyettinger.random.AceRandom;
 import com.github.tommyettinger.random.EnhancedRandom;
 import com.github.yellowstonegames.game.AssetData;
 import com.github.yellowstonegames.game.Mover;
 import com.github.yellowstonegames.grid.Coord;
+import com.github.yellowstonegames.grid.NoiseWrapper;
 import com.github.yellowstonegames.grid.Region;
+import com.github.yellowstonegames.grid.VroomNoise;
 import com.github.yellowstonegames.place.FlowingCaveGenerator;
-import com.github.yellowstonegames.place.OrganicConnectingMapGenerator;
 import com.github.yellowstonegames.place.PlaceGenerator;
 import com.github.yellowstonegames.place.tileset.TilesetType;
 import com.github.yellowstonegames.util.HasPosition3D;
-import com.github.yellowstonegames.util.MathSupport;
-import com.github.yellowstonegames.util.MiniNoise;
 import com.github.yellowstonegames.util.VoxelCollider;
 
 import static com.badlogic.gdx.math.MathUtils.round;
@@ -440,9 +437,9 @@ public class LocalMap {
     public static LocalMap generateMap(EnhancedRandom random, int mapSize, int mapPeak, TextureAtlas atlas) {
 
         // Noise that gradually moves a little
-        MiniNoise baseNoise = new MiniNoise(random.nextInt(), 0.07f, MiniNoise.FBM, 3);
+        NoiseWrapper baseNoise = new NoiseWrapper(new VroomNoise(random.nextLong()), 0.17f, NoiseWrapper.FBM, 3);
         // Noise that is usually a low value, but has ridges of high values
-        MiniNoise ridgeNoise = new MiniNoise(random.nextInt(), 0.1f, MiniNoise.RIDGED, 1);
+        NoiseWrapper ridgeNoise = new NoiseWrapper(new VroomNoise(random.nextLong()), 0.22f, NoiseWrapper.RIDGED_MULTI, 1);
 
         mapSize = Math.max(11, mapSize);
         mapPeak = Math.max(4, mapPeak);

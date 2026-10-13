@@ -1,21 +1,18 @@
 package com.github.yellowstonegames.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Vector4;
 import com.badlogic.gdx.utils.Array;
-import com.github.tommyettinger.digital.MathTools;
 import com.github.tommyettinger.digital.TrigTools;
+import com.github.tommyettinger.random.LineWobble;
 import com.github.yellowstonegames.AnimatedIsoSprite;
 import com.github.yellowstonegames.AtlasSprite;
 import com.github.yellowstonegames.Main;
 import com.github.yellowstonegames.LocalMap;
 import com.github.yellowstonegames.util.HasPosition3D;
-import com.github.yellowstonegames.util.MiniNoise;
 
 /**
  * A creature, hero, or hazard that can move around of its own accord.
@@ -188,9 +185,9 @@ public class Mover implements HasPosition3D {
         // If you include a pathfinding library as a dependency, then you can use that to make NPCs chase the PC.
         if(npc){
             // Gets 1D noise (as a wiggly line, essentially) for distance to move on the f axis...
-            float df = MiniNoise.PerlueNoise.instance.getNoiseWithSeed(totalMoveTime * 1.7548f, id);
+            float df = LineWobble.bicubicWobble(id, totalMoveTime * 1.7548f);
             // and on the g axis, as a different wiggly line. These values are always between -1 and 1.
-            float dg = MiniNoise.PerlueNoise.instance.getNoiseWithSeed(totalMoveTime * 1.5698f, ~id);
+            float dg = LineWobble.bicubicWobble(~id, totalMoveTime * 1.5698f);
             float c = map.cosRotation;
             float s = map.sinRotation;
             float rf = c * df + s * dg;

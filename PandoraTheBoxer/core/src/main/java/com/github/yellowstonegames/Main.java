@@ -852,7 +852,7 @@ public class Main extends ApplicationAdapter {
      * Resets the map to a procedurally-generated new map, and updates Labels showing gameplay progress.
      */
     private void reset() {
-        regenerate(MathUtils.random.nextLong());
+        regenerate(random.nextLong());
         updateFish();
         updateHealth();
     }
