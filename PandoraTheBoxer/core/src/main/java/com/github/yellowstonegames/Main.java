@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
@@ -49,10 +48,10 @@ import static com.github.yellowstonegames.util.MathSupport.INVERSE_ROOT_2;
 
 /**
  * This is the primary starting point in the core module, and the only platform-specific code should be in "Launcher"
- * classes in other modules. This is an isometric pixel art demo project where the player (a little person in blue) runs
- * around trying to save goldfish (little orange fish out of water) without bumping into enemies (green-skinned, brawny
- * orcs). Bumping into enemies will take away your health, and reaching 0 health is a game-over condition. Saving all 10
- * goldfish is the win condition. Arrows point to your blue player character on the edges of the map.
+ * classes in other modules. This is an isometric pixel art demo project where the player (Pandora, a woman with boxing
+ * gloves wearing a toga) runs around trying to close boxes of evil without bumping into enemies (purple floating
+ * heads). Bumping into enemies will take away your health, and reaching 0 health is a game-over condition. Closing all
+ * 10 boxes is the win condition.
  * <br>
  * This uses a special kind of coordinates because isometric coordinates just don't correspond nicely to x, y,
  * and z with any common convention. Here, when referring to isometric tiles, we use "f, g, h" positions.The f and g
@@ -132,9 +131,9 @@ public class Main extends ApplicationAdapter {
     private IntMap<TextButton> keyButtons;
 
     /**
-     * Can be changed to make the game harder with more fish to save, or easier with fewer.
+     * Can be changed to make the game harder with more boxes to close, or easier with fewer.
      */
-    public static int FISH_COUNT = 10;
+    public static int BOX_COUNT = 10;
     /**
      * Can be changed to make the game harder with more enemies, or easier with fewer.
      */
@@ -196,8 +195,8 @@ public class Main extends ApplicationAdapter {
      */
     private Label fpsLabel;
     /**
-     * Shows how many goldfish you need to rescue, if you have "won" by saving all goldfish, or if you have "died" by
-     * taking 3 separate hits (you are hit by touching an enemy, which is always a green orc here).
+     * Shows how many boxes you need to close, if you have "won" by closing all boxes, or if you have "died" by
+     * taking 3 separate hits (you are hit by touching an enemy, which is always a purple head here).
      * <br>
      * CUSTOM TO YOUR GAME.
      */
@@ -310,8 +309,7 @@ public class Main extends ApplicationAdapter {
      * The x, y, and z coordinates correspond directly to a tile's isometric f, g, and h coordinates, while the
      * Vector4's w coordinate corresponds to the depth modifier for any sprite at that f,g,h position. A position with
      * the same x,y,z position (or f,g,h) but a different w (or depth modifier) is treated as different in "everything"
-     * and this allows more than one sprite to share a position. This is how the outlines on terrain are handled, and
-     * how goldfish can briefly occupy the same area as the player or an enemy.
+     * and this allows more than one sprite to share a position.
      */
     private static final Vector4 tempVector4 = new Vector4();
 
@@ -321,9 +319,7 @@ public class Main extends ApplicationAdapter {
      * It uses the map's pre-calculated {@link LocalMap#cosRotation} and sinRotation instead of needing to repeatedly
      * call cos() and sin(). The isometric points here are Vector4, but for the most part, only the x, y,
      * and z components are used. The fourth component, w, is only used to create another point at the same x, y, z
-     * location but with a different depth. The depth change is currently used to draw outlines behind terrain tiles,
-     * but have them be overdrawn by other terrain tiles if nearby. The outlines only appear if there is empty space
-     * behind a terrain tile.
+     * location but with a different depth.
      */
     public final Comparator<? super Vector4> comparator =
         (a, b) -> Float.compare(
@@ -404,7 +400,7 @@ public class Main extends ApplicationAdapter {
 
         // The ClickListeners define what happens when you click each TextButton.
 
-        // Resets the game and generates a new map. The player will have full health and all goldfish will be present.
+        // Resets the game and generates a new map. The player will have full health and all boxes will be open.
         TextButton reset = new TextButton("RESET", skin);
         reset.addListener(new ClickListener(){
             @Override
@@ -526,8 +522,8 @@ public class Main extends ApplicationAdapter {
             /* The seed will change after just over one hour, and will stay the same for over an hour. */
             TimeUtils.millis() >>> 22);
 
-        // The goal label text changes when updateFish() or updateHealth() is called.
-        updateFish();
+        // The goal label text changes when updateBoxes() or updateHealth() is called.
+        updateBoxes();
         // The health label shows red hearts (using BitmapFont markup to make them red) for your current health.
         // It shows " :( " if the player reaches 0 health, using darker red.
         updateHealth();
@@ -564,9 +560,9 @@ public class Main extends ApplicationAdapter {
             MAP_PEAK,
             /* All terrain tiles in the tileset. */
             atlas);
-        map.totalFish = FISH_COUNT;
-        map.fishSaved = 0;
-        Coord[] boxPositions = map.placeBoxes(random, map.totalFish, animations);
+        map.totalBoxes = BOX_COUNT;
+        map.boxesClosed = 0;
+        Coord[] boxPositions = map.placeBoxes(random, map.totalBoxes, animations);
         mapCenter = (map.getFSize() - 1f) * 0.5f;
         // Random initial position for the player.
         Region floorCopy = new Region(map.floors);
@@ -667,15 +663,16 @@ public class Main extends ApplicationAdapter {
             map.everything.get(pos).update(time).draw(batch, (map.getFSize() - 1) * 0.5f, (map.getGSize() - 1) * 0.5f, map.cosRotation, map.sinRotation);
         }
 
+        // TODO: needs updating; boxes need boxing.
         Vector3 pos = player.getPosition();
-        // Makes tempVector4 store the position we want to check: the players's location, rounded, at the fish depth.
+        // Makes tempVector4 store the position we want to check: the player's location, rounded, at the fish depth.
         // If there is anything at that position, it is a fish the player is touching, and so has rescued.
         map.setToFishPosition(tempVector4, pos.x, pos.y, pos.z);
         IsoSprite fish = map.everything.get(tempVector4);
         if(fish instanceof AnimatedIsoSprite && fish != player.visual){
-            ++map.fishSaved;
+            ++map.boxesClosed;
             map.everything.remove(tempVector4);
-            ((Main)Gdx.app.getApplicationListener()).updateFish();
+            ((Main)Gdx.app.getApplicationListener()).updateBoxes();
         }
 //        playerAxisX.setX(player.visual.getSprite().getX());
 //        playerAxisY.setY(player.visual.getSprite().getY());
@@ -789,7 +786,7 @@ public class Main extends ApplicationAdapter {
             Gdx.app.exit();
             return;
         }
-        // Zero-state, or a brand-new map and fresh healthy character, also with 10 enemies and 10 goldfish.
+        // Zero-state, or a brand-new map and fresh healthy character, also with 10 enemies and 10 boxes.
         if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
             reset();
             return;
@@ -816,7 +813,7 @@ public class Main extends ApplicationAdapter {
         if (Gdx.input.isKeyJustPressed(Input.Keys.I)) camera.zoom *= .5f; // In
         if (Gdx.input.isKeyJustPressed(Input.Keys.O)) camera.zoom *= 2f; // Out
 
-        // The square bracket keys handle rotation, which can be important to spot goldfish behind terrain.
+        // The square bracket keys handle rotation, which can be important to spot boxes behind terrain.
         if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT_BRACKET)) {
             rotateCamera(1);
         }
@@ -853,7 +850,7 @@ public class Main extends ApplicationAdapter {
      */
     private void reset() {
         regenerate(random.nextLong());
-        updateFish();
+        updateBoxes();
         updateHealth();
     }
 
@@ -897,18 +894,18 @@ public class Main extends ApplicationAdapter {
     }
 
     /**
-     * Updates the goal Label to show the appropriate number of goldfish you need to save, or if you have won.
+     * Updates the goal Label to show the appropriate number of boxes you need to save, or if you have won.
      */
-    public void updateFish() {
+    public void updateBoxes() {
         if(player.health > 0) {
-            if (map.totalFish == map.fishSaved) {
+            if (map.totalBoxes == map.boxesClosed) {
                 // We use libGDX color markup to make any text some color other than blindingly-bright white.
-                goalLabel.setText("[ORANGE]YOU SAVED THEM ALL! Great job!");
+                goalLabel.setText("[ORANGE]YOU ARE THE GREATEST BOXER!");
                 player.makeInvincible(Float.NaN);
             } else {
                 // You can use either named colors or the hex RRGGBBAA color format.
-                goalLabel.setText("[#ddddddff]SAVE THE GOLDFISH!!! " + (map.totalFish - map.fishSaved) + " still " +
-                    ((map.totalFish - map.fishSaved) == 1 ? "needs" : "need") + " your help!");
+                goalLabel.setText("[#ddddddff]CLOSE THE BOXES!!! " + (map.totalBoxes - map.boxesClosed) + " still " +
+                    ((map.totalBoxes - map.boxesClosed) == 1 ? "needs" : "need") + " packing!");
             }
         }
         goalLabel.setAlignment(Align.center);

@@ -506,7 +506,7 @@ public class Mover implements HasPosition3D {
     /**
      * Puts this Mover into {@link LocalMap#everything} at the given depth modifier, such as {@link Mover#PLAYER_W}.
      * If a Mover's {@link #position} changes any coordinates, this should be called when those changes are complete.
-     * @param depth a depth modifier like {@link Mover#NPC_W} or {@link Mover#FISH_W}
+     * @param depth a depth modifier like {@link Mover#NPC_W} or {@link Mover#PLAYER_W}
      * @return this Mover, for chaining
      */
     public Mover place(float depth) {

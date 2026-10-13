@@ -61,13 +61,13 @@ public class LocalMap {
      */
     public float gCenter;
     /**
-     * How many fish we started out needing to rescue.
+     * How many boxes we started out needing to close.
      */
-    public int totalFish = 10;
+    public int totalBoxes = 10;
     /**
-     * How many fish have been saved so far.
+     * How many boxes have been closed so far.
      */
-    public int fishSaved = 0;
+    public int boxesClosed = 0;
 
     /**
      * A collision tracker for Movers so we can tell when the player should be damaged by touching an enemy.
