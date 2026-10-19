@@ -449,6 +449,16 @@ public class LocalMap {
 //        PlaceGenerator mapGen = new OrganicConnectingMapGenerator(mapSize, mapSize, 6, 6, 3, new AceRandom(seed));
         char[][] dungeon = mapGen.generate();
         map.floors.refill(dungeon, '.');
+        Region elevation = new Region(dungeon.length + 1, dungeon[0].length + 1);
+        elevation.insert(1, 1, map.floors);
+        elevation.not();
+        elevation.expand8way();
+        for (int f = 0; f < elevation.width; f++) {
+            for (int g = 0; g < elevation.height; g++) {
+                if(baseNoise.getNoise(f, g) > 0f)
+                    elevation.insert(f, g);
+            }
+        }
         // Cave map as a base, with slopes determined by noise.
         for (int f = 0; f < mapSize; f++) {
             for (int g = 0; g < mapSize; g++) {
@@ -456,10 +466,10 @@ public class LocalMap {
                 // tile ID 4 is a solid rock cube.
                 map.setTile(f, g, height, 4 + random.next(2));
                 if(height == 0){
-                    int n = baseNoise.getNoise(f+1, g+1) > 0f ? AssetData.NORTH : 0;
-                    int w = baseNoise.getNoise(f+1, g  ) > 0f ? AssetData.WEST : 0;
-                    int s = baseNoise.getNoise(f  , g  ) > 0f ? AssetData.SOUTH : 0;
-                    int e = baseNoise.getNoise(f  , g+1) > 0f ? AssetData.EAST : 0;
+                    int n = elevation.contains(f+1, g+1) ? AssetData.NORTH : 0;
+                    int w = elevation.contains(f+1, g  ) ? AssetData.WEST : 0;
+                    int s = elevation.contains(f  , g  ) ? AssetData.SOUTH : 0;
+                    int e = elevation.contains(f  , g+1) ? AssetData.EAST : 0;
                     map.setTile(f, g, 1, AssetData.SLOPE_INDICES[0][n|w|s|e]);
                 }
                 // Anything below one of these tiles must be solid.
