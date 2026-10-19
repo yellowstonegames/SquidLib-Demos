@@ -487,15 +487,11 @@ public class LocalMap {
             }
         }
 
-        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL, -1);
-        map.floors.remove(stairsCenter);
-        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL - 1, AssetData.SLOPE_INDICES[0][AssetData.NORTH | AssetData.WEST]);
-        map.setTile(stairsCenter.x-1, stairsCenter.y, GROUND_LEVEL - 1, -1);
+        map.setTile(stairsCenter.x-1, stairsCenter.y, GROUND_LEVEL, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
         map.floors.remove(stairsCenter.x - 1, stairsCenter.y);
-        if(GROUND_LEVEL >= 2){
-            map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL - 2, 4);
-            map.setTile(stairsCenter.x-1, stairsCenter.y, GROUND_LEVEL - 2, AssetData.SLOPE_INDICES[0][AssetData.NORTH | AssetData.WEST]);
-        }
+        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL, 28 + random.next(2));
+        map.floors.remove(stairsCenter);
+        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL + 1, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
 
         // Remove this next line if you intend to allow players to edit the map or destroy tiles during play.
 //        removeInvisibleTiles(map);
