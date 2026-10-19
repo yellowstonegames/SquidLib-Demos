@@ -454,7 +454,7 @@ public class LocalMap {
             for (int g = 0; g < mapSize; g++) {
                 int height = dungeon[f][g] == '#' ? 2 : 0;
                 // tile ID 4 is a solid rock cube.
-                map.setTile(f, g, height, 4);
+                map.setTile(f, g, height, 4 + random.next(2));
                 if(height == 0){
                     int n = baseNoise.getNoise(f+1, g+1) > 0f ? AssetData.NORTH : 0;
                     int w = baseNoise.getNoise(f+1, g  ) > 0f ? AssetData.WEST : 0;
@@ -464,7 +464,7 @@ public class LocalMap {
                 }
                 // Anything below one of these tiles must be solid.
                 for (int h = height - 1; h >= 0; h--) {
-                    map.setTile(f, g, h, 4);
+                    map.setTile(f, g, h, 4 + random.next(2));
                 }
             }
         }
