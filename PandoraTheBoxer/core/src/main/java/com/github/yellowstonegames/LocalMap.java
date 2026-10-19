@@ -460,6 +460,10 @@ public class LocalMap {
                     elevation.insert(f, g);
             }
         }
+
+        Coord stairsCenter = map.floors.copy().retract().singleRandom(random);
+        elevation.removeRectangle(stairsCenter.x - 1, stairsCenter.y - 1, 3, 3);
+
         // Cave map as a base, with slopes determined by noise.
         for (int f = 0; f < mapSize; f++) {
             for (int g = 0; g < mapSize; g++) {
@@ -481,6 +485,16 @@ public class LocalMap {
                     map.setTile(f, g, h, detail * 24 + 4 + random.next(2));
                 }
             }
+        }
+
+        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL, -1);
+        map.floors.remove(stairsCenter);
+        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL - 1, AssetData.SLOPE_INDICES[0][AssetData.NORTH | AssetData.WEST]);
+        map.setTile(stairsCenter.x-1, stairsCenter.y, GROUND_LEVEL - 1, -1);
+        map.floors.remove(stairsCenter.x - 1, stairsCenter.y);
+        if(GROUND_LEVEL >= 2){
+            map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL - 2, 4);
+            map.setTile(stairsCenter.x-1, stairsCenter.y, GROUND_LEVEL - 2, AssetData.SLOPE_INDICES[0][AssetData.NORTH | AssetData.WEST]);
         }
 
         // Remove this next line if you intend to allow players to edit the map or destroy tiles during play.

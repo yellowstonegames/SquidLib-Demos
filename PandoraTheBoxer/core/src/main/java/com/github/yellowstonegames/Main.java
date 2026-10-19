@@ -230,12 +230,12 @@ public class Main extends ApplicationAdapter {
      * The base width and height in tiles of a map; this may vary slightly when the map is created, for variety.
      * The variance only goes up by 0 to 3 width and height (by the same amount).
      */
-    public static final int MAP_SIZE = 20;
+    public static final int MAP_SIZE = 25;
     /**
      * The maximum number of voxels and creatures that can be stacked on top of each other in the map; typically also
      * includes some room to jump higher.
      */
-    public static final int MAP_PEAK = 10;
+    public static final int MAP_PEAK = 6;
     /**
      * The h-value for positions (how many layers stacked up) where slopes can be placed and creatures can go on top of.
      */
