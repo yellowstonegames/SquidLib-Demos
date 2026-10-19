@@ -463,7 +463,7 @@ public class LocalMap {
         for (int f = 0; f < mapSize; f++) {
             for (int g = 0; g < mapSize; g++) {
                 // -1, 0, or 1, with 0 most likely and -1 least.
-                int detail = (int)(extraNoise.getNoise(f, g) * 1.5f + 0.2f);
+                int detail = (int)(extraNoise.getNoise(f, g) * 1.75f + 0.1f);
                 detail = ((detail << 1) ^ detail >> 31);
                 int height = dungeon[f][g] == '#' ? 3 : 1;
                 // tile ID 4 is a solid rock cube.
