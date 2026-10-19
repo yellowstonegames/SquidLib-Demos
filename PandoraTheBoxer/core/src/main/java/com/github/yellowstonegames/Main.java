@@ -572,7 +572,7 @@ public class Main extends ApplicationAdapter {
         floorCopy.remove(choice);
         // Pandora is a boxer! She has big boxing gloves and wears a toga.
         int id = AssetData.ENTITIES.indexOf("Pandora");
-        player = new Mover(map, animations, id, rf, rg, 2f);
+        player = new Mover(map, animations, id, rf, rg, 3);
         player.place(Mover.PLAYER_W);
         map.movers.entities.add(player);
 
@@ -594,7 +594,7 @@ public class Main extends ApplicationAdapter {
             rf = choice.x;
             rg = choice.y;
             floorCopy.remove(choice);
-            Mover enemy = new Mover(map, animations, id, rf, rg, 2);
+            Mover enemy = new Mover(map, animations, id, rf, rg, 3);
             // We track enemies here as well as tracking them as general Movers in the map so that we can handle the
             // semi-random movement of enemies when we update them in Main, without semi-randomly moving the player.
             enemies.add(enemy);
@@ -638,7 +638,9 @@ public class Main extends ApplicationAdapter {
             for (int i = 0, n = order.size; i < n; i++) {
                 Vector4 pt = order.get(i);
                 if(pt.w != 0f) continue; // 0f is used for terrain, higher values for creatures, lower for outlines.
-                setVisual(map.everything.get(pt).sprite, map.tileset.get(AssetData.rotateIndex(map.getTile(pt), rotationIndex)));
+                int index = AssetData.rotateIndex(map.getTile(pt), rotationIndex);
+                if(index < 0) continue;
+                setVisual(map.everything.get(pt).sprite, map.tileset.get(index));
             }
             player.handleFacing();
         }

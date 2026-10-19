@@ -439,7 +439,7 @@ public class LocalMap {
         // Noise that gradually moves a little
         NoiseWrapper baseNoise = new NoiseWrapper(new VroomNoise(random.nextLong()), 0.17f, NoiseWrapper.FBM, 3);
         // Noise that is usually a low value, but has ridges of high values
-        NoiseWrapper ridgeNoise = new NoiseWrapper(new VroomNoise(random.nextLong()), 0.22f, NoiseWrapper.RIDGED_MULTI, 1);
+        NoiseWrapper extraNoise = new NoiseWrapper(new VroomNoise(random.nextLong()), 0.22f, NoiseWrapper.FBM, 2);
 
         mapSize = Math.max(11, mapSize);
         mapPeak = Math.max(4, mapPeak);
@@ -462,19 +462,22 @@ public class LocalMap {
         // Cave map as a base, with slopes determined by noise.
         for (int f = 0; f < mapSize; f++) {
             for (int g = 0; g < mapSize; g++) {
-                int height = dungeon[f][g] == '#' ? 2 : 0;
+                // -1, 0, or 1, with 0 most likely and -1 least.
+                int detail = (int)(extraNoise.getNoise(f, g) * 1.5f + 0.2f);
+                detail = ((detail << 1) ^ detail >> 31);
+                int height = dungeon[f][g] == '#' ? 3 : 1;
                 // tile ID 4 is a solid rock cube.
-                map.setTile(f, g, height, 4 + random.next(2));
-                if(height == 0){
+                map.setTile(f, g, height, detail * 24 + 4 + random.next(2));
+                if(height == 1){
                     int n = elevation.contains(f+1, g+1) ? AssetData.NORTH : 0;
                     int w = elevation.contains(f+1, g  ) ? AssetData.WEST : 0;
                     int s = elevation.contains(f  , g  ) ? AssetData.SOUTH : 0;
                     int e = elevation.contains(f  , g+1) ? AssetData.EAST : 0;
-                    map.setTile(f, g, 1, AssetData.SLOPE_INDICES[0][n|w|s|e]);
+                    map.setTile(f, g, 2, AssetData.SLOPE_INDICES[detail][n|w|s|e]);
                 }
                 // Anything below one of these tiles must be solid.
                 for (int h = height - 1; h >= 0; h--) {
-                    map.setTile(f, g, h, 4 + random.next(2));
+                    map.setTile(f, g, h, detail * 24 + 4 + random.next(2));
                 }
             }
         }
