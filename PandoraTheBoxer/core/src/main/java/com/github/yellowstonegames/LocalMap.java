@@ -20,6 +20,7 @@ import com.github.yellowstonegames.util.HasPosition3D;
 import com.github.yellowstonegames.util.VoxelCollider;
 
 import static com.badlogic.gdx.math.MathUtils.round;
+import static com.github.yellowstonegames.Main.GROUND_LEVEL;
 
 /**
  * Stores a current "level" of the game and its contents, including moving beings and immobile terrain.
@@ -465,15 +466,15 @@ public class LocalMap {
                 // -1, 0, or 1, with 0 most likely and -1 least.
                 int detail = (int)(extraNoise.getNoise(f, g) * 1.75f + 0.1f);
                 detail = ((detail << 1) ^ detail >> 31);
-                int height = dungeon[f][g] == '#' ? 3 : 1;
+                int height = dungeon[f][g] == '#' ? GROUND_LEVEL + 1 : GROUND_LEVEL - 1;
                 // tile ID 4 is a solid rock cube.
                 map.setTile(f, g, height, detail * 24 + 4 + random.next(2));
-                if(height == 1){
+                if(height == GROUND_LEVEL - 1){
                     int n = elevation.contains(f+1, g+1) ? AssetData.NORTH : 0;
                     int w = elevation.contains(f+1, g  ) ? AssetData.WEST : 0;
                     int s = elevation.contains(f  , g  ) ? AssetData.SOUTH : 0;
                     int e = elevation.contains(f  , g+1) ? AssetData.EAST : 0;
-                    map.setTile(f, g, 2, AssetData.SLOPE_INDICES[detail][n|w|s|e]);
+                    map.setTile(f, g, GROUND_LEVEL, AssetData.SLOPE_INDICES[detail][n|w|s|e]);
                 }
                 // Anything below one of these tiles must be solid.
                 for (int h = height - 1; h >= 0; h--) {
@@ -549,7 +550,7 @@ public class LocalMap {
         Coord[] found = floors.separatedPoisson(random, 3, boxCount);
         for(Coord point : found)
         {
-            int h = tiles[point.x][point.y][2] == -1 ? 2 : 3;
+            int h = tiles[point.x][point.y][2] == -1 ? GROUND_LEVEL : GROUND_LEVEL + 1;
             setEntity(point.x, point.y, h, Mover.NPC_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.ENTITIES.indexOf("Box_Open")), point.x, point.y, h));
         }
         return found;
