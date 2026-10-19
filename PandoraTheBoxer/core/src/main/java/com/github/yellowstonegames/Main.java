@@ -237,6 +237,10 @@ public class Main extends ApplicationAdapter {
      */
     public static final int MAP_PEAK = 10;
     /**
+     * The h-value for positions (how many layers stacked up) where slopes can be placed and creatures can go on top of.
+     */
+    public static final int GROUND_LEVEL = 2;
+    /**
      * A scale factor applied to the smaller pixel art "canvas" so scaling it doesn't get as blurry. This works well
      * if it's set to about 4 or 8, with 4 being a little more blurry and 8 being a little less. They're very similar.
      */
