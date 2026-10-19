@@ -549,7 +549,7 @@ public class LocalMap {
         Coord[] found = floors.separatedPoisson(random, 3, boxCount);
         for(Coord point : found)
         {
-            int h = tiles[point.x][point.y][1] == -1 ? 1 : 2;
+            int h = tiles[point.x][point.y][2] == -1 ? 2 : 3;
             setEntity(point.x, point.y, h, Mover.NPC_W, new AnimatedIsoSprite(animations.get(0).get(AssetData.ENTITIES.indexOf("Box_Open")), point.x, point.y, h));
         }
         return found;
