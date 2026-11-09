@@ -61,6 +61,13 @@ public class LocalMap {
      * The center position, in fractional tiles, of the entire map's g-size.
      */
     public float gCenter;
+
+    /**
+     * The center position, in fractional tiles, of the map, to rotate around.
+     * This can be shared with the player character's position.
+     */
+    public Vector3 center;
+
     /**
      * How many boxes we started out needing to close.
      */

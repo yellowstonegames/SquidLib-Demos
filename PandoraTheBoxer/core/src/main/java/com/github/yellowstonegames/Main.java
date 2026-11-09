@@ -327,8 +327,8 @@ public class Main extends ApplicationAdapter {
      */
     public final Comparator<? super Vector4> comparator =
         (a, b) -> Float.compare(
-            IsoSprite.viewDistance(a.x, a.y, a.z, map.fCenter, map.gCenter, map.cosRotation, map.sinRotation) + a.w,
-            IsoSprite.viewDistance(b.x, b.y, b.z, map.fCenter, map.gCenter, map.cosRotation, map.sinRotation) + b.w);
+            IsoSprite.viewDistance(a.x, a.y, a.z, map.center.x, map.center.y, map.cosRotation, map.sinRotation) + a.w,
+            IsoSprite.viewDistance(b.x, b.y, b.z, map.center.x, map.center.y, map.cosRotation, map.sinRotation) + b.w);
 
     // You can use this block of code instead; it may perform better if framerate is an issue in practice, but it isn't
     // quite as clear to read. Internally, this uses {@link NumberUtils#floatToIntBits(float)} instead of
@@ -578,6 +578,7 @@ public class Main extends ApplicationAdapter {
         int id = AssetData.ENTITIES.indexOf("Pandora");
         player = new Mover(map, animations, id, rf, rg, GROUND_LEVEL + 1);
         player.place(Mover.PLAYER_W);
+        map.center = player.getPosition();
         map.movers.entities.add(player);
 
 //        // The player axis sprites show a crosshair-like indicator of where the player character is on the x and y axes.
@@ -666,7 +667,7 @@ public class Main extends ApplicationAdapter {
         for (int i = 0, n = order.size; i < n; i++) {
             Vector4 pos = order.get(i);
             // Updates each voxel in "everything" and then draws it with the parameters needed for rotation.
-            map.everything.get(pos).update(time).draw(batch, (map.getFSize() - 1) * 0.5f, (map.getGSize() - 1) * 0.5f, map.cosRotation, map.sinRotation);
+            map.everything.get(pos).update(time).draw(batch, map.center.x, map.center.y, map.cosRotation, map.sinRotation);
         }
 
         // TODO: needs updating; boxes need boxing.
