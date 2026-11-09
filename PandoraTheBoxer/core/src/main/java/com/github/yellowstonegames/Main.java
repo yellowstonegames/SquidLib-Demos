@@ -669,6 +669,7 @@ public class Main extends ApplicationAdapter {
             // Updates each voxel in "everything" and then draws it with the parameters needed for rotation.
             map.everything.get(pos).update(time).draw(batch, map.center.x, map.center.y, map.cosRotation, map.sinRotation);
         }
+        viewport.getCamera().position.set(player.visual.sprite.getX(), player.visual.sprite.getY(), 0);
 
         // TODO: needs updating; boxes need boxing.
         Vector3 pos = player.getPosition();
