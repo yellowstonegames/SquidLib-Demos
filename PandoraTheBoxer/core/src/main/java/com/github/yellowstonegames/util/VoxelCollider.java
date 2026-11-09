@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Array;
  * This is only meant for relatively small entity counts (under about 50). Larger amounts of entities will take longer
  * to process.
  *
- * @param <T> Any type that you can get a Vector3 position from; must implement HasPosition3D, often {@link gdx.liftoff.game.Mover}
+ * @param <T> Any type that you can get a Vector3 position from; must implement HasPosition3D, often {@link com.github.yellowstonegames.game.Mover}
  */
 public class VoxelCollider<T extends HasPosition3D> {
 

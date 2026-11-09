@@ -1,8 +1,6 @@
 package com.github.yellowstonegames.game;
 
-import com.badlogic.gdx.utils.*;
 import com.github.tommyettinger.ds.NumberedSet;
-import com.github.yellowstonegames.LocalMap;
 
 /**
  * Data specific to the art assets used here. If the art assets change, you will need to update this class.
