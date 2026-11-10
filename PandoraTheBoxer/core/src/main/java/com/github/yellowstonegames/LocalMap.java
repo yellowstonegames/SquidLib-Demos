@@ -38,6 +38,11 @@ public class LocalMap {
      * A SquidSquad Region that stores all Coord points where a floor is walkable.
      */
     public Region floors;
+
+    public Coord stairsUpCenter;
+
+    public Coord stairsDownCenter;
+
     /**
      * The critical, sortable mapping of Vector4 positions to visible IsoSprites. This includes two IsoSprites for each
      * voxel of terrain: one is the terrain cube itself, and one is its outline, which has a substantial depth modifier
@@ -458,9 +463,11 @@ public class LocalMap {
         char[][] dungeon = mapGen.generate();
         map.floors.refill(dungeon, '.');
         Region elevation = new Region(dungeon.length + 1, dungeon[0].length + 1);
-        elevation.insert(1, 1, map.floors);
-        elevation.not();
-        elevation.expand8way();
+        // Makes all walls have slopes near them if they would have un-elevated edges.
+        // With this commented out, walls can be taller.
+//        elevation.insert(1, 1, map.floors);
+//        elevation.not();
+//        elevation.expand8way();
         for (int f = 0; f < elevation.width; f++) {
             for (int g = 0; g < elevation.height; g++) {
                 if(baseNoise.getNoise(f, g) > 0f)
@@ -469,11 +476,11 @@ public class LocalMap {
         }
 
         Region validStairs = map.floors.copy().retract();
-        Coord stairsUpCenter = validStairs.singleRandom(random);
+        Coord stairsUpCenter = map.stairsUpCenter = validStairs.singleRandom(random);
         elevation.removeRectangle(stairsUpCenter.x - 1, stairsUpCenter.y - 1, 3, 3);
         validStairs.removeRectangle(stairsUpCenter.x - 3, stairsUpCenter.y - 3, 7, 7);
 
-        Coord stairsDownCenter = validStairs.singleRandom(random);
+        Coord stairsDownCenter = map.stairsDownCenter = validStairs.singleRandom(random);
         elevation.insertRectangle(stairsDownCenter.x - 1, stairsDownCenter.y - 1, 3, 3);
         validStairs.removeRectangle(stairsDownCenter.x - 3, stairsDownCenter.y - 3, 7, 7);
 
@@ -500,11 +507,11 @@ public class LocalMap {
             }
         }
 
-        map.setTile(stairsUpCenter.x-1, stairsUpCenter.y, GROUND_LEVEL, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
-        map.floors.remove(stairsUpCenter.x - 1, stairsUpCenter.y);
-        map.setTile(stairsUpCenter.x, stairsUpCenter.y, GROUND_LEVEL, 28 + random.next(2));
+        map.setTile(stairsUpCenter.x, stairsUpCenter.y, GROUND_LEVEL, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
         map.floors.remove(stairsUpCenter);
-        map.setTile(stairsUpCenter.x, stairsUpCenter.y, GROUND_LEVEL + 1, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
+        map.setTile(stairsUpCenter.x+1, stairsUpCenter.y, GROUND_LEVEL, 28 + random.next(2));
+        map.floors.remove(stairsUpCenter.x + 1, stairsUpCenter.y);
+        map.setTile(stairsUpCenter.x+1, stairsUpCenter.y, GROUND_LEVEL + 1, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
 
         map.setTile(stairsDownCenter.x, stairsDownCenter.y, GROUND_LEVEL, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
         map.floors.remove(stairsDownCenter.x, stairsDownCenter.y);
