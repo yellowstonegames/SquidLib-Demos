@@ -468,8 +468,14 @@ public class LocalMap {
             }
         }
 
-        Coord stairsCenter = map.floors.copy().retract().singleRandom(random);
-        elevation.removeRectangle(stairsCenter.x - 1, stairsCenter.y - 1, 3, 3);
+        Region validStairs = map.floors.copy().retract();
+        Coord stairsUpCenter = validStairs.singleRandom(random);
+        elevation.removeRectangle(stairsUpCenter.x - 1, stairsUpCenter.y - 1, 3, 3);
+        validStairs.removeRectangle(stairsUpCenter.x - 3, stairsUpCenter.y - 3, 7, 7);
+
+        Coord stairsDownCenter = validStairs.singleRandom(random);
+        elevation.insertRectangle(stairsDownCenter.x - 1, stairsDownCenter.y - 1, 3, 3);
+        validStairs.removeRectangle(stairsDownCenter.x - 3, stairsDownCenter.y - 3, 7, 7);
 
         // Cave map as a base, with slopes determined by noise.
         for (int f = 0; f < mapSize; f++) {
@@ -494,11 +500,17 @@ public class LocalMap {
             }
         }
 
-        map.setTile(stairsCenter.x-1, stairsCenter.y, GROUND_LEVEL, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
-        map.floors.remove(stairsCenter.x - 1, stairsCenter.y);
-        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL, 28 + random.next(2));
-        map.floors.remove(stairsCenter);
-        map.setTile(stairsCenter.x, stairsCenter.y, GROUND_LEVEL + 1, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
+        map.setTile(stairsUpCenter.x-1, stairsUpCenter.y, GROUND_LEVEL, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
+        map.floors.remove(stairsUpCenter.x - 1, stairsUpCenter.y);
+        map.setTile(stairsUpCenter.x, stairsUpCenter.y, GROUND_LEVEL, 28 + random.next(2));
+        map.floors.remove(stairsUpCenter);
+        map.setTile(stairsUpCenter.x, stairsUpCenter.y, GROUND_LEVEL + 1, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
+
+        map.setTile(stairsDownCenter.x, stairsDownCenter.y, GROUND_LEVEL, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
+        map.floors.remove(stairsDownCenter.x, stairsDownCenter.y);
+        map.setTile(stairsDownCenter.x-1, stairsDownCenter.y, GROUND_LEVEL, -1);
+        map.floors.remove(stairsDownCenter.x-1, stairsDownCenter.y);
+        map.setTile(stairsDownCenter.x-1, stairsDownCenter.y, GROUND_LEVEL-1, AssetData.SLOPE_INDICES[1][AssetData.NORTH | AssetData.WEST]);
 
         // Remove this next line if you intend to allow players to edit the map or destroy tiles during play.
 //        removeInvisibleTiles(map);
